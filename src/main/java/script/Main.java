@@ -186,17 +186,4 @@ public class Main extends AbstractScript implements PaintInfo, ChatListener
     {
     	ReadMessage.readPlayerMessage(msg);
     }
-    
-    
-    /*
-	@Override
-	public void notify(ChatMessage arg0) {
-		String mesg = StringUtility.clean(arg0.getMessage());
-		if(mesg.contains("You dig up some snow from the snowpile"))
-		{
-			API.snowDigTimer = new Timer();
-		}
-	}*/
-
-
 }

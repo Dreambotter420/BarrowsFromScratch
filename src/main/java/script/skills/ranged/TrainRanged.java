@@ -4,6 +4,7 @@ import org.dreambot.api.methods.MethodProvider;
 import org.dreambot.api.methods.skills.Skill;
 import org.dreambot.api.methods.skills.Skills;
 
+import script.behaviour.DecisionLeaf;
 import script.framework.Leaf;
 import script.framework.Tree;
 import script.quest.varrockmuseum.Timing;
@@ -35,6 +36,12 @@ public class TrainRanged extends Leaf {
         	API.mode = null;
         	return Timing.sleepLogNormalSleep();
         }
+        if(DecisionLeaf.taskTimer.finished())
+    	{
+    		MethodProvider.log("[TIMEOUT] -> Ranged!");
+            API.mode = null;
+            return Timing.sleepLogNormalSleep();
+    	}
     	if (Skills.getRealLevel(Skill.RANGED) >= 75) {
             MethodProvider.log("[COMPLETE] -> lvl 75 ranged!");
             completedRanged = true;

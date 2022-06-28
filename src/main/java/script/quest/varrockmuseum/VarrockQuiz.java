@@ -17,7 +17,7 @@ import java.util.List;
 public class VarrockQuiz extends Leaf {
 	public static boolean started = false;
 	public static boolean completedQuiz = false;
-    public static void onStart() {
+    public static int onStart() {
         MethodProvider.log("Generating Random Pattern: ");
         Museum.completionOrder = new LinkedHashMap<Location, List<Display>>(){{
             Museum.getShuffledLocations().forEach(location -> {
@@ -31,6 +31,7 @@ public class VarrockQuiz extends Leaf {
         
         instantiateTree();
         started = true;
+        return 10;
     }
 
     private final static Tree tree = new Tree();
@@ -45,7 +46,8 @@ public class VarrockQuiz extends Leaf {
     }
     @Override
     public int onLoop() {
-        if (PlayerSettings.getBitValue(3688) == 1) {
+        if(!started) return onStart();
+    	if (PlayerSettings.getBitValue(3688) == 1) {
             MethodProvider.log("[COMPLETED] -> Museum Quiz");
            	completedQuiz = true;
            	API.mode = null;

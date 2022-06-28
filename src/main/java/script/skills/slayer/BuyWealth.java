@@ -3,7 +3,7 @@ package script.skills.slayer;
 import org.dreambot.api.methods.MethodProvider;
 import org.dreambot.api.methods.container.impl.equipment.EquipmentSlot;
 import script.framework.Leaf;
-import script.utilities.InventoryEquipment;
+import script.utilities.InvEquip;
 
 public class BuyWealth extends Leaf{
 	@Override
@@ -13,16 +13,16 @@ public class BuyWealth extends Leaf{
 
 	@Override
 	public int onLoop() {
-		InventoryEquipment.clearAll();
-		InventoryEquipment.setEquipItem(EquipmentSlot.RING,InventoryEquipment.wealth);
-		InventoryEquipment.setEquipItem(EquipmentSlot.AMULET,InventoryEquipment.glory);
-		InventoryEquipment.addInvyItem(InventoryEquipment.ironDart, 1000,1000,false, 1000);
-		InventoryEquipment.addInvyItem(InventoryEquipment.coins, 0, 0, false, 0);
-		if(InventoryEquipment.fulfillSetup(60000))
+		InvEquip.clearAll();
+		InvEquip.setEquipItem(EquipmentSlot.RING,InvEquip.wealth);
+		InvEquip.setEquipItem(EquipmentSlot.AMULET,InvEquip.glory);
+		InvEquip.addInvyItem(InvEquip.ironDart, 1000,1000,false, 1000);
+		InvEquip.addInvyItem(InvEquip.coins, 0, 0, false, 0);
+		if(InvEquip.fulfillSetup(60000))
 		{
-			MethodProvider.log("fulfill boolean returned true!");
+			
 		}
-		else MethodProvider.log("fulfill boolean returned false!");
+		
 		return 1000;
 	}
 	

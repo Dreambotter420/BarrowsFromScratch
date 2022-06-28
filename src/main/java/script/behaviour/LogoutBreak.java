@@ -18,13 +18,17 @@ public class LogoutBreak extends Leaf
 
 	@Override
 	public int onLoop() {
-		int sleep = Sleep.calculate(5000,5555);
+		if(DecisionLeaf.taskTimer.finished()) 
+		{
+			API.mode = null;
+			return 10;
+		}
+		long sleep = DecisionLeaf.taskTimer.remaining();
 		ScriptReloader reloader = new ScriptReloader(sleep);
-		MethodProvider.log("Attempting to break script, will unpause automatically after: "+ sleep + "ms");
+		MethodProvider.log("Attempting to break script, will unpause automatically after: "+ sleep + "ms ("+((double)sleep / 60000)+" minutes)");
 		Thread t = new Thread(reloader);
 		t.start();
-		API.mode = null;
-		return 3000;
+		return 1000;
 	}
 
 }

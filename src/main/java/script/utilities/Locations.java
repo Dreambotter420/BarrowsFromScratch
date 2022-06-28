@@ -4,6 +4,26 @@ import org.dreambot.api.methods.map.Area;
 import org.dreambot.api.methods.map.Tile;
 
 public class Locations {
+	public static final Area camelotTrees = new Area(
+			new Tile(2752, 3452, 0),
+			new Tile(2756, 3451, 0),
+			new Tile(2760, 3451, 0),
+			new Tile(2770, 3455, 0),
+			new Tile(2777, 3457, 0),
+			new Tile(2781, 3467, 0),
+			new Tile(2776, 3480, 0),
+			new Tile(2754, 3480, 0));
+	public static final Area castleWars = new Area(2446, 3081, 2435, 3098, 0);
+	public static final Area castleWarsTrees = new Area(
+			new Tile(2475, 3104, 0),
+			new Tile(2465, 3120, 0),
+			new Tile(2442, 3129, 0),
+			new Tile(2438, 3114, 0),
+			new Tile(2436, 3096, 0),
+			new Tile(2436, 3081, 0),
+			new Tile(2452, 3080, 0),
+			new Tile(2469, 3080, 0),
+			new Tile(2476, 3089, 0));
 	public static final Area dontTeleToGEAreaJustWalk = new Area(
 		    new Tile[] {
 		        new Tile(3138, 3513, 0),

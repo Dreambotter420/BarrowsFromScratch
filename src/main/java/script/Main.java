@@ -79,7 +79,7 @@ public class Main extends AbstractScript implements PaintInfo, ChatListener
         					new TrainWoodcutting(),
         					new TrainCrafting(),
         					new TrainMagic(),
-        					new TrainSlayer().addLeafs(new BuyWealth()),
+        					new TrainSlayer(),
         					new TrainRanged(),
         					new LogoutBreak()
         					));
@@ -152,10 +152,12 @@ public class Main extends AbstractScript implements PaintInfo, ChatListener
     	return new String[] {
     			getManifest().name() +" "+ getManifest().version() + " by Dreambotter420 ^_^",
                 "Current Branch: " + API.currentBranch,
-                "Current Leaf: " + API.currentLeaf
+                "Current Task: " + API.currentLeaf,
+                "Time spent on current task: " + (DecisionLeaf.taskTimer == null ? "N/A" : DecisionLeaf.taskTimer.formatTime()),
+                "Time remaining until next force task switch: " + (DecisionLeaf.taskTimer == null ? "N/A" : Timer.formatTime(DecisionLeaf.taskTimer.remaining()))
         };
     }
-
+   
     // Instantiate the paint object. This can be customized to your liking.
     private final CustomPaint CUSTOM_PAINT = new CustomPaint(this,
             CustomPaint.PaintLocations.BOTTOM_LEFT_PLAY_SCREEN,

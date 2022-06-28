@@ -37,6 +37,12 @@ public class TrainMagic extends Leaf {
         	API.mode = null;
             return Timing.sleepLogNormalSleep();
         }
+        if(DecisionLeaf.taskTimer.finished())
+    	{
+    		MethodProvider.log("[TIMEOUT] -> Magic!");
+            API.mode = null;
+            return Timing.sleepLogNormalSleep();
+    	}
     	if (Skills.getRealLevel(Skill.MAGIC) >= DecisionLeaf.mageSetpoint) {
             MethodProvider.log("[COMPLETE] -> lvl "+DecisionLeaf.mageSetpoint+" magic!");
             completedMagic = true;

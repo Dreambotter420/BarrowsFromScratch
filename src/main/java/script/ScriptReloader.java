@@ -1,22 +1,24 @@
 package script;
+import org.dreambot.api.methods.Calculations;
 import org.dreambot.api.methods.MethodProvider;
 import org.dreambot.api.script.ScriptManager;
+import org.dreambot.api.utilities.Timer;
 
 public class ScriptReloader implements Runnable{
 	
-	int sleep;
+	long sleep;
 	
-	public ScriptReloader (int sleep)
+	public ScriptReloader (long sleep2)
 	{
-		this.sleep = sleep;
+		this.sleep = sleep2;
 	}
 	
     @Override
     public void run() {
-        ScriptManager manager = ScriptManager.getScriptManager();
+    	ScriptManager manager = ScriptManager.getScriptManager();
         manager.pause();
         try {
-            Thread.sleep(this.sleep);
+            Thread.sleep(sleep);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }

@@ -214,7 +214,7 @@ public class API {
 		}
 		else if(tmp < 3000)  
 		{
-			MethodProvider.log("AFK: 10.0% chance, max 3.2");
+			MethodProvider.log("AFK: 10.0% chance, max 3.2s");
 			Sleep.sleep(50,600);
 		}
 	}

@@ -35,6 +35,14 @@ public class DecisionLeaf extends Leaf{
     public static int prayerSetpoint;
     public static int slayerSetpoint;
     public static Timer taskTimer;
+    public static Timer forceBreakTimer;
+    
+    
+    public static void resetForceBreakTimer()
+    {
+    	forceBreakTimer = new Timer((int)Calculations.nextGaussianRandom(12000000, 200000));
+    }
+    
     /**
      * sets a timer for random length.
      * enter 1 for short,
@@ -84,8 +92,11 @@ public class DecisionLeaf extends Leaf{
     	}}
     }
     
+    public static boolean setPoints = false;
+    
 	@Override
 	public int onLoop() {
+		if(!setPoints) initialize();
 		final int ranged = Skills.getRealLevel(Skill.RANGED);
 		final int wc = Skills.getRealLevel(Skill.WOODCUTTING);
 		final int mage = Skills.getRealLevel(Skill.MAGIC);
@@ -165,9 +176,12 @@ public class DecisionLeaf extends Leaf{
 		if(validModes.isEmpty()) MethodProvider.log("Congratulations, you win!");
 		else
 		{
-			validModes.add(API.modes.BREAK);
-			Collections.shuffle(validModes);
-			API.mode = validModes.get(0);
+			if(Calculations.random(1,100) > 95 || forceBreakTimer.finished()) API.mode = API.modes.BREAK;
+			else 
+			{
+				Collections.shuffle(validModes);
+				API.mode = validModes.get(0);
+			}
 			MethodProvider.log("Switching mode: " + API.mode.toString());
 			if(API.mode == API.modes.ANIMAL_MAGNETISM || 
 					API.mode == API.modes.ERNEST_THE_CHIKKEN || 
@@ -192,11 +206,18 @@ public class DecisionLeaf extends Leaf{
 			{
 				setTimer(1);
 			}
+			else if(API.mode == API.modes.BREAK)
+			{
+				setTimer(2);
+				resetForceBreakTimer();
+			}
 		}
 		return 10;
 	}
-	public static void initializeSetpoints()
+	public static void initialize()
 	{
+		resetForceBreakTimer();
+		
 		int tmp =(int) Calculations.nextGaussianRandom(21, 3);
 		if(tmp >= 19 && tmp <= 24) craftingSetpoint = tmp;
 		else craftingSetpoint = 19;
@@ -220,6 +241,8 @@ public class DecisionLeaf extends Leaf{
 		tmp =(int) Calculations.nextGaussianRandom(47, 3);
 		if(tmp >= 45 && tmp <= 50) mageSetpoint = tmp;
 		else mageSetpoint = 83;
+		setPoints = true;
+		
 		
 	}
 	

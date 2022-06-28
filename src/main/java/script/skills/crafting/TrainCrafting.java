@@ -16,7 +16,7 @@ import script.behaviour.DecisionLeaf;
 import script.framework.Leaf;
 import script.quest.varrockmuseum.Timing;
 import script.utilities.API;
-import script.utilities.InventoryEquipment;
+import script.utilities.InvEquip;
 import script.utilities.Sleep;
 /**
  * Trains crafting 35-40
@@ -25,13 +25,21 @@ import script.utilities.Sleep;
  * ^_^
  */
 public class TrainCrafting extends Leaf {
-	public static boolean initialized = false;
+	private final static int threadMax = (25+(int)(Calculations.nextGaussianRandom(20, 10)));
+	private final static int threadResupply = (75+(int)(Calculations.nextGaussianRandom(50, 10)));
+	private final static int leatherResupply = (350+(int)(Calculations.nextGaussianRandom(50, 10)));
+	
 	private final static int needle = 1733;
 	private final static int leather = 1741;
 	private final static int  thread = 1734;
-	private static boolean initiatedCorrectItemForLevel = false;
     @Override
     public int onLoop() {
+    	if(DecisionLeaf.taskTimer.finished())
+    	{
+    		MethodProvider.log("[TIMEOUT] -> Crafting!");
+            API.mode = null;
+            return Timing.sleepLogNormalSleep();
+    	}
     	final int crafting = Skills.getRealLevel(Skill.CRAFTING);
     	if (crafting >= DecisionLeaf.craftingSetpoint) {
             MethodProvider.log("[COMPLETE] -> lvl "+DecisionLeaf.craftingSetpoint+" crafting!");
@@ -39,15 +47,14 @@ public class TrainCrafting extends Leaf {
             return Timing.sleepLogNormalSleep();
         }
         
-        InventoryEquipment.clearAll();
-        InventoryEquipment.setEquipItem(EquipmentSlot.RING, InventoryEquipment.wealth);
-        InventoryEquipment.addInvyItem(needle, 1, 1, false, 1);
-        InventoryEquipment.addInvyItem(thread, 1, (25+(int)(Calculations.nextGaussianRandom(20, 10))), false, (75+(int)(Calculations.nextGaussianRandom(50, 10))));
-        InventoryEquipment.addInvyItem(leather, 1, 26, false, (350+(int)(Calculations.nextGaussianRandom(50, 10))));
-        InventoryEquipment.addInvyItem(InventoryEquipment.coins, 0,0, false,0);
+        InvEquip.clearAll();
+        InvEquip.addInvyItem(needle, 1, 1, false, 1);
+        InvEquip.addInvyItem(thread, 1, threadMax, false, threadResupply);
+        InvEquip.addInvyItem(leather, 1, 26, false, leatherResupply);
+        InvEquip.addInvyItem(InvEquip.coins, 0,0, false,0);
         if(!craftLeatherThing(crafting))
         {
-        	if(InventoryEquipment.fulfillSetup(60000))
+        	if(InvEquip.fulfillSetup(60000))
             {
             	MethodProvider.log("Should be equipped now ;-)");
             }

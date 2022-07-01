@@ -1,5 +1,6 @@
 package script.utilities;
 
+import org.dreambot.api.methods.interactive.Players;
 import org.dreambot.api.methods.map.Area;
 import org.dreambot.api.methods.map.Tile;
 
@@ -13,7 +14,19 @@ public class Locations {
 			new Tile(2781, 3467, 0),
 			new Tile(2776, 3480, 0),
 			new Tile(2754, 3480, 0));
+	public static final Area fallyTeleSpot = new Area(2961, 3384, 2969, 3376, 0);
+	public static final Area houseTeleSpot = new Area(2953, 3227, 2958, 3221, 0);
+	public static final Area varrockTeleSpot = new Area(3210, 3425, 3215, 3422, 0);
+	public static final Area cammyTeleSpot = new Area(2755, 3480, 2759, 3476, 0);
+	public static final Area edgevilleTeleTile = new Area(3087, 3496, 3087, 3496, 0);
+	public static final Area rimmington = new Area(2944, 3209, 2960, 3229, 0);
+	public static final Area estateRoom = new Area(2981, 3370, 2984, 3368, 0);
 	public static final Area castleWars = new Area(2446, 3081, 2435, 3098, 0);
+	public static final int edgeOfTheWorldX = 3904;
+	public static boolean isInstanced() {
+		if(Players.localPlayer().getX() >= edgeOfTheWorldX) return true;
+		return false;
+	}
 	public static final Area castleWarsTrees = new Area(
 			new Tile(2475, 3104, 0),
 			new Tile(2465, 3120, 0),

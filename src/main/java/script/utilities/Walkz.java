@@ -29,6 +29,8 @@ import org.dreambot.api.wrappers.items.Item;
 public class Walkz {
 
 	public static final int cammyTele = 8010;
+	public static final int houseTele = 8013;
+	public static final int fallyTele = 8009;
 	public static final int varrockTele = 8007;
 	
 	public static boolean goToGE(long timeout)
@@ -84,75 +86,32 @@ public class Walkz {
 				if(Bank.isOpen()) Bank.close();
 				else if(Inventory.interact(varrockTele, "Break"))
 				{
-					MethodProvider.sleepUntil(() -> Locations.clickableGEArea.contains(Players.localPlayer()), () -> Players.localPlayer().isAnimating(), Sleep.calculate(4444,2222),50);
+					MethodProvider.sleepUntil(() -> Locations.dontTeleToGEAreaJustWalk.contains(Players.localPlayer()), () -> Players.localPlayer().isAnimating(), Sleep.calculate(4444,2222),50);
 				}
 				continue;
 			}
 			
 			//check if we have opened bank one time since script start
-			if(!InvEquip.checkedBank)
-			{
-				if(Bank.isOpen()) InvEquip.checkedBank = true;
-				else if(Walking.shouldWalk(6) && !Bank.openClosest())
-				{
-					Sleep.sleep(666,666);
-				}
-				continue;
-			}
+			if(!InvEquip.checkedBank()) continue;
 			
 			//check bank for wealth / varrock tabs
-			int ring = 0;
-			for(int ring2 : InvEquip.wearableWealth)
-			{
-				if(Bank.contains(ring2)) 
-				{
-					ringFound = true;
-					ring = ring2;
-					break;
-				}	
-			}
+			int ring = InvEquip.getFirstInBank(InvEquip.wearableWealth);
 			
 			//if no ring found in equip OR invy OR bank, check bank for varrock tab
-			if(!ringFound) 
+			if(ring == -1) 
 			{
 				if(Bank.contains(varrockTele))
 				{
-					if(Bank.openClosest())
-					{
-						if(Bank.withdraw(varrockTele))
-						{
-							final int tmp = varrockTele;
-							MethodProvider.sleepUntil(() -> Inventory.count(tmp) > 0, Sleep.calculate(2222, 2222));
-						}
-					} 
-					else Sleep.sleep(666, 666);
+					InvEquip.withdrawOne(varrockTele, timeout);
+					continue;
 				} 
 				//no options left - go to GE by walking
 				else if(Walking.shouldWalk(6) && Walking.walk(Locations.GE)) Sleep.sleep(666, 666);
 			}
-				
-			
 			//found item in bank - withdraw it
 			else
 			{
-				if(Bank.openClosest())
-				{
-					if(Inventory.emptySlotCount() < 2)
-					{
-						Item i = Inventory.getItemInSlot(Inventory.getFirstFullSlot());
-						int iD = i.getID();
-						if(Bank.depositAll(i))
-						{
-							MethodProvider.sleepUntil(() -> Inventory.count(iD) <= 0,Sleep.calculate(2222, 2222));
-						}
-						continue;
-					}
-					if(Bank.withdraw(ring))
-					{
-						final int tmp = ring;
-						MethodProvider.sleepUntil(() -> Inventory.count(tmp) > 0, Sleep.calculate(2222, 2222));
-					}
-				} else Sleep.sleep(666, 666);
+				InvEquip.withdrawOne(ring, timeout);
 			}
 		}
 		
@@ -222,15 +181,7 @@ public class Walkz {
 			
 			
 			//check if we have opened bank one time since script start
-			if(!InvEquip.checkedBank)
-			{
-				if(Bank.isOpen()) InvEquip.checkedBank = true;
-				else if(Walking.shouldWalk(6) && !Bank.openClosest())
-				{
-					Sleep.sleep(666,666);
-				}
-				continue;
-			}
+			if(!InvEquip.checkedBank()) continue;
 			
 			//check bank for dueling rings
 			int ring = 0;
@@ -250,24 +201,7 @@ public class Walkz {
 			//found item in bank - withdraw it
 			else
 			{
-				if(Bank.openClosest())
-				{
-					if(Inventory.emptySlotCount() < 2)
-					{
-						Item i = Inventory.getItemInSlot(Inventory.getFirstFullSlot());
-						int iD = i.getID();
-						if(Bank.depositAll(i))
-						{
-							MethodProvider.sleepUntil(() -> Inventory.count(iD) <= 0,Sleep.calculate(2222, 2222));
-						}
-						continue;
-					}
-					if(Bank.withdraw(ring))
-					{
-						final int tmp = ring;
-						MethodProvider.sleepUntil(() -> Inventory.count(tmp) > 0, Sleep.calculate(2222, 2222));
-					}
-				} else Sleep.sleep(666, 666);
+				InvEquip.withdrawOne(ring, timeout);
 			}
 		}
 		
@@ -306,43 +240,77 @@ public class Walkz {
 				continue;
 			}
 			//check if we have opened bank one time since script start
-			if(!InvEquip.checkedBank)
-			{
-				if(Bank.isOpen()) InvEquip.checkedBank = true;
-				else if(Walking.shouldWalk(6) && !Bank.openClosest())
-				{
-					Sleep.sleep(666,666);
-				}
-				continue;
-			}
+			if(!InvEquip.checkedBank()) continue;
 			
 			//if no ring found in invy OR bank, buy at GE
-			if(!Bank.contains(cammyTele)) InvEquip.buyItem(InvEquip.duel8, 1, timeout);
+			if(!Bank.contains(cammyTele)) InvEquip.buyItem(cammyTele, 1, timeout);
 			
 			//found item in bank - withdraw it
 			else
 			{
-				if(Bank.openClosest())
-				{
-					if(Inventory.emptySlotCount() < 2)
-					{
-						Item i = Inventory.getItemInSlot(Inventory.getFirstFullSlot());
-						int iD = i.getID();
-						if(Bank.depositAll(i))
-						{
-							MethodProvider.sleepUntil(() -> Inventory.count(iD) <= 0,Sleep.calculate(2222, 2222));
-						}
-						continue;
-					}
-					if(Bank.withdraw(cammyTele,1))
-					{
-						MethodProvider.sleepUntil(() -> Inventory.count(cammyTele) > 0, Sleep.calculate(2222, 2222));
-					}
-				} else Sleep.sleep(666, 666);
+				InvEquip.withdrawOne(cammyTele, timeout);
 			}
 		}
 		
 		return false;
+	}
+	public static boolean teleport(int tabID, Area teleSpot, long timeout)
+	{
+		Timer timer = new Timer(timeout);
+		while(!timer.finished() && Client.getGameState() == GameState.LOGGED_IN
+				&& ScriptManager.getScriptManager().isRunning() && !ScriptManager.getScriptManager().isPaused())
+		{
+			if(teleSpot.contains(Players.localPlayer())) return true;
+			
+			Sleep.sleep(69,69);
+			//check if within reasonable walking distance
+			double dist = teleSpot.distance(Players.localPlayer().getTile());
+			
+			if(dist <= 30)
+			{
+				if(Walking.shouldWalk(6) && Walking.walk(teleSpot.getCenter()))
+				{
+					MethodProvider.log("Distance to tele area is: " + dist + "... walking...");
+					Sleep.sleep(666, 1111);
+				}
+				continue;
+			}
+			//check if have fally tab in invy, use it
+			if(Inventory.contains(tabID))
+			{
+				if(Bank.isOpen()) Bank.close();
+				else if(Inventory.interact(tabID, "Break"))
+				{
+					MethodProvider.sleepUntil(() -> teleSpot.contains(Players.localPlayer()), () -> Players.localPlayer().isAnimating(), Sleep.calculate(4444,2222),50);
+				}
+				continue;
+			}
+			//check if we have opened bank one time since script start
+			if(!InvEquip.checkedBank()) continue;
+			
+			//if none found in invy OR bank, stop
+			if(!Bank.contains(tabID)) return false;
+			
+			//found item in bank - withdraw it
+			else InvEquip.withdrawOne(tabID, timeout);
+		}
+		return false;
+	}
+	public static boolean teleportFalador(long timeout)
+	{
+		return teleport(fallyTele,Locations.fallyTeleSpot,timeout);
+	}
+	public static boolean teleportHouse(long timeout)
+	{
+		return teleport(houseTele,Locations.houseTeleSpot,timeout);
+	}
+	public static boolean teleportVarrock(long timeout)
+	{
+		return teleport(varrockTele,Locations.varrockTeleSpot,timeout);
+	}
+	public static boolean teleportCamelot(long timeout)
+	{
+		return teleport(cammyTele,Locations.cammyTeleSpot,timeout);
 	}
 	public static boolean walkToArea(Area area,Tile walkableTile)
 	{

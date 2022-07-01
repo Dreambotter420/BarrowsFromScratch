@@ -176,33 +176,23 @@ public class TrainWoodcutting extends Leaf {
     		InvEquip.addInvyItem(addyAxe, 1, 1, false, 1);
     		careAboutAxe = addyAxe;
     	}
+    	InvEquip.addOptionalItem(InvEquip.jewelry);
     	InvEquip.shuffleFulfillOrder();
 		InvEquip.addInvyItem(InvEquip.coins, 0, 0, false, 0);
 		
 		boolean careAboutOaks = (wc >= 15 ? true : false);
 		
-		/**
-		 * TESTING castle wars force
-		 */
-		
+		//inventory full or not have care about axe - go get
+		if(Inventory.isFull() || !Inventory.contains(careAboutAxe))
+		{
+			InvEquip.fulfillSetup(true,60000);
+			return Timing.sleepLogNormalSleep();
+		}
 		if(wcArea == Locations.castleWarsTrees)
 		{
 			//if not in in chopping area, walk to it - give it 10 minutes timer
 			if(Locations.castleWarsTrees.contains(Players.localPlayer()) || Walkz.goToCastleWars(600000))
 			{
-				if(Inventory.isFull())
-				{
-					InvEquip.fulfillSetup(60000);
-					return Timing.sleepLogNormalSleep();
-				}
-				
-				if(!Inventory.contains(careAboutAxe)) 
-				{
-					InvEquip.fulfillSetup(60000);
-					return Timing.sleepLogNormalInteraction();
-				}
-				
-				//inventory not full and have care about axe - go chop
 				return chopTree(careAboutOaks);
 			}
 		}
@@ -211,18 +201,6 @@ public class TrainWoodcutting extends Leaf {
 			//if not in in chopping area, walk to it - give it 10 minutes timer
 			if(Locations.camelotTrees.contains(Players.localPlayer()) || Walkz.goToCamelotTrees(600000))
 			{
-				if(Inventory.isFull())
-				{
-					InvEquip.fulfillSetup(60000);
-					return Timing.sleepLogNormalSleep();
-				}
-				
-				if(!Inventory.contains(careAboutAxe)) 
-				{
-					InvEquip.fulfillSetup(60000);
-					return Timing.sleepLogNormalInteraction();
-				}
-				
 				//inventory not full and have care about axe - go chop
 				return chopTree(careAboutOaks);
 			}

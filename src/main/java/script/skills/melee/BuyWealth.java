@@ -1,4 +1,4 @@
-package script.skills.slayer;
+package script.skills.melee;
 
 import org.dreambot.api.methods.container.impl.equipment.EquipmentSlot;
 import script.framework.Leaf;

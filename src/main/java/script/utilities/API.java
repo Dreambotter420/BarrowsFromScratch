@@ -10,6 +10,8 @@ import org.dreambot.api.data.ActionMode;
 import org.dreambot.api.methods.MethodProvider;
 import org.dreambot.api.methods.input.Keyboard;
 import org.dreambot.api.methods.settings.PlayerSettings;
+import org.dreambot.api.methods.tabs.Tab;
+import org.dreambot.api.methods.tabs.Tabs;
 import org.dreambot.api.methods.widget.Widgets;
 import org.dreambot.api.methods.world.World;
 import org.dreambot.api.methods.world.Worlds;
@@ -25,8 +27,10 @@ public class API {
 		TRAIN_WOODCUTTING,
 		TRAIN_RANGE,
 		TRAIN_MAGIC,
+		TRAIN_MELEE,
 		TRAIN_CRAFTING,
 		TRAIN_PRAYER,
+		TRAIN_AGILITY,
 		MAGE_ARENA_1,
 		MAGE_ARENA_2,
 		RESTLESS_GHOST,
@@ -35,6 +39,10 @@ public class API {
 		PRIEST_IN_PERIL,
 		ERNEST_THE_CHIKKEN,
 		ANIMAL_MAGNETISM,
+		HORROR_FROM_THE_DEEP,
+		WATERFALL_QUEST,
+		FIGHT_ARENA,
+		FREMENNIK_TRIALS,
 		BREAK
     }
     
@@ -99,9 +107,8 @@ public class API {
     	else if(ClientSettings.isTradeDelayEnabled())
     	{
     		ClientSettings.toggleTradeDelay(false);
-    		
     	}
-		//trade delay set to ON
+		//profanity filter set to ON
     	else if(PlayerSettings.getConfig(1074) == 0)
     	{
         	//exit button for main Settings menu visible
@@ -111,17 +118,21 @@ public class API {
         		if(Widgets.getWidgetChild(134, 23, 2) != null &&
         				Widgets.getWidgetChild(134, 23, 2).isVisible())
         		{
-        			Widgets.getWidgetChild(134, 23, 2).interact("Select Chat");
-        			MethodProvider.sleepUntil(() -> Widgets.getWidgetChild(134, 23, 2) == null || 
-        					!Widgets.getWidgetChild(134, 23, 2).isVisible(), 5555);
+        			if(Widgets.getWidgetChild(134, 23, 2).interact("Select Chat"))
+        			{
+        				MethodProvider.sleepUntil(() -> Widgets.getWidgetChild(134, 23, 2) == null || 
+            					!Widgets.getWidgetChild(134, 23, 2).isVisible(), Sleep.calculate(2222, 2222));
+        			}
             		Sleep.sleep(333,444);
         		}
         		//Enable profanity button toggle is visible
         		if(Widgets.getWidgetChild(134, 19, 1) != null && Widgets.getWidgetChild(134, 19, 1).isVisible())
             	{
-        			Widgets.getWidgetChild(134, 19, 1).interact("Toggle");
-        			MethodProvider.sleepUntil(() -> Widgets.getWidgetChild(134,18,4) == null, 5555);
-        			Sleep.sleep(777,333);
+        			if(Widgets.getWidgetChild(134, 19, 1).interact("Toggle"))
+        			{
+        				MethodProvider.sleepUntil(() -> PlayerSettings.getConfig(1074) == 1, Sleep.calculate(2222, 2222));
+        			}
+        			Sleep.sleep(420,420);
                 }
         	} 
         	else
@@ -129,19 +140,16 @@ public class API {
         		//"All settings" button visible in Settings tab
         		if(Widgets.getWidgetChild(116,75) != null && Widgets.getWidgetChild(116,75).isVisible())
             	{
-        			Widgets.getWidgetChild(116,75).interact();
-        			MethodProvider.sleepUntil(() -> Widgets.getWidgetChild(116,75) == null,5555);
+        			if(Widgets.getWidgetChild(116,75).interact("All Settings"))
+        			{
+        				MethodProvider.sleepUntil(() -> Widgets.getWidgetChild(134,4) != null && Widgets.getWidgetChild(134,4).isVisible(), Sleep.calculate(2222, 2222));
+        			}
             		Sleep.sleep(333,444);
                 } 
-        		else 
-            	{
-            		if(Widgets.getWidgetChild(548,50) != null && Widgets.getWidgetChild(548,50).isVisible())
-                	{
-            			Widgets.getWidgetChild(548,50).interact();
-            			MethodProvider.sleepUntil(() -> Widgets.getWidgetChild(548,50) == null,5555);
-                		Sleep.sleep(333,444);
-                    }
-            	}
+        		else if(!Tabs.isOpen(Tab.OPTIONS) && Tabs.open(Tab.OPTIONS))
+        		{
+        			MethodProvider.sleepUntil(() -> Tabs.isOpen(Tab.OPTIONS), Sleep.calculate(2222, 2222));
+        		}
         	}
     	}
 		if(ClientSettings.isAcceptAidEnabled() || 
@@ -155,6 +163,7 @@ public class API {
     			ClientSettings.isResizableActive() || 
     			ClientSettings.isTradeDelayEnabled())
 		{
+			MethodProvider.log("Some settings still AIDS");
 			Sleep.sleep(666, 111);
 			return false;
 		}

@@ -10,7 +10,7 @@ import script.framework.Tree;
 import script.quest.varrockmuseum.Timing;
 import script.utilities.API;
 /**
- * Trains ranged 1-75
+ * Trains prayer 1-45
  * 
  * @author Dreambotter420
  * ^_^

@@ -22,6 +22,7 @@ import org.dreambot.api.wrappers.interactive.GameObject;
 import org.dreambot.api.wrappers.interactive.Player;
 import org.dreambot.api.wrappers.items.GroundItem;
 
+import script.Main;
 import script.behaviour.DecisionLeaf;
 import script.framework.Leaf;
 import script.framework.Tree;
@@ -131,13 +132,19 @@ public class TrainWoodcutting extends Leaf {
         		return Timing.sleepLogNormalSleep();
     		}
     	}
-    			
+    	
     	final int wc = Skills.getRealLevel(Skill.WOODCUTTING);
     	if (wc >= DecisionLeaf.wcSetpoint) {
             MethodProvider.log("[COMPLETE] -> lvl "+DecisionLeaf.wcSetpoint+" woodcutting!");
             API.mode = null;
+            Main.clearCustomPaintText();
             return Timing.sleepLogNormalSleep();
         }
+    	final int birdNestsCount = (Inventory.count("Bird nest") + Bank.count("Bird nest"));	
+    	Main.customPaintText2 = "~~Have bird nests (bank + invy): " + birdNestsCount;
+    	Main.customPaintText1 = "~~~Training Woodcutting~~~";
+
+    	Main.customPaintText4 = "Current wc lvl: " + wc + " and training to: " +DecisionLeaf.wcSetpoint;
     	InvEquip.clearAll();
     	int careAboutAxe = 0;
     	//add axes to inventory
@@ -190,6 +197,8 @@ public class TrainWoodcutting extends Leaf {
 		}
 		if(wcArea == Locations.castleWarsTrees)
 		{
+
+	    	Main.customPaintText3 = "Training location: Castle Wars";
 			//if not in in chopping area, walk to it - give it 10 minutes timer
 			if(Locations.castleWarsTrees.contains(Players.localPlayer()) || Walkz.goToCastleWars(600000))
 			{
@@ -198,6 +207,8 @@ public class TrainWoodcutting extends Leaf {
 		}
 		if(wcArea == Locations.camelotTrees)
 		{
+
+	    	Main.customPaintText3 = "Training location: Camelot";
 			//if not in in chopping area, walk to it - give it 10 minutes timer
 			if(Locations.camelotTrees.contains(Players.localPlayer()) || Walkz.goToCamelotTrees(600000))
 			{

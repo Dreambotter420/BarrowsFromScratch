@@ -43,6 +43,7 @@ public class API {
 		WATERFALL_QUEST,
 		FIGHT_ARENA,
 		FREMENNIK_TRIALS,
+		X_MARKS_THE_SPOT,
 		BREAK
     }
     
@@ -195,36 +196,36 @@ public class API {
 	
 	public static void randomAFK()
 	{
-		int tmp = API.rand2.nextInt(40000);
+		int tmp = API.rand2.nextInt(20000);
 		if(tmp < 2)  
 		{
 			MethodProvider.log("AFK: 0.001% chance, max 240s");
-			Sleep.sleep(50,10000);
+			Sleep.sleep(50,42000);
 		}
 		else if(tmp < 6)  
 		{
 			MethodProvider.log("AFK: 0.003% chance, max 120s");
-			Sleep.sleep(50,5000);
+			Sleep.sleep(50,20000);
 		}
 		else if(tmp < 25)
 		{
 			MethodProvider.log("AFK: 0.095% chance, max 40s");
-			Sleep.sleep(50,3000);
+			Sleep.sleep(50,12000);
 		}
 		else if(tmp < 150)  
 		{
 			MethodProvider.log("AFK: .625% chance, max 20s");
-			Sleep.sleep(50,2000);
+			Sleep.sleep(50,5000);
 		}
 		else if(tmp < 1000)  
 		{
 			MethodProvider.log("AFK: 4.25% chance, max 6.0s");
-			Sleep.sleep(50,1200);
+			Sleep.sleep(50,2400);
 		}
 		else if(tmp < 3000)  
 		{
 			MethodProvider.log("AFK: 10.0% chance, max 3.2s");
-			Sleep.sleep(50,600);
+			Sleep.sleep(50,1200);
 		}
 	}
 	public static int getP2PWorld()

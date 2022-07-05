@@ -163,6 +163,13 @@ public class Main extends AbstractScript implements PaintInfo, ChatListener
     public static String customPaintText2 = "";
     public static String customPaintText3 = "";
     public static String customPaintText4 = "";
+    public static void clearCustomPaintText()
+    {
+    	customPaintText1 = "";
+    	customPaintText2 = "";
+    	customPaintText3 = "";
+    	customPaintText4 = "";
+    }
     @Override
     public String[] getPaintInfo()
     {

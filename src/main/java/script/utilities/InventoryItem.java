@@ -24,5 +24,4 @@ public class InventoryItem {
 	{
 		return new InventoryItem(itemID,minQty,maxQty,noted,refillQty);
 	}
-	
 }

@@ -20,7 +20,6 @@ import org.dreambot.api.methods.grandexchange.GrandExchange;
 import org.dreambot.api.methods.grandexchange.LivePrices;
 import org.dreambot.api.methods.tabs.Tab;
 import org.dreambot.api.methods.tabs.Tabs;
-import org.dreambot.api.methods.walking.impl.Walking;
 import org.dreambot.api.methods.widget.Widgets;
 import org.dreambot.api.script.ScriptManager;
 import org.dreambot.api.utilities.Timer;
@@ -28,9 +27,10 @@ import org.dreambot.api.wrappers.items.Item;
 
 public class InvEquip {
 	public static Map<EquipmentSlot, Integer> equipmentMap = new LinkedHashMap<EquipmentSlot, Integer>();
-	public static boolean checkedBank = false;
 	public static Map<Integer,InventoryItem> inventoryList = new LinkedHashMap<Integer,InventoryItem>();
 	public static List<Integer> optionalItems = new ArrayList<Integer>();
+	
+
 	
 	public static void clearAll()
 	{
@@ -93,16 +93,24 @@ public class InvEquip {
 	
 	public static boolean checkedBank()
 	{
-		if(!checkedBank)
+		////return true;
+		if(Bank.getLastBankHistoryCacheTime() <= 0)
 		{
-			if(Bank.isOpen()) checkedBank = true;
+			if(Bank.isOpen()) 
+			{
+				Bank.contains(coins);
+			}
 			else
 			{
-				Bank.openClosest();
-				Sleep.sleep(666,666);
+				if(!closeBankEquipment()) return false;
+				if(!Bank.openClosest()) Sleep.sleep(666,666);
 			}
 		}
-		return checkedBank;
+		if(Bank.getLastBankHistoryCacheTime() > 0)
+		{
+			return true;
+		}
+		return false;
 	}
 	
 	public static int getFirstInBank(List<Integer> ints)
@@ -137,6 +145,14 @@ public class InvEquip {
 		}
 		return false;
 	}
+	public static int getInvyItem(List<Integer> ints)
+	{
+		for(int i: ints)
+		{
+			if(Inventory.contains(i)) return i;
+		}
+		return 0;
+	}
 	public static boolean equipmentContains(List<Integer> ints)
 	{
 		for(int i: ints)
@@ -144,6 +160,22 @@ public class InvEquip {
 			if(Equipment.contains(i)) return true;
 		}
 		return false;
+	}
+	public static int getEquipped(List<Integer> ints)
+	{
+		for(int i: ints)
+		{
+			if(Equipment.contains(i)) return i;
+		}
+		return 0;
+	}
+	public static int getBankItem(List<Integer> ints)
+	{
+		for(int i: ints)
+		{
+			if(Bank.contains(i)) return i;
+		}
+		return 0;
 	}
 	public static boolean bankContains(List<Integer> ints)
 	{
@@ -161,7 +193,10 @@ public class InvEquip {
 				&& ScriptManager.getScriptManager().isRunning() && !ScriptManager.getScriptManager().isPaused())
 		{
 			Sleep.sleep(69, 69);
+
+			MethodProvider.log("In WithdrawOne loop");
 			if(Inventory.count(itemID) > 0) return;
+			if(!closeBankEquipment()) continue;
 			if(Bank.openClosest())
 			{
 				if(Inventory.emptySlotCount() < 2)
@@ -190,6 +225,7 @@ public class InvEquip {
 		{
 			Sleep.sleep(69, 69);
 			if(Bank.count(itemID) < count || Inventory.isFull()) return;
+			if(closeBankEquipment()) continue;
 			if(Bank.openClosest())
 			{
 				if(noted)
@@ -335,11 +371,16 @@ public class InvEquip {
 					validIDs.add(passage1); validIDs.add(passage2); validIDs.add(passage3);
 					validIDs.add(passage4); validIDs.add(passage5);
 				} 
+				else if(equipID == combat)
+				{
+					validIDs.add(combat1); validIDs.add(combat2); validIDs.add(combat3);
+					validIDs.add(combat4); validIDs.add(combat5); validIDs.add(combat6);
+				} 
 				else if(equipID == jewelry)
 				{
-					for(int jewel : allJewelry)
+					for(Entry<EquipmentSlot,Integer> jewelryEntry : allJewelry.entrySet()) 
 					{
-						validIDs.add(jewel);
+						validIDs.add(jewelryEntry.getValue());
 					}
 				}
 				validIDs.add(equipID);
@@ -390,52 +431,45 @@ public class InvEquip {
 			case(-2):
 			{
 				if(slot.getKey() != EquipmentSlot.RING) continue;
-				if(equipID == wealth1 || equipID == wealth2 || 
-						equipID == wealth3 || equipID == wealth4 || 
-						equipID == wealth5) break;
+				if(wearableWealth.contains(equipID)) break;
 				else missingItems.put(slot.getKey(),slot.getValue());
 				break;
 			}case(-3):
 			{
 				if(slot.getKey() != EquipmentSlot.AMULET) continue;
-				if(equipID == glory1 || equipID == glory2 || 
-						equipID == glory3 || equipID == glory4 || 
-						equipID == glory5 || equipID == glory6) break;
+				if(wearableGlory.contains(equipID)) break;
 				else missingItems.put(slot.getKey(),slot.getValue());
 				break;
 			}case(-4):
 			{
 				if(slot.getKey() != EquipmentSlot.AMULET) continue;
-				if(equipID == skills1 || equipID == skills2 || 
-						equipID == skills3 || equipID == skills4 || 
-						equipID == skills5 || equipID == skills6) break;
+				if(wearableSkills.contains(equipID)) break;
 				else missingItems.put(slot.getKey(),slot.getValue());
 				break;
 			}case(-5):
 			{
 				if(slot.getKey() != EquipmentSlot.RING) continue;
-				if(equipID == duel1 || equipID == duel2 || 
-						equipID == duel3 || equipID == duel4 || 
-						equipID == duel5 || equipID == duel6 ||
-						equipID == duel7 || equipID == duel8) break;
+				if(wearableDuel.contains(equipID)) break;
 				else missingItems.put(slot.getKey(),slot.getValue());
 				break;
 			}case(-6):
 			{
 				if(slot.getKey() != EquipmentSlot.AMULET) continue;
-				if(equipID == games1 || equipID == games2 || 
-						equipID == games3 || equipID == games4 || 
-						equipID == games5 || equipID == games6 ||
-						equipID == games7 || equipID == games8) break;
+				if(wearableGames.contains(equipID)) break;
 				else missingItems.put(slot.getKey(),slot.getValue());
 				break;
 			}
 			case(-7):
 			{
 				if(slot.getKey() != EquipmentSlot.AMULET) continue;
-				if(equipID == passage1 || equipID == passage2 || 
-						equipID == passage3 || equipID == passage4 || 
-						equipID == passage5) break;
+				if(wearablePassages.contains(equipID)) break;
+				else missingItems.put(slot.getKey(),slot.getValue());
+				break;
+			}
+			case(-8):
+			{
+				if(slot.getKey() != EquipmentSlot.HANDS) continue;
+				if(wearableCombats.contains(equipID)) break;
 				else missingItems.put(slot.getKey(),slot.getValue());
 				break;
 			}
@@ -450,9 +484,11 @@ public class InvEquip {
 		//nothing missing from required equipment, so all good
 		if(missingItems.isEmpty())
 		{
+			MethodProvider.log("Have fulfilled equipment! (strict: "+strict+")");
 			return true;
 		}
 		//otherwise not good
+		MethodProvider.log("Not fulfilled equipment! (strict: "+strict+")");
 		return false;
 	}
 	/**
@@ -468,6 +504,7 @@ public class InvEquip {
 			return;
 		}
 		final int initItemCount = Bank.count(itemID) + Inventory.count(itemID) + Inventory.count(new Item(itemID,1).getNotedItemID());
+		MethodProvider.log("Starting buy function");
 		Timer timer = new Timer(timeout);
 		double priceIncrease = 1;
 		while(!timer.finished() && Client.getGameState() == GameState.LOGGED_IN
@@ -508,9 +545,10 @@ public class InvEquip {
 						Bank.setWithdrawMode(BankMode.ITEM);
 					}
 				}
+				if(!closeBankEquipment()) continue;
 				else
 				{
-					Walkz.goToGE(timeout);
+					Walkz.goToGE(timer.remaining());
 				}
 				continue;
 			}
@@ -592,6 +630,7 @@ public class InvEquip {
 		boolean equippedItems = false;
 		do
 		{
+			MethodProvider.log("Starting fulfill function");
 			Sleep.sleep(69, 69);
 			if(!equipmentMap.isEmpty())
 			{
@@ -608,6 +647,7 @@ public class InvEquip {
 							validIDs.add(wealth1); validIDs.add(wealth2); validIDs.add(wealth3);
 							validIDs.add(wealth4); validIDs.add(wealth5);
 						}
+					
 						else if(equipID == glory)
 						{
 							validIDs.add(glory1); validIDs.add(glory2); validIDs.add(glory3);
@@ -635,37 +675,49 @@ public class InvEquip {
 							validIDs.add(passage1); validIDs.add(passage2); validIDs.add(passage3);
 							validIDs.add(passage4); validIDs.add(passage5);
 						} 
+						else if(equipID == combat)
+						{
+							validIDs.add(combat1); validIDs.add(combat2); validIDs.add(combat3);
+							validIDs.add(combat4); validIDs.add(combat5); validIDs.add(combat6);
+						} 
 						else if(equipID == jewelry)
 						{
-							for(int jewel : allJewelry)
+							for(Entry<EquipmentSlot,Integer> jewelryEntry : allJewelry.entrySet()) 
 							{
-								validIDs.add(jewel);
+								validIDs.add(jewelryEntry.getValue());
 							}
 						}
-						validIDs.add(equipID);
+						else validIDs.add(equipID);
 					}
 					if(!optionalItems.isEmpty())
 					{
 						for(int optionalItemOK : optionalItems)
 						{
-							validIDs.add(optionalItemOK);
+							if(optionalItemOK == jewelry)
+							{
+								for(Entry<EquipmentSlot,Integer> jewelryEntry : allJewelry.entrySet()) 
+								{
+									validIDs.add(jewelryEntry.getValue());
+								}
+							} else validIDs.add(optionalItemOK);
 						}
 					}
-					boolean exit = false;
 					for(Item i : Equipment.all())
 					{
-						if(exit) break;
 						if(i == null) continue;
 						else 
 						{
-							boolean ok = false;
+							boolean found = false;
 							final int equippedID = i.getID();
 							for(int validID : validIDs)
 							{
-								if(validID == equippedID) ok = true;
-								break;
+								if(validID == equippedID) 
+								{
+									found = true;
+									break;
+								}
 							}
-							if(!ok) notOKItems.add(equippedID);
+							if(!found) notOKItems.add(equippedID);
 						}
 					}
 					
@@ -676,8 +728,7 @@ public class InvEquip {
 						{
 							MethodProvider.log("~~" + new Item(i,1).getName()+"~~");
 						}
-						if(Widgets.getWidgetChild(12, 76) != null &&
-								Widgets.getWidgetChild(12, 76).isVisible())
+						if(openBankEquipment())
 						{
 							for(int i = 76; i <= 86; i++)
 							{
@@ -695,23 +746,14 @@ public class InvEquip {
 									{
 										if(Widgets.getWidgetChild(12,i,1).interact("Bank"))
 										{
-											MethodProvider.log("removing not OK item: " + notOKItem);
-											final int tmp = i;
-											MethodProvider.sleepUntil(() -> Widgets.getWidgetChild(12,tmp,1).getItemId() == -1, Sleep.calculate(2222, 2222));
+											MethodProvider.log("removing not OK item: " + new Item(notOKItem,1).getName());
+											MethodProvider.sleepUntil(() -> !Equipment.contains(slotID), Sleep.calculate(2222, 2222));
 										}
 										break;
 									}
 								}
 							}
 						}
-						else if(Bank.openClosest())
-						{
-							if(Widgets.getWidgetChild(12, 113).interact("Show worn items"))
-							{
-								MethodProvider.sleepUntil(() -> Widgets.getWidgetChild(12, 76) != null &&
-										Widgets.getWidgetChild(12, 76).isVisible(), Sleep.calculate(2222, 2222));
-							}
-						} else Sleep.sleep(696, 1111);
 						continue;
 					}
 				}
@@ -733,52 +775,45 @@ public class InvEquip {
 					case(-2):
 					{
 						if(slot.getKey() != EquipmentSlot.RING) continue;
-						if(equipID == wealth1 || equipID == wealth2 || 
-								equipID == wealth3 || equipID == wealth4 || 
-								equipID == wealth5) break;
+						if(wearableWealth.contains(equipID)) break;
 						else missingItems.put(slot.getKey(),slot.getValue());
 						break;
 					}case(-3):
 					{
 						if(slot.getKey() != EquipmentSlot.AMULET) continue;
-						if(equipID == glory1 || equipID == glory2 || 
-								equipID == glory3 || equipID == glory4 || 
-								equipID == glory5 || equipID == glory6) break;
+						if(wearableGlory.contains(equipID)) break;
 						else missingItems.put(slot.getKey(),slot.getValue());
 						break;
 					}case(-4):
 					{
 						if(slot.getKey() != EquipmentSlot.AMULET) continue;
-						if(equipID == skills1 || equipID == skills2 || 
-								equipID == skills3 || equipID == skills4 || 
-								equipID == skills5 || equipID == skills6) break;
+						if(wearableSkills.contains(equipID)) break;
 						else missingItems.put(slot.getKey(),slot.getValue());
 						break;
 					}case(-5):
 					{
 						if(slot.getKey() != EquipmentSlot.RING) continue;
-						if(equipID == duel1 || equipID == duel2 || 
-								equipID == duel3 || equipID == duel4 || 
-								equipID == duel5 || equipID == duel6 ||
-								equipID == duel7 || equipID == duel8) break;
+						if(wearableDuel.contains(equipID)) break;
 						else missingItems.put(slot.getKey(),slot.getValue());
 						break;
 					}case(-6):
 					{
 						if(slot.getKey() != EquipmentSlot.AMULET) continue;
-						if(equipID == games1 || equipID == games2 || 
-								equipID == games3 || equipID == games4 || 
-								equipID == games5 || equipID == games6 ||
-								equipID == games7 || equipID == games8) break;
+						if(wearableGames.contains(equipID)) break;
 						else missingItems.put(slot.getKey(),slot.getValue());
 						break;
 					}
 					case(-7):
 					{
 						if(slot.getKey() != EquipmentSlot.AMULET) continue;
-						if(equipID == passage1 || equipID == passage2 || 
-								equipID == passage3 || equipID == passage4 || 
-								equipID == passage5) break;
+						if(wearablePassages.contains(equipID)) break;
+						else missingItems.put(slot.getKey(),slot.getValue());
+						break;
+					}
+					case(-8):
+					{
+						if(slot.getKey() != EquipmentSlot.HANDS) continue;
+						if(wearableCombats.contains(equipID)) break;
 						else missingItems.put(slot.getKey(),slot.getValue());
 						break;
 					}
@@ -804,243 +839,150 @@ public class InvEquip {
 						while(!timeout.finished() && Client.getGameState() == GameState.LOGGED_IN
 								&& ScriptManager.getScriptManager().isRunning() && !ScriptManager.getScriptManager().isPaused())
 						{
+							Sleep.sleep(69, 69);
 							Item item = Equipment.getItemInSlot(slot);
 							
 							//if item is equipped, continue to next item
 							if(item != null)
 							{
+								MethodProvider.log("Found item in slot: " + slot.toString()+", " + item.getName());
 								int equipID = item.getID();
 								boolean breakOrNot = false;
 								switch(itemID)
 								{
 								case(-2):
 								{
-									if(equipID == wealth1 || equipID == wealth2 || 
-											equipID == wealth3 || equipID == wealth4 || 
-											equipID == wealth5) breakOrNot = true;
+									if(wearableWealth.contains(equipID)) breakOrNot = true;
 									break;
 								}case(-3):
 								{
-									if(equipID == glory1 || equipID == glory2 || 
-											equipID == glory3 || equipID == glory4 || 
-											equipID == glory5 || equipID == glory6) breakOrNot = true;
+									if(wearableGlory.contains(equipID)) breakOrNot = true;
 									break;
 								}case(-4):
 								{
-									if(equipID == skills1 || equipID == skills2 || 
-											equipID == skills3 || equipID == skills4 || 
-											equipID == skills5 || equipID == skills6) breakOrNot = true;
+									if(wearableSkills.contains(equipID)) breakOrNot = true;
 									break;
 								}case(-5):
 								{
-									if(equipID == duel1 || equipID == duel2 || 
-											equipID == duel3 || equipID == duel4 || 
-											equipID == duel5 || equipID == duel6 ||
-											equipID == duel7 || equipID == duel8) breakOrNot = true;
+									if(wearableDuel.contains(equipID)) breakOrNot = true;
 									break;
 								}case(-6):
 								{
-									if(equipID == games1 || equipID == games2 || 
-											equipID == games3 || equipID == games4 || 
-											equipID == games5 || equipID == games6 ||
-											equipID == games7 || equipID == games8) breakOrNot = true;
+									if(wearableGames.contains(equipID)) breakOrNot = true;
 									break;
 								}
 								case(-7):
 								{
-									if(equipID == passage1 || equipID == passage2 || 
-											equipID == passage3 || equipID == passage4 || 
-											equipID == passage5) breakOrNot = true;
+									if(wearablePassages.contains(equipID)) breakOrNot = true;
+									break;
+								}
+								case(-8):
+								{
+									if(wearableCombats.contains(equipID)) breakOrNot = true;
 									break;
 								}
 								default:
 								{
-									if(equipID == itemID) breakOrNot = true;
-									break;
+									if(equipID == itemID) 
+									{
+										breakOrNot = true;
+										break;
+									}
+									
 								}
 								}
 								if(breakOrNot) break;
-							}
-							//have item in inventory, so handle inventory equipping
+							} else MethodProvider.log("NOT Found item in slot: " + slot.toString());
+							//not have item in equipment, so handle inventory equipping
+							MethodProvider.log("Not equipped: " + new Item(itemID,1).getName());
 							boolean continueOrNot = false;
 							int invyID = 0;
 							switch(itemID)
 							{
 							case(-2):
 							{
-								if(Inventory.contains(wealth1))
+								for(int jewelry : wearableWealth)
 								{
-									continueOrNot = true;
-									invyID = wealth1;
-								} else if(Inventory.contains(wealth2))
-								{
-									continueOrNot = true;
-									invyID = wealth2;
-								} else if(Inventory.contains(wealth3))
-								{
-									continueOrNot = true;
-									invyID = wealth3;
-								} else if(Inventory.contains(wealth4))
-								{
-									continueOrNot = true;
-									invyID = wealth4;
-								} else if(Inventory.contains(wealth5))
-								{
-									continueOrNot = true;
-									invyID = wealth5;
+									if(Inventory.contains(jewelry))
+									{
+										continueOrNot = true;
+										invyID = jewelry;
+										break;
+									}
 								}
 								break;
 							}case(-3):
 							{
-								if(Inventory.contains(glory1))
+								for(int jewelry : wearableGlory)
 								{
-									continueOrNot = true;
-									invyID = glory1;
-								} else if(Inventory.contains(glory2))
-								{
-									continueOrNot = true;
-									invyID = glory2;
-								} else if(Inventory.contains(glory3))
-								{
-									continueOrNot = true;
-									invyID = glory3;
-								} else if(Inventory.contains(glory4))
-								{
-									continueOrNot = true;
-									invyID = glory4;
-								} else if(Inventory.contains(glory5))
-								{
-									continueOrNot = true;
-									invyID = glory5;
-								} else if(Inventory.contains(glory6))
-								{
-									continueOrNot = true;
-									invyID = glory6;
+									if(Inventory.contains(jewelry))
+									{
+										continueOrNot = true;
+										invyID = jewelry;
+										break;
+									}
 								}
 								break;
 							}case(-4):
 							{
-								if(Inventory.contains(skills1))
+								for(int jewelry : wearableSkills)
 								{
-									continueOrNot = true;
-									invyID = skills1;
-								} else if(Inventory.contains(skills2))
-								{
-									continueOrNot = true;
-									invyID = skills2;
-								} else if(Inventory.contains(skills3))
-								{
-									continueOrNot = true;
-									invyID = skills3;
-								} else if(Inventory.contains(skills4))
-								{
-									continueOrNot = true;
-									invyID = skills4;
-								} else if(Inventory.contains(skills5))
-								{
-									continueOrNot = true;
-									invyID = skills5;
-								} else if(Inventory.contains(skills6))
-								{
-									continueOrNot = true;
-									invyID = skills6;
+									if(Inventory.contains(jewelry))
+									{
+										continueOrNot = true;
+										invyID = jewelry;
+										break;
+									}
 								}
 								break;
 							}case(-5):
 							{
-								if(Inventory.contains(duel1))
+								for(int jewelry : wearableDuel)
 								{
-									continueOrNot = true;
-									invyID = duel1;
-								} else if(Inventory.contains(duel2))
-								{
-									continueOrNot = true;
-									invyID = duel2;
-								} else if(Inventory.contains(duel3))
-								{
-									continueOrNot = true;
-									invyID = duel3;
-								} else if(Inventory.contains(duel4))
-								{
-									continueOrNot = true;
-									invyID = duel4;
-								} else if(Inventory.contains(duel5))
-								{
-									continueOrNot = true;
-									invyID = duel5;
-								} else if(Inventory.contains(duel6))
-								{
-									continueOrNot = true;
-									invyID = duel6;
-								} else if(Inventory.contains(duel7))
-								{
-									continueOrNot = true;
-									invyID = duel7;
-								} else if(Inventory.contains(duel8))
-								{
-									continueOrNot = true;
-									invyID = duel8;
+									if(Inventory.contains(jewelry))
+									{
+										continueOrNot = true;
+										invyID = jewelry;
+										break;
+									}
 								}
 								break;
 							}case(-6):
 							{
-								if(Inventory.contains(games1))
+								for(int jewelry : wearableGames)
 								{
-									continueOrNot = true;
-									invyID = games1;
-								} else if(Inventory.contains(games2))
-								{
-									continueOrNot = true;
-									invyID = games2;
-								} else if(Inventory.contains(games3))
-								{
-									continueOrNot = true;
-									invyID = games3;
-								} else if(Inventory.contains(games4))
-								{
-									continueOrNot = true;
-									invyID = games4;
-								} else if(Inventory.contains(games5))
-								{
-									continueOrNot = true;
-									invyID = games5;
-								} else if(Inventory.contains(games6))
-								{
-									continueOrNot = true;
-									invyID = games6;
-								} else if(Inventory.contains(games7))
-								{
-									continueOrNot = true;
-									invyID = games7;
-								} else if(Inventory.contains(games8))
-								{
-									continueOrNot = true;
-									invyID = games8;
+									if(Inventory.contains(jewelry))
+									{
+										continueOrNot = true;
+										invyID = jewelry;
+										break;
+									}
 								}
 								break;
 							}
 							case(-7):
 							{
-								if(Inventory.contains(passage1))
+								for(int jewelry : wearablePassages)
 								{
-									continueOrNot = true;
-									invyID = passage1;
-								} else if(Inventory.contains(passage2))
+									if(Inventory.contains(jewelry))
+									{
+										continueOrNot = true;
+										invyID = jewelry;
+										break;
+									}
+								}
+								break;
+							}
+							case(-8):
+							{
+								for(int jewelry : wearableCombats)
 								{
-									continueOrNot = true;
-									invyID = passage2;
-								} else if(Inventory.contains(passage3))
-								{
-									continueOrNot = true;
-									invyID = passage3;
-								} else if(Inventory.contains(passage4))
-								{
-									continueOrNot = true;
-									invyID = passage4;
-								} else if(Inventory.contains(passage5))
-								{
-									continueOrNot = true;
-									invyID = passage5;
+									if(Inventory.contains(jewelry))
+									{
+										continueOrNot = true;
+										invyID = jewelry;
+										break;
+									}
 								}
 								break;
 							}
@@ -1065,7 +1007,9 @@ public class InvEquip {
 									Sleep.sleep(111, 111);
 									continue;
 								}
-								if(Bank.isOpen() || Tabs.isOpen(Tab.INVENTORY))
+								
+								if(Bank.isOpen() || Tabs.isOpen(Tab.INVENTORY) || Widgets.getWidgetChild(12, 76) != null &&
+										Widgets.getWidgetChild(12, 76).isVisible())
 								{
 									equipItem(invyID);
 								}
@@ -1087,179 +1031,88 @@ public class InvEquip {
 							{
 							case(-2):
 							{
-								if(Bank.contains(wealth1))
+								for(int jewelry : wearableWealth)
 								{
-									continueOrNot2 = true;
-									bankID = wealth1;
-								} else if(Bank.contains(wealth2))
-								{
-									continueOrNot2 = true;
-									bankID = wealth2;
-								} else if(Bank.contains(wealth3))
-								{
-									continueOrNot2 = true;
-									bankID = wealth3;
-								} else if(Bank.contains(wealth4))
-								{
-									continueOrNot2 = true;
-									bankID = wealth4;
-								} else if(Bank.contains(wealth5))
-								{
-									continueOrNot2 = true;
-									bankID = wealth5;
+									if(Bank.contains(jewelry))
+									{
+										continueOrNot2 = true;
+										bankID = jewelry;
+										break;
+									}
 								}
 								break;
 							}case(-3):
 							{
-								if(Bank.contains(glory1))
+								for(int jewelry : wearableGlory)
 								{
-									continueOrNot2 = true;
-									bankID = glory1;
-								} else if(Bank.contains(glory2))
-								{
-									continueOrNot2 = true;
-									bankID = glory2;
-								} else if(Bank.contains(glory3))
-								{
-									continueOrNot2 = true;
-									bankID = glory3;
-								} else if(Bank.contains(glory4))
-								{
-									continueOrNot2 = true;
-									bankID = glory4;
-								} else if(Bank.contains(glory5))
-								{
-									continueOrNot2 = true;
-									bankID = glory5;
-								} else if(Bank.contains(glory6))
-								{
-									continueOrNot2 = true;
-									bankID = glory6;
+									if(Bank.contains(jewelry))
+									{
+										continueOrNot2 = true;
+										bankID = jewelry;
+										break;
+									}
 								}
 								break;
 							}case(-4):
 							{
-								if(Bank.contains(skills1))
+								for(int jewelry : wearableSkills)
 								{
-									continueOrNot2 = true;
-									bankID = skills1;
-								} else if(Bank.contains(skills2))
-								{
-									continueOrNot2 = true;
-									bankID = skills2;
-								} else if(Bank.contains(skills3))
-								{
-									continueOrNot2 = true;
-									bankID = skills3;
-								} else if(Bank.contains(skills4))
-								{
-									continueOrNot2 = true;
-									bankID = skills4;
-								} else if(Bank.contains(skills5))
-								{
-									continueOrNot2 = true;
-									bankID = skills5;
-								} else if(Bank.contains(skills6))
-								{
-									continueOrNot2 = true;
-									bankID = skills6;
+									if(Bank.contains(jewelry))
+									{
+										continueOrNot2 = true;
+										bankID = jewelry;
+										break;
+									}
 								}
 								break;
 							}case(-5):
 							{
-								if(Bank.contains(duel1))
+								for(int jewelry : wearableDuel)
 								{
-									continueOrNot2 = true;
-									bankID = duel1;
-								} else if(Bank.contains(duel2))
-								{
-									continueOrNot2 = true;
-									bankID = duel2;
-								} else if(Bank.contains(duel3))
-								{
-									continueOrNot2 = true;
-									bankID = duel3;
-								} else if(Bank.contains(duel4))
-								{
-									continueOrNot2 = true;
-									bankID = duel4;
-								} else if(Bank.contains(duel5))
-								{
-									continueOrNot2 = true;
-									bankID = duel5;
-								} else if(Bank.contains(duel6))
-								{
-									continueOrNot2 = true;
-									bankID = duel6;
-								} else if(Bank.contains(duel7))
-								{
-									continueOrNot2 = true;
-									bankID = duel7;
-								} else if(Bank.contains(duel8))
-								{
-									continueOrNot2 = true;
-									bankID = duel8;
+									if(Bank.contains(jewelry))
+									{
+										continueOrNot2 = true;
+										bankID = jewelry;
+										break;
+									}
 								}
 								break;
 							}case(-6):
 							{
-								if(Bank.contains(games1))
+								for(int jewelry : wearableGames)
 								{
-									continueOrNot2 = true;
-									bankID = games1;
-								} else if(Bank.contains(games2))
-								{
-									continueOrNot2 = true;
-									bankID = games2;
-								} else if(Bank.contains(games3))
-								{
-									continueOrNot2 = true;
-									bankID = games3;
-								} else if(Bank.contains(games4))
-								{
-									continueOrNot2 = true;
-									bankID = games4;
-								} else if(Bank.contains(games5))
-								{
-									continueOrNot2 = true;
-									bankID = games5;
-								} else if(Bank.contains(games6))
-								{
-									continueOrNot2 = true;
-									bankID = games6;
-								} else if(Bank.contains(games7))
-								{
-									continueOrNot2 = true;
-									bankID = games7;
-								} else if(Bank.contains(games8))
-								{
-									continueOrNot2 = true;
-									bankID = games8;
+									if(Bank.contains(jewelry))
+									{
+										continueOrNot2 = true;
+										bankID = jewelry;
+										break;
+									}
 								}
 								break;
 							}
 							case(-7):
 							{
-								if(Bank.contains(passage1))
+								for(int jewelry : wearablePassages)
 								{
-									continueOrNot2 = true;
-									bankID = passage1;
-								} else if(Bank.contains(passage2))
+									if(Bank.contains(jewelry))
+									{
+										continueOrNot2 = true;
+										bankID = jewelry;
+										break;
+									}
+								}
+								break;
+							}
+							case(-8):
+							{
+								for(int jewelry : wearableCombats)
 								{
-									continueOrNot2 = true;
-									bankID = passage2;
-								} else if(Bank.contains(passage3))
-								{
-									continueOrNot2 = true;
-									bankID = passage3;
-								} else if(Bank.contains(passage4))
-								{
-									continueOrNot2 = true;
-									bankID = passage4;
-								} else if(Bank.contains(passage5))
-								{
-									continueOrNot2 = true;
-									bankID = passage5;
+									if(Bank.contains(jewelry))
+									{
+										continueOrNot2 = true;
+										bankID = jewelry;
+										break;
+									}
 								}
 								break;
 							}
@@ -1275,6 +1128,7 @@ public class InvEquip {
 							}
 							if(continueOrNot2)
 							{
+								if(!closeBankEquipment()) continue;
 								if(Bank.openClosest())
 								{
 									if(Bank.getWithdrawMode() == BankMode.ITEM)
@@ -1313,39 +1167,56 @@ public class InvEquip {
 							/**
 							 * Time to buy stuff on GE, handle teles
 							 */
+							int itemQty = 0;
 							switch(itemID)
 							{
 							case(-2):
 							{
 								itemID = wealth5;
+								itemQty = 2;
 								break;
 							}
 							case(-3):
 							{
 								itemID = glory6;
+								itemQty = 2;
 								break;
 							}
 							case(-4):
 							{
 								itemID = skills6;
+								itemQty = 1;
 								break;
 							}
 							case(-5):
 							{
 								itemID = duel8;
+								itemQty = 2;
 								break;
 							}
 							case(-6):
 							{
 								itemID = games8;
+								itemQty = 2;
 								break;
 							}
 							case(-7):
 							{
 								itemID = passage5;
+								itemQty = 1;
 								break;
 							}
-							default: break;
+							case(-8):
+							{
+								itemID = combat6;
+								itemQty = 1;
+								break;
+							}
+							default: 
+							{
+								itemQty = 1;
+								break;
+							}
 							}
 							
 							buyItem(itemID,1,timeout.remaining());
@@ -1362,50 +1233,109 @@ public class InvEquip {
 				{
 					if(!Equipment.isEmpty())
 					{
-						if(Widgets.getWidgetChild(12, 76) != null &&
-								Widgets.getWidgetChild(12, 76).isVisible())
+						List<Integer> validIDs = new ArrayList<>();
+						List<Integer> notOKItems = new ArrayList<>();
+						if(!optionalItems.isEmpty())
 						{
-							if(Widgets.getWidgetChild(12, 113).interact("Hide worn items"))
+							for(int optionalItemOK : optionalItems)
 							{
-								MethodProvider.sleepUntil(Bank::isOpen, Sleep.calculate(2222, 2222));
+								if(optionalItemOK == jewelry)
+								{
+									for(Entry<EquipmentSlot,Integer> jewelryEntry : allJewelry.entrySet()) 
+									{
+										validIDs.add(jewelryEntry.getValue());
+									}
+								} else validIDs.add(optionalItemOK);
+							}
+						}
+						for(Item i : Equipment.all())
+						{
+							if(i == null) continue;
+							else 
+							{
+								boolean found = false;
+								final int equippedID = i.getID();
+								for(int validID : validIDs)
+								{
+									if(validID == equippedID) 
+									{
+										found = true;
+										break;
+									}
+								}
+								if(!found) notOKItems.add(equippedID);
+							}
+						}
+						if(!notOKItems.isEmpty())
+						{
+							if(!closeBankEquipment()) continue;
+							if(Bank.openClosest())
+							{
+								if(Bank.depositAllEquipment())
+								{
+									MethodProvider.sleepUntil(() -> Equipment.isEmpty(), Sleep.calculate(2222, 2222));
+								}
+							} else {
+								Sleep.sleep(666, 1111);
 							}
 							continue;
 						}
-						if(Bank.openClosest())
-						{
-							if(Bank.depositAllEquipment())
-							{
-								MethodProvider.sleepUntil(() -> Equipment.isEmpty(), Sleep.calculate(2222, 2222));
-							}
-						} else {
-							Sleep.sleep(666, 1111);
-						}
-						continue;
 					}
 				}
 			}
-			if(Widgets.getWidgetChild(12, 76) != null &&
-					Widgets.getWidgetChild(12, 76).isVisible())
-			{
-				if(Widgets.getWidgetChild(12, 113).interact("Hide worn items"))
-				{
-					MethodProvider.sleepUntil(Bank::isOpen, Sleep.calculate(2222, 2222));
-				}
-				continue;
-			}
+			if(!closeBankEquipment()) continue;
 			//have all items equipped - now check inventory
 			if(inventoryList.isEmpty())
 			{
 				if(!strict) return true;
+				else if(Inventory.isEmpty()) return true;
 				else
 				{
-					if(Bank.openClosest())
+					List<Integer> validIDs = new ArrayList<>();
+					List<Integer> notOKItems = new ArrayList<>();
+					if(!optionalItems.isEmpty())
 					{
-						if(Bank.depositAllItems()) MethodProvider.sleepUntil(Inventory::isEmpty, Sleep.calculate(2222, 2222));
+						for(int optionalItemOK : optionalItems)
+						{
+							if(optionalItemOK == jewelry)
+							{
+								for(Entry<EquipmentSlot,Integer> jewelryEntry : allJewelry.entrySet()) 
+								{
+									validIDs.add(jewelryEntry.getValue());
+								}
+							} else validIDs.add(optionalItemOK);
+						}
 					}
-					else Sleep.sleep(666, 696);
+					for(Item i : Equipment.all())
+					{
+						if(i == null) continue;
+						else 
+						{
+							boolean found = false;
+							final int equippedID = i.getID();
+							for(int validID : validIDs)
+							{
+								if(validID == equippedID) 
+								{
+									found = true;
+									break;
+								}
+							}
+							if(!found) notOKItems.add(equippedID);
+						}
+					}
+					if(!notOKItems.isEmpty())
+					{
+						if(!closeBankEquipment()) continue;
+						if(Bank.openClosest())
+						{
+							if(Bank.depositAllItems()) MethodProvider.sleepUntil(Inventory::isEmpty, Sleep.calculate(2222, 2222));
+						}
+						else Sleep.sleep(666, 696);
+						continue;
+					}
+					
 				}
-				continue;
 			}
 			
 			if(strict)
@@ -1449,10 +1379,12 @@ public class InvEquip {
 					{
 						MethodProvider.log("~~"+new Item(i,1).getName()+"~~");
 					}
+					if(!closeBankEquipment()) continue;
 					if(Bank.openClosest())
 					{
 						for(int depositItem : notOKItems)
 						{
+							if(Inventory.count(depositItem) <= 0) continue;
 							if(Bank.depositAll(depositItem))
 							{
 								MethodProvider.sleepUntil(() -> Inventory.count(depositItem) <= 0, Sleep.calculate(2222, 2222));
@@ -1506,15 +1438,13 @@ public class InvEquip {
 					
 					//if item is in inventory in correct qty and form, continue to next item
 					Item item = Inventory.get(requestedID);
-					int invCount = 0;
-					if(item == null)
+					int invCount = Inventory.count(requestedID);
+					if(item == null || invCount <= 0)
 					{
 						if(minQty <= 0) break;
-						else invCount = 0;
 					}
 					else 
 					{
-						invCount = item.getAmount();
 						if(invCount >= minQty && invCount <= maxQty) break;
 					}
 					
@@ -1540,6 +1470,7 @@ public class InvEquip {
 					//need to deposit if maxQty set to 0
 					if(maxQty <= 0)
 					{
+						if(!closeBankEquipment()) continue;
 						if(Bank.openClosest())
 						{
 							if(Bank.depositAll(requestedID))
@@ -1556,6 +1487,7 @@ public class InvEquip {
 					if(swapDepositID != -1)
 					{
 						MethodProvider.log("Have something to swap noted <--> item: " + swapDepositID);
+						if(!closeBankEquipment()) continue;
 						if(Bank.openClosest())
 						{
 							if(Bank.depositAll(swapDepositID))
@@ -1573,6 +1505,7 @@ public class InvEquip {
 					//check bank for item
 					if(bankCount > 0 || tooMuch > 0) 
 					{
+						if(!closeBankEquipment()) continue;
 						if(Bank.openClosest())
 						{
 							//have too much in inventory (over max)
@@ -1652,9 +1585,11 @@ public class InvEquip {
 	
 	public static boolean equipItem(int ID)
 	{
+		MethodProvider.log("Equipping item: " + new Item(ID,1).getName());
 		if(Equipment.contains(ID)) return true;
 		
-		if(Tabs.isOpen(Tab.INVENTORY) || Bank.isOpen())
+		if(Tabs.isOpen(Tab.INVENTORY) || Bank.isOpen() ||
+				(Widgets.getWidgetChild(12, 76) != null && Widgets.getWidgetChild(12, 76).isVisible()))
 		{
 			Item wearItem = Inventory.get(ID);
 			if(wearItem == null) return false;
@@ -1698,7 +1633,8 @@ public class InvEquip {
 	public static boolean equipItem(String itemName)
 	{
 		if(Equipment.contains(itemName)) return true;
-		if(Tabs.isOpen(Tab.INVENTORY) || Bank.isOpen())
+		if(Tabs.isOpen(Tab.INVENTORY) || Bank.isOpen() ||
+				(Widgets.getWidgetChild(12, 76) != null && Widgets.getWidgetChild(12, 76).isVisible()))
 		{
 			Item wearItem = Inventory.get(itemName);
 			if(wearItem == null) return false;
@@ -1739,7 +1675,56 @@ public class InvEquip {
 		}
 		return false;
 	}
-	
+	/**
+	 * returns false if Equipment can be closed, true if equipment bank tab closed already
+	 * @return
+	 */
+	public static boolean closeBankEquipment()
+	{
+		if(Widgets.getWidgetChild(12, 76) != null &&
+				Widgets.getWidgetChild(12, 76).isVisible())
+		{
+			if(Widgets.getWidgetChild(12, 113).interact("Hide worn items"))
+			{
+				MethodProvider.sleepUntil(Bank::isOpen, Sleep.calculate(2222, 2222));
+			}
+			if(Bank.isOpen()) return true;
+			return false;
+		} else return true;
+	}
+	/**
+	 * returns false if Equipment can be opened, true if equipment bank tab open already
+	 * @return
+	 */
+	public static boolean openBankEquipment()
+	{
+		if(Widgets.getWidgetChild(12, 76) != null &&
+				Widgets.getWidgetChild(12, 76).isVisible())
+		{
+			return true;
+		}
+		
+		if(Bank.isOpen())
+		{
+			if(Widgets.getWidgetChild(12, 113).interact("Show worn items"))
+			{
+				MethodProvider.sleepUntil(() -> Widgets.getWidgetChild(12, 76) != null &&
+						Widgets.getWidgetChild(12, 76).isVisible(), Sleep.calculate(2222, 2222));
+			}
+			if(Widgets.getWidgetChild(12, 76) != null &&
+					Widgets.getWidgetChild(12, 76).isVisible())
+			{
+				return true;
+			}
+			return false;
+		} 
+		
+		else if(GrandExchange.isOpen()) GrandExchange.close();
+		
+		else if(!Bank.openClosest()) Sleep.sleep(666, 666);
+		
+		return false;
+	}
 	public static int coins = 995;
 	
 	public static void initializeIntLists ()
@@ -1762,17 +1747,53 @@ public class InvEquip {
 		wearableWealth.add(wealth1);wearableWealth.add(wealth2);
 		wearableWealth.add(wealth3);wearableWealth.add(wealth4);wearableWealth.add(wealth5);
 		
-		allJewelry.addAll(wearablePassages);
-		allJewelry.addAll(wearableGames);
-		allJewelry.addAll(wearableDuel);
-		allJewelry.addAll(wearableSkills);
-		allJewelry.addAll(wearableGlory);
-		allJewelry.addAll(wearableWealth);
-		allJewelry.addAll(wearableDuel);
+		wearableCombats.add(combat1);wearableCombats.add(combat2);wearableCombats.add(combat3);
+		wearableCombats.add(combat4);wearableCombats.add(combat5);wearableCombats.add(combat6);
+		
+		for(int jewelry : wearablePassages)
+		{
+			allJewelry.put(EquipmentSlot.AMULET, jewelry);
+		}
+		for(int jewelry : wearableGames)
+		{
+			allJewelry.put(EquipmentSlot.AMULET, jewelry);
+		}
+		for(int jewelry : wearableSkills)
+		{
+			allJewelry.put(EquipmentSlot.AMULET, jewelry);
+		}
+		for(int jewelry : wearableGlory)
+		{
+			allJewelry.put(EquipmentSlot.AMULET, jewelry);
+		}
+		for(int jewelry : wearableCombats)
+		{
+			allJewelry.put(EquipmentSlot.HANDS, jewelry);
+		}
+		for(int jewelry : wearableDuel)
+		{
+			allJewelry.put(EquipmentSlot.RING, jewelry);
+		}
+		for(int jewelry : wearableWealth)
+		{
+			allJewelry.put(EquipmentSlot.AMULET, jewelry);
+		}
 	}
-	public static int jewelry = -10;
-	public static List<Integer> allJewelry = new ArrayList<Integer>();
 	
+	
+	public static int jewelry = -10;
+
+	public static Map<EquipmentSlot,Integer> allJewelry = new LinkedHashMap<EquipmentSlot,Integer>();
+	//-8 represents the value of any charge of combat bracelet
+	public static int combat = -8; 
+	public static List<Integer> wearableCombats = new ArrayList<Integer>();
+	public static int combat1 = 11124;
+	public static int combat2 = 11122;
+	public static int combat3 = 11120;
+	public static int combat4 = 11118;
+	public static int combat5 = 11974;
+	public static int combat6 = 11972;
+		
 	//-7 represents the value of any charge of necklace of glory
 	public static int passage = -7; 
 	public static List<Integer> wearablePassages = new ArrayList<Integer>();

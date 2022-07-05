@@ -21,7 +21,6 @@ public class Initialize extends Leaf {
    
     @Override
     public int onLoop() {
-    	Widgets.closeAll();
     	API.rand2.setSeed(LocalTime.now().getNano());
     	Sleep.initSleepMod = 1.2 + (API.rand2.nextDouble()/1.25);
     	Sleep.initSleepMod = Sleep.initSleepMod * Sleep.initSleepMod;

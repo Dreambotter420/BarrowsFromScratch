@@ -65,6 +65,8 @@ public class TrainPrayer extends Leaf {
 	public static int randomCoinsAmount = 0;
 	public static boolean visitedLast = false;
 	public static boolean announcedShitHouse = false;
+	public static boolean forceLeaveShitHouse = false;
+	public static List<Integer> usedSlots = new ArrayList<Integer>();
 	
     public void onStart() {
     	randomBonesAdder = (int) Calculations.nextGaussianRandom(15, 7);
@@ -137,6 +139,10 @@ public class TrainPrayer extends Leaf {
     
     public static void chooseRandomAltarHouse()
     {
+    	if(Inventory.getSelectedItemName() != null)
+		{
+    		Inventory.deselect();
+		}
     	if(Worlds.getCurrentWorld() != 330)
     	{
     		if(Widgets.isOpen()) Widgets.closeAll();
@@ -185,13 +191,10 @@ public class TrainPrayer extends Leaf {
     			if(houseAd.interact("Visit-last"))
         		{
         			MethodProvider.sleepUntil(() -> Locations.isInstanced(), () -> Players.localPlayer().isMoving(), Sleep.calculate(2222,2222),50);
-        			if(Locations.isInstanced()) 
-        			{
-        				visitedLast = true;
-        				return;
-        			}
-        			visitedLast = false;
+        			Sleep.sleep(420, 696);
+        			if(!Locations.isInstanced()) visitedLast = false;
         		}
+    			return;
     		}
     		if(houseAd.interact("View"))
     		{
@@ -281,11 +284,13 @@ public class TrainPrayer extends Leaf {
     	}
     	if(Locations.isInstanced())
     	{
-    		if(Inventory.count(dBones) <= 0) 
+    		if(Inventory.count(dBones) <= 0 || forceLeaveShitHouse) 
     		{
     			leaveHouse();
     			return Timing.sleepLogNormalSleep();
     		}
+    		
+    		//have bones to look to offer
     		GameObject altar = GameObjects.closest("Altar");
     		if(altar != null)
     		{
@@ -335,8 +340,8 @@ public class TrainPrayer extends Leaf {
         						String addText = null;
         						if(rand < 100) addText = bruh+" light "+ur+" burners pls";
             					else if(rand < 200) addText = "light "+ur+" burners pls "+bruh+" ";
-            					else if(rand < 300) addText = ur+"burners aren"+apostrophe+"t lit "+bruh+" ";
-            					else if(rand < 400) addText = bruh+" "+ur+"burners aren"+apostrophe+"t lit ";
+            					else if(rand < 300) addText = ur+" burners aren"+apostrophe+"t lit "+bruh+" ";
+            					else if(rand < 400) addText = bruh+" "+ur+" burners aren"+apostrophe+"t lit ";
             					else if(rand < 500) addText = "waste of xp without incense "+bruh+" ";
             					else if(rand < 600) addText = bruh+" waste of xp without incense ";
             					else if(rand < 700) addText = "i"+apostrophe+"m disappointed "+bruh+" ";
@@ -350,8 +355,8 @@ public class TrainPrayer extends Leaf {
         						if(rand5 > 75) expletive = "";
         						if(rand < 100) indicateShitHouse = bruh+" light "+ur+" burners pls"+expletive;
             					else if(rand < 200) indicateShitHouse = "light "+ur+" burners pls "+bruh+" "+expletive;
-            					else if(rand < 300) indicateShitHouse = ur+"burners aren"+apostrophe+"t lit "+bruh+" "+expletive;
-            					else if(rand < 400) indicateShitHouse = bruh+" "+ur+"burners aren"+apostrophe+"t lit "+expletive;
+            					else if(rand < 300) indicateShitHouse = ur+" burners aren"+apostrophe+"t lit "+bruh+" "+expletive;
+            					else if(rand < 400) indicateShitHouse = bruh+" "+ur+" burners aren"+apostrophe+"t lit "+expletive;
             					else if(rand < 500) indicateShitHouse = "waste of xp without incense "+bruh+" "+expletive;
             					else if(rand < 600) indicateShitHouse = bruh+" waste of xp without incense "+expletive;
             					else if(rand < 700) indicateShitHouse = "i"+apostrophe+"m disappointed "+bruh+" "+expletive;
@@ -362,6 +367,7 @@ public class TrainPrayer extends Leaf {
         					
         					Keyboard.type(indicateShitHouse);
         					visitedLast = false;
+        					forceLeaveShitHouse = true;
         					announcedShitHouse = true;
     					}
     					return Sleep.calculate(69, 69);
@@ -373,14 +379,31 @@ public class TrainPrayer extends Leaf {
     			if(Inventory.getSelectedItemName() == null)
     			{
     				MethodProvider.log("Nothing selected");
-    				List<Integer> boneSlots = new ArrayList<Integer>();
-    				for(Item bones : Inventory.all())
+    				if(Tabs.isOpen(Tab.INVENTORY))
     				{
-    					if(bones != null && bones.getID() == dBones) boneSlots.add(bones.getSlot());
-    				}
-    				Collections.reverse(boneSlots);
-    				Item lastBone = Inventory.getItemInSlot(boneSlots.get(0));
-    				lastBone.interact("Use");
+    					List<Integer> boneSlots = new ArrayList<Integer>();
+        				for(Item bones : Inventory.all())
+        				{
+        					if(bones != null && bones.getID() == dBones) 
+        					{
+        						boolean break1 = false;
+        						for(int bannedSlot : usedSlots) {
+        							if(bannedSlot == bones.getSlot()) 
+        							{
+        								break1 = true;
+        								break;
+        							}
+        						}
+        						if(break1) continue;
+        						boneSlots.add(bones.getSlot());
+        					}
+        				}
+        				Collections.reverse(boneSlots);
+        				Item lastBone = Inventory.getItemInSlot(boneSlots.get(0));
+        				usedSlots.add(boneSlots.get(0));
+        				lastBone.interact("Use");
+    				} else if(Widgets.isOpen()) Widgets.closeAll();
+    				else Tabs.open(Tab.INVENTORY);
     				Sleep.sleep(69, 69);
     			}
     			else if(!Inventory.getSelectedItemName().contains(new Item(dBones,1).getName()))
@@ -398,7 +421,11 @@ public class TrainPrayer extends Leaf {
 					{
 						if(Menu.isVisible())
 						{
-							if(Menu.clickAction(useAction, altar)) Sleep.sleep(69,1111);
+							if(Menu.clickAction(useAction, altar)) 
+							{
+								MethodProvider.sleepUntil(() -> Players.localPlayer().isMoving() || Players.localPlayer().isAnimating(), Sleep.calculate(2222, 2222));
+								Sleep.sleep(69,69);
+							}
 						}
 						else 
 						{
@@ -418,19 +445,27 @@ public class TrainPrayer extends Leaf {
 		    				}
 		    				else Menu.open();
 						}
+						return Sleep.calculate(69, 69);
 					}
 					if(Players.localPlayer().isMoving()) MethodProvider.sleepUntil(() -> !Players.localPlayer().isMoving(), Sleep.calculate(2222, 2222));
 		    		if(Players.localPlayer().isAnimating())
 		    		{
 		    			MethodProvider.sleepUntil(() -> Inventory.count(dBones) <= 0 || 
-		    					Dialogues.inDialogue() ||
+		    					Dialogues.inDialogue() || 
+		    					!Locations.isInstanced() ||
 		    					GameObjects.all(litBurnersFilter).size() <= 1,
 		    					() -> (Players.localPlayer().isAnimating() || Players.localPlayer().isMoving()), Sleep.calculate(2222, 2222),50);
-		    		 	if(Inventory.count(dBones) <= 0 || GameObjects.all(litBurnersFilter).size() <= 1) return Timing.sleepLogNormalSleep();
+		    		 	if(Inventory.count(dBones) <= 0 || 
+		    		 			GameObjects.all(litBurnersFilter).size() <= 1 || 
+		    		 			Locations.isInstanced()) return Timing.sleepLogNormalSleep();
 		    		}
 		    		if(Menu.isVisible())
 					{
-						if(Menu.clickAction(useAction, altar)) Sleep.sleep(69,69);
+						if(Menu.clickAction(useAction, altar)) 
+						{
+							MethodProvider.sleepUntil(() -> Players.localPlayer().isMoving() || Players.localPlayer().isAnimating(), Sleep.calculate(2222, 2222));
+							Sleep.sleep(69,69);
+						}
 					}
 					else 
 					{
@@ -452,16 +487,25 @@ public class TrainPrayer extends Leaf {
 					}
 					return Timing.sleepLogNormalSleep();
     			}
-    		}
+    		} else leaveHouse();
     		return Timing.sleepLogNormalSleep();
     	}
     	else //not in instanced area (house) 
     	{
+    		usedSlots.clear();
+    		forceLeaveShitHouse = false;
     		announcedShitHouse = false;
     		if(Inventory.count(dBones) >= 1)
     		{
-    			chooseRandomAltarHouse();
-    		} else if(Inventory.count(new Item(dBones,1).getNotedItemID()) > 0) {
+    			if(Locations.rimmington.contains(Players.localPlayer())) 
+    			{
+    				chooseRandomAltarHouse();
+    			}
+    			else Walkz.teleportHouse(180000);
+    			return Timing.sleepLogNormalSleep();
+    		} 
+    		if(Inventory.count(new Item(dBones,1).getNotedItemID()) > 0) 
+    		{
     			//check if Phials nearby
     	    	NPC phials = NPCs.closest("Phials");
     	    	if(phials != null)
@@ -477,81 +521,81 @@ public class TrainPrayer extends Leaf {
     	    	}
     	    	else
     	    	{
-    	    		if(Walking.shouldWalk(6) && Walking.walk(Locations.rimmington.getCenter())) Sleep.sleep(420,1111);
+    	    		if(Locations.rimmington.distance(Players.localPlayer().getTile()) > 45) Walkz.teleportHouse(180000);
+        			else if(Walking.shouldWalk(6) && Walking.walk(Locations.rimmington.getCenter())) Sleep.sleep(420,1111);
+    	    		
     	    	}
-    		} else {
-    			//check bank for stuff
-    	    	if(!InvEquip.checkedBank()) return Timing.sleepLogNormalSleep();
-    	    	final int totalBones = Bank.count(dBones) + Inventory.count(dBones) + Inventory.count(new Item(dBones,1).getNotedItemID());
-    	    	if(totalBones < bonesToGoal)
-    	    	{
-    	    		neededBones = bonesToGoal - totalBones;
-    	    	}
-    	    	Main.customPaintText3 = "total # bones (invy unnoted + noted + bank): " + totalBones;
-    	    	Main.customPaintText4 = "total # bones missing to goal: " + neededBones;
-    	    	//withdraw all dBones noted
-    	    	if(Bank.contains(dBones) || totalBones < bonesToGoal || Inventory.count(Walkz.houseTele) > 1)
-    	    	{
-    	    		if(Locations.isInstanced())
-    	    		{
-    	    			leaveHouse();
-    	    			return Timing.sleepLogNormalSleep();
-    	    		}
-    	    		InvEquip.clearAll();
-    	    		InvEquip.addInvyItem(dBones, bonesToGoal, bonesToGoal, true, neededBones);
-    	    		InvEquip.addInvyItem(Walkz.houseTele, 1, 1, false, 10);
-    	    		InvEquip.setEquipItem(EquipmentSlot.RING, InvEquip.wealth);
-    	    		if(PlayerSettings.getBitValue(2188) != 1 || PlayerSettings.getBitValue(2187) != 1 ||
-    	        			PlayerSettings.getConfig(738) != 33)
-    	    		{
-    	    			InvEquip.addInvyItem(Walkz.fallyTele, 1, 1, false, 10);
-    	    		}
-    	    		InvEquip.addInvyItem(InvEquip.coins, 5, randomCoinsAmount, false, 0);
-    	    		InvEquip.fulfillSetup(true, 120000);
-    	    		return Timing.sleepLogNormalSleep();
-    	    	}
-    	    	if(Bank.isOpen()) Bank.close();
-    			else if(GrandExchange.isOpen()) GrandExchange.close();
-    			
-    	    	
-    	    	if(PlayerSettings.getBitValue(2188) != 1 || PlayerSettings.getBitValue(2187) != 1 ||
-    	    			PlayerSettings.getConfig(738) != 33)
-    	    	{
-    	    		//check for estate agent around us
-    	        	NPC estateAgent = NPCs.closest("Estate agent");
-    	        	if(estateAgent != null)
-    	        	{
-    	        		if(estateAgent.canReach())
-    	        		{
-    	        			if(estateAgent.interact("Talk-to"))
-    	        			{
-    	        				MethodProvider.sleepUntil(() -> Dialogues.inDialogue(), Sleep.calculate(2222,2222));
-    	        			}
-    	        		}
-    	        		else
-    	        		{
-    	        			if(Walking.shouldWalk(6) && Walking.walk(estateAgent)) Sleep.sleep(666,1111);
-    	        		}
-    	        		return Timing.sleepLogNormalSleep();
-    	        	}
-    	        	//see how close we are to estate room - walk if close
-    	        	final double dist = Locations.estateRoom.distance(Players.localPlayer().getTile());
-    	        	if(dist <= 45)
-    	        	{
-    	        		if(Walking.shouldWalk(6) && Walking.walk(Locations.estateRoom.getCenter())) Sleep.sleep(666,1111);
-    	        		return Timing.sleepLogNormalSleep();
-    	        	}
-    	        	if(!Walkz.teleportFalador(60000)) InvEquip.buyItem(Walkz.fallyTele, 10, 60000);
-    	        	return Timing.sleepLogNormalSleep();
-    	    	}
-    	    	
-    	    	if(Inventory.interact(Walkz.houseTele, "Break"))
-    			{
-    				MethodProvider.sleepUntil(() -> Locations.isInstanced(), () -> Players.localPlayer().isAnimating(), Sleep.calculate(4444,2222),50);
-    				return Timing.sleepLogNormalSleep();
-    			}
-    	    	
-    		}
+    	    	return Timing.sleepLogNormalSleep();
+    		} 
+    		//check bank for stuff
+	    	if(!InvEquip.checkedBank()) return Timing.sleepLogNormalSleep();
+	    	final int totalBones = Bank.count(dBones) + Inventory.count(dBones) + Inventory.count(new Item(dBones,1).getNotedItemID());
+	    	if(totalBones < bonesToGoal)
+	    	{
+	    		neededBones = bonesToGoal - totalBones;
+	    	}
+	    	Main.customPaintText3 = "total # bones (invy unnoted + noted + bank): " + totalBones;
+	    	Main.customPaintText4 = "total # bones missing to goal: " + neededBones;
+	    	//withdraw all dBones noted
+	    	if(Bank.contains(dBones) || totalBones < bonesToGoal || Inventory.count(Walkz.houseTele) > 1)
+	    	{
+	    		if(Locations.isInstanced())
+	    		{
+	    			leaveHouse();
+	    			return Timing.sleepLogNormalSleep();
+	    		}
+	    		InvEquip.clearAll();
+	    		InvEquip.addInvyItem(dBones, bonesToGoal, bonesToGoal, true, neededBones);
+	    		InvEquip.addInvyItem(Walkz.houseTele, 1, 1, false, 10);
+	    		InvEquip.setEquipItem(EquipmentSlot.RING, InvEquip.wealth);
+	    		if(PlayerSettings.getBitValue(2188) != 1 || PlayerSettings.getBitValue(2187) != 1 ||
+	        			PlayerSettings.getConfig(738) != 33)
+	    		{
+	    			InvEquip.addInvyItem(Walkz.fallyTele, 1, 1, false, 10);
+	    		}
+	    		InvEquip.addInvyItem(InvEquip.coins, 5, randomCoinsAmount, false, 0);
+	    		InvEquip.fulfillSetup(true, 180000);
+	    		return Timing.sleepLogNormalSleep();
+	    	}
+	    	if(Widgets.isOpen())Widgets.closeAll();
+			
+	    	
+	    	if(PlayerSettings.getBitValue(2188) != 1 || PlayerSettings.getBitValue(2187) != 1 ||
+	    			PlayerSettings.getConfig(738) != 33)
+	    	{
+	    		//check for estate agent around us
+	        	NPC estateAgent = NPCs.closest("Estate agent");
+	        	if(estateAgent != null)
+	        	{
+	        		if(estateAgent.canReach())
+	        		{
+	        			if(estateAgent.interact("Talk-to"))
+	        			{
+	        				MethodProvider.sleepUntil(() -> Dialogues.inDialogue(), Sleep.calculate(2222,2222));
+	        			}
+	        		}
+	        		else
+	        		{
+	        			if(Walking.shouldWalk(6) && Walking.walk(estateAgent)) Sleep.sleep(666,1111);
+	        		}
+	        		return Timing.sleepLogNormalSleep();
+	        	}
+	        	//see how close we are to estate room - walk if close
+	        	final double dist = Locations.estateRoom.distance(Players.localPlayer().getTile());
+	        	if(dist <= 45)
+	        	{
+	        		if(Walking.shouldWalk(6) && Walking.walk(Locations.estateRoom.getCenter())) Sleep.sleep(666,1111);
+	        		return Timing.sleepLogNormalSleep();
+	        	}
+	        	if(!Walkz.teleportFalador(60000)) InvEquip.buyItem(Walkz.fallyTele, 10, 60000);
+	        	return Timing.sleepLogNormalSleep();
+	    	}
+	    	
+	    	if(Inventory.interact(Walkz.houseTele, "Break"))
+			{
+				MethodProvider.sleepUntil(() -> Locations.isInstanced(), () -> Players.localPlayer().isAnimating(), Sleep.calculate(4444,2222),50);
+				return Timing.sleepLogNormalSleep();
+			}
     		return Timing.sleepLogNormalSleep();
     	}
     	

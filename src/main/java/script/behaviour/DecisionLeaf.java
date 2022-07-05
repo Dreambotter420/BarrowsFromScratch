@@ -25,6 +25,7 @@ import script.quest.restlessghost.RestlessGhost;
 import script.quest.varrockmuseum.VarrockQuiz;
 import script.quest.waterfallquest.WaterfallQuest;
 import script.utilities.API;
+import script.utilities.API.modes;
 
 public class DecisionLeaf extends Leaf{
 
@@ -131,14 +132,14 @@ public class DecisionLeaf extends Leaf{
 		
 		if(!natureSpirited)
 		{
-			if(slayer >= slayerSetpoint && priestSaved && restedGhost && ranged >= 30 && !validModes.contains(API.modes.NATURE_SPIRIT)) validModes.add(API.modes.NATURE_SPIRIT);
+			if(slayer >= slayerSetpoint && priestSaved && restedGhost && ranged >= 30 && !validModes.contains(modes.NATURE_SPIRIT)) validModes.add(modes.NATURE_SPIRIT);
 			else if(slayer < slayerSetpoint)
 			{
-				if(!quizzed && !validModes.contains(API.modes.VARROCK_QUIZ)) validModes.add(API.modes.VARROCK_QUIZ);
+				if(!quizzed && !validModes.contains(modes.VARROCK_QUIZ)) validModes.add(modes.VARROCK_QUIZ);
 				else {
 					if(!priestSaved) {
-						if(ranged >= 30 && !validModes.contains(API.modes.TRAIN_SLAYER)) validModes.add(API.modes.TRAIN_SLAYER);
-						else if(!validModes.contains(API.modes.TRAIN_RANGE)) validModes.add(API.modes.TRAIN_RANGE);
+						if(ranged >= 30 && !validModes.contains(modes.TRAIN_SLAYER)) validModes.add(modes.TRAIN_SLAYER);
+						else if(!validModes.contains(modes.TRAIN_RANGE)) validModes.add(modes.TRAIN_RANGE);
 					}
 					else {
 						MethodProvider.log("Somehow the account has unlocked Morytania with Priest in Peril without");
@@ -147,19 +148,19 @@ public class DecisionLeaf extends Leaf{
 					}
 				}
 			} else { // slayer past point!! Can do priest in peril now :-)
-				if(!priestSaved && !validModes.contains(API.modes.PRIEST_IN_PERIL)) validModes.add(API.modes.PRIEST_IN_PERIL);
-				if(!restedGhost && !validModes.contains(API.modes.RESTLESS_GHOST)) validModes.add(API.modes.RESTLESS_GHOST);
+				if(!priestSaved && !validModes.contains(modes.PRIEST_IN_PERIL)) validModes.add(modes.PRIEST_IN_PERIL);
+				if(!restedGhost && !validModes.contains(modes.RESTLESS_GHOST)) validModes.add(modes.RESTLESS_GHOST);
 			}
 		}
 		
 		if(!animalMagnetized)
 		{
 			if(slayer < slayerSetpoint) {
-				if(!quizzed && !validModes.contains(API.modes.VARROCK_QUIZ)) validModes.add(API.modes.VARROCK_QUIZ);
+				if(!quizzed && !validModes.contains(modes.VARROCK_QUIZ)) validModes.add(modes.VARROCK_QUIZ);
 				else {
 					if(!priestSaved) {
-						if(ranged >= 30 && !validModes.contains(API.modes.TRAIN_SLAYER)) validModes.add(API.modes.TRAIN_SLAYER);
-						else if(!validModes.contains(API.modes.TRAIN_RANGE)) validModes.add(API.modes.TRAIN_RANGE);
+						if(ranged >= 50 && !validModes.contains(modes.TRAIN_SLAYER)) validModes.add(modes.TRAIN_SLAYER);
+						else if(!validModes.contains(modes.TRAIN_RANGE)) validModes.add(modes.TRAIN_RANGE);
 					}
 					else 
 					{
@@ -169,100 +170,101 @@ public class DecisionLeaf extends Leaf{
 					}
 				}
 			} else { // slayer past point!! Can do priest in peril now :-)
-				if(!priestSaved && !validModes.contains(API.modes.PRIEST_IN_PERIL)) validModes.add(API.modes.PRIEST_IN_PERIL);
+				if(!priestSaved && !validModes.contains(modes.PRIEST_IN_PERIL)) validModes.add(modes.PRIEST_IN_PERIL);
 			}
-			if(ranged < 30 && !validModes.contains(API.modes.TRAIN_RANGE)) validModes.add(API.modes.TRAIN_RANGE);
-			if(wc < wcSetpoint && !validModes.contains(API.modes.TRAIN_WOODCUTTING)) validModes.add(API.modes.TRAIN_WOODCUTTING);
-			if(crafting < craftingSetpoint  && !validModes.contains(API.modes.TRAIN_CRAFTING)) validModes.add(API.modes.TRAIN_CRAFTING);
-			if(!ernestDone && !validModes.contains(API.modes.ERNEST_THE_CHIKKEN)) validModes.add(API.modes.ERNEST_THE_CHIKKEN);
-			if(!restedGhost && !validModes.contains(API.modes.RESTLESS_GHOST)) validModes.add(API.modes.RESTLESS_GHOST);
+			if(ranged < 50 && !validModes.contains(modes.TRAIN_RANGE)) validModes.add(modes.TRAIN_RANGE);
+			if(wc < wcSetpoint && !validModes.contains(modes.TRAIN_WOODCUTTING)) validModes.add(modes.TRAIN_WOODCUTTING);
+			if(crafting < craftingSetpoint  && !validModes.contains(modes.TRAIN_CRAFTING)) validModes.add(modes.TRAIN_CRAFTING);
+			if(!ernestDone && !validModes.contains(modes.ERNEST_THE_CHIKKEN)) validModes.add(modes.ERNEST_THE_CHIKKEN);
+			if(!restedGhost && !validModes.contains(modes.RESTLESS_GHOST)) validModes.add(modes.RESTLESS_GHOST);
 		}
 		
 		if(!horrorDone)
 		{
-			if(ranged >= 46 && mage >= 35 && agility >= agilitySetpoint && !validModes.contains(API.modes.HORROR_FROM_THE_DEEP)) validModes.add(API.modes.HORROR_FROM_THE_DEEP);
-			if(ranged < 46 && !validModes.contains(API.modes.TRAIN_RANGE)) validModes.add(API.modes.TRAIN_RANGE);
-			if(mage < 35 && !validModes.contains(API.modes.TRAIN_MAGIC)) validModes.add(API.modes.TRAIN_MAGIC);
-			if(agility < agilitySetpoint && !validModes.contains(API.modes.TRAIN_AGILITY)) validModes.add(API.modes.TRAIN_AGILITY);
+			if(ranged >= 46 && mage >= 35 && agility >= agilitySetpoint && !validModes.contains(modes.HORROR_FROM_THE_DEEP)) validModes.add(modes.HORROR_FROM_THE_DEEP);
+			if(ranged < 46 && !validModes.contains(modes.TRAIN_RANGE)) validModes.add(modes.TRAIN_RANGE);
+			if(mage < 35 && !validModes.contains(modes.TRAIN_MAGIC)) validModes.add(modes.TRAIN_MAGIC);
+			if(agility < agilitySetpoint && !validModes.contains(modes.TRAIN_AGILITY)) validModes.add(modes.TRAIN_AGILITY);
 		}
 		
 		if(!mageArena2Done)
 		{
-			if(mageArena1Done && prayer >= prayerSetpoint && mage >= 75 && def >= 40 && ranged >= 70 && !validModes.contains(API.modes.MAGE_ARENA_2)) validModes.add(API.modes.MAGE_ARENA_2);
+			if(mageArena1Done && prayer >= prayerSetpoint && mage >= 75 && def >= 40 && ranged >= 70 && !validModes.contains(modes.MAGE_ARENA_2)) validModes.add(modes.MAGE_ARENA_2);
 			if(!mageArena1Done)
 			{
-				if(mage >= 60 && prayer >= prayerSetpoint && !validModes.contains(API.modes.MAGE_ARENA_1)) validModes.add(API.modes.MAGE_ARENA_1);
-				if(mage < 60 && !validModes.contains(API.modes.TRAIN_MAGIC)) validModes.add(API.modes.TRAIN_MAGIC);
-				if(prayer < prayerSetpoint && !validModes.contains(API.modes.TRAIN_PRAYER)) validModes.add(API.modes.TRAIN_PRAYER);
+				if(mage >= 60 && prayer >= prayerSetpoint && !validModes.contains(modes.MAGE_ARENA_1)) validModes.add(modes.MAGE_ARENA_1);
+				if(mage < 60 && !validModes.contains(modes.TRAIN_MAGIC)) validModes.add(modes.TRAIN_MAGIC);
+				if(prayer < prayerSetpoint && !validModes.contains(modes.TRAIN_PRAYER)) validModes.add(modes.TRAIN_PRAYER);
 			}
 			else //mage arena 1 done
 			{
-				if(mage < 75 && !validModes.contains(API.modes.TRAIN_MAGIC)) validModes.add(API.modes.TRAIN_MAGIC);
-				if(prayer < prayerSetpoint && !validModes.contains(API.modes.TRAIN_PRAYER)) validModes.add(API.modes.TRAIN_PRAYER);
-				if((def < 40 || ranged < 70) && !validModes.contains(API.modes.TRAIN_RANGE)) validModes.add(API.modes.TRAIN_RANGE);
+				if(mage < 75 && !validModes.contains(modes.TRAIN_MAGIC)) validModes.add(modes.TRAIN_MAGIC);
+				if(prayer < prayerSetpoint && !validModes.contains(modes.TRAIN_PRAYER)) validModes.add(modes.TRAIN_PRAYER);
+				if((def < 40 || ranged < 70) && !validModes.contains(modes.TRAIN_RANGE)) validModes.add(modes.TRAIN_RANGE);
 			}
 		}
 		
 		if(!fremmyTrialsDone)
 		{
-			if(fightArenaDone && waterfallDone && prayer >= prayerSetpoint && att >= attSetpoint && str >= strSetpoint && validModes.contains(API.modes.FREMENNIK_TRIALS)) validModes.add(API.modes.FREMENNIK_TRIALS);
+			if(fightArenaDone && waterfallDone && prayer >= prayerSetpoint && att >= attSetpoint && str >= strSetpoint && validModes.contains(modes.FREMENNIK_TRIALS)) validModes.add(modes.FREMENNIK_TRIALS);
 			if(!fightArenaDone)
 			{
-				if(waterfallDone && prayer >= prayerSetpoint && !validModes.contains(API.modes.FIGHT_ARENA)) validModes.add(API.modes.FIGHT_ARENA);
-				if(!waterfallDone && !validModes.contains(API.modes.WATERFALL_QUEST)) validModes.add(API.modes.WATERFALL_QUEST);
-				if(prayer < prayerSetpoint && validModes.contains(API.modes.TRAIN_PRAYER)) validModes.add(API.modes.TRAIN_PRAYER);
+				if(waterfallDone && prayer >= prayerSetpoint && !validModes.contains(modes.FIGHT_ARENA)) validModes.add(modes.FIGHT_ARENA);
+				if(!waterfallDone && !validModes.contains(modes.WATERFALL_QUEST)) validModes.add(modes.WATERFALL_QUEST);
+				if(prayer < prayerSetpoint && validModes.contains(modes.TRAIN_PRAYER)) validModes.add(modes.TRAIN_PRAYER);
 			} else {
-				if(!waterfallDone && !validModes.contains(API.modes.WATERFALL_QUEST)) validModes.add(API.modes.WATERFALL_QUEST);
-				if((att < attSetpoint || str < strSetpoint) && !validModes.contains(API.modes.TRAIN_MELEE)) validModes.add(API.modes.TRAIN_MELEE);
-				if(prayer < prayerSetpoint && !validModes.contains(API.modes.TRAIN_PRAYER)) validModes.add(API.modes.TRAIN_PRAYER);
+				if(!waterfallDone && !validModes.contains(modes.WATERFALL_QUEST)) validModes.add(modes.WATERFALL_QUEST);
+				if((att < attSetpoint || str < strSetpoint) && !validModes.contains(modes.TRAIN_MELEE)) validModes.add(modes.TRAIN_MELEE);
+				if(prayer < prayerSetpoint && !validModes.contains(modes.TRAIN_PRAYER)) validModes.add(modes.TRAIN_PRAYER);
 			}
 		}
 		
-		if(!ernestDone && !validModes.contains(API.modes.ERNEST_THE_CHIKKEN)) validModes.add(API.modes.ERNEST_THE_CHIKKEN);
-		if(!restedGhost && !validModes.contains(API.modes.RESTLESS_GHOST)) validModes.add(API.modes.RESTLESS_GHOST);
-		if(ranged < rangeSetpoint && !validModes.contains(API.modes.TRAIN_RANGE)) validModes.add(API.modes.TRAIN_RANGE);
-		if(mage < mageSetpoint && !validModes.contains(API.modes.TRAIN_MAGIC)) validModes.add(API.modes.TRAIN_MAGIC);
-		if(prayer < prayerSetpoint && !validModes.contains(API.modes.TRAIN_PRAYER)) validModes.add(API.modes.TRAIN_PRAYER);
+		if(!ernestDone && !validModes.contains(modes.ERNEST_THE_CHIKKEN)) validModes.add(modes.ERNEST_THE_CHIKKEN);
+		if(!restedGhost && !validModes.contains(modes.RESTLESS_GHOST)) validModes.add(modes.RESTLESS_GHOST);
+		if(ranged < rangeSetpoint && !validModes.contains(modes.TRAIN_RANGE)) validModes.add(modes.TRAIN_RANGE);
+		if(mage < mageSetpoint && !validModes.contains(modes.TRAIN_MAGIC)) validModes.add(modes.TRAIN_MAGIC);
+		if(prayer < prayerSetpoint && !validModes.contains(modes.TRAIN_PRAYER)) validModes.add(modes.TRAIN_PRAYER);
 		
 		if(validModes.isEmpty()) MethodProvider.log("Congratulations, you win!");
 		else
 		{
-			if(Calculations.random(1,100) > 95 || forceBreakTimer.finished()) API.mode = API.modes.BREAK;
+			if(Calculations.random(1,100) > 95 || forceBreakTimer.finished()) API.mode = modes.BREAK;
 			else 
 			{
 				Collections.shuffle(validModes);
 				API.mode = validModes.get(0);
 			}
+			API.mode = modes.TRAIN_RANGE;
 			MethodProvider.log("Switching mode: " + API.mode.toString());
-			if(API.mode == API.modes.ANIMAL_MAGNETISM || 
-					API.mode == API.modes.ERNEST_THE_CHIKKEN || 
-					API.mode == API.modes.MAGE_ARENA_1 || 
-					API.mode == API.modes.MAGE_ARENA_2 || 
-					API.mode == API.modes.NATURE_SPIRIT || 
-					API.mode == API.modes.RESTLESS_GHOST || 
-					API.mode == API.modes.VARROCK_QUIZ || 
-					API.mode == API.modes.PRIEST_IN_PERIL || 
-					API.mode == API.modes.HORROR_FROM_THE_DEEP || 
-					API.mode == API.modes.FREMENNIK_TRIALS || 
-					API.mode == API.modes.FIGHT_ARENA || 
-					API.mode == API.modes.WATERFALL_QUEST)
+			if(API.mode == modes.ANIMAL_MAGNETISM || 
+					API.mode == modes.ERNEST_THE_CHIKKEN || 
+					API.mode == modes.MAGE_ARENA_1 || 
+					API.mode == modes.MAGE_ARENA_2 || 
+					API.mode == modes.NATURE_SPIRIT || 
+					API.mode == modes.RESTLESS_GHOST || 
+					API.mode == modes.VARROCK_QUIZ || 
+					API.mode == modes.PRIEST_IN_PERIL || 
+					API.mode == modes.HORROR_FROM_THE_DEEP || 
+					API.mode == modes.FREMENNIK_TRIALS || 
+					API.mode == modes.FIGHT_ARENA || 
+					API.mode == modes.WATERFALL_QUEST)
 			{
 				setTimer(3);
 			}
-			else if(API.mode == API.modes.TRAIN_MAGIC || 
-					API.mode == API.modes.TRAIN_SLAYER || 
-					API.mode == API.modes.TRAIN_RANGE || 
-					API.mode == API.modes.TRAIN_MELEE)
+			else if(API.mode == modes.TRAIN_MAGIC || 
+					API.mode == modes.TRAIN_SLAYER || 
+					API.mode == modes.TRAIN_RANGE || 
+					API.mode == modes.TRAIN_MELEE)
 			{
 				setTimer(2);
 			}
-			else if(API.mode == API.modes.TRAIN_CRAFTING || 
-					API.mode == API.modes.TRAIN_WOODCUTTING || 
-					API.mode == API.modes.TRAIN_PRAYER)
+			else if(API.mode == modes.TRAIN_CRAFTING || 
+					API.mode == modes.TRAIN_WOODCUTTING || 
+					API.mode == modes.TRAIN_PRAYER)
 			{
 				setTimer(1);
 			}
-			else if(API.mode == API.modes.BREAK)
+			else if(API.mode == modes.BREAK)
 			{
 				setTimer(2);
 				resetForceBreakTimer();
@@ -298,7 +300,7 @@ public class DecisionLeaf extends Leaf{
 		if(tmp >= 83 && tmp <= 85) mageSetpoint = tmp;
 		else mageSetpoint = 83;
 		
-		tmp =(int) Calculations.nextGaussianRandom(47, 3);
+		tmp =(int) Calculations.nextGaussianRandom(49, 3);
 		if(tmp >= 45 && tmp <= 50) prayerSetpoint = tmp;
 		else prayerSetpoint = 45;
 		

@@ -1,8 +1,12 @@
 package script.utilities;
 
+import org.dreambot.api.methods.MethodProvider;
+import org.dreambot.api.methods.filter.Filter;
+import org.dreambot.api.methods.interactive.GameObjects;
 import org.dreambot.api.methods.interactive.Players;
 import org.dreambot.api.methods.map.Area;
 import org.dreambot.api.methods.map.Tile;
+import org.dreambot.api.wrappers.interactive.GameObject;
 
 public class Locations {
 	public static final Area camelotTrees = new Area(
@@ -18,10 +22,70 @@ public class Locations {
 	public static final Area houseTeleSpot = new Area(2953, 3227, 2958, 3221, 0);
 	public static final Area varrockTeleSpot = new Area(3210, 3425, 3215, 3422, 0);
 	public static final Area cammyTeleSpot = new Area(2755, 3480, 2759, 3476, 0);
-	public static final Area edgevilleTeleTile = new Area(3087, 3496, 3087, 3496, 0);
+	public static final Area edgevilleTeleSpot = new Area(3087, 3496, 3087, 3496, 0);
+	public static final Area farmingGuildTeleSpot = new Area(1245, 3720, 1252, 3714, 0);
+	public static final Area woodcuttingGuildTeleSpot = new Area(1658, 3508, 1663, 3502, 0);
+	public static final Area rangingGuildTeleSpot = new Area(2657, 3443, 2652, 3438, 0);
+	public static final Tile draynorTeleSpot = new Tile(3105,3251,0);
 	public static final Area rimmington = new Area(2944, 3209, 2960, 3229, 0);
 	public static final Area estateRoom = new Area(2981, 3370, 2984, 3368, 0);
 	public static final Area castleWars = new Area(2446, 3081, 2435, 3098, 0);
+	public static final Area veosPisc = new Area(1829,3688, 3048, 3252, 0);
+	public static final Area veosRimmington = new Area(3058, 3244, 1820,3691, 0);
+	public static final Area veosLandsEnd = new Area(1502, 3399, 1506, 3409, 0);
+	public static final Area shipLandsEnd = new Area(1500, 3396, 1510, 3394, 1);
+	public static final Area shipSarimVeos = new Area(3050, 3240, 3060, 3242, 1);
+	public static final Area shipPiscVeos = new Area(1818, 3694, 1828, 3696, 1);
+	public static final Area kourendCastle2ndFloor = new Area(1643, 3701, 1587, 3653, 1);
+	public static final Area kourendCastle3rdFloor = new Area(1627, 3654, 1590, 3697, 2);
+	public static final Area entireKourend = new Area(1969, 4073, 1151, 3345, 0);
+	public static final Area kourendGiantsCaveEntrance = new Area(1420, 3587, 1415, 3592, 0);
+	public static final Area kourendGiantsCaveExit = new Area(1429, 9906, 1436, 9914, 0);
+	public static final Area kourendGiantsCaveArea = new Area(1408, 9916, 1471, 9856, 0);
+	public static final Area kourendGiantsSafeSpot_Hill = new Area(1430, 9876, 1430, 9876, 0);
+	public static final Area kourendGiantsKillingArea_Hill = new Area(1420, 9878, 1440, 9892, 0);
+	public static final Area dreambotFuckedWCGuildSouth = new Area(1614, 3438, 1670, 3513, 0);
+	public static final Tile dreambotFuckedWCGuildDestSouth = new Tile(1609, 3438, 0);
+	public static void leaveDestinationShip()
+	{
+		Filter<GameObject> gangplankFilter = g ->
+			g != null && 
+			g.exists() && 
+			g.getName().equals("Gangplank") && 
+			g.hasAction("Cross") && 
+			g.canReach();
+		GameObject gangplank = GameObjects.closest(gangplankFilter);
+		if(gangplank != null)
+		{
+			if(gangplank.interact("Cross"))
+			{
+				MethodProvider.sleepUntil(() -> !isInDestinationShip(), 
+					() -> Players.localPlayer().isMoving(),
+					Sleep.calculate(2222,2222), 50);
+			}
+		}
+	}
+	public static boolean isInDestinationShip() {
+		if(shipLandsEnd.contains(Players.localPlayer())) return true;
+		if(shipSarimVeos.contains(Players.localPlayer())) return true;
+		if(shipPiscVeos.contains(Players.localPlayer())) return true;
+		return false;
+	}
+	public static boolean isInKourend() {
+		if(kourendGiantsCaveArea.contains(Players.localPlayer()) || 
+				entireKourend.contains(Players.localPlayer()) || 
+				kourendCastle2ndFloor.contains(Players.localPlayer()) || 
+				kourendCastle3rdFloor.contains(Players.localPlayer())) return true;
+		return false;
+	}
+	public static final Area boarZone = new Area(
+			new Tile(1563, 3664, 0),
+			new Tile(1562, 3660, 0),
+			new Tile(1546, 3664, 0),
+			new Tile(1540, 3669, 0),
+			new Tile(1535, 3676, 0),
+			new Tile(1546, 3682, 0),
+			new Tile(1563, 3678, 0));
 	public static final int edgeOfTheWorldX = 3904;
 	public static boolean isInstanced() {
 		if(Players.localPlayer().getX() >= edgeOfTheWorldX) return true;

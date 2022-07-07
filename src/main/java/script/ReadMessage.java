@@ -3,20 +3,25 @@ package script;
 import org.dreambot.api.wrappers.widgets.message.Message;
 
 import script.skills.prayer.TrainPrayer;
+import script.utilities.InvEquip;
+import script.utilities.Locations;
 
 public class ReadMessage {
-	public static void readGameMessage(Message msg)
+	public static void readMessage(Message msg)
 	{
 		String txt = msg.getMessage();
-		if(txt.contains("That player is offline, or has privacy mode enabled."))
+		if(txt.contains("That player is offline, or has privacy mode enabled"))
 		{
 			TrainPrayer.visitedLast = false;
 		}
+		if(txt.contains("You must travel to Great Kourend before you can use this teleport."))
+		{
+			Locations.unlockedKourend = false;
+		}
+		if(txt.contains("Your inventory is too full to take everything") || 
+				txt.contains("Your inventory is too full to take everything"))
+		{
+			InvEquip.collectBank = true;
+		}
 	}
-	
-	public static void readPlayerMessage(Message msg)
-    {
-    	String username = msg.getUsername();
-    	String txt = msg.getMessage();
-    }
 }

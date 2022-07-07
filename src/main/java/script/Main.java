@@ -207,14 +207,8 @@ public class Main extends AbstractScript implements PaintInfo, ChatListener
         CUSTOM_PAINT.paint(graphics2D);
     }
     @Override
-    public void onGameMessage(Message msg)
+    public void onMessage(Message msg)
     {
-    	ReadMessage.readGameMessage(msg);
-    }
-    
-    @Override
-    public void onPlayerMessage(Message msg)
-    {
-    	ReadMessage.readPlayerMessage(msg);
+    	ReadMessage.readMessage(msg);
     }
 }

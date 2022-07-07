@@ -41,7 +41,7 @@ public class Mobs {
 	}
 	public static void chooseMob()
 	{
-		final int range = Skills.getRealLevel(Skill.RANGED);
+		//final int range = TrainRanged.ranged;
 		mob = Mob.BOAR;
 		//if(range < 30) mob = Mob.BOAR;
 		//else mob = Mob.HILL_GIANT;
@@ -65,8 +65,8 @@ public class Mobs {
 	}
 	public static int trainBoars()
 	{
-		//think its config: 414: 262144 -> 393216
-		if(PlayerSettings.getConfig(414) != 393216) //need config values of "not having been to kourend at all yet"
+		Locations.isInKourend();
+		if(!Locations.unlockedKourend) //fuck config value 414 we assume unlocked unless get teh game msg
 		{
 			//handle dialogue for Veos traveling to Kourend
 			if(Dialogues.inDialogue()) 
@@ -85,14 +85,17 @@ public class Mobs {
 	        		if(veos.interact("Talk-to"))
         			{
         				MethodProvider.sleepUntil(Dialogues::inDialogue, () -> Players.localPlayer().isMoving(), Sleep.calculate(2222,2222), 50);
-        			}
+        			} else if(!Players.localPlayer().isMoving() && 
+        					Walking.shouldWalk(6) && 
+        					Walking.walk(veos)) Sleep.sleep(69,696);
 	    		}
 				return Timing.sleepLogNormalSleep();
 			}
 	    	else
 	    	{
-	    		if(Locations.veosRimmington.getCenter().distance(Players.localPlayer().getTile()) > 75) Walkz.teleportDraynor(180000);
-    			else if(Walking.shouldWalk(6) && Walking.walk(Locations.veosRimmington.getCenter())) Sleep.sleep(420,666);
+	    		//no veos here
+	    		if(Locations.veosSarim.getCenter().distance(Players.localPlayer().getTile()) > 75) Walkz.teleportDraynor(180000);
+    			else if(Walking.shouldWalk(6) && Walking.walk(Locations.veosSarim.getCenter())) Sleep.sleep(420,666);
 	    		
 	    	}
 			return Timing.sleepLogNormalSleep();
@@ -203,8 +206,8 @@ public class Mobs {
 			}
 	    	else
 	    	{
-	    		if(Locations.veosRimmington.getCenter().distance(Players.localPlayer().getTile()) > 75) Walkz.teleportDraynor(180000);
-    			else if(Walking.shouldWalk(6) && Walking.walk(Locations.veosRimmington.getCenter())) Sleep.sleep(420,666);
+	    		if(Locations.veosSarim.getCenter().distance(Players.localPlayer().getTile()) > 75) Walkz.teleportDraynor(180000);
+    			else if(Walking.shouldWalk(6) && Walking.walk(Locations.veosSarim.getCenter())) Sleep.sleep(420,666);
 	    		
 	    	}
 			return Timing.sleepLogNormalSleep();

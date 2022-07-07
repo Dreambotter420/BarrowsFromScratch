@@ -54,7 +54,7 @@ public class TrainCrafting extends Leaf {
         InvEquip.addInvyItem(InvEquip.coins, 0,0, false,0);
         if(!craftLeatherThing(crafting))
         {
-        	if(InvEquip.fulfillSetup(false,60000))
+        	if(InvEquip.fulfillSetup(true,60000))
             {
             	MethodProvider.log("Should be equipped now ;-)");
             }

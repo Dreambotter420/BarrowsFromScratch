@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.dreambot.api.Client;
 import org.dreambot.api.data.GameState;
+import org.dreambot.api.methods.Calculations;
 import org.dreambot.api.methods.MethodProvider;
 import org.dreambot.api.methods.container.impl.Inventory;
 import org.dreambot.api.methods.container.impl.bank.Bank;
@@ -389,7 +390,12 @@ public class Walkz {
 			int jewelry = InvEquip.getBankItem(InvEquip.wearableGlory);
 			
 			//if no ring found in invy OR bank, buy at GE
-			if(jewelry == 0) InvEquip.buyItem(InvEquip.glory6, 1, timeout);
+			if(jewelry == 0) 
+			{
+				InvEquip.buyItem(InvEquip.glory6, 1, timeout);
+				if(!InvEquip.bankContains(InvEquip.wearableWealth)) InvEquip.buyItem(InvEquip.wealth5, 3, timeout);
+			}
+				
 			
 			//found item in bank - withdraw it
 			else InvEquip.withdrawOne(jewelry, timeout);
@@ -404,6 +410,11 @@ public class Walkz {
 				&& ScriptManager.getScriptManager().isRunning() && !ScriptManager.getScriptManager().isPaused())
 		{
 			Sleep.sleep(69,69);
+			if(!Locations.unlockedKourend)
+			{
+				MethodProvider.log("Exiting woodcutting tele loop, do not have kourend unlocked");
+				break;
+			}
 			MethodProvider.log("In teleportWoodcuttingGuild loop");
 			//check if already in good draynor teleport area
 			double dist = Locations.woodcuttingGuildTeleSpot.distance(Players.localPlayer().getTile());
@@ -418,7 +429,11 @@ public class Walkz {
 			int jewelry = InvEquip.getBankItem(InvEquip.wearableSkills);
 			
 			//if nothing found in invy OR bank, buy at GE
-			if(jewelry == 0) InvEquip.buyItem(InvEquip.skills6, 1, timeout);
+			if(jewelry == 0) 
+			{
+				InvEquip.buyItem(InvEquip.skills6, 1, timeout);
+				if(!InvEquip.bankContains(InvEquip.wearableWealth)) InvEquip.buyItem(InvEquip.wealth5, 3, timeout);
+			}
 			
 			//found item in bank - withdraw it
 			else InvEquip.withdrawOne(jewelry, timeout);
@@ -461,7 +476,12 @@ public class Walkz {
 			if(!InvEquip.checkedBank()) continue;
 			
 			//if no ring found in invy OR bank, buy at GE
-			if(!Bank.contains(cammyTele)) InvEquip.buyItem(cammyTele, 1, timeout);
+			if(!Bank.contains(cammyTele)) 
+			{
+				InvEquip.buyItem(cammyTele, 1, timeout);
+				if(!InvEquip.bankContains(InvEquip.wearableWealth)) InvEquip.buyItem(InvEquip.wealth5, 3, timeout);
+			}
+				
 			
 			//found item in bank - withdraw it
 			else
@@ -507,7 +527,11 @@ public class Walkz {
 			if(!InvEquip.checkedBank()) continue;
 			
 			//if none found in invy OR bank, stop
-			if(!Bank.contains(tabID)) return false;
+			if(!Bank.contains(tabID)) 
+			{
+				InvEquip.buyItem(houseTele, (int) Calculations.nextGaussianRandom(12,5),timeout);
+				if(!InvEquip.bankContains(InvEquip.wearableWealth)) InvEquip.buyItem(InvEquip.wealth5, 3, timeout);
+			}
 			
 			//found item in bank - withdraw it
 			else InvEquip.withdrawOne(tabID, timeout);
@@ -550,7 +574,11 @@ public class Walkz {
 			if(!InvEquip.checkedBank()) continue;
 			
 			//if none found in invy OR bank, stop
-			if(!Bank.contains(houseTele)) return false;
+			if(!Bank.contains(houseTele)) 
+			{
+				InvEquip.buyItem(houseTele, (int) Calculations.nextGaussianRandom(12,5),timeout);
+				if(!InvEquip.bankContains(InvEquip.wearableWealth)) InvEquip.buyItem(InvEquip.wealth5, 3, timeout);
+			}
 			
 			//found item in bank - withdraw it
 			else InvEquip.withdrawOne(houseTele, timeout);

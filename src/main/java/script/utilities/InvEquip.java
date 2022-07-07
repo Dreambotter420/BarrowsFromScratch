@@ -507,6 +507,7 @@ public class InvEquip {
 		MethodProvider.log("Starting buy function");
 		Timer timer = new Timer(timeout);
 		double priceIncrease = 1;
+		collectBank = false;
 		while(!timer.finished() && Client.getGameState() == GameState.LOGGED_IN
 				&& ScriptManager.getScriptManager().isRunning() && !ScriptManager.getScriptManager().isPaused())
 		{
@@ -567,9 +568,16 @@ public class InvEquip {
 			{
 				if(GrandExchange.isReadyToCollect())
 				{
-					if(GrandExchange.collect())
+					if(collectBank)
 					{
-						MethodProvider.sleepUntil(() -> !GrandExchange.isReadyToCollect(), Sleep.calculate(2222, 2222));
+						if(GrandExchange.collectToBank())
+						{
+							MethodProvider.sleepUntil(() -> !GrandExchange.isReadyToCollect(), Sleep.calculate(2222, 2222));
+						}
+					}
+					else if(GrandExchange.collect())
+					{
+						MethodProvider.sleepUntil(() -> collectBank || !GrandExchange.isReadyToCollect(), Sleep.calculate(2222, 2222));
 					}
 					continue;
 				}
@@ -1526,10 +1534,21 @@ public class InvEquip {
 								if(bankCount >= neededForMax)
 								{
 									if(Bank.getWithdrawMode() != correctMode) Bank.setWithdrawMode(correctMode);
-									else if(Bank.withdraw(unnotedID,neededForMax))
+									else  
 									{
-										final int tmp = requestedID;
-										MethodProvider.sleepUntil(() -> (Inventory.count(tmp) == maxQty || Inventory.isFull()), Sleep.calculate(2222, 2222));
+										if(Inventory.emptySlotCount() < 1)
+										{
+											if(Bank.depositAll(Inventory.getItemInSlot(Inventory.getFirstFullSlot())))
+											{
+												MethodProvider.sleepUntil(() -> Inventory.emptySlotCount() >= 1,Sleep.calculate(2222, 2222));
+											}
+											continue;
+										}
+										if(Bank.withdraw(unnotedID,neededForMax))
+										{
+											final int tmp = requestedID;
+											MethodProvider.sleepUntil(() -> (Inventory.count(tmp) == maxQty || Inventory.isFull()), Sleep.calculate(2222, 2222));
+										}
 									}
 									continue;
 								}
@@ -1538,10 +1557,20 @@ public class InvEquip {
 								if(bankCount > 0)
 								{
 									if(Bank.getWithdrawMode() != correctMode) Bank.setWithdrawMode(correctMode);
-									else if(Bank.withdrawAll(unnotedID))
-									{
-										final int tmp = unnotedID;
-										MethodProvider.sleepUntil(() -> Bank.count(tmp) <= 0, Sleep.calculate(2222, 2222));
+									else {
+										if(Inventory.emptySlotCount() < 1)
+										{
+											if(Bank.depositAll(Inventory.getItemInSlot(Inventory.getFirstFullSlot())))
+											{
+												MethodProvider.sleepUntil(() -> Inventory.emptySlotCount() >= 1,Sleep.calculate(2222, 2222));
+											}
+											continue;
+										}
+										if(Bank.withdrawAll(unnotedID))
+										{
+											final int tmp = unnotedID;
+											MethodProvider.sleepUntil(() -> Bank.count(tmp) <= 0, Sleep.calculate(2222, 2222));
+										}
 									}
 								}
 								continue;
@@ -1550,18 +1579,41 @@ public class InvEquip {
 							if(bankCount >= neededForMax)
 							{
 								if(Bank.getWithdrawMode() != correctMode) Bank.setWithdrawMode(correctMode);
-								else if(Bank.withdraw(unnotedID,neededForMax))
+								else 
 								{
-									final int tmp = requestedID;
-									MethodProvider.sleepUntil(() -> Inventory.count(tmp) == maxQty, Sleep.calculate(2222, 2222));
+									if(Inventory.emptySlotCount() < 1)
+									{
+										if(Bank.depositAll(Inventory.getItemInSlot(Inventory.getFirstFullSlot())))
+										{
+											MethodProvider.sleepUntil(() -> Inventory.emptySlotCount() >= 1,Sleep.calculate(2222, 2222));
+										}
+										continue;
+									}
+									if(Bank.withdraw(unnotedID,neededForMax))
+									{
+										final int tmp = requestedID;
+										MethodProvider.sleepUntil(() -> Inventory.count(tmp) == maxQty, Sleep.calculate(2222, 2222));
+									}
 								}
+									
 								continue;
 							}
 							if(Bank.getWithdrawMode() != correctMode) Bank.setWithdrawMode(correctMode);
-							else if(Bank.withdrawAll(unnotedID))
+							else
 							{
-								final int tmp = unnotedID;
-								MethodProvider.sleepUntil(() -> Bank.count(tmp) <= 0, Sleep.calculate(2222, 2222));
+								if(Inventory.emptySlotCount() < 1)
+								{
+									if(Bank.depositAll(Inventory.getItemInSlot(Inventory.getFirstFullSlot())))
+									{
+										MethodProvider.sleepUntil(() -> Inventory.emptySlotCount() >= 1,Sleep.calculate(2222, 2222));
+									}
+									continue;
+								}
+								if(Bank.withdrawAll(unnotedID))
+								{
+									final int tmp = unnotedID;
+									MethodProvider.sleepUntil(() -> Bank.count(tmp) <= 0, Sleep.calculate(2222, 2222));
+								}
 							}
 							continue;
 						}
@@ -1580,6 +1632,7 @@ public class InvEquip {
 		}
 		while(!timeout.finished() && Client.getGameState() == GameState.LOGGED_IN
 				&& ScriptManager.getScriptManager().isRunning() && !ScriptManager.getScriptManager().isPaused());
+		MethodProvider.log("Ending fulfill function");
 		return false;
 	}
 	
@@ -1858,6 +1911,7 @@ public class InvEquip {
 	public static int wealth3 = 11984;
 	public static int wealth4 = 11982;
 	public static int wealth5 = 11980;
+	public static boolean collectBank = false;
 	
 	public static final int ironDart = 807;
 	public static final int steelDart = 808;

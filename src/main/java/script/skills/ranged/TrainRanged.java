@@ -130,7 +130,6 @@ public class TrainRanged extends Leaf {
                 API.mode = null;
                 return Timing.sleepLogNormalSleep();
     		}
-           
         }
     	if(!started) 
     	{
@@ -170,7 +169,6 @@ public class TrainRanged extends Leaf {
 		if(getNextNextBestDart() != getBestDart() && 
 				getNextNextBestDart() != getNextBestDart()) InvEquip.addInvyItem(getNextNextBestDart(), 500, 1000, false, 1000);
     	
-    	InvEquip.addInvyItem(jugOfWine, 1, 27, false, (int) Calculations.nextGaussianRandom(500, 100));
     	InvEquip.addInvyItem(rangePot4, 1, 6, false, (int) Calculations.nextGaussianRandom(20, 5));
     	
     	for(int f : Combat.foods)
@@ -183,6 +181,8 @@ public class TrainRanged extends Leaf {
     	}
     	InvEquip.addOptionalItem(InvEquip.jewelry);
     	InvEquip.shuffleFulfillOrder();
+    	InvEquip.addInvyItem(jugOfWine, 1, 27, false, (int) Calculations.nextGaussianRandom(500, 100));
+    	
 		if(InvEquip.fulfillSetup(true, 180000))
 		{
 			MethodProvider.log("[TRAIN RANGED] -> Fulfilled equipment correctly for Boars!");

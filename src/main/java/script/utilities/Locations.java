@@ -9,6 +9,7 @@ import org.dreambot.api.methods.map.Tile;
 import org.dreambot.api.wrappers.interactive.GameObject;
 
 public class Locations {
+	public static boolean unlockedKourend = true;
 	public static final Area camelotTrees = new Area(
 			new Tile(2752, 3452, 0),
 			new Tile(2756, 3451, 0),
@@ -31,7 +32,7 @@ public class Locations {
 	public static final Area estateRoom = new Area(2981, 3370, 2984, 3368, 0);
 	public static final Area castleWars = new Area(2446, 3081, 2435, 3098, 0);
 	public static final Area veosPisc = new Area(1829,3688, 3048, 3252, 0);
-	public static final Area veosRimmington = new Area(3058, 3244, 1820,3691, 0);
+	public static final Area veosSarim = new Area(3055, 3249, 3049, 3245, 0);
 	public static final Area veosLandsEnd = new Area(1502, 3399, 1506, 3409, 0);
 	public static final Area shipLandsEnd = new Area(1500, 3396, 1510, 3394, 1);
 	public static final Area shipSarimVeos = new Area(3050, 3240, 3060, 3242, 1);
@@ -46,6 +47,17 @@ public class Locations {
 	public static final Area kourendGiantsKillingArea_Hill = new Area(1420, 9878, 1440, 9892, 0);
 	public static final Area dreambotFuckedWCGuildSouth = new Area(1614, 3438, 1670, 3513, 0);
 	public static final Tile dreambotFuckedWCGuildDestSouth = new Tile(1609, 3438, 0);
+	public static final Area dreambotFuckedShayzien = new Area(
+			new Tile(1460, 3691, 0),
+			new Tile(1470, 3689, 0),
+			new Tile(1470, 3678, 0),
+			new Tile(1468, 3669, 0),
+			new Tile(1468, 3656, 0),
+			new Tile(1480, 3651, 0),
+			new Tile(1480, 3648, 0),
+			new Tile(1458, 3647, 0),
+			new Tile(1461, 3665, 0));
+	public static final Tile dreambotFuckedShayzienDest = new Tile(1490, 3649, 0); 
 	public static void leaveDestinationShip()
 	{
 		Filter<GameObject> gangplankFilter = g ->
@@ -75,7 +87,11 @@ public class Locations {
 		if(kourendGiantsCaveArea.contains(Players.localPlayer()) || 
 				entireKourend.contains(Players.localPlayer()) || 
 				kourendCastle2ndFloor.contains(Players.localPlayer()) || 
-				kourendCastle3rdFloor.contains(Players.localPlayer())) return true;
+				kourendCastle3rdFloor.contains(Players.localPlayer())) 
+		{
+			unlockedKourend = true;
+			return true;
+		}
 		return false;
 	}
 	public static final Area boarZone = new Area(

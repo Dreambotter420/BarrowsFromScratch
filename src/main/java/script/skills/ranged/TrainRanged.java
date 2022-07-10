@@ -65,7 +65,7 @@ public class TrainRanged extends Leaf {
 	public static int def = 0;
 	public static int bringMoreGear = 0;
     public void onStart() {
-    	if(Mobs.mob == null) Mobs.chooseMob();
+    	
     	Combat.foods.clear();
         Combat.foods.add(jugOfWine);
         Combat.highFoods.clear();
@@ -101,6 +101,7 @@ public class TrainRanged extends Leaf {
     }
     public boolean onExit() {
         Main.clearCustomPaintText();
+        if(!Walkz.exitGiantsCave()) return false;
         Mobs.mob = null;
     	return true;
     }
@@ -123,7 +124,7 @@ public class TrainRanged extends Leaf {
     		}
            
     	}
-    	if (Skills.getRealLevel(Skill.RANGED) >= 75) {
+    	if(Skills.getRealLevel(Skill.RANGED) >= 75) {
             MethodProvider.log("[COMPLETE] -> lvl 75 ranged!");
             if(onExit())
     		{
@@ -136,8 +137,8 @@ public class TrainRanged extends Leaf {
     		onStart();
     		return Timing.sleepLogNormalSleep();
     	}
-    	Mobs.trainMob(Mobs.mob);
-        return tree.onLoop();
+    	if(Mobs.mob == null) Mobs.chooseMob();
+        return Mobs.trainMob(Mobs.mob);
     }
     
     
@@ -181,7 +182,7 @@ public class TrainRanged extends Leaf {
     	}
     	InvEquip.addOptionalItem(InvEquip.jewelry);
     	InvEquip.shuffleFulfillOrder();
-    	InvEquip.addInvyItem(jugOfWine, 1, 27, false, (int) Calculations.nextGaussianRandom(500, 100));
+    	InvEquip.addInvyItem(jugOfWine, 15, 27, false, (int) Calculations.nextGaussianRandom(500, 100));
     	
 		if(InvEquip.fulfillSetup(true, 180000))
 		{
@@ -219,7 +220,7 @@ public class TrainRanged extends Leaf {
     }
     public static boolean shouldDrinkBoost()
     {
-    	if(nextRandBoostLvl == 0)
+    	if(nextRandBoostLvl == 0 || nextRandBoostLvl < ranged)
     	{
     		if(randRangedBoostFactor == 0)
         	{
@@ -263,7 +264,7 @@ public class TrainRanged extends Leaf {
     }
     public static boolean shouldEatFood(int maxHit)
     {
-    	if(nextFoodHP == 0)
+    	if(nextFoodHP == 0 || nextFoodHP < maxHit)
     	{
     		int tmp = (int) Calculations.nextGaussianRandom((maxHit + 3), maxHit);
     		if(tmp > Skills.getRealLevel(Skill.HITPOINTS)) nextFoodHP = (Skills.getRealLevel(Skill.HITPOINTS) - 2);
@@ -341,6 +342,9 @@ public class TrainRanged extends Leaf {
 	public static int getBestCapeSlot()
 	{
 		if(ranged >= 50 && AnimalMagnetism.completedAnimalMagnetism) return avasAccumulator;
+    	if(InvEquip.equipmentContains(randCapes)) return InvEquip.getEquipmentItem(randCapes);
+    	if(InvEquip.invyContains(randCapes)) return InvEquip.getInvyItem(randCapes);
+    	if(InvEquip.bankContains(randCapes)) return InvEquip.getBankItem(randCapes);
     	return randCape;
 	}
 	

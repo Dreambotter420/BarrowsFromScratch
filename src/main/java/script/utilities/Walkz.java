@@ -152,7 +152,7 @@ public class Walkz {
 				if(useJewelry(InvEquip.games,"Barbarian Outpost")) continue;
 				if(Locations.kourendGiantsCaveArea.contains(Players.localPlayer()))
 				{
-					exitCave();
+					exitGiantsCave();
 					continue;
 				}
 				if(!foundShortest)
@@ -190,30 +190,28 @@ public class Walkz {
 		}
 		return false;
 	}
-	public static void exitCave()
+	public static boolean exitGiantsCave()
 	{
-
-		MethodProvider.log("Test");
-		Filter<GameObject> caveFilter = c -> 
-		c != null && 
-		c.exists() && 
-		c.getName().contains("Cave") && 
-		c.hasAction("Exit");
-		GameObject cave = GameObjects.closest(caveFilter);
-		if(cave != null)
+		if(Locations.kourendGiantsCaveArea.contains(Players.localPlayer()))
 		{
-			if(cave.interact("Exit"))
+			Filter<GameObject> caveFilter = c -> 
+			c != null && 
+			c.exists() && 
+			c.getName().contains("Cave") && 
+			c.hasAction("Exit");
+			GameObject cave = GameObjects.closest(caveFilter);
+			if(cave != null)
 			{
-				MethodProvider.sleepUntil(() -> Locations.kourendGiantsCaveEntrance.contains(Players.localPlayer()),
-						() -> Players.localPlayer().isMoving(),Sleep.calculate(2222,2222), 50);
+				if(cave.interact("Exit"))
+				{
+					MethodProvider.sleepUntil(() -> Locations.kourendGiantsCaveEntrance.contains(Players.localPlayer()),
+							() -> Players.localPlayer().isMoving(),Sleep.calculate(2222,2222), 50);
+				} else if(Walking.shouldWalk(6) && Walking.walk(cave))
+				MethodProvider.sleep(Timing.sleepLogNormalSleep());
 			}
-			MethodProvider.sleep(Timing.sleepLogNormalSleep());
-			return;
+			return false;
 		}
-		else 
-		{
-			if(Walking.shouldWalk(6) && Walking.walk(Locations.kourendGiantsCaveEntrance.getCenter())) Sleep.sleep(69, 420);
-		}
+		return true;
 	}
 	/**
 	 * returns true if have jewelry in invy or equipment. If in invy, equips and then teleports

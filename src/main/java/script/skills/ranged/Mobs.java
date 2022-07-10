@@ -2,6 +2,7 @@ package script.skills.ranged;
 
 import java.util.List;
 
+import org.dreambot.api.methods.Calculations;
 import org.dreambot.api.methods.MethodProvider;
 import org.dreambot.api.methods.combat.CombatStyle;
 import org.dreambot.api.methods.container.impl.Inventory;
@@ -13,13 +14,19 @@ import org.dreambot.api.methods.interactive.GameObjects;
 import org.dreambot.api.methods.interactive.NPCs;
 import org.dreambot.api.methods.interactive.Players;
 import org.dreambot.api.methods.map.Area;
+import org.dreambot.api.methods.map.Map;
 import org.dreambot.api.methods.map.Tile;
+import org.dreambot.api.methods.prayer.Prayer;
+import org.dreambot.api.methods.prayer.Prayers;
 import org.dreambot.api.methods.settings.PlayerSettings;
 import org.dreambot.api.methods.skills.Skill;
 import org.dreambot.api.methods.skills.Skills;
+import org.dreambot.api.methods.tabs.Tab;
+import org.dreambot.api.methods.tabs.Tabs;
 import org.dreambot.api.methods.walking.impl.Walking;
 import org.dreambot.api.wrappers.interactive.GameObject;
 import org.dreambot.api.wrappers.interactive.NPC;
+import org.dreambot.api.wrappers.items.GroundItem;
 import org.dreambot.api.wrappers.items.Item;
 
 import script.Main;
@@ -41,11 +48,8 @@ public class Mobs {
 	}
 	public static void chooseMob()
 	{
-		//final int range = TrainRanged.ranged;
-		mob = Mob.BOAR;
-		//if(range < 30) mob = Mob.BOAR;
-		//else mob = Mob.HILL_GIANT;
-		
+		if(TrainRanged.ranged < 30) mob = Mob.BOAR;
+		else mob = Mob.HILL_GIANT;
 	}
 	public static int trainMob(Mob mob)
 	{
@@ -115,7 +119,7 @@ public class Mobs {
 				if(Combat.getFood() != null)
 				{
 					//should eat at 1 max hit
-					if(TrainRanged.shouldEatFood(1))
+					if(TrainRanged.shouldEatFood(2))
 					{
 						Combat.eatFood();
 					}
@@ -123,6 +127,7 @@ public class Mobs {
 				else 
 				{
 					//no more food, fulfill setup
+					
 					TrainRanged.fulfillRangedDarts();
 					return Timing.sleepLogNormalSleep();
 				}
@@ -161,7 +166,24 @@ public class Mobs {
 					if(Bank.isOpen()) Bank.close();
 					if(Locations.kourendGiantsCaveArea.contains(Players.localPlayer()))
 					{
-						Walkz.exitCave();
+						if(!Walkz.exitGiantsCave()) Sleep.sleep(420,696);
+						return Timing.sleepLogNormalSleep();
+					}
+					if(Locations.dreambotFuckedShayzien3.contains(Players.localPlayer()))
+					{
+						if(Walking.shouldWalk(6) && Walking.walk(Locations.dreambotFuckedShayzienDest3)) Sleep.sleep(69, 420);
+						return Timing.sleepLogNormalSleep();
+					}
+					if(Locations.dreambotFuckedShayzien2.contains(Players.localPlayer()))
+					{
+						
+						if(Walking.shouldWalk(6) && Walking.walk(Locations.dreambotFuckedShayzienDest2)) Sleep.sleep(69, 420);
+						return Timing.sleepLogNormalSleep();
+					}
+					if(Locations.dreambotFuckedShayzien.contains(Players.localPlayer()))
+					{
+						
+						if(Walking.shouldWalk(6) && Walking.walk(Locations.dreambotFuckedShayzienDest)) Sleep.sleep(69, 420);
 						return Timing.sleepLogNormalSleep();
 					}
 					if(Walking.shouldWalk(6) && Walking.walk(Locations.boarZone.getCenter())) Sleep.sleep(69, 420);
@@ -180,8 +202,8 @@ public class Mobs {
 	}
 	public static int trainHillGiants()
 	{
-		//think its config: 414: 262144 -> 393216
-		if(PlayerSettings.getConfig(414) != 393216) //need config values of "not having been to kourend at all yet"
+		Locations.isInKourend();
+		if(!Locations.unlockedKourend) //fuck config value 414 we assume unlocked unless get teh game msg
 		{
 			//handle dialogue for Veos traveling to Kourend
 			if(Dialogues.inDialogue()) 
@@ -238,25 +260,7 @@ public class Mobs {
 					TrainRanged.fulfillRangedDarts();
 					return Timing.sleepLogNormalSleep();
 				}
-				//if(nearbyGroundItemExists()) grabNearbyGroundItem();
-				//check for proper ranged lvl boost
-				if(TrainRanged.shouldDrinkBoost())
-				{
-					//if have any ranged pots while needing a drink, wait until in killingzone to sip up
-					if(InvEquip.invyContains(TrainRanged.rangedPots))
-					{
-						if(Locations.boarZone.contains(Players.localPlayer()))
-						{
-							if(!TrainRanged.drankRangedPotion()) MethodProvider.log("Not drank ranged Potion");
-						}
-					}
-					else 
-					{
-						//need a ranged pot to drink but have none
-						TrainRanged.fulfillRangedDarts();
-						return Timing.sleepLogNormalSleep();
-					}
-				}
+				
 				
 				//check for glory in invy + not equipped -> equip it
 				if(InvEquip.getInvyItem(InvEquip.wearableGlory) != 0 && 
@@ -265,29 +269,108 @@ public class Mobs {
 				//in location to kill mobs
 				if(Locations.kourendGiantsCaveArea.contains(Players.localPlayer()))
     			{
+					if(Inventory.isFull())
+					{
+						if(!Tabs.isOpen(Tab.INVENTORY))
+						{
+							Tabs.openWithFKey(Tab.INVENTORY);
+						}
+						if(Inventory.count(TrainRanged.jug) > 0)
+						{
+							Inventory.dropAll(TrainRanged.jug);
+						}
+						if(Inventory.count(ItemsOnGround.bigBones) > 0)
+						{
+							Inventory.interact(ItemsOnGround.bigBones, "Bury");
+							Sleep.sleep(69,420);
+						}
+						if(Combat.eatFood())
+						{
+							return Timing.sleepLogNormalSleep();
+						}
+					}
+					if(TrainRanged.shouldEatFood(8))
+					{
+						Combat.eatFood();
+					}
+					if(Inventory.count(ItemsOnGround.bigBones) > 0)
+					{
+						if((int) Calculations.nextGaussianRandom(50,30) > 65 && Inventory.interact(ItemsOnGround.bigBones, "Bury")) MethodProvider.sleep(Timing.sleepLogNormalSleep());
+					}
+					GroundItem gi = ItemsOnGround.getNearbyGroundItem(ItemsOnGround.hillGiantsLoot,Locations.kourendGiantsKillingArea_Hill);
+					if(gi != null)
+					{
+						ItemsOnGround.grabNearbyGroundItem(gi);
+						return Timing.sleepLogNormalSleep();
+					}
 					
+					//must be OK to fight hill giants now 
+					//check for proper ranged lvl boost
+					if(TrainRanged.shouldDrinkBoost())
+					{
+						//if have any ranged pots while needing a drink, wait until in killingzone to sip up
+						if(InvEquip.invyContains(TrainRanged.rangedPots))
+						{
+							if(!TrainRanged.drankRangedPotion()) MethodProvider.log("Not drank ranged Potion");						}
+						else 
+						{
+							//need a ranged pot to drink but have none
+							TrainRanged.fulfillRangedDarts();
+							return Timing.sleepLogNormalSleep();
+						}
+					}
+					
+					if(!Locations.kourendGiantsSafeSpot_Hill.contains(Players.localPlayer()))
+					{
+						final Tile closestSafespot = Locations.kourendGiantsSafeSpot_Hill.getNearestTile(Players.localPlayer());
+						if(Map.isTileOnScreen(closestSafespot))
+						{
+							if(Walking.walkExact(closestSafespot)) Sleep.sleep(420,696);
+						}
 						
-					Mobs.fightMobRanged("Hill Giant", Locations.kourendGiantsKillingArea_Hill, 4);
+						else if(!Players.localPlayer().isMoving() && Walking.walk(closestSafespot))
+						{
+							Sleep.sleep(420,696);
+						}
+						return Timing.sleepLogNormalSleep();
+					}
+					
+					final int boostedPrayer = Skills.getBoostedLevels(Skill.PRAYER);
+					final int prayer = Skills.getRealLevel(Skill.PRAYER);
+					
+					if(prayer >= 44)
+					{
+						if(boostedPrayer > 8 && !Prayers.isActive(Prayer.EAGLE_EYE))
+						{
+							if(Prayers.isOpen())
+							{
+								Prayers.toggle(true, Prayer.EAGLE_EYE);
+							}
+							else Prayers.openTab();
+							Sleep.sleep(69, 420);
+						}
+					}
+					else if(prayer >= 26)
+					{
+						if(boostedPrayer > 8 && !Prayers.isActive(Prayer.HAWK_EYE))
+						{
+							if(Prayers.isOpen())
+							{
+								Prayers.toggle(true, Prayer.HAWK_EYE);
+							}
+							else Prayers.openTab();
+							Sleep.sleep(69, 420);
+						}
+					}
+					
+					Mobs.fightMobRanged("Hill Giant", Locations.kourendGiantsKillingArea_Hill, 8);
 					return Timing.sleepLogNormalSleep();
     			}
 				else if(Locations.isInKourend())
 				{
 					if(Bank.isOpen()) Bank.close();
-					Filter<GameObject> caveFilter = c -> 
-						c != null && 
-						c.exists() && 
-						c.getName().contains("Cave") && 
-						c.hasAction("Enter");
-					GameObject cave = GameObjects.closest(caveFilter);
-					if(cave != null)
-					{
-						if(cave.interact("Enter"))
-						{
-							MethodProvider.sleepUntil(() -> Locations.kourendGiantsCaveEntrance.contains(Players.localPlayer()),
-									() -> Players.localPlayer().isMoving(),Sleep.calculate(2222,2222), 50);
-						}
-						return Timing.sleepLogNormalSleep();
-					}
+					
+					
 					if(!Locations.kourendGiantsCaveEntrance.contains(Players.localPlayer()))
 					{
 						if(Locations.dreambotFuckedWCGuildSouth.contains(Players.localPlayer()))
@@ -305,7 +388,27 @@ public class Mobs {
 								Sleep.sleep(69, 420);
 							}
 						}
-					} else MethodProvider.log("[SCRIPT] -> Error! In Hill Giants cave entrance in Kourend, but cave not found!");
+					} else 
+					{
+						//check for cave entrance
+						Filter<GameObject> caveFilter = c -> 
+							c != null && 
+							c.exists() && 
+							c.getName().contains("Cave") && 
+							c.hasAction("Enter");
+						GameObject cave = GameObjects.closest(caveFilter);
+						if(cave != null)
+						{
+							if(cave.interact("Enter"))
+							{
+								MethodProvider.sleepUntil(() -> Locations.kourendGiantsCaveArea.contains(Players.localPlayer()),
+										() -> Players.localPlayer().isMoving(),Sleep.calculate(2222,2222), 50);
+							}
+							return Timing.sleepLogNormalSleep();
+						}
+						MethodProvider.log("[SCRIPT] -> Error! In Hill Giants cave entrance in Kourend, but cave not found!");
+					}
+						
 				} 
 				else 
 				{
@@ -316,6 +419,7 @@ public class Mobs {
 			{
 				MethodProvider.log("Not enough darts: " + new Item(TrainRanged.getBestDart(),1).getName());
 				TrainRanged.fulfillRangedDarts();
+				
 			}
 		}
 		return Timing.sleepLogNormalSleep();
@@ -377,7 +481,7 @@ public class Mobs {
 			Main.customPaintText3 = "~~Attacking mob: " + name+"~~";
 			if(mob.interact("Attack"))
 			{
-				MethodProvider.sleepUntil(() -> mob.isInteracting(Players.localPlayer()), () -> Players.localPlayer().isInteracting(mob), Sleep.calculate(2222, 2222), 50);
+				MethodProvider.sleepUntil(() -> Players.localPlayer().isInteracting(mob) && mob.isInteracting(Players.localPlayer()), Sleep.calculate(2222, 2222));
 				if(Players.localPlayer().isInteracting(mob)) MethodProvider.sleep(Timing.sleepLogNormalSleep());
 	        	return;
 			}

@@ -4,8 +4,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.dreambot.api.methods.MethodProvider;
+import org.dreambot.api.methods.container.impl.Inventory;
 import org.dreambot.api.methods.filter.Filter;
+import org.dreambot.api.methods.interactive.Players;
+import org.dreambot.api.methods.item.GroundItems;
+import org.dreambot.api.methods.map.Area;
 import org.dreambot.api.wrappers.items.GroundItem;
+import org.dreambot.api.wrappers.items.Item;
+
+import script.quest.varrockmuseum.Timing;
+import script.utilities.Combat;
+import script.utilities.Sleep;
 
 public class ItemsOnGround {
 	public static List<Integer> herbTable = new ArrayList<Integer>();
@@ -69,28 +78,55 @@ public class ItemsOnGround {
 		}
 		return false;
 	}
-	public static boolean nearbyGroundItemExists(List<Integer> listToCheck)
+	public static GroundItem getNearbyGroundItem(List<Integer> listToCheck, Area killingArea)
 	{
 		if(listToCheck == null)
 		{
 			MethodProvider.log("Attempted to check ground items list which is null");
-			return false;
+			return null;
 		}
 		if(listToCheck.isEmpty())
 		{
 			MethodProvider.log("Attempted to check ground items list which is empty");
-			return false;
+			return null;
 		}
 		Filter<GroundItem> nearbyGroundItemFilter = g -> 
 			g != null && 
 			g.exists() &&
 			g.distance() <= 15 &&
+			(killingArea.contains(g) || g.getID() != bigBones) &&
 			g.canReach() && 
 			groundIDMatchesList(g.getID(), listToCheck);
-		return false;
+		GroundItem g = GroundItems.closest(nearbyGroundItemFilter);
+		return g;
 	}
-	public static void grabNearbyGroundItem()
+	public static void grabNearbyGroundItem(GroundItem g)
 	{
-		
+		if(g == null) return;
+		if(Inventory.isFull())
+		{
+			for(int food : Combat.foods)
+			{
+				if(Inventory.count(food) > 0)
+				{
+					if(Inventory.drop(food))
+					{
+						MethodProvider.log("Dropped a food: " + new Item(food, 1).getName());
+						MethodProvider.sleep(Timing.sleepLogNormalSleep());
+					}
+				}
+			}
+		}
+		if(Inventory.isFull())
+		{
+			MethodProvider.log("Inventory full but found nearby ground item, confused wat do?? : "+g.getName());
+			return;
+		}
+		MethodProvider.log("Attempting to grab ground item: "+g.getName() +" in amount: " + g.getAmount());
+		final int count = Inventory.count(g.getID());
+		if(g.interact("Take")) 
+		{
+			MethodProvider.sleepUntil(() -> Inventory.count(g.getID()) > count, Sleep.calculate(2222, 2222));
+		}
 	}
 }

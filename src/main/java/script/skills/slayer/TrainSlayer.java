@@ -29,6 +29,11 @@ public class TrainSlayer extends Leaf{
 
 	@Override
 	public int onLoop() {
+		if(true)
+		{
+			MethodProvider.log("[SLAYER] -> unscripted!");
+			return 5;
+		}
 		if(!started) initializeTree();
 		if(DecisionLeaf.taskTimer.finished())
     	{

@@ -13,17 +13,21 @@ import org.dreambot.api.methods.Calculations;
 import org.dreambot.api.methods.MethodProvider;
 import org.dreambot.api.methods.container.impl.Inventory;
 import org.dreambot.api.methods.container.impl.bank.Bank;
+import org.dreambot.api.methods.container.impl.bank.BankLocation;
 import org.dreambot.api.methods.container.impl.bank.BankMode;
 import org.dreambot.api.methods.container.impl.equipment.Equipment;
 import org.dreambot.api.methods.container.impl.equipment.EquipmentSlot;
 import org.dreambot.api.methods.grandexchange.GrandExchange;
 import org.dreambot.api.methods.grandexchange.LivePrices;
+import org.dreambot.api.methods.interactive.Players;
 import org.dreambot.api.methods.tabs.Tab;
 import org.dreambot.api.methods.tabs.Tabs;
 import org.dreambot.api.methods.widget.Widgets;
 import org.dreambot.api.script.ScriptManager;
 import org.dreambot.api.utilities.Timer;
 import org.dreambot.api.wrappers.items.Item;
+
+import script.skills.ranged.TrainRanged;
 
 public class InvEquip {
 	public static Map<EquipmentSlot, Integer> equipmentMap = new LinkedHashMap<EquipmentSlot, Integer>();
@@ -103,7 +107,7 @@ public class InvEquip {
 			else
 			{
 				if(!closeBankEquipment()) return false;
-				if(!Bank.openClosest()) Sleep.sleep(666,666);
+				if(!Bankz.openClosest()) Sleep.sleep(666,666);
 			}
 		}
 		if(Bank.getLastBankHistoryCacheTime() > 0)
@@ -161,7 +165,7 @@ public class InvEquip {
 		}
 		return false;
 	}
-	public static int getEquipped(List<Integer> ints)
+	public static int getEquipmentItem(List<Integer> ints)
 	{
 		for(int i: ints)
 		{
@@ -197,15 +201,16 @@ public class InvEquip {
 			MethodProvider.log("In WithdrawOne loop");
 			if(Inventory.count(itemID) > 0) return;
 			if(!closeBankEquipment()) continue;
-			if(Bank.openClosest())
+			if(Bankz.openClosest())
 			{
 				if(Inventory.emptySlotCount() < 2)
 				{
 					Item i = Inventory.getItemInSlot(Inventory.getFirstFullSlot());
 					int iD = i.getID();
-					if(Bank.depositAll(i))
+					final int count = Inventory.count(iD);
+					if(Bank.deposit(i,1))
 					{
-						MethodProvider.sleepUntil(() -> Inventory.count(iD) <= 0,Sleep.calculate(2222, 2222));
+						MethodProvider.sleepUntil(() -> Inventory.count(iD) < count,Sleep.calculate(2222, 2222));
 					}
 					continue;
 				}
@@ -226,7 +231,7 @@ public class InvEquip {
 			Sleep.sleep(69, 69);
 			if(Bank.count(itemID) < count || Inventory.isFull()) return;
 			if(closeBankEquipment()) continue;
-			if(Bank.openClosest())
+			if(Bankz.openClosest())
 			{
 				if(noted)
 				{
@@ -1137,7 +1142,7 @@ public class InvEquip {
 							if(continueOrNot2)
 							{
 								if(!closeBankEquipment()) continue;
-								if(Bank.openClosest())
+								if(Bankz.openClosest())
 								{
 									if(Bank.getWithdrawMode() == BankMode.ITEM)
 									{
@@ -1277,7 +1282,7 @@ public class InvEquip {
 						if(!notOKItems.isEmpty())
 						{
 							if(!closeBankEquipment()) continue;
-							if(Bank.openClosest())
+							if(Bankz.openClosest())
 							{
 								if(Bank.depositAllEquipment())
 								{
@@ -1335,7 +1340,7 @@ public class InvEquip {
 					if(!notOKItems.isEmpty())
 					{
 						if(!closeBankEquipment()) continue;
-						if(Bank.openClosest())
+						if(Bankz.openClosest())
 						{
 							if(Bank.depositAllItems()) MethodProvider.sleepUntil(Inventory::isEmpty, Sleep.calculate(2222, 2222));
 						}
@@ -1388,7 +1393,7 @@ public class InvEquip {
 						MethodProvider.log("~~"+new Item(i,1).getName()+"~~");
 					}
 					if(!closeBankEquipment()) continue;
-					if(Bank.openClosest())
+					if(Bankz.openClosest())
 					{
 						for(int depositItem : notOKItems)
 						{
@@ -1479,7 +1484,7 @@ public class InvEquip {
 					if(maxQty <= 0)
 					{
 						if(!closeBankEquipment()) continue;
-						if(Bank.openClosest())
+						if(Bankz.openClosest())
 						{
 							if(Bank.depositAll(requestedID))
 							{
@@ -1496,7 +1501,7 @@ public class InvEquip {
 					{
 						MethodProvider.log("Have something to swap noted <--> item: " + swapDepositID);
 						if(!closeBankEquipment()) continue;
-						if(Bank.openClosest())
+						if(Bankz.openClosest())
 						{
 							if(Bank.depositAll(swapDepositID))
 							{
@@ -1514,7 +1519,7 @@ public class InvEquip {
 					if(bankCount > 0 || tooMuch > 0) 
 					{
 						if(!closeBankEquipment()) continue;
-						if(Bank.openClosest())
+						if(Bankz.openClosest())
 						{
 							//have too much in inventory (over max)
 							if(tooMuch > 0)
@@ -1665,7 +1670,7 @@ public class InvEquip {
 			if(Inventory.interact(ID, action))
 			{
 				MethodProvider.sleepUntil(() -> {
-					Combat.eatFood();
+					if(TrainRanged.shouldEatFood(8)) Combat.eatFood();
 					return Equipment.contains(tmp);
 				}, Sleep.calculate(2222, 2222));
 			}
@@ -1710,7 +1715,7 @@ public class InvEquip {
 			if(Inventory.interact(itemName, action))
 			{
 				MethodProvider.sleepUntil(() -> {
-					Combat.eatFood();
+					if(TrainRanged.shouldEatFood(8)) Combat.eatFood();
 					return Equipment.contains(tmp);
 				}, Sleep.calculate(2222, 2222));
 			}
@@ -1773,8 +1778,7 @@ public class InvEquip {
 		} 
 		
 		else if(GrandExchange.isOpen()) GrandExchange.close();
-		
-		else if(!Bank.openClosest()) Sleep.sleep(666, 666);
+		else if(Bankz.openClosest()) Sleep.sleep(666, 666);
 		
 		return false;
 	}

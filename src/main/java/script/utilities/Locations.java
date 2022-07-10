@@ -19,6 +19,7 @@ public class Locations {
 			new Tile(2781, 3467, 0),
 			new Tile(2776, 3480, 0),
 			new Tile(2754, 3480, 0));
+	public static final Area museumArea = new Area(1725, 4991, 1793, 4928);
 	public static final Area fallyTeleSpot = new Area(2961, 3384, 2969, 3376, 0);
 	public static final Area houseTeleSpot = new Area(2953, 3227, 2958, 3221, 0);
 	public static final Area varrockTeleSpot = new Area(3210, 3425, 3215, 3422, 0);
@@ -58,6 +59,11 @@ public class Locations {
 			new Tile(1458, 3647, 0),
 			new Tile(1461, 3665, 0));
 	public static final Tile dreambotFuckedShayzienDest = new Tile(1490, 3649, 0); 
+	public static final Area dreambotFuckedShayzien2 = new Area(1531, 3640, 1470, 3667, 0);
+	public static final Tile dreambotFuckedShayzienDest2 = new Tile(1533,3642, 0); 
+	public static final Tile dreambotFuckedShayzienDest3 = new Tile(1562,3664, 0); 
+	public static final Area dreambotFuckedShayzien3 = new Area(1535, 3629, 1560, 3657, 0);
+	
 	public static void leaveDestinationShip()
 	{
 		Filter<GameObject> gangplankFilter = g ->

@@ -488,7 +488,6 @@ public class TrainPrayer extends Leaf {
 					return Timing.sleepLogNormalSleep();
     			}
     		} else leaveHouse();
-    		return Timing.sleepLogNormalSleep();
     	}
     	else //not in instanced area (house) 
     	{
@@ -596,11 +595,8 @@ public class TrainPrayer extends Leaf {
 				MethodProvider.sleepUntil(() -> Locations.isInstanced(), () -> Players.localPlayer().isAnimating(), Sleep.calculate(4444,2222),50);
 				return Timing.sleepLogNormalSleep();
 			}
-    		return Timing.sleepLogNormalSleep();
     	}
-    	
-    	
-    	
+		return Timing.sleepLogNormalSleep();
     }
 
 	@Override

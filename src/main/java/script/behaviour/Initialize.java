@@ -6,6 +6,7 @@ import org.dreambot.api.methods.MethodProvider;
 import org.dreambot.api.methods.widget.Widgets;
 import script.framework.Leaf;
 import script.quest.varrockmuseum.VarrockQuiz;
+import script.skills.ranged.ItemsOnGround;
 import script.utilities.API;
 import script.utilities.InvEquip;
 import script.utilities.Sleep;
@@ -28,6 +29,7 @@ public class Initialize extends Leaf {
 		InvEquip.clearEquipmentSlots();
 		InvEquip.initializeIntLists();
 		DecisionLeaf.initialize();
+		ItemsOnGround.initializeLists();
 		MethodProvider.log("Initialized");
 		API.initialized = true;
         return 5;

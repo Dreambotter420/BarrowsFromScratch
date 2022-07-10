@@ -36,11 +36,6 @@ public class Combat {
 			MethodProvider.log("attempted to eat food: " +foodAttemptTimer.elapsed()+"ms ago, continuing");
 			return false;
 		}
-		if(!TrainRanged.shouldEatFood(5)) 
-		{
-			MethodProvider.log("Called eatFood function but HP should be lower than: " + TrainRanged.nextFoodHP + " and HP is " + Skills.getBoostedLevels(Skill.HITPOINTS));
-			return false;
-		}
 		Timer timer = new Timer(5000);
 		while(!timer.finished() && Client.getGameState() == GameState.LOGGED_IN
 				&& ScriptManager.getScriptManager().isRunning() && !ScriptManager.getScriptManager().isPaused())

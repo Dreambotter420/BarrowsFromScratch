@@ -63,9 +63,13 @@ public class TrainRanged extends Leaf {
 	public static List<Integer> randCapes = new ArrayList<Integer>();
 	public static int ranged = 0;
 	public static int def = 0;
-	public static int bringMoreGear = 0;
     public void onStart() {
-    	
+        instantiateTree();
+        Main.customPaintText1 = "~~~ Training Ranged ~~~";
+        started = true;
+    }
+    public static void initialize()
+    {
     	Combat.foods.clear();
         Combat.foods.add(jugOfWine);
         Combat.highFoods.clear();
@@ -80,10 +84,7 @@ public class TrainRanged extends Leaf {
         if(tmp > 8) randCape = lightGreenCape;
         if(randCape == 0) randCape = lightBlueCape;
 
-        int rand = (int) Calculations.nextGaussianRandom(1, 2);
-        if(rand <= 0) rand = 0;
-        if(rand >= 2) rand = 2;
-        bringMoreGear = rand;
+        
         randCapes.add(darkRedCape);
         randCapes.add(lightRedCape);
         randCapes.add(yellowCape);
@@ -93,11 +94,6 @@ public class TrainRanged extends Leaf {
         rangedPots.add(rangePot2);
         rangedPots.add(rangePot3);
         rangedPots.add(rangePot4);
-        instantiateTree();
-        Main.customPaintText1 = "~~~ Training Ranged ~~~";
-        started = true;
-        
-    	
     }
     public boolean onExit() {
         Main.clearCustomPaintText();
@@ -146,6 +142,7 @@ public class TrainRanged extends Leaf {
     public static boolean fulfillRangedDarts()
     {
     	InvEquip.clearAll();
+    	
     	InvEquip.setEquipItem(EquipmentSlot.SHIELD, getBestShieldSlot());
     	InvEquip.setEquipItem(EquipmentSlot.HAT, getBestHeadSlot());
     	InvEquip.setEquipItem(EquipmentSlot.CHEST, getBestBodySlot());
@@ -186,11 +183,11 @@ public class TrainRanged extends Leaf {
     	
 		if(InvEquip.fulfillSetup(true, 180000))
 		{
-			MethodProvider.log("[TRAIN RANGED] -> Fulfilled equipment correctly for Boars!");
+			MethodProvider.log("[TRAIN RANGED] -> Fulfilled equipment correctly!");
 			return true;
 		} else 
 		{
-			MethodProvider.log("[TRAIN RANGED] -> NOT fulfilled equipment correctly for Boars!");
+			MethodProvider.log("[TRAIN RANGED] -> NOT fulfilled equipment correctly!");
 			return false;
 		}
     	

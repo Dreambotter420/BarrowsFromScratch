@@ -21,7 +21,12 @@ public class ItemsOnGround {
 	public static List<Integer> seedTable = new ArrayList<Integer>();
 	public static List<Integer> rareDropTable = new ArrayList<Integer>();
 	public static List<Integer> hillGiantsLoot = new ArrayList<Integer>();
+	public static List<Integer> forgottenSoulsLoot = new ArrayList<Integer>();
 	public static final int grimyRanarr = 207;
+	public static final int grimyAvantoe = 211;
+	public static final int grimyKwuarm = 213;
+	public static final int grimyCadantine = 215;
+	public static final int grimyLantadyme = 2485;
 
 	public static final int snapdragonSeed = 5300;
 	public static final int ranarrSeed = 5295;
@@ -33,6 +38,13 @@ public class ItemsOnGround {
 	public static final int natureRune = 561;
 	public static final int bigBones = 532;
 
+	public static final int mithBolts = 9142;
+	public static final int lawRune = 563;
+	public static final int fireBattlestaff = 1393;
+	public static final int earthBattlestaff = 1399;
+	public static final int airBattlestaff = 1397;
+	public static final int waterBattlestaff = 1395;
+	
 	public static final int shieldLeftHalf = 2366;
 	public static final int dragonSpear = 1249;
 	public static final int runeSpear = 1247;
@@ -44,6 +56,11 @@ public class ItemsOnGround {
 	public static void initializeLists()
 	{
 		herbTable.add(grimyRanarr);
+		herbTable.add(grimyAvantoe);
+		herbTable.add(grimyKwuarm);
+		herbTable.add(grimyCadantine);
+		herbTable.add(grimyLantadyme);
+		
 		seedTable.add(snapdragonSeed);
 		seedTable.add(torstolSeed);
 		seedTable.add(toadflaxSeed);
@@ -54,11 +71,20 @@ public class ItemsOnGround {
 		rareDropTable.add(keyLoopHalf);
 		rareDropTable.add(keyToothHalf);
 		rareDropTable.add(uncutDiamond);
+
+		forgottenSoulsLoot.add(mithBolts);
+		forgottenSoulsLoot.add(lawRune);
+		forgottenSoulsLoot.add(fireBattlestaff);
+		forgottenSoulsLoot.add(earthBattlestaff);
+		forgottenSoulsLoot.add(airBattlestaff);
+		forgottenSoulsLoot.add(waterBattlestaff);
+		
 		hillGiantsLoot.add(giantKey);
 		hillGiantsLoot.add(natureRune);
 		hillGiantsLoot.add(bigBones);
 		for(int i : herbTable)
 		{
+			forgottenSoulsLoot.add(i);
 			hillGiantsLoot.add(i);
 		}
 		for(int i: seedTable)
@@ -67,6 +93,7 @@ public class ItemsOnGround {
 		}
 		for(int i: rareDropTable)
 		{
+			forgottenSoulsLoot.add(i);
 			hillGiantsLoot.add(i);
 		}
 	}

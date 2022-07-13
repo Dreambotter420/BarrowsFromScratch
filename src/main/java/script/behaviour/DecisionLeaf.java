@@ -234,6 +234,9 @@ public class DecisionLeaf extends Leaf{
 				Collections.shuffle(validModes);
 				API.mode = validModes.get(0);
 			}
+			
+			//testing
+			
 			MethodProvider.log("Switching mode: " + API.mode.toString());
 			if(API.mode == modes.ANIMAL_MAGNETISM || 
 					API.mode == modes.ERNEST_THE_CHIKKEN || 

@@ -139,24 +139,6 @@ public class Main extends AbstractScript implements PaintInfo, ChatListener
         return tree.onLoop();
     }
     
-    @Override
-    public void onResume()
-    {
-    	
-    }
-    
-    @Override
-    public void onPause()
-    {
-    	
-    }
-    
-    @Override
-    public void onExit()
-    {
-    	
-    }
-
     // Our paint info
     // Add new lines to the paint here
     public static String customPaintText1 = "";

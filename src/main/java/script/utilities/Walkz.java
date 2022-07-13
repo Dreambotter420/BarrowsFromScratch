@@ -285,6 +285,17 @@ public class Walkz {
 			InvEquip.equipItem(jewelryID);
 			return true;
 		}
+		
+		if(InvEquip.checkedBank())
+		{
+			if(InvEquip.bankContains(wearableJewelry))
+			{
+				final int jewelryID = InvEquip.getInvyItem(wearableJewelry);
+				InvEquip.withdrawOne(jewelryID, 180000);
+				return true;
+			}
+		}
+		
 		return false;
 	}
 	public static boolean goToCastleWars(long timeout)

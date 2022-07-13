@@ -26,8 +26,7 @@ public class Combat {
 	public static Timer foodAttemptTimer = null;
 	public static Item getFood()
 	{
-		Item food = Inventory.get(InvEquip.getInvyItem(foods));
-		return food;
+		return Inventory.get(InvEquip.getInvyItem(foods));
 	}
 	public static boolean eatFood()
 	{

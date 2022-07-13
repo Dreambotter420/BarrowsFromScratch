@@ -7,6 +7,7 @@ import org.dreambot.api.methods.MethodProvider;
 import org.dreambot.api.methods.combat.CombatStyle;
 import org.dreambot.api.methods.container.impl.Inventory;
 import org.dreambot.api.methods.container.impl.bank.Bank;
+import org.dreambot.api.methods.container.impl.bank.BankLocation;
 import org.dreambot.api.methods.container.impl.equipment.Equipment;
 import org.dreambot.api.methods.dialogues.Dialogues;
 import org.dreambot.api.methods.filter.Filter;
@@ -18,12 +19,12 @@ import org.dreambot.api.methods.map.Map;
 import org.dreambot.api.methods.map.Tile;
 import org.dreambot.api.methods.prayer.Prayer;
 import org.dreambot.api.methods.prayer.Prayers;
-import org.dreambot.api.methods.settings.PlayerSettings;
 import org.dreambot.api.methods.skills.Skill;
 import org.dreambot.api.methods.skills.Skills;
 import org.dreambot.api.methods.tabs.Tab;
 import org.dreambot.api.methods.tabs.Tabs;
 import org.dreambot.api.methods.walking.impl.Walking;
+import org.dreambot.api.methods.widget.Widgets;
 import org.dreambot.api.wrappers.interactive.GameObject;
 import org.dreambot.api.wrappers.interactive.NPC;
 import org.dreambot.api.wrappers.items.GroundItem;
@@ -42,6 +43,7 @@ import script.utilities.Walkz;
 
 public class Mobs {
 	public static Mob mob = null;
+	public static final int shantayPass = 1854;
 	public static enum Mob {
 		BOAR,
 		HILL_GIANT
@@ -197,6 +199,162 @@ public class Mobs {
 				MethodProvider.log("Not enough darts: " + new Item(TrainRanged.getBestDart(),1).getName());
 				TrainRanged.fulfillRangedDarts();
 			}
+		}
+		return Timing.sleepLogNormalSleep();
+	}
+	public static int trainPlainMainlandSlayerTask(String mobName, Area killingZone, int maxHit)
+	{
+		//check invy for best darts, equip 
+		if(Inventory.count(TrainRanged.getBestDart()) > 0) InvEquip.equipItem(TrainRanged.getBestDart());
+		
+		//check invy + equip for best darts, if have, do more checks, if not, fulfill setup
+		if(Inventory.count(TrainRanged.getBestDart()) > 0 || Equipment.count(TrainRanged.getBestDart()) > 0)
+		{
+			//have some food in invy
+			if(Combat.getFood() != null)
+			{
+				//should eat at 1 max hit
+				if(TrainRanged.shouldEatFood(maxHit))
+				{
+					Combat.eatFood();
+				}
+			}
+			else 
+			{
+				//no more food, fulfill setup
+				TrainRanged.fulfillRangedDarts();
+				return Timing.sleepLogNormalSleep();
+			}
+			
+			//check for proper ranged lvl boost
+			if(TrainRanged.shouldDrinkBoost())
+			{
+				//if have any ranged pots while needing a drink, wait until in killingzone to sip up
+				if(InvEquip.invyContains(TrainRanged.rangedPots))
+				{
+					if(killingZone.contains(Players.localPlayer()))
+					{
+						if(!TrainRanged.drankRangedPotion()) MethodProvider.log("Not drank ranged Potion");
+					}
+				}
+				else 
+				{
+					//need a ranged pot to drink but have none
+					TrainRanged.fulfillRangedDarts();
+					return Timing.sleepLogNormalSleep();
+				}
+			}
+			
+			//check for glory in invy + not equipped -> equip it
+			if(InvEquip.getInvyItem(InvEquip.wearableGlory) != 0 && 
+					!InvEquip.equipmentContains(InvEquip.wearableGlory)) InvEquip.equipItem(InvEquip.getInvyItem(InvEquip.wearableGlory));
+			
+			//in location to kill mobs
+			if(killingZone.contains(Players.localPlayer()))
+			{
+				Mobs.fightMobRanged(mobName, killingZone, maxHit);
+				return Timing.sleepLogNormalSleep();
+			}
+			else
+			{
+				if(mobName.contains("Zombie"))
+				{
+					if(Locations.isInKourend())
+					{
+						Walkz.leaveKourend(180000);
+						return Timing.sleepLogNormalSleep();
+					}
+					
+					if(Locations.edgevilleDungeon.contains(Players.localPlayer()))
+					{
+						if(Walking.shouldWalk(6) && Walking.walk(Locations.zombiesEdgeville.getCenter())) Sleep.sleep(420,696);
+					}
+					else
+					{
+						if(Locations.edgevilleTeleSpot.distance(Players.localPlayer().getTile()) >= 50)
+						{
+							if(Walkz.useJewelry(InvEquip.glory, "Edgeville"))
+							{
+								return Sleep.calculate(420,696);
+							}
+						}
+						
+						if(Walking.shouldWalk(6) && Walking.walk(Locations.zombiesEdgeville.getCenter())) Sleep.sleep(420,696);
+					}
+					return Timing.sleepLogNormalSleep();
+				}
+				if(mobName.contains("Guard dog"))
+				{
+					if(Locations.isInKourend())
+					{
+						if(Walking.shouldWalk(6) && Walking.walk(killingZone.getCenter())) Sleep.sleep(420,696);
+					} else 
+					{
+						Walkz.teleportWoodcuttingGuild(180000);
+						return Timing.sleepLogNormalInteraction();
+					}
+						
+				}
+				if(mobName.contains("Forgotten Soul"))
+				{
+					if(Locations.isleOfSouls.contains(Players.localPlayer()))
+					{
+						MethodProvider.log("In Isle of Souls");
+						if(Walking.shouldWalk(6) && Walking.walk(Locations.ghostArea.getCenter())) Sleep.sleep(420, 696);
+						return Timing.sleepLogNormalSleep();
+					}
+					if(InvEquip.invyContains(InvEquip.staminas))
+					{
+						if(Locations.edgevilleSoulsPortal.contains(Players.localPlayer()))
+						{
+							Filter<GameObject> portalFilter = p -> 
+								p != null && 
+								p.getName().equals("Soul Wars Portal") && 
+								p.hasAction("Enter");
+							GameObject portal = GameObjects.closest(portalFilter);
+							if(portal == null)
+							{
+								MethodProvider.log("Portal is null in portal area :-( Souls wars at edgeville");
+								return Timing.sleepLogNormalSleep();
+							}
+							if(portal.interact("Enter"))
+							{
+								MethodProvider.sleepUntil(() -> Locations.isleOfSouls.contains(Players.localPlayer()), Sleep.calculate(4444, 2222));
+								Sleep.sleep(420, 696);
+							}
+							return Timing.sleepLogNormalSleep();
+						}
+						
+						if(Locations.edgevilleSoulsPortal.getCenter().distance() > 100)
+						{
+							if(Walkz.useJewelry(InvEquip.glory, "Edgeville")) 
+							{
+								return Timing.sleepLogNormalInteraction();
+							}
+						}
+						
+						if(Walking.shouldWalk(6) && Walking.walk(Locations.edgevilleSoulsPortal)) Sleep.sleep(420, 696);
+					}
+					else
+					{
+						if(InvEquip.checkedBank())
+						{
+							if(InvEquip.bankContains(InvEquip.staminas))
+							{
+								InvEquip.withdrawOne(InvEquip.getBankItem(InvEquip.staminas), 180000);
+							} else {
+								InvEquip.buyItem(InvEquip.stamina4, 10, 180000);
+							}
+						}
+						
+					}
+				}
+			}
+		}
+		else 
+		{
+			MethodProvider.log("Not enough darts: " + new Item(TrainRanged.getBestDart(),1).getName());
+			TrainRanged.fulfillRangedDarts();
 		}
 		return Timing.sleepLogNormalSleep();
 	}

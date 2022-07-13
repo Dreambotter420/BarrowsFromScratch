@@ -18,6 +18,10 @@ public class ReadMessage {
 		{
 			Locations.unlockedKourend = false;
 		}
+		if(txt.contains("You should talk to the estate agent to get a house first."))
+		{
+			Locations.unlockedHouse = false;
+		}
 		if(txt.contains("Your inventory is too full to take everything") || 
 				txt.contains("Your inventory is too full to take everything"))
 		{

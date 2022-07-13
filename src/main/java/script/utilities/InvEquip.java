@@ -97,7 +97,7 @@ public class InvEquip {
 	
 	public static boolean checkedBank()
 	{
-		////return true;
+		//return true;
 		if(Bank.getLastBankHistoryCacheTime() <= 0)
 		{
 			if(Bank.isOpen()) 
@@ -198,7 +198,7 @@ public class InvEquip {
 		{
 			Sleep.sleep(69, 69);
 
-			MethodProvider.log("In WithdrawOne loop");
+			MethodProvider.log("In WithdrawOne loop for itemID: "+ itemID + " / name: "+new Item(itemID,1).getName());
 			if(Inventory.count(itemID) > 0) return;
 			if(!closeBankEquipment()) continue;
 			if(Bankz.openClosest())
@@ -509,25 +509,38 @@ public class InvEquip {
 			return;
 		}
 		final int initItemCount = Bank.count(itemID) + Inventory.count(itemID) + Inventory.count(new Item(itemID,1).getNotedItemID());
-		MethodProvider.log("Starting buy function");
+		MethodProvider.log("Starting buy function for item: " + new Item(itemID,1).getName());
 		Timer timer = new Timer(timeout);
 		double priceIncrease = 1;
 		collectBank = false;
+		boolean justCollected = false;
 		while(!timer.finished() && Client.getGameState() == GameState.LOGGED_IN
 				&& ScriptManager.getScriptManager().isRunning() && !ScriptManager.getScriptManager().isPaused())
 		{
 			Sleep.sleep(69, 69);
-			final int totalItemCount = Bank.count(itemID) + Inventory.count(itemID) + Inventory.count(new Item(itemID,1).getNotedItemID());
+			if(!InvEquip.checkedBank())
+			{
+				continue;
+			}
+			if(Bank.isOpen()) Bank.count(coins); //random API call to update bank cache ...
+			final int totalItemCount = Bank.count(itemID) + Inventory.count(itemID);
 			if(totalItemCount >= (initItemCount + qty)) 
 			{
 				if(GrandExchange.isOpen()) GrandExchange.close();
 				else return;
 				continue;
 			}
-			if(Bank.contains(coins) || (Bank.contains(coins) && Inventory.emptySlotCount() < 2))
+			if(Bank.contains(coins) || (Bank.contains(coins) && Inventory.emptySlotCount() < 2) || 
+					justCollected ||
+					Inventory.count(new Item(itemID,1).getNotedItemID()) > 0)
 			{
 				if(Bank.isOpen())
 				{
+					if(Inventory.count(new Item(itemID,1).getNotedItemID()) > 0)
+					{
+						if(Bank.depositAll(new Item(itemID,1).getNotedItemID())) Sleep.sleep(696, 420);
+						continue;
+					}
 					if(Bank.getWithdrawMode() == BankMode.ITEM)
 					{
 						if(Inventory.emptySlotCount() < 2)
@@ -550,12 +563,21 @@ public class InvEquip {
 					{
 						Bank.setWithdrawMode(BankMode.ITEM);
 					}
+					continue;
 				}
 				if(!closeBankEquipment()) continue;
-				else
+				if(GrandExchange.isOpen() && GrandExchange.close()) 
 				{
-					Walkz.goToGE(timer.remaining());
+					Sleep.sleep(696, 420);
+					continue;
 				}
+				if(BankLocation.GRAND_EXCHANGE.distance(Players.localPlayer().getTile()) < 50 && 
+						Bank.open(BankLocation.GRAND_EXCHANGE) )
+				{
+					Sleep.sleep(420, 696);
+					continue;
+				}
+				Walkz.goToGE(timer.remaining());
 				continue;
 			}
 			if(!GrandExchange.isOpen())
@@ -577,11 +599,13 @@ public class InvEquip {
 					{
 						if(GrandExchange.collectToBank())
 						{
+							justCollected = true;
 							MethodProvider.sleepUntil(() -> !GrandExchange.isReadyToCollect(), Sleep.calculate(2222, 2222));
 						}
 					}
 					else if(GrandExchange.collect())
 					{
+						justCollected = true;
 						MethodProvider.sleepUntil(() -> collectBank || !GrandExchange.isReadyToCollect(), Sleep.calculate(2222, 2222));
 					}
 					continue;
@@ -643,6 +667,7 @@ public class InvEquip {
 		boolean equippedItems = false;
 		do
 		{
+			if(Bank.isOpen()) Bank.count(coins); //random API call to update bank cache ...
 			MethodProvider.log("Starting fulfill function");
 			Sleep.sleep(69, 69);
 			if(!equipmentMap.isEmpty())
@@ -852,6 +877,7 @@ public class InvEquip {
 						while(!timeout.finished() && Client.getGameState() == GameState.LOGGED_IN
 								&& ScriptManager.getScriptManager().isRunning() && !ScriptManager.getScriptManager().isPaused())
 						{
+							if(Bank.isOpen()) Bank.count(coins); //random API call to update bank cache ...
 							Sleep.sleep(69, 69);
 							Item item = Equipment.getItemInSlot(slot);
 							
@@ -1746,7 +1772,11 @@ public class InvEquip {
 			{
 				MethodProvider.sleepUntil(Bank::isOpen, Sleep.calculate(2222, 2222));
 			}
-			if(Bank.isOpen()) return true;
+			if(Bank.isOpen())
+			{
+				Bank.count(coins); //random API call to update bank cache ...
+				return true;
+			}
 			return false;
 		} else return true;
 	}
@@ -1764,6 +1794,7 @@ public class InvEquip {
 		
 		if(Bank.isOpen())
 		{
+			Bank.count(coins); //random API call to update bank cache ...
 			if(Widgets.getWidgetChild(12, 113).interact("Show worn items"))
 			{
 				MethodProvider.sleepUntil(() -> Widgets.getWidgetChild(12, 76) != null &&
@@ -1835,8 +1866,14 @@ public class InvEquip {
 		{
 			allJewelry.put(EquipmentSlot.AMULET, jewelry);
 		}
+		staminas.add(stamina1);staminas.add(stamina2);staminas.add(stamina3);staminas.add(stamina4);
+		
 	}
-	
+	public static final int stamina4 = 12625;
+	public static final int stamina3 = 12627;
+	public static final int stamina2 = 12629;
+	public static final int stamina1 = 12631;
+	public static List<Integer> staminas = new ArrayList<Integer>();
 	
 	public static int jewelry = -10;
 
@@ -1894,7 +1931,7 @@ public class InvEquip {
 	public static int skills4 = 11105;
 	public static int skills5 = 11970;
 	public static int skills6 = 11968;
-		
+	
 	//-3 represents the value of any charge of glory
 	public static int glory = -3; 
 	public static List<Integer> wearableGlory = new ArrayList<Integer>();

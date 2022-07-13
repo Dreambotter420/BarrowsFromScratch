@@ -547,8 +547,7 @@ public class TrainPrayer extends Leaf {
 	    		InvEquip.addInvyItem(dBones, bonesToGoal, bonesToGoal, true, neededBones);
 	    		InvEquip.addInvyItem(Walkz.houseTele, 1, 1, false, 10);
 	    		InvEquip.setEquipItem(EquipmentSlot.RING, InvEquip.wealth);
-	    		if(PlayerSettings.getBitValue(2188) != 1 || PlayerSettings.getBitValue(2187) != 1 ||
-	        			PlayerSettings.getConfig(738) != 33)
+	    		if(!Locations.unlockedHouse)
 	    		{
 	    			InvEquip.addInvyItem(Walkz.fallyTele, 1, 1, false, 10);
 	    		}
@@ -559,36 +558,7 @@ public class TrainPrayer extends Leaf {
 	    	if(Widgets.isOpen())Widgets.closeAll();
 			
 	    	
-	    	if(PlayerSettings.getBitValue(2188) != 1 || PlayerSettings.getBitValue(2187) != 1 ||
-	    			PlayerSettings.getConfig(738) != 33)
-	    	{
-	    		//check for estate agent around us
-	        	NPC estateAgent = NPCs.closest("Estate agent");
-	        	if(estateAgent != null)
-	        	{
-	        		if(estateAgent.canReach())
-	        		{
-	        			if(estateAgent.interact("Talk-to"))
-	        			{
-	        				MethodProvider.sleepUntil(() -> Dialogues.inDialogue(), Sleep.calculate(2222,2222));
-	        			}
-	        		}
-	        		else
-	        		{
-	        			if(Walking.shouldWalk(6) && Walking.walk(estateAgent)) Sleep.sleep(666,1111);
-	        		}
-	        		return Timing.sleepLogNormalSleep();
-	        	}
-	        	//see how close we are to estate room - walk if close
-	        	final double dist = Locations.estateRoom.distance(Players.localPlayer().getTile());
-	        	if(dist <= 45)
-	        	{
-	        		if(Walking.shouldWalk(6) && Walking.walk(Locations.estateRoom.getCenter())) Sleep.sleep(666,1111);
-	        		return Timing.sleepLogNormalSleep();
-	        	}
-	        	if(!Walkz.teleportFalador(60000)) InvEquip.buyItem(Walkz.fallyTele, 10, 60000);
-	        	return Timing.sleepLogNormalSleep();
-	    	}
+	    	if(!unlockHouse()) return Timing.sleepLogNormalSleep();
 	    	
 	    	if(Inventory.interact(Walkz.houseTele, "Break"))
 			{
@@ -599,6 +569,42 @@ public class TrainPrayer extends Leaf {
 		return Timing.sleepLogNormalSleep();
     }
 
+    public static boolean unlockHouse()
+    {
+    	if(Locations.unlockedHouse) return true;
+    	//here we unlock teh house
+    	//check for estate agent around us
+    	NPC estateAgent = NPCs.closest("Estate agent");
+    	if(estateAgent != null)
+    	{
+    		if(estateAgent.canReach())
+    		{
+    			if(estateAgent.interact("Talk-to"))
+    			{
+    				MethodProvider.sleepUntil(() -> Dialogues.inDialogue(), Sleep.calculate(2222,2222));
+    			}
+    		}
+    		else
+    		{
+    			if(Walking.shouldWalk(6) && Walking.walk(estateAgent)) Sleep.sleep(666,1111);
+    		}
+    		MethodProvider.sleep(Timing.sleepLogNormalSleep());
+    		return false;
+    	}
+    	//see how close we are to estate room - walk if close
+    	final double dist = Locations.estateRoom.distance(Players.localPlayer().getTile());
+    	if(dist <= 45)
+    	{
+    		if(Walking.shouldWalk(6) && Walking.walk(Locations.estateRoom.getCenter())) Sleep.sleep(666,1111);
+    		MethodProvider.sleep(Timing.sleepLogNormalSleep());
+    		return false;
+    	}
+    	if(!Walkz.teleportFalador(60000)) InvEquip.buyItem(Walkz.fallyTele, 10, 60000);
+    	MethodProvider.sleep(Timing.sleepLogNormalSleep());
+		return false;
+    }
+    
+    
 	@Override
 	public boolean isValid() {
 		return API.mode == API.modes.TRAIN_PRAYER;

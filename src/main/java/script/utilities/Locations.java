@@ -6,10 +6,15 @@ import org.dreambot.api.methods.interactive.GameObjects;
 import org.dreambot.api.methods.interactive.Players;
 import org.dreambot.api.methods.map.Area;
 import org.dreambot.api.methods.map.Tile;
+import org.dreambot.api.methods.walking.impl.Walking;
+import org.dreambot.api.methods.walking.pathfinding.impl.web.WebFinder;
+import org.dreambot.api.methods.walking.web.node.AbstractWebNode;
+import org.dreambot.api.methods.walking.web.node.impl.BasicWebNode;
 import org.dreambot.api.wrappers.interactive.GameObject;
 
 public class Locations {
 	public static boolean unlockedKourend = true;
+	public static boolean unlockedHouse = true;
 	public static final Area camelotTrees = new Area(
 			new Tile(2752, 3452, 0),
 			new Tile(2756, 3451, 0),
@@ -28,7 +33,9 @@ public class Locations {
 	public static final Area farmingGuildTeleSpot = new Area(1245, 3720, 1252, 3714, 0);
 	public static final Area woodcuttingGuildTeleSpot = new Area(1658, 3508, 1663, 3502, 0);
 	public static final Area rangingGuildTeleSpot = new Area(2657, 3443, 2652, 3438, 0);
+	public static final Area burthorpeTeleSpot = new Area(2896, 3555, 2902, 3550, 0);
 	public static final Tile draynorTeleSpot = new Tile(3105,3251,0);
+	public static final Area turaelArea = new Area(2930, 3537, 2933, 3535, 0);
 	public static final Area rimmington = new Area(2944, 3209, 2960, 3229, 0);
 	public static final Area estateRoom = new Area(2981, 3370, 2984, 3368, 0);
 	public static final Area castleWars = new Area(2446, 3081, 2435, 3098, 0);
@@ -46,6 +53,60 @@ public class Locations {
 	public static final Area kourendGiantsCaveArea = new Area(1408, 9916, 1471, 9856, 0);
 	public static final Area kourendGiantsSafeSpot_Hill = new Area(1430, 9876, 1430, 9876, 0);
 	public static final Area kourendGiantsKillingArea_Hill = new Area(1420, 9878, 1440, 9892, 0);
+	public static final Area zombiesEdgeville = new Area(3138, 9914, 3151, 9881, 0);
+	public static final Area edgevilleDungeon = new Area(3153, 9918, 3089, 9861, 0);
+	public static final Area ghostArea = new Area(2132, 2997, 2137, 2994,0);
+	public static final Area isleOfSouls = new Area(2049, 3012, 2362, 2749);
+	public static final Area edgevilleSoulsPortal = new Area(
+			new Tile(3089, 3483, 0),
+			new Tile(3089, 3486, 0),
+			new Tile(3077, 3485, 0),
+			new Tile(3077, 3478, 0),
+			new Tile(3078, 3476, 0),
+			new Tile(3079, 3466, 0),
+			new Tile(3081, 3464, 0),
+			new Tile(3086, 3464, 0),
+			new Tile(3086, 3468, 0),
+			new Tile(3081, 3467, 0));
+	public static final Area guardDogAreaHosidius = new Area(1755, 3606, 1771, 3590, 0);
+	public static final Area wholeDesert = new Area(
+		    new Tile[] {
+		    		new Tile(3301, 3116, 0),
+			        new Tile(3309, 3116, 0),
+			        new Tile(3320, 3136, 0),
+			        new Tile(3330, 3137, 0),
+			        new Tile(3336, 3160, 0),
+			        new Tile(3346, 3160, 0),
+			        new Tile(3354, 3155, 0),
+			        new Tile(3354, 3144, 0),
+			        new Tile(3364, 3138, 0),
+			        new Tile(3371, 3136, 0),
+			        new Tile(3377, 3126, 0),
+			        new Tile(3384, 3135, 0),
+			        new Tile(3394, 3149, 0),
+			        new Tile(3394, 3164, 0),
+			        new Tile(3409, 3161, 0),
+			        new Tile(3419, 3171, 0),
+			        new Tile(3441, 3180, 0),
+			        new Tile(3537, 3095, 0),
+			        new Tile(3530, 2732, 0),
+			        new Tile(3365, 2759, 0),
+			        new Tile(3325, 2769, 0),
+			        new Tile(3324, 2807, 0),
+			        new Tile(3202, 2810, 0),
+			        new Tile(3203, 2751, 0),
+			        new Tile(3124, 2749, 0),
+			        new Tile(3101, 2973, 0),
+			        new Tile(3153, 3063, 0),
+			        new Tile(3198, 3085, 0),
+			        new Tile(3202, 3134, 0),
+			        new Tile(3276, 3137, 0),
+			        new Tile(3286, 3130, 0)
+		    }
+		);
+	public static final Area carpetDestPollni = new Area(3351, 3003, 3351, 3003, 0);
+	public static final Area carpetAreaShantay = new Area(3299, 3115, 3316, 3105, 0);
+	public static final Area shantayPassArea = new Area(3310, 3117, 3298, 3131, 0);
 	public static final Area dreambotFuckedWCGuildSouth = new Area(1614, 3438, 1670, 3513, 0);
 	public static final Tile dreambotFuckedWCGuildDestSouth = new Tile(1609, 3438, 0);
 	public static final Area dreambotFuckedShayzien = new Area(
@@ -154,5 +215,9 @@ public class Locations {
 			new Tile(3174, 3493, 0),
 			new Tile(3174, 3486, 0));
 	public static Tile GE = new Tile(3165,3487,0);
+	
+	
+	
+
 	
 }

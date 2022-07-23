@@ -2,14 +2,16 @@ package script.behaviour;
 
 import java.time.LocalTime;
 
+import org.dreambot.api.methods.Calculations;
 import org.dreambot.api.methods.MethodProvider;
 import org.dreambot.api.methods.widget.Widgets;
 import script.framework.Leaf;
 import script.quest.varrockmuseum.VarrockQuiz;
-import script.skills.ranged.ItemsOnGround;
 import script.skills.ranged.TrainRanged;
 import script.utilities.API;
 import script.utilities.InvEquip;
+import script.utilities.ItemsOnGround;
+import script.utilities.Locations;
 import script.utilities.Sleep;
 
 
@@ -32,6 +34,10 @@ public class Initialize extends Leaf {
 		DecisionLeaf.initialize();
 		ItemsOnGround.initializeLists();
 		TrainRanged.initialize();
+		if((int) Calculations.nextGammaRandom(100,50) >= 120) Locations.scorpions = Locations.scorpionsKharidNorth;
+		else Locations.scorpions = Locations.scorpionsKharidSouth;
+		if((int) Calculations.nextGammaRandom(100,50) >= 120) Locations.kalphiteWorkersArea = Locations.kalphiteWorkers2;
+		else Locations.scorpions = Locations.kalphiteWorkers1;
 		MethodProvider.log("Initialized");
 		API.initialized = true;
         return 5;

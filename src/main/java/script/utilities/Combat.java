@@ -5,8 +5,10 @@ import java.util.List;
 
 import org.dreambot.api.Client;
 import org.dreambot.api.data.GameState;
+import org.dreambot.api.methods.Calculations;
 import org.dreambot.api.methods.MethodProvider;
 import org.dreambot.api.methods.container.impl.Inventory;
+import org.dreambot.api.methods.settings.PlayerSettings;
 import org.dreambot.api.methods.skills.Skill;
 import org.dreambot.api.methods.skills.Skills;
 import org.dreambot.api.methods.tabs.Tab;
@@ -28,6 +30,53 @@ public class Combat {
 	{
 		return Inventory.get(InvEquip.getInvyItem(foods));
 	}
+	public static boolean hasAntidoteProtection()
+	{
+		if(PlayerSettings.getConfig(102) < 0 && PlayerSettings.getConfig(102) >= -40)
+		{
+			return true;
+		}
+		return false;
+	}
+	public static Timer antidoteDrinkTimer = null;
+	public static boolean drinkAntidote()
+	{
+		if(antidoteDrinkTimer != null && !antidoteDrinkTimer.finished()) return true;
+		if(InvEquip.invyContains(InvEquip.antidotes))
+		{
+			if(Inventory.interact(InvEquip.getInvyItem(InvEquip.antidotes), "Drink"))
+			{
+				MethodProvider.log("Drank antidote!");
+				antidoteDrinkTimer = new Timer(Sleep.calculate(2222,2222));
+				return true;
+			}
+			
+			if(!Tabs.isOpen(Tab.INVENTORY))
+			{
+				Tabs.open(Tab.INVENTORY);
+			}
+			return true;
+		}
+		return false;
+	}
+
+	public static int nextFoodHP = 0;
+	public static boolean shouldEatFood(int maxHit)
+    {
+    	if(nextFoodHP == 0 || nextFoodHP < maxHit)
+    	{
+    		int tmp = (int) Calculations.nextGaussianRandom((maxHit + 3), maxHit);
+    		if(tmp > Skills.getRealLevel(Skill.HITPOINTS)) nextFoodHP = (Skills.getRealLevel(Skill.HITPOINTS) - 2);
+    		else if(tmp < maxHit) nextFoodHP = maxHit;
+    		else nextFoodHP = tmp;
+    	}
+    	Main.customPaintText1 = "Eating next food at HP lvl: " + nextFoodHP;
+    	if(Skills.getBoostedLevels(Skill.HITPOINTS) <= nextFoodHP)
+    	{
+    		return true;
+    	}
+    	return false;
+    }
 	public static boolean eatFood()
 	{
 		if(foodAttemptTimer != null && !foodAttemptTimer.isPaused() && !foodAttemptTimer.finished())
@@ -72,7 +121,7 @@ public class Combat {
 				if(Inventory.interact(foodID, action))
 				{
 					MethodProvider.log("Attempted to eat food!");
-					TrainRanged.nextFoodHP = 0;
+					nextFoodHP = 0;
 					foodAttemptTimer = new Timer(600);
 					foodEatTimer = new Timer(1200); // when u eat a food, it waits until next tick to actually eat it.
 					//once food is eaten then the game needs to wait 2 more ticks until you can attempt to eat another food

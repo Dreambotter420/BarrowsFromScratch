@@ -55,7 +55,6 @@ public class TrainRanged extends Leaf {
 	public static final int rangePot3 = 169;
 	public static final int rangePot2 = 171;
 	public static final int rangePot1 = 173;
-	public static int nextFoodHP = 0;
 	public static List<Integer> rangedPots = new ArrayList<Integer>();
 	public static int randRangedBoostFactor = 0;
 	public static int nextRandBoostLvl = 0;
@@ -115,18 +114,17 @@ public class TrainRanged extends Leaf {
     		MethodProvider.log("[TIMEOUT] -> Ranged!");
     		if(onExit())
     		{
-    			 API.mode = null;
-    	            return Timing.sleepLogNormalSleep();
+    			API.mode = null;
     		}
-           
+    		return Timing.sleepLogNormalSleep();
     	}
     	if(Skills.getRealLevel(Skill.RANGED) >= 75) {
             MethodProvider.log("[COMPLETE] -> lvl 75 ranged!");
             if(onExit())
     		{
                 API.mode = null;
-                return Timing.sleepLogNormalSleep();
     		}
+            return Timing.sleepLogNormalSleep();
         }
     	if(!started) 
     	{
@@ -142,7 +140,36 @@ public class TrainRanged extends Leaf {
     public static boolean fulfillRangedDarts()
     {
     	InvEquip.clearAll();
+
+    	setBestRangedEquipment();
     	
+    	InvEquip.addInvyItem(rangePot4, 1, 6, false, (int) Calculations.nextGaussianRandom(20, 5));
+    	
+    	for(int f : Combat.foods)
+    	{
+    		InvEquip.addOptionalItem(f);
+    	}
+    	for(int r : rangedPots)
+    	{
+    		InvEquip.addOptionalItem(r);
+    	}
+    	InvEquip.addOptionalItem(InvEquip.jewelry);
+    	InvEquip.shuffleFulfillOrder();
+    	InvEquip.addInvyItem(jugOfWine, 15, 27, false, (int) Calculations.nextGaussianRandom(500, 100));
+    	InvEquip.addInvyItem(InvEquip.coins, 0, 0, false, 0);
+		if(InvEquip.fulfillSetup(true, 180000))
+		{
+			MethodProvider.log("[TRAIN RANGED] -> Fulfilled equipment correctly!");
+			return true;
+		} else 
+		{
+			MethodProvider.log("[TRAIN RANGED] -> NOT fulfilled equipment correctly!");
+			return false;
+		}
+    	
+    }
+    public static void setBestRangedEquipment()
+    {
     	InvEquip.setEquipItem(EquipmentSlot.SHIELD, getBestShieldSlot());
     	InvEquip.setEquipItem(EquipmentSlot.HAT, getBestHeadSlot());
     	InvEquip.setEquipItem(EquipmentSlot.CHEST, getBestBodySlot());
@@ -167,7 +194,17 @@ public class TrainRanged extends Leaf {
 		if(getNextNextBestDart() != getBestDart() && 
 				getNextNextBestDart() != getNextBestDart()) InvEquip.addInvyItem(getNextNextBestDart(), 500, 1000, false, 1000);
     	
+    }
+    public static boolean fulfillRangedDartsStaminaAntidote()
+    {
+    	InvEquip.clearAll();
+    	
+    	setBestRangedEquipment();
+    	
     	InvEquip.addInvyItem(rangePot4, 1, 6, false, (int) Calculations.nextGaussianRandom(20, 5));
+    	InvEquip.addInvyItem(InvEquip.games, 1, 1, false, 5);
+    	InvEquip.addInvyItem(InvEquip.antidote4, 1, 1, false, 5);
+    	InvEquip.addInvyItem(InvEquip.stamina4, 1, 1, false, 5);
     	
     	for(int f : Combat.foods)
     	{
@@ -180,14 +217,14 @@ public class TrainRanged extends Leaf {
     	InvEquip.addOptionalItem(InvEquip.jewelry);
     	InvEquip.shuffleFulfillOrder();
     	InvEquip.addInvyItem(jugOfWine, 15, 27, false, (int) Calculations.nextGaussianRandom(500, 100));
-    	
+    	InvEquip.addInvyItem(InvEquip.coins, 0, 0, false, 0);
 		if(InvEquip.fulfillSetup(true, 180000))
 		{
-			MethodProvider.log("[TRAIN RANGED] -> Fulfilled equipment correctly!");
+			MethodProvider.log("[INVEQUIP] -> Fulfilled equipment correctly! (antidote + stamina strict)");
 			return true;
 		} else 
 		{
-			MethodProvider.log("[TRAIN RANGED] -> NOT fulfilled equipment correctly!");
+			MethodProvider.log("[INVEQUIP] -> NOT Fulfilled equipment correctly! (antidote + stamina strict)");
 			return false;
 		}
     	
@@ -259,22 +296,7 @@ public class TrainRanged extends Leaf {
     	}
     	return false;
     }
-    public static boolean shouldEatFood(int maxHit)
-    {
-    	if(nextFoodHP == 0 || nextFoodHP < maxHit)
-    	{
-    		int tmp = (int) Calculations.nextGaussianRandom((maxHit + 3), maxHit);
-    		if(tmp > Skills.getRealLevel(Skill.HITPOINTS)) nextFoodHP = (Skills.getRealLevel(Skill.HITPOINTS) - 2);
-    		else if(tmp < maxHit) nextFoodHP = maxHit;
-    		else nextFoodHP = tmp;
-    	}
-    	Main.customPaintText1 = "Eating next food at HP lvl: " + nextFoodHP;
-    	if(Skills.getBoostedLevels(Skill.HITPOINTS) <= nextFoodHP)
-    	{
-    		return true;
-    	}
-    	return false;
-    }
+    
     
     public static int calculateMaxRangedBoost()
     {

@@ -84,7 +84,7 @@ public class TrainWoodcutting extends Leaf {
             API.mode = null;
             return Timing.sleepLogNormalSleep();
     	}
-    	API.randomAFK();
+    	API.randomAFK(5);
     	if(Dialogues.canContinue())
     	{
     		boolean skip = (Calculations.nextGaussianRandom(500,5) > 501 ? true : false);

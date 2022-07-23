@@ -42,7 +42,7 @@ public class DecisionLeaf extends Leaf{
     public static int craftingSetpoint;
     public static int prayerSetpoint;
     public static int agilitySetpoint;
-    public static int slayerSetpoint = 18;
+    public static int slayerSetpoint = 45; //set to 18 upon script completion
     public static Timer taskTimer;
     public static Timer forceBreakTimer;
     
@@ -236,6 +236,7 @@ public class DecisionLeaf extends Leaf{
 			}
 			
 			//testing
+			//API.mode = modes.WATERFALL_QUEST;
 			
 			MethodProvider.log("Switching mode: " + API.mode.toString());
 			if(API.mode == modes.ANIMAL_MAGNETISM || 

@@ -43,14 +43,14 @@ public class VarrockQuiz extends Leaf {
     {
     	if(Locations.museumArea.contains(Players.localPlayer()))
     	{
-    		 GameObject gameObject = GameObjects.closest(g -> g.getID() == 24428 && g.getTile().equals(stairTile));
-    	        if (gameObject != null && gameObject.distance() < 8 && gameObject.interact("Walk-up")) {
-    	            MethodProvider.sleepUntil(() -> Locations.museumArea.contains(Players.localPlayer()), 1000 + Timing.sleepLogNormalInteraction());
-    	            MethodProvider.sleep(Timing.sleepLogNormalSleep());
-    	            return false;
-    	        }
-
-    	        WalkHandler.walkTo(6, stairTile);
+    		 GameObject gameObject = GameObjects.closest(g -> g.getName().contains("Stairs") && g.hasAction("Walk-up"));
+    	     if (gameObject != null && gameObject.distance() < 8 && gameObject.interact("Walk-up")) 
+    	     {
+    	    	 MethodProvider.sleepUntil(() -> Locations.museumArea.contains(Players.localPlayer()), (1000 + Timing.sleepLogNormalInteraction()));
+    	    	 MethodProvider.sleep(Timing.sleepLogNormalSleep());
+    	    	 return false;
+    	     }
+    	     WalkHandler.walkTo(6, stairTile);
     	}
     	else 
     	{

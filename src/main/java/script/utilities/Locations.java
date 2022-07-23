@@ -41,6 +41,25 @@ public class Locations {
 	public static final Area castleWars = new Area(2446, 3081, 2435, 3098, 0);
 	public static final Area veosPisc = new Area(1829,3688, 3048, 3252, 0);
 	public static final Area veosSarim = new Area(3055, 3249, 3049, 3245, 0);
+	public static final Area burthrope = new Area(
+		    new Tile[] {
+		        new Tile(2885, 3606, 0),
+		        new Tile(2851, 3608, 0),
+		        new Tile(2822, 3584, 0),
+		        new Tile(2810, 3558, 0),
+		        new Tile(2838, 3534, 0),
+		        new Tile(2858, 3528, 0),
+		        new Tile(2865, 3532, 0),
+		        new Tile(2881, 3520, 0),
+		        new Tile(2880, 3497, 0),
+		        new Tile(2936, 3497, 0),
+		        new Tile(2935, 3503, 0),
+		        new Tile(2938, 3507, 0),
+		        new Tile(2944, 3526, 0),
+		        new Tile(2952, 3568, 0),
+		        new Tile(2931, 3591, 0)
+		    }
+		);
 	public static final Area veosLandsEnd = new Area(1502, 3399, 1506, 3409, 0);
 	public static final Area shipLandsEnd = new Area(1500, 3396, 1510, 3394, 1);
 	public static final Area shipSarimVeos = new Area(3050, 3240, 3060, 3242, 1);
@@ -55,8 +74,211 @@ public class Locations {
 	public static final Area kourendGiantsKillingArea_Hill = new Area(1420, 9878, 1440, 9892, 0);
 	public static final Area zombiesEdgeville = new Area(3138, 9914, 3151, 9881, 0);
 	public static final Area edgevilleDungeon = new Area(3153, 9918, 3089, 9861, 0);
-	public static final Area ghostArea = new Area(2132, 2997, 2137, 2994,0);
 	public static final Area isleOfSouls = new Area(2049, 3012, 2362, 2749);
+	public static final Area forgottenSoulsLvl1 = new Area(2118, 3005, 2151, 2987, 0);
+	public static final Area forgottenSoulsLvl2 = new Area(2140, 2991, 2128, 3000, 1);
+	public static final Area forgottenSoulsLvl3 = new Area(2127, 3000, 2140, 2991, 2);
+	public static final Area seagullsSarim = new Area(3023, 3242, 3035, 3229, 0);
+	public static final Area bearsFremmy = new Area(2704, 3600, 2679, 3626, 0);
+	public static final Area caveCrawlersFremmyCave = new Area(2800, 10006, 2779, 9989, 0);
+	public static final Area entireFremmyDungeon = new Area(2687, 9948, 2814, 10046,0);
+	public static final Area fremmyCaveEntrance = new Area(2787, 3620, 2798, 3609, 0);
+	public static final Area lizards = new Area(3432, 3071, 3418, 3046, 0);
+	public static final Area strongholdEntrance = new Area(3076, 3426, 3087, 3416, 0);
+	public static final Area strongholdLvl1 = new Area(1853, 5248, 1919, 5183,0);
+	public static final Area strongholdDoor1 = new Area(1859, 5236, 1858, 5238, 0);
+	public static final Area strongholdLvl1Foyer = new Area(1866, 5239, 1857, 5246, 0);
+	public static final Area lumbridgeCaveEntrance = new Area(3164, 3176, 3174, 3166, 0);
+	public static final Area lumbridgeTeleSpot = new Area(3218, 3215, 3226, 3222, 0);
+	public static final Area shantayPassSouthSide = new Area(3302, 3115, 3306, 3112, 0);
+	public static final Area lumbyCaveFoyer = new Area(3174, 9566, 3163, 9575, 0);
+	public static final Tile caveHandSkipTile = new Tile(3163, 9573, 0);
+	public static final Tile caveHandSkipTile2 = new Tile(3161, 9573, 0);
+	public static final Area caveSlimeArea = new Area(3149, 9567, 3167, 9549, 0);
+	public static final Area caveBugs = new Area(3161, 9583, 3144, 9565, 0);
+	
+	public static final Area icefiends = new Area(
+			new Tile(2994, 3464, 0),
+			new Tile(3002, 3459, 0),
+			new Tile(3013, 3463, 0),
+			new Tile(3014, 3492, 0),
+			new Tile(3007, 3494, 0),
+			new Tile(3001, 3489, 0),
+			new Tile(3000, 3480, 0),
+			new Tile(2990, 3470, 0));
+	public static final Area bats = new Area(
+			new Tile(3327, 3478, 0),
+			new Tile(3332, 3471, 0),
+			new Tile(3347, 3473, 0),
+			new Tile(3360, 3476, 0),
+			new Tile(3384, 3468, 0),
+			new Tile(3396, 3483, 0),
+			new Tile(3394, 3497, 0),
+			new Tile(3372, 3491, 0),
+			new Tile(3356, 3498, 0),
+			new Tile(3346, 3500, 0));
+	public static final Area dwarfs = new Area(
+			new Tile(3008, 3461, 0),
+			new Tile(3007, 3454, 0),
+			new Tile(3030, 3455, 0),
+			new Tile(3037, 3469, 0),
+			new Tile(3027, 3469, 0),
+			new Tile(3021, 3464, 0),
+			new Tile(3014, 3466, 0));
+	public static Area scorpions = null;
+	public static final Area scorpionsKharidNorth = new Area(
+			new Tile(3303, 3297, 0),
+			new Tile(3290, 3297, 0),
+			new Tile(3295, 3307, 0),
+			new Tile(3293, 3310, 0),
+			new Tile(3297, 3318, 0),
+			new Tile(3302, 3318, 0),
+			new Tile(3305, 3312, 0),
+			new Tile(3304, 3307, 0),
+			new Tile(3307, 3303, 0),
+			new Tile(3303, 3297, 0));
+	public static final Area scorpionsKharidSouth = new Area(
+			new Tile(3306, 3276, 0),
+			new Tile(3307, 3282, 0),
+			new Tile(3303, 3286, 0),
+			new Tile(3307, 3293, 0),
+			new Tile(3303, 3297, 0),
+			new Tile(3292, 3296, 0),
+			new Tile(3295, 3290, 0),
+			new Tile(3290, 3284, 0),
+			new Tile(3293, 3279, 0),
+			new Tile(3291, 3275, 0));
+	public static final Area wizardsTower0 = new Area(3130, 3191, 3090, 3142,0);
+	public static final Tile wizardsTowerStairTile0 = new Tile(3105, 3161, 0);
+	public static final Area wizardsTower1 = new Area(3099, 3170, 3127, 3151, 1);
+	public static final Area wizardsTowerStairTile1 = new Area(3104, 3161, 3104, 3161, 1);
+	public static final Area wizardsTower2 = new Area(3096, 3172, 3119, 3152, 2);
+	public static final Area lesserDemonWizardsTower = new Area(3108, 3163, 3113, 3159, 2);
+	public static final Area lumbyCastle1 = new Area(3201, 3232, 3219, 3205, 1);
+	public static final Area lumbyCastle2 = new Area(3202, 3232, 3222, 3205, 2);
+	public static final Area almera = new Area(
+			new Tile(2524, 3495, 0),
+			new Tile(2523, 3492, 0),
+			new Tile(2518, 3493, 0),
+			new Tile(2518, 3498, 0),
+			new Tile(2521, 3499, 0),
+			new Tile(2521, 3502, 0),
+			new Tile(2523, 3502, 0),
+			new Tile(2523, 3499, 0));
+	public static final Area hadleySurrounding = new Area(
+		    new Tile[] {
+		        new Tile(2532, 3448, 0),
+		        new Tile(2532, 3409, 0),
+		        new Tile(2500, 3429, 0)
+		    }
+		);
+	public static final Area waterfallDungeon1 = new Area(2564, 9588, 2498, 9546,0);
+	public static final Area gnomeStrongholdDungeonEntrance = new Area(2538, 3155, 2527, 3156, 0);
+	public static final Tile gnomeStrongholdEntrance = new Tile(2504, 3191, 0);
+	public static final Area hadley2 = new Area(2516, 3431, 2520, 3424, 1);
+	public static final Area hadleyStairs = new Area(2516, 3432, 2520, 3427, 0);
+	public static final Tile waterfallRaftTile1 = new Tile(2510,3494,0);
+	public static final Area barrelDestination = new Area(2524, 3416, 2534, 3411, 0);
+	public static final Tile waterfallIsland1SouthTile = new Tile(2512, 3476, 0);
+	public static final Area waterfallIsland1 = new Area(2513, 3475, 2510, 3481, 0);
+	public static final Area waterfallIsland2 = new Area(2512, 3468, 2513, 3465, 0);
+	public static final Tile waterfallLedge = new Tile(2511, 3463, 0);
+	public static final Area waterfallDungeonKeyRoom = new Area(2530, 9575, 2556, 9560);
+	public static final Area waterfallDungeonBeforeGolrieRoom = new Area(2507, 9575, 2522, 9567, 0);
+	public static final Area waterfallDungeonGolrieRoom = new Area(2522, 9576, 2506, 9586, 0);
+	public static final Area waterfallGlarialsGravestone = new Area(2554, 3449, 2563, 3440, 0);
+	public static final Area waterfallDungeon2 = new Area(2523, 9852, 2559, 9808);
+	public static final Area glarialsTomb = new Area(2538, 9809, 2548, 9816, 0);
+	public static final Area glarialsChest = new Area(2537, 9841, 2524, 9847, 0);
+	public static final Area kalphiteCave = new Area(3342, 9544, 3264, 9472,0);
+	
+	public static Area kalphiteWorkersArea = null;
+	public static final Area kalphiteWorkers2 = new Area(3289, 9529, 3271, 9509, 0);
+	public static final Area kalphiteWorkers1 = new Area(
+			new Tile(3312, 9495, 0),
+			new Tile(3329, 9486, 0),
+			new Tile(3340, 9502, 0),
+			new Tile(3325, 9520, 0),
+			new Tile(3312, 9510, 0));
+	public static final Area kalphiteCaveEntrance = new Area(3317, 3115, 3325, 3127, 0);
+	public static final Area skeletonsEdgeville = new Area(
+			new Tile(3125, 9911, 0),
+			new Tile(3125, 9907, 0),
+			new Tile(3128, 9906, 0),
+			new Tile(3128, 9903, 0),
+			new Tile(3137, 9903, 0),
+			new Tile(3137, 9916, 0),
+			new Tile(3134, 9917, 0),
+			new Tile(3128, 9917, 0));
+	public static final Area monkeysArdyZoo = new Area(
+			new Tile(2595, 3291, 0),
+			new Tile(2592, 3270, 0),
+			new Tile(2610, 3272, 0),
+			new Tile(2610, 3290, 0),
+			new Tile(2595, 3291, 0),
+			new Tile(2595, 3291, 0));
+	public static final Area giantRats = new Area(
+			new Tile(3213, 3197, 0),
+			new Tile(3191, 3196, 0),
+			new Tile(3192, 3158, 0),
+			new Tile(3211, 3158, 0),
+			new Tile(3220, 3174, 0),
+			new Tile(3225, 3189, 0));
+	public static final Area goblins = new Area(
+			new Tile(3266, 3222, 0),
+			new Tile(3255, 3216, 0),
+			new Tile(3238, 3233, 0),
+			new Tile(3238, 3254, 0),
+			new Tile(3264, 3254, 0),
+			new Tile(3266, 3239, 0),
+			new Tile(3267, 3227, 0),
+			new Tile(3267, 3224, 0),
+			new Tile(3267, 3223, 0));
+	public static final Area entireLumbyCave = new Area(3137, 9602, 3262, 9536,0);
+	public static final boolean isInDesert()
+	{
+		if(Locations.shantayPassSouthSide.contains(Players.localPlayer()) || 
+				Locations.wholeDesert.contains(Players.localPlayer()) || 
+				Locations.carpetAreaShantay.contains(Players.localPlayer())) return true;
+		return false;
+	}
+	public static final Area strongholdWolves = new Area(
+			new Tile(1868, 5224, 0),
+			new Tile(1876, 5224, 0),
+			new Tile(1875, 5245, 0),
+			new Tile(1867, 5244, 0),
+			new Tile(1867, 5230, 0));
+	public static final Area strongholdGoblins = new Area(
+			new Tile(1866, 5222, 0),
+			new Tile(1865, 5225, 0),
+			new Tile(1864, 5228, 0),
+			new Tile(1860, 5235, 0),
+			new Tile(1857, 5235, 0),
+			new Tile(1857, 5213, 0),
+			new Tile(1866, 5213, 0));
+	public static final Area strongholdDoor2 = new Area(1867, 5226, 1865, 5227, 0);
+	public static final Area cowsArdy = new Area(
+			new Tile(2658, 3340, 0),
+			new Tile(2658, 3357, 0),
+			new Tile(2674, 3357, 0),
+			new Tile(2675, 3355, 0),
+			new Tile(2675, 3343, 0),
+			new Tile(2670, 3339, 0));
+	public static final Area spidersGE = new Area(
+			new Tile(3128, 3493, 0),
+			new Tile(3137, 3493, 0),
+			new Tile(3140, 3491, 0),
+			new Tile(3140, 3486, 0),
+			new Tile(3138, 3482, 0),
+			new Tile(3137, 3474, 0),
+			new Tile(3128, 3474, 0));
+	public static boolean isInIsleOfSouls() {
+		if(forgottenSoulsLvl1.contains(Players.localPlayer()) || 
+				forgottenSoulsLvl2.contains(Players.localPlayer()) || 
+				forgottenSoulsLvl3.contains(Players.localPlayer()) || 
+				isleOfSouls.contains(Players.localPlayer())) return true;
+		return false;
+	}
 	public static final Area edgevilleSoulsPortal = new Area(
 			new Tile(3089, 3483, 0),
 			new Tile(3089, 3486, 0),

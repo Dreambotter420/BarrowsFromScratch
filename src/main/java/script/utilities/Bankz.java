@@ -14,8 +14,9 @@ public class Bankz {
 		if(Bank.isOpen()) return true;
 		
 		final double dist = BankLocation.getNearest(Players.localPlayer()).getTile().distance();
-		if(dist >= 50)
+		if(dist >= 100)
 		{
+			MethodProvider.log("Distance to closest bank: " + dist);
 			if(Walkz.useJewelry(InvEquip.wealth,"Grand Exchange") || 
 					Walkz.useJewelry(InvEquip.glory,"Edgeville") || 
 					Walkz.useJewelry(InvEquip.combat,"Ranging Guild") || 
@@ -30,6 +31,25 @@ public class Bankz {
 			}
 		}
 		
+		if(dist <= 8)
+		{
+			if(Bank.openClosest()) return true;
+			MethodProvider.sleep(Timing.sleepLogNormalSleep());
+			return false;
+		}
+		
+		if(Walking.shouldWalk(6) && Walking.walk(BankLocation.getNearest(Players.localPlayer())))
+		{
+			MethodProvider.sleep(Timing.sleepLogNormalSleep());
+		}
+		return false;
+	}
+	
+	public static boolean openClosestNoJewelry()
+	{
+		if(Bank.isOpen()) return true;
+		
+		final double dist = BankLocation.getNearest(Players.localPlayer()).getTile().distance();
 		if(dist <= 8)
 		{
 			if(Bank.openClosest()) return true;

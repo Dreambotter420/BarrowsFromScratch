@@ -30,6 +30,7 @@ public class API {
 		TRAIN_MELEE,
 		TRAIN_CRAFTING,
 		TRAIN_PRAYER,
+		TRAIN_FIREMAKING,
 		TRAIN_AGILITY,
 		MAGE_ARENA_1,
 		MAGE_ARENA_2,
@@ -73,7 +74,6 @@ public class API {
 		else if(ClientSettings.roofsEnabled())
     	{
     		ClientSettings.toggleRoofs(false);
-    		
     	}
 		else if(ClientSettings.getNPCAttackOptionsMode() != ActionMode.ALWAYS_RIGHT_CLICK)
     	{
@@ -194,39 +194,44 @@ public class API {
 		return true;
 	}
 	
-	public static void randomAFK()
+	public static void randomAFK(int chance)
 	{
-		int tmp = API.rand2.nextInt(20000);
-		if(tmp < 2)  
+		int roll = API.rand2.nextInt(100);
+		if(roll < chance)
 		{
-			MethodProvider.log("AFK: 0.001% chance, max 240s");
-			Sleep.sleep(50,42000);
+			int tmp = API.rand2.nextInt(100);
+			if(tmp < 2)  
+			{
+				MethodProvider.log("AFK: 1% chance, max 240s");
+				Sleep.sleep(50,84000);
+			}
+			else if(tmp < 6)  
+			{
+				MethodProvider.log("AFK: 5% chance, max 120s");
+				Sleep.sleep(50,40000);
+			}
+			else if(tmp < 25)
+			{
+				MethodProvider.log("AFK: 14% chance, max 40s");
+				Sleep.sleep(50,20000);
+			}
+			else if(tmp < 45)  
+			{
+				MethodProvider.log("AFK: 20% chance, max 20s");
+				Sleep.sleep(50,10000);
+			}
+			else if(tmp < 65)  
+			{
+				MethodProvider.log("AFK: 20% chance, max 6.0s");
+				Sleep.sleep(50,4500);
+			}
+			else if(tmp < 1000)  
+			{
+				MethodProvider.log("AFK: 35% chance, max 3.2s");
+				Sleep.sleep(50,2400);
+			}
 		}
-		else if(tmp < 6)  
-		{
-			MethodProvider.log("AFK: 0.003% chance, max 120s");
-			Sleep.sleep(50,20000);
-		}
-		else if(tmp < 25)
-		{
-			MethodProvider.log("AFK: 0.095% chance, max 40s");
-			Sleep.sleep(50,12000);
-		}
-		else if(tmp < 150)  
-		{
-			MethodProvider.log("AFK: .625% chance, max 20s");
-			Sleep.sleep(50,5000);
-		}
-		else if(tmp < 1000)  
-		{
-			MethodProvider.log("AFK: 4.25% chance, max 6.0s");
-			Sleep.sleep(50,2400);
-		}
-		else if(tmp < 3000)  
-		{
-			MethodProvider.log("AFK: 10.0% chance, max 3.2s");
-			Sleep.sleep(50,1200);
-		}
+		
 	}
 	public static int getP2PWorld()
 	{

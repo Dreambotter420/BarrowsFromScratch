@@ -24,6 +24,7 @@ import org.dreambot.api.methods.interactive.GameObjects;
 import org.dreambot.api.methods.interactive.NPCs;
 import org.dreambot.api.methods.interactive.Players;
 import org.dreambot.api.methods.map.Map;
+import org.dreambot.api.methods.map.Tile;
 import org.dreambot.api.methods.settings.PlayerSettings;
 import org.dreambot.api.methods.skills.Skill;
 import org.dreambot.api.methods.skills.Skills;
@@ -49,6 +50,7 @@ import script.utilities.Locations;
 import script.utilities.MissingAPI;
 import script.utilities.Sleep;
 import script.utilities.Walkz;
+import script.utilities.id;
 /**
  * Trains prayer 1-45/50
  * 
@@ -56,6 +58,7 @@ import script.utilities.Walkz;
  * ^_^
  */
 public class TrainPrayer extends Leaf {
+	public static final int constructionBook = 8463;
 	public static boolean initialized = false;
 	public static final int dBones = 536;
 	public static int neededBones = 0;
@@ -260,34 +263,33 @@ public class TrainPrayer extends Leaf {
     		if(!Dialogues.chooseFirstOptionContaining("Exchange All:")) Keyboard.type("1",false);
     		return Timing.sleepLogNormalSleep();
     	}
-    	if(Dialogues.areOptionsAvailable())
+    	if(Inventory.count(constructionBook) > 0)
     	{
-    		if(Dialogues.getOptionIndexContaining("How can I get a house?") == -1)
-    		{
-    			if(Dialogues.getOptionIndexContaining("Yes please!") == -1)
-    			{
-    				Mouse.click(Map.tileToMiniMap(Players.localPlayer().getTile()));
-    				Sleep.sleep(696,420);
-    				return Timing.sleepLogNormalSleep();
-    			} else
-    			{
-    				Dialogues.chooseOption("Yes please!");
-    				Sleep.sleep(420,1111);
-    			}
-    		}
-    		else
-    		{
-    			Dialogues.chooseOption("How can I get a house?");
-    			Sleep.sleep(420,1111);
-    		}
+    		if(Tabs.isOpen(Tab.INVENTORY)) Inventory.drop(constructionBook);
+    		else Tabs.open(Tab.INVENTORY);
     		return Timing.sleepLogNormalSleep();
     	}
+    	
     	if(Locations.isInstanced())
     	{
     		if(Inventory.count(dBones) <= 0 || forceLeaveShitHouse) 
     		{
     			leaveHouse();
     			return Timing.sleepLogNormalSleep();
+    		}
+    		
+    		//cancel, do not bury the bone
+    		if(Dialogues.areOptionsAvailable())
+    		{
+    			for(String s : Dialogues.getOptions())
+        		{
+        			if(s == null) continue;
+        			if(s.contains("Bury the bone")) 
+        			{
+        				if(Dialogues.chooseOption("Cancel")) Sleep.sleep(696,420);
+        				return Timing.sleepLogNormalInteraction();
+        			}
+        		}
     		}
     		
     		//have bones to look to offer
@@ -511,7 +513,12 @@ public class TrainPrayer extends Leaf {
     	    	{
     	    		if(!Players.localPlayer().isInteracting(phials))
     	    		{
-    	        		Item bonesNoted = Inventory.get(new Item(TrainPrayer.dBones,1).getNotedItemID());
+    	        		if(!Tabs.isOpen(Tab.INVENTORY))
+    	        		{
+    	        			Tabs.open(Tab.INVENTORY);
+    	        			return Timing.sleepLogNormalInteraction();
+    	        		}
+    	    			Item bonesNoted = Inventory.get(new Item(TrainPrayer.dBones,1).getNotedItemID());
     	        		if(bonesNoted.useOn(phials))
 	        			{
 	        				MethodProvider.sleepUntil(Dialogues::inDialogue, () -> Players.localPlayer().isMoving(), Sleep.calculate(2222,2222), 50);
@@ -536,7 +543,7 @@ public class TrainPrayer extends Leaf {
 	    	Main.customPaintText3 = "total # bones (invy unnoted + noted + bank): " + totalBones;
 	    	Main.customPaintText4 = "total # bones missing to goal: " + neededBones;
 	    	//withdraw all dBones noted
-	    	if(Bank.contains(dBones) || totalBones < bonesToGoal || Inventory.count(Walkz.houseTele) > 1)
+	    	if(Bank.contains(dBones) || totalBones < bonesToGoal || Inventory.count(id.houseTele) > 1)
 	    	{
 	    		if(Locations.isInstanced())
 	    		{
@@ -545,11 +552,11 @@ public class TrainPrayer extends Leaf {
 	    		}
 	    		InvEquip.clearAll();
 	    		InvEquip.addInvyItem(dBones, bonesToGoal, bonesToGoal, true, neededBones);
-	    		InvEquip.addInvyItem(Walkz.houseTele, 1, 1, false, 10);
+	    		InvEquip.addInvyItem(id.houseTele, 1, 1, false, 10);
 	    		InvEquip.setEquipItem(EquipmentSlot.RING, InvEquip.wealth);
 	    		if(!Locations.unlockedHouse)
 	    		{
-	    			InvEquip.addInvyItem(Walkz.fallyTele, 1, 1, false, 10);
+	    			InvEquip.addInvyItem(id.fallyTele, 1, 1, false, 10);
 	    		}
 	    		InvEquip.addInvyItem(InvEquip.coins, 5, randomCoinsAmount, false, 0);
 	    		InvEquip.fulfillSetup(true, 180000);
@@ -560,7 +567,7 @@ public class TrainPrayer extends Leaf {
 	    	
 	    	if(!unlockHouse()) return Timing.sleepLogNormalSleep();
 	    	
-	    	if(Inventory.interact(Walkz.houseTele, "Break"))
+	    	if(Inventory.interact(id.houseTele, "Break"))
 			{
 				MethodProvider.sleepUntil(() -> Locations.isInstanced(), () -> Players.localPlayer().isAnimating(), Sleep.calculate(4444,2222),50);
 				return Timing.sleepLogNormalSleep();
@@ -573,6 +580,59 @@ public class TrainPrayer extends Leaf {
     {
     	if(Locations.unlockedHouse) return true;
     	//here we unlock teh house
+    	
+    	if(Inventory.count(constructionBook) > 0)
+    	{
+    		Locations.unlockedHouse = true;
+    		return true;
+    	}
+    	
+    	//handle dialogues from Phials/Estate agent
+    	if(Dialogues.isProcessing())
+    	{
+    		Sleep.sleep(696,420);
+    		return false;
+    	}
+    	if(Dialogues.canContinue())
+    	{
+    		Dialogues.continueDialogue();
+    		Sleep.sleep(696,420);
+    		return false;
+    	}
+    	if(Widgets.getWidgetChild(219, 1, 1) != null && 
+    			Widgets.getWidgetChild(219, 1, 1).isVisible() && 
+    			Widgets.getWidgetChild(219, 1, 1).getText().contains("Exchange")) 
+    	{ 
+    		//have at least one option to exchange items, check for "all" and if none, choose "1"
+    		if(!Dialogues.chooseFirstOptionContaining("Exchange All:")) Keyboard.type("1",false);
+    		return false;
+    	}
+    	if(Dialogues.areOptionsAvailable())
+    	{
+    		if(Dialogues.getOptionIndexContaining("How can I get a house?") == -1)
+    		{
+    			if(Dialogues.getOptionIndexContaining("Yes please!") == -1)
+    			{
+    				Mouse.click(Map.tileToMiniMap(Players.localPlayer().getTile()));
+    				Sleep.sleep(696,420);
+    				return false;
+    			} else
+    			{
+    				if(Dialogues.chooseOption("Yes please!"))
+    				{
+    					Locations.unlockedHouse = true;
+    				}
+    				Sleep.sleep(420,1111);
+    			}
+    		}
+    		else
+    		{
+    			Dialogues.chooseOption("How can I get a house?");
+    			Sleep.sleep(420,1111);
+    		}
+    		return false;
+    	}
+    	
     	//check for estate agent around us
     	NPC estateAgent = NPCs.closest("Estate agent");
     	if(estateAgent != null)
@@ -586,7 +646,19 @@ public class TrainPrayer extends Leaf {
     		}
     		else
     		{
-    			if(Walking.shouldWalk(6) && Walking.walk(estateAgent)) Sleep.sleep(666,1111);
+    			GameObject doorfuckery = GameObjects.closest(d -> d!=null && 
+    					d.getName().equals("Door") && 
+    					d.hasAction("Close") && 
+    					d.getTile().equals(new Tile(2982,3370,0)));
+    			if(estateAgent.getTile().equals(new Tile(2981,3370,0)) && doorfuckery != null)
+    			{
+    				if(doorfuckery.interact("Close")) Sleep.sleep(696, 420);
+    				{
+    					MethodProvider.sleepWhile(() -> Players.localPlayer().isMoving(), Sleep.calculate(2222,2222));
+    				}
+    				return false;
+    			}
+    			if(Walking.shouldWalk(6) && Walking.walk(Locations.estateRoom.getCenter())) Sleep.sleep(666,1111);
     		}
     		MethodProvider.sleep(Timing.sleepLogNormalSleep());
     		return false;
@@ -599,7 +671,7 @@ public class TrainPrayer extends Leaf {
     		MethodProvider.sleep(Timing.sleepLogNormalSleep());
     		return false;
     	}
-    	if(!Walkz.teleportFalador(60000)) InvEquip.buyItem(Walkz.fallyTele, 10, 60000);
+    	if(!Walkz.teleportFalador(60000)) InvEquip.buyItem(id.fallyTele, 10, 60000);
     	MethodProvider.sleep(Timing.sleepLogNormalSleep());
 		return false;
     }

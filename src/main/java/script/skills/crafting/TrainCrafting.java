@@ -31,7 +31,7 @@ public class TrainCrafting extends Leaf {
 	
 	private final static int needle = 1733;
 	private final static int leather = 1741;
-	private final static int  thread = 1734;
+	private final static int thread = 1734;
     @Override
     public int onLoop() {
     	if(DecisionLeaf.taskTimer.finished())
@@ -47,30 +47,34 @@ public class TrainCrafting extends Leaf {
             return Timing.sleepLogNormalSleep();
         }
         
-        InvEquip.clearAll();
-        InvEquip.addInvyItem(needle, 1, 1, false, 1);
-        InvEquip.addInvyItem(thread, 1, threadMax, false, threadResupply);
-        InvEquip.addInvyItem(leather, 1, 26, false, leatherResupply);
-        InvEquip.addInvyItem(InvEquip.coins, 0,0, false,0);
-        if(!craftLeatherThing(crafting))
-        {
-        	if(InvEquip.fulfillSetup(true,60000))
-            {
-            	MethodProvider.log("Should be equipped now ;-)");
-            }
-        }
+    	doCrafting();
         
         return Sleep.calculate(69,420);
     }
-    public static boolean craftLeatherThing(int crafting)
+    public static void doCrafting()
+    {
+    	if(!craftLeatherThing(Skills.getRealLevel(Skill.CRAFTING)))
+        {
+        	InvEquip.clearAll();
+            InvEquip.addInvyItem(needle, 1, 1, false, 1);
+            InvEquip.addInvyItem(thread, 1, threadMax, false, threadResupply);
+            InvEquip.addInvyItem(leather, 1, 26, false, leatherResupply);
+            InvEquip.addInvyItem(InvEquip.coins, 0,0, false,0);
+        	if(InvEquip.fulfillSetup(true,60000))
+            {
+            	MethodProvider.log("Should be equipped now for crafting!");
+            }
+        }
+    }
+    public static boolean craftLeatherThing(int craftingLvl)
     {
     	String name = null;
-    	if(crafting < 7) name = "Leather gloves";
-    	else if(crafting < 9) name = "Leather boots";
-    	else if(crafting < 11) name = "Leather cowl";
-    	else if(crafting < 14) name = "Leather vambraces";
-    	else if(crafting < 18) name = "Leather body";
-    	else if(crafting < 25) name = "Leather chaps";
+    	if(craftingLvl < 7) name = "Leather gloves";
+    	else if(craftingLvl < 9) name = "Leather boots";
+    	else if(craftingLvl < 11) name = "Leather cowl";
+    	else if(craftingLvl < 14) name = "Leather vambraces";
+    	else if(craftingLvl < 18) name = "Leather body";
+    	else if(craftingLvl < 25) name = "Leather chaps";
     	if(Inventory.containsAll(thread,needle,leather))
     	{
     		if(Bank.isOpen())
@@ -82,6 +86,7 @@ public class TrainCrafting extends Leaf {
         	{
         		if(ItemProcessing.makeAll(name))
         		{
+        			MethodProvider.log("Starting to make all: " + name);
         			MethodProvider.sleepUntil(() -> Inventory.count(leather) <= 0 || Dialogues.canContinue(),() -> Players.localPlayer().isAnimating(), Sleep.calculate(2222, 2222),50);   
         		}
         		return true;

@@ -1,6 +1,7 @@
 package script.utilities;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.dreambot.api.Client;
@@ -8,10 +9,13 @@ import org.dreambot.api.data.GameState;
 import org.dreambot.api.methods.Calculations;
 import org.dreambot.api.methods.MethodProvider;
 import org.dreambot.api.methods.container.impl.Inventory;
+import org.dreambot.api.methods.container.impl.Shop;
 import org.dreambot.api.methods.container.impl.bank.Bank;
 import org.dreambot.api.methods.container.impl.bank.BankLocation;
 import org.dreambot.api.methods.container.impl.equipment.Equipment;
 import org.dreambot.api.methods.container.impl.equipment.EquipmentSlot;
+import org.dreambot.api.methods.depositbox.DepositBox;
+import org.dreambot.api.methods.dialogues.Dialogues;
 import org.dreambot.api.methods.filter.Filter;
 import org.dreambot.api.methods.grandexchange.GrandExchange;
 import org.dreambot.api.methods.interactive.GameObjects;
@@ -19,7 +23,9 @@ import org.dreambot.api.methods.interactive.NPCs;
 import org.dreambot.api.methods.interactive.Players;
 import org.dreambot.api.methods.item.GroundItems;
 import org.dreambot.api.methods.map.Area;
+import org.dreambot.api.methods.map.Map;
 import org.dreambot.api.methods.map.Tile;
+import org.dreambot.api.methods.settings.PlayerSettings;
 import org.dreambot.api.methods.tabs.Tab;
 import org.dreambot.api.methods.tabs.Tabs;
 import org.dreambot.api.methods.walking.impl.Walking;
@@ -31,14 +37,35 @@ import org.dreambot.api.wrappers.interactive.NPC;
 import org.dreambot.api.wrappers.items.GroundItem;
 import org.dreambot.api.wrappers.items.Item;
 
+import script.Main;
 import script.quest.varrockmuseum.Timing;
+import script.skills.prayer.TrainPrayer;
+import script.skills.ranged.TrainRanged;
 
 public class Walkz {
 
-	public static final int cammyTele = 8010;
-	public static final int houseTele = 8013;
-	public static final int fallyTele = 8009;
-	public static final int varrockTele = 8007;
+	public static boolean isStaminated()
+	{
+		return (PlayerSettings.getBitValue(25) == 0 ? false : true);
+	}
+	
+	public static void drinkStamina()
+	{
+		if(InvEquip.invyContains(InvEquip.staminas))
+		{
+			if(Tabs.isOpen(Tab.INVENTORY))
+			{
+				if(Inventory.interact(InvEquip.getInvyItem(InvEquip.staminas),"Drink"))
+				{
+					Sleep.sleep(69,69);
+				}
+				return;
+			}
+			
+			Tabs.open(Tab.INVENTORY);
+			
+		}
+	}
 	
 	public static boolean goToGE(long timeout)
 	{
@@ -88,10 +115,10 @@ public class Walkz {
 				}
 			}
 			if(ringFound) continue;
-			if(Inventory.contains(varrockTele))
+			if(Inventory.contains(id.varrockTele))
 			{
 				if(Bank.isOpen()) Bank.close();
-				else if(Inventory.interact(varrockTele, "Break"))
+				else if(Inventory.interact(id.varrockTele, "Break"))
 				{
 					MethodProvider.sleepUntil(() -> Locations.dontTeleToGEAreaJustWalk.contains(Players.localPlayer()), () -> Players.localPlayer().isAnimating(), Sleep.calculate(4444,2222),50);
 				}
@@ -107,9 +134,9 @@ public class Walkz {
 			//if no ring found in equip OR invy OR bank, check bank for varrock tab
 			if(ring == -1) 
 			{
-				if(Bank.contains(varrockTele))
+				if(Bank.contains(id.varrockTele))
 				{
-					InvEquip.withdrawOne(varrockTele, timeout);
+					InvEquip.withdrawOne(id.varrockTele, timeout);
 					continue;
 				} 
 				//no options left - go to GE by walking
@@ -123,6 +150,393 @@ public class Walkz {
 			}
 		}
 		
+		return false;
+	}
+	
+	public static boolean walkToForgottenSouls()
+	{
+		if(Locations.forgottenSoulsLvl3.contains(Players.localPlayer())) return true;
+		if(Locations.forgottenSoulsLvl1.contains(Players.localPlayer()))
+		{
+			GameObject stairs = GameObjects.closest("Staircase");
+			if(stairs == null)
+			{
+				MethodProvider.log("Staircase is null in lvl 1 forgotten souls!");
+				return false;
+			}
+			if(stairs.interact("Climb-up"))
+			{
+				MethodProvider.sleepUntil(() -> Locations.forgottenSoulsLvl2.contains(Players.localPlayer()),
+						() -> Players.localPlayer().isMoving(),
+						Sleep.calculate(2222,2222), 50);
+				Sleep.sleep(420,696);
+			}
+			return false;
+		}
+		if(Locations.forgottenSoulsLvl2.contains(Players.localPlayer()))
+		{
+			GameObject stairs = GameObjects.closest("Staircase");
+			if(stairs == null)
+			{
+				MethodProvider.log("Staircase is null in lvl 2 forgotten souls!");
+				return false;
+			}
+			if(stairs.interact("Climb-up"))
+			{
+				MethodProvider.sleepUntil(() -> Locations.forgottenSoulsLvl2.contains(Players.localPlayer()),
+						() -> Players.localPlayer().isMoving(),
+						Sleep.calculate(2222,2222), 50);
+				Sleep.sleep(420,696);
+			}
+			return false;
+		}
+		
+		if(!walkPath(Paths.path_soulWarsLobbyToForgottenSouls))
+		{
+			if(!walkPath(Paths.path_otherSideOfIsleOfSoulsToForgottenSouls))
+			{
+				MethodProvider.log(":-(");
+			}
+		}
+		return false;
+	}
+	
+	public static boolean walkPath(Tile[] path)
+	{
+		List<Tile> pathTiles = new ArrayList<Tile>();
+		for(Tile t : path)
+		{
+			pathTiles.add(t);
+		}
+		Collections.reverse(pathTiles);
+		for(Tile t : pathTiles)
+		{
+			if(Map.isTileOnMap(t))
+			{
+				if(Walking.shouldWalk(6) && Walking.walk(t))
+				{
+					MethodProvider.log("Walked on path(regular walk)!");
+					Sleep.sleep(696,420);
+				}
+				else if(Walking.shouldWalk(6) && Walking.clickTileOnMinimap(t))
+				{
+					MethodProvider.log("Walked on path (map)!");
+					Sleep.sleep(696,420);
+				}
+				else if(Walking.shouldWalk(6) && Map.interact(t,"Walk here"))
+				{
+					MethodProvider.log("Walked here on path (screen)!");
+					Sleep.sleep(696,420);
+				}
+				return true;
+			}
+		}
+		MethodProvider.log("No tiles found to path to in path :-(");
+		return false;
+	}
+	public static boolean exitLumbyCave()
+	{
+		if(!Locations.entireLumbyCave.contains(Players.localPlayer())) return true;
+		if(!Bankz.openClosest())
+		{
+			if(Locations.lumbyCaveFoyer.contains(Players.localPlayer()))
+			{
+				GameObject climbingRope = GameObjects.closest(g -> g!=null && 
+						g.getName().equals("Climbing rope") && 
+						g.hasAction("Climb"));
+				if(climbingRope == null)
+				{
+					MethodProvider.log("climbing rope null in lumby cave foyer!");
+					return false;
+				}
+				if(climbingRope.interact("Climb"))
+				{
+					Sleep.sleep(696,420);
+				}
+				return false;
+			}
+			if(Locations.caveHandSkipTile2.equals(Players.localPlayer().getTile()))
+			{
+				if(!Walking.isRunEnabled())
+				{
+					if(Walking.toggleRun()) Sleep.sleep(420, 696);
+					return false;
+				}
+				if(Walking.walkExact(Locations.caveHandSkipTile))
+				{
+					Sleep.sleep(420, 696);
+				}
+				return false;
+			}
+			if(Walking.shouldWalk(6) && Walking.walk(Locations.caveHandSkipTile2)) Sleep.sleep(420, 696);
+		}
+		return false;
+	}
+	public static boolean enterDesert()
+	{
+		Timer timeout = new Timer(180000);
+		while(!timeout.finished() && Client.getGameState() == GameState.LOGGED_IN
+				&& ScriptManager.getScriptManager().isRunning() && !ScriptManager.getScriptManager().isPaused())
+		{
+			MethodProvider.log("Inside enter desert loop");
+			
+				
+			Sleep.sleep(69,420);
+			if(Locations.shantayPassSouthSide.contains(Players.localPlayer())) 
+			{
+				MethodProvider.log("Exiting enter desert loop - in south side of shantay pass!");
+				return true;
+			}
+			if(Locations.shantayPassArea.contains(Players.localPlayer()))
+			{
+				//drop all useless junk
+				if(Inventory.dropAll(i -> 
+						i != null &&
+						(i.getID() == InvEquip.waterskin0 || 
+						i.getID() == InvEquip.waterskin1 || 
+						i.getID() == InvEquip.waterskin2 || 
+						i.getID() == InvEquip.waterskin3 || 
+						i.getID() == TrainRanged.jug))) 
+				{
+					MethodProvider.sleep(Timing.sleepLogNormalInteraction());
+					continue;
+				}
+					
+				if(Inventory.count(InvEquip.waterskin4) >= 5 && 
+						Inventory.count(InvEquip.shantayPass) >= 1)
+				{
+					if(Widgets.getWidgetChild(565,17) != null && 
+							Widgets.getWidgetChild(565,17).isVisible() && 
+							Widgets.getWidgetChild(565,17).getText().contains("Proceed regardless"))
+					{
+						if(Widgets.getWidgetChild(565,17).interact("Yes"))
+						{
+							MethodProvider.sleepUntil(() -> Locations.shantayPassSouthSide.contains(Players.localPlayer()), Sleep.calculate(2222,2222));
+						}
+						continue;
+					}
+					
+					GameObject shantayPass = GameObjects.closest(f -> f!=null && f.getName().contains("Shantay pass") && f.hasAction("Go-through"));
+					if(shantayPass == null)
+					{
+						MethodProvider.log("Shantay pass null in shantay pass area!");
+						MethodProvider.sleep(Timing.sleepLogNormalInteraction());
+						continue;
+					}
+					if(shantayPass.interact("Go-through"))
+					{
+						MethodProvider.sleepUntil(() -> Locations.shantayPassSouthSide.contains(Players.localPlayer()) || 
+								(Widgets.getWidgetChild(565,17) != null && 
+										Widgets.getWidgetChild(565,17).isVisible() && 
+										Widgets.getWidgetChild(565,17).getText().contains("Proceed regardless")),
+								() -> Players.localPlayer().isMoving(),
+								Sleep.calculate(2222, 2222),50);
+					}
+					MethodProvider.sleep(Timing.sleepLogNormalInteraction());
+					continue;
+				}
+				
+				if(!InvEquip.checkedBank()) continue;
+				
+				int neededWaterskins = 0;
+				int neededPasses = 0;
+				if(Inventory.count(InvEquip.shantayPass) <= 0) neededPasses = 1;
+				if(Inventory.count(InvEquip.waterskin4) < 5) neededWaterskins = (5 - Inventory.count(InvEquip.waterskin4));
+				
+				final int neededInvySlots = neededPasses + neededWaterskins;
+				final int emptySlots = Inventory.getEmptySlots();
+				if(emptySlots < neededInvySlots)
+				{
+					MethodProvider.log("Not enuf invy spaces for waterskins + shantay pass");
+					if(Bank.isOpen())
+					{
+						if(Bank.depositAll(i -> i != null && 
+								ItemsOnGround.allSlayerLoot.contains(i.getID())))
+						{
+							MethodProvider.log("Deposited some allSlayerLoot");
+						}
+						else 
+						{
+							MethodProvider.log("Did not deposit any allSlayerLoot");
+							if(Bank.deposit(i -> i != null && 
+									i.getID() == TrainRanged.jugOfWine, (neededInvySlots - emptySlots)))
+							{
+								MethodProvider.log("Deposited "+(neededInvySlots - emptySlots)+" jugs of wine");
+							}
+							else 
+							{
+								MethodProvider.log("Did not deposit any jugs of wine");
+							}
+						}
+							
+						MethodProvider.sleep(Timing.sleepLogNormalInteraction());
+						continue;
+					}
+					if(Bankz.openClosestNoJewelry()) MethodProvider.sleep(Timing.sleepLogNormalSleep());
+					continue;
+				}
+				
+				if((neededPasses > 0 && Bank.count(InvEquip.shantayPass) > 0) || 
+						(neededWaterskins > 0 && Bank.count(InvEquip.waterskin4) > 0)) 
+				{
+					if(Bank.isOpen())
+					{
+						if(neededPasses > 0) 
+						{
+							if(Bank.withdraw(i -> i != null && 
+									i.getID() == InvEquip.shantayPass, neededPasses)) 
+							{
+								MethodProvider.sleep(Timing.sleepLogNormalInteraction());
+							}
+						}
+						if(neededWaterskins > 0) 
+						{
+							if(Bank.withdraw(i -> i != null && 
+									i.getID() == InvEquip.waterskin4, neededWaterskins)) 
+							{
+								MethodProvider.sleep(Timing.sleepLogNormalInteraction());
+							}
+						}
+						continue;
+					}
+					if(Bankz.openClosestNoJewelry()) MethodProvider.sleep(Timing.sleepLogNormalSleep());
+					continue;
+				}
+				
+				if(Inventory.count(InvEquip.coins) >= 2000)
+				{
+					if(Bank.isOpen()) 
+					{
+						if(Bank.close())
+						{
+							MethodProvider.sleep(Timing.sleepLogNormalInteraction());
+						}
+						continue;
+					}
+					if(Shop.isOpen())
+					{
+						if(neededPasses > 0)
+						{
+							if(Shop.interact(i -> i != null && 
+									i.getID() == InvEquip.shantayPass, "Buy 50"))
+							{
+								MethodProvider.log("Bought 50 passes from Shantay!");
+								MethodProvider.sleep(Timing.sleepLogNormalSleep());
+							}
+							continue;
+						}
+						if(neededWaterskins > 0)
+						{
+							if(Shop.interact(i -> i != null && 
+									i.getID() == InvEquip.waterskin4, "Buy 50"))
+							{
+								MethodProvider.log("Filled invy with "+emptySlots+" waterskin(4) from Shantay!");
+								MethodProvider.sleep(Timing.sleepLogNormalSleep());
+							}
+							continue;
+						}
+					}
+					
+					NPC shantay = NPCs.closest(s -> s != null && 
+							s.getName().equals("Shantay") && 
+							s.hasAction("Trade"));
+					if(shantay == null)
+					{
+						MethodProvider.log("Shantay null inside shantay pass area! :-(");
+						continue;
+					}
+					if(shantay.interact("Trade"))
+					{
+						MethodProvider.log("Interacted -trade- to -shantay-");
+						MethodProvider.sleepUntil(Shop::isOpen, () -> Players.localPlayer().isMoving(),
+								Sleep.calculate(2222, 2222),50);
+						continue;
+					}
+					
+					MethodProvider.sleep(Timing.sleepLogNormalSleep());
+					continue;
+				}
+				
+				if(Bank.isOpen())
+				{
+					if(Bank.count(InvEquip.coins) < 5000) 
+					{
+						MethodProvider.log("Not enough coins (5000) for buying shantay pass / waterskins to enter desert!");
+						ScriptManager.getScriptManager().stop();
+						return false;
+					}
+					if(Bank.withdraw(InvEquip.coins, 5000))
+					{
+						MethodProvider.log("Withdrew 5000 coins!");
+						MethodProvider.sleep(Timing.sleepLogNormalInteraction());
+					}
+					continue;
+				}
+				if(Bankz.openClosestNoJewelry()) MethodProvider.sleep(Timing.sleepLogNormalSleep());
+				continue;
+			}
+			
+			if(Locations.shantayPassArea.getCenter().distance() >= 150)
+			{
+				if(!Walkz.useJewelry(InvEquip.glory,"Al Kharid"))
+				{
+					if(!Walkz.useJewelry(InvEquip.duel, "PvP Arena"))
+					{
+						MethodProvider.log("Walking to Al-Karid ... ");
+						if(Walking.shouldWalk(6) && Walking.walk(BankLocation.SHANTAY_PASS)) Sleep.sleep(420,696);
+					}
+				}
+				continue;
+			}
+			if(Walking.shouldWalk(6) && Walking.walk(BankLocation.SHANTAY_PASS)) Sleep.sleep(420,696);
+		}
+		return false;
+	}
+	public static boolean exitDesert()
+	{
+		Timer timeout = new Timer(180000);
+		while(!timeout.finished() && Client.getGameState() == GameState.LOGGED_IN
+				&& ScriptManager.getScriptManager().isRunning() && !ScriptManager.getScriptManager().isPaused())
+		{
+			if(!Locations.isInDesert())
+			{
+				MethodProvider.log("Exited desert!");
+				return true;
+			}
+			if(Locations.isInDesert())
+			{
+				if(InvEquip.getWaterskinCharges() <= 2)
+				{
+					if(Walkz.useJewelry(InvEquip.glory, "Al Kharid")) continue;
+					if(Walkz.useJewelry(InvEquip.duel, "PvP Arena")) continue;
+					
+					if(Locations.carpetAreaShantay.contains(Players.localPlayer()))
+					{
+						GameObject shantayPass = GameObjects.closest(f -> f!=null && f.getName().contains("Shantay pass") && f.hasAction("Go-through"));
+						if(shantayPass == null)
+						{
+							MethodProvider.log("Shantay pass null in carpet guy area!");
+							MethodProvider.sleep(Timing.sleepLogNormalInteraction());
+							continue;
+						}
+						if(shantayPass.interact("Go-through"))
+						{
+							MethodProvider.sleepUntil(() -> Locations.shantayPassArea.contains(Players.localPlayer()),
+									() -> Players.localPlayer().isMoving(),
+									Sleep.calculate(2222, 2222),50);
+						}
+						MethodProvider.sleep(Timing.sleepLogNormalInteraction());
+						continue;
+					}
+					
+					if(Walking.shouldWalk(6) && Walking.walk(Locations.carpetAreaShantay.getCenter())) Sleep.sleep(696, 420);
+					MethodProvider.sleep(Timing.sleepLogNormalInteraction());
+					continue;
+				}
+				
+				MethodProvider.sleep(Timing.sleepLogNormalInteraction());
+			}
+		}
 		return false;
 	}
 	public static boolean leaveKourend(long timeout)
@@ -215,7 +629,8 @@ public class Walkz {
 	}
 	/**
 	 * returns true if have jewelry in invy or equipment. If in invy, equips and then teleports
-	 * both to avoid having to handle tele menu interface, and to ensure it teleports in combat
+	 * both to avoid having to handle tele menu interface, and to ensure it teleports in combat.
+	 * DOES NOT CHECK BANK FOR JEWELRY! Returns false if no jewelry specified in invy or equipment.
 	 * @param jewelry
 	 * @param teleName
 	 * @return
@@ -274,8 +689,11 @@ public class Walkz {
 			}
 			else
 			{
-				if(Widgets.isOpen()) Widgets.closeAll();
-				Tabs.openWithFKey(Tab.EQUIPMENT);
+				if(Shop.isOpen()) Shop.close();
+				else if(Bank.isOpen()) Bank.close();
+				else if(GrandExchange.isOpen()) GrandExchange.close();
+				else if(DepositBox.isOpen()) DepositBox.close();
+				else Tabs.open(Tab.EQUIPMENT);
 			}
 			return true;
 		}
@@ -285,17 +703,6 @@ public class Walkz {
 			InvEquip.equipItem(jewelryID);
 			return true;
 		}
-		
-		if(InvEquip.checkedBank())
-		{
-			if(InvEquip.bankContains(wearableJewelry))
-			{
-				final int jewelryID = InvEquip.getInvyItem(wearableJewelry);
-				InvEquip.withdrawOne(jewelryID, 180000);
-				return true;
-			}
-		}
-		
 		return false;
 	}
 	public static boolean goToCastleWars(long timeout)
@@ -472,10 +879,10 @@ public class Walkz {
 				continue;
 			}
 			//check if have cammy tab in invy, use it
-			if(Inventory.contains(cammyTele))
+			if(Inventory.contains(id.cammyTele))
 			{
 				if(Bank.isOpen()) Bank.close();
-				else if(Inventory.interact(cammyTele, "Break"))
+				else if(Inventory.interact(id.cammyTele, "Break"))
 				{
 					MethodProvider.sleepUntil(() -> Locations.camelotTrees.contains(Players.localPlayer()), () -> Players.localPlayer().isAnimating(), Sleep.calculate(4444,2222),50);
 				}
@@ -485,9 +892,9 @@ public class Walkz {
 			if(!InvEquip.checkedBank()) continue;
 			
 			//if no ring found in invy OR bank, buy at GE
-			if(!Bank.contains(cammyTele)) 
+			if(!Bank.contains(id.cammyTele)) 
 			{
-				InvEquip.buyItem(cammyTele, 1, timeout);
+				InvEquip.buyItem(id.cammyTele, 1, timeout);
 				if(!InvEquip.bankContains(InvEquip.wearableWealth)) InvEquip.buyItem(InvEquip.wealth5, 3, timeout);
 			}
 				
@@ -495,7 +902,7 @@ public class Walkz {
 			//found item in bank - withdraw it
 			else
 			{
-				InvEquip.withdrawOne(cammyTele, timeout);
+				InvEquip.withdrawOne(id.cammyTele, timeout);
 			}
 		}
 		
@@ -538,7 +945,7 @@ public class Walkz {
 			//if none found in invy OR bank, stop
 			if(!Bank.contains(tabID)) 
 			{
-				InvEquip.buyItem(houseTele, (int) Calculations.nextGaussianRandom(12,5),timeout);
+				InvEquip.buyItem(tabID, (int) Calculations.nextGaussianRandom(12,5),timeout);
 				if(!InvEquip.bankContains(InvEquip.wearableWealth)) InvEquip.buyItem(InvEquip.wealth5, 3, timeout);
 			}
 			
@@ -549,7 +956,7 @@ public class Walkz {
 	}
 	public static boolean teleportFalador(long timeout)
 	{
-		return teleport(fallyTele,Locations.fallyTeleSpot,timeout);
+		return teleport(id.fallyTele,Locations.fallyTeleSpot,timeout);
 	}
 	public static boolean teleportHouse(long timeout)
 	{
@@ -558,6 +965,11 @@ public class Walkz {
 				&& ScriptManager.getScriptManager().isRunning() && !ScriptManager.getScriptManager().isPaused())
 		{
 			if(Locations.isInstanced() || Locations.houseTeleSpot.contains(Players.localPlayer())) return true;
+			if(!Locations.unlockedHouse)
+			{
+				TrainPrayer.unlockHouse();
+				return false;
+			}
 			Sleep.sleep(69,69);
 			final double dist = Locations.houseTeleSpot.distance(Players.localPlayer().getTile());
 			if(dist <= 30)
@@ -570,10 +982,10 @@ public class Walkz {
 				continue;
 			}
 			//check if have fally tab in invy, use it
-			if(Inventory.contains(houseTele))
+			if(Inventory.contains(id.houseTele))
 			{
 				if(Bank.isOpen()) Bank.close();
-				else if(Inventory.interact(houseTele, "Break"))
+				else if(Inventory.interact(id.houseTele, "Break"))
 				{
 					MethodProvider.sleepUntil(() -> Locations.isInstanced() || Locations.houseTeleSpot.contains(Players.localPlayer()), () -> Players.localPlayer().isAnimating(), Sleep.calculate(4444,2222),50);
 				}
@@ -583,24 +995,28 @@ public class Walkz {
 			if(!InvEquip.checkedBank()) continue;
 			
 			//if none found in invy OR bank, stop
-			if(!Bank.contains(houseTele)) 
+			if(!Bank.contains(id.houseTele)) 
 			{
-				InvEquip.buyItem(houseTele, (int) Calculations.nextGaussianRandom(12,5),timeout);
+				InvEquip.buyItem(id.houseTele, (int) Calculations.nextGaussianRandom(12,5),timeout);
 				if(!InvEquip.bankContains(InvEquip.wearableWealth)) InvEquip.buyItem(InvEquip.wealth5, 3, timeout);
 			}
 			
 			//found item in bank - withdraw it
-			else InvEquip.withdrawOne(houseTele, timeout);
+			else InvEquip.withdrawOne(id.houseTele, timeout);
 		}
 		return false;
 	}
 	public static boolean teleportVarrock(long timeout)
 	{
-		return teleport(varrockTele,Locations.varrockTeleSpot,timeout);
+		return teleport(id.varrockTele,Locations.varrockTeleSpot,timeout);
+	}
+	public static boolean teleportLumbridge(long timeout)
+	{
+		return teleport(id.lumbridgeTele,Locations.lumbridgeTeleSpot,timeout);
 	}
 	public static boolean teleportCamelot(long timeout)
 	{
-		return teleport(cammyTele,Locations.cammyTeleSpot,timeout);
+		return teleport(id.cammyTele,Locations.cammyTeleSpot,timeout);
 	}
 	public static boolean walkToArea(Area area,Tile walkableTile)
 	{

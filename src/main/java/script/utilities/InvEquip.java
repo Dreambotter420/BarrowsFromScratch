@@ -12,11 +12,13 @@ import org.dreambot.api.data.GameState;
 import org.dreambot.api.methods.Calculations;
 import org.dreambot.api.methods.MethodProvider;
 import org.dreambot.api.methods.container.impl.Inventory;
+import org.dreambot.api.methods.container.impl.Shop;
 import org.dreambot.api.methods.container.impl.bank.Bank;
 import org.dreambot.api.methods.container.impl.bank.BankLocation;
 import org.dreambot.api.methods.container.impl.bank.BankMode;
 import org.dreambot.api.methods.container.impl.equipment.Equipment;
 import org.dreambot.api.methods.container.impl.equipment.EquipmentSlot;
+import org.dreambot.api.methods.depositbox.DepositBox;
 import org.dreambot.api.methods.grandexchange.GrandExchange;
 import org.dreambot.api.methods.grandexchange.LivePrices;
 import org.dreambot.api.methods.interactive.Players;
@@ -27,7 +29,9 @@ import org.dreambot.api.script.ScriptManager;
 import org.dreambot.api.utilities.Timer;
 import org.dreambot.api.wrappers.items.Item;
 
+import script.quest.varrockmuseum.Timing;
 import script.skills.ranged.TrainRanged;
+import script.skills.woodcutting.TrainWoodcutting;
 
 public class InvEquip {
 	public static Map<EquipmentSlot, Integer> equipmentMap = new LinkedHashMap<EquipmentSlot, Integer>();
@@ -189,8 +193,32 @@ public class InvEquip {
 		}
 		return false;
 	}
-	
-	public static void withdrawOne(int itemID, long timeout)
+	public static void depositExtraJunk()
+	{
+		Item i = Inventory.get(TrainRanged.jug);
+		if(i == null) i = Inventory.get(id.vial);
+		if(i == null) i = Inventory.get(InvEquip.waterskin0);
+		if(i == null) i = Inventory.get(InvEquip.waterskin1);
+		if(i == null) i = Inventory.get(InvEquip.waterskin2);
+		if(i == null) i = Inventory.get(InvEquip.waterskin3);
+		if(i == null) i = Inventory.get(TrainWoodcutting.logs);
+		if(i == null) i = Inventory.get(TrainWoodcutting.oakLogs);
+		if(i == null) i = Inventory.get(InvEquip.skills0);
+		if(i == null) i = Inventory.get(InvEquip.wealth0);
+		if(i == null) i = Combat.getFood();
+		if(i == null) i = Inventory.get(InvEquip.getInvyItem(ItemsOnGround.allSlayerLoot));
+		if(i != null)
+		{
+			if(i.isNoted() || i.isStackable())
+			{
+				if(Bank.depositAll(i))Sleep.sleep(696, 420);
+			} else if(Bank.deposit(i,1)) Sleep.sleep(696, 420);
+			return;
+		}
+		MethodProvider.log("Could not find any un-valuable things to deposit to make room in invy :-( ");
+		return;
+	}
+	public static boolean withdrawOne(int itemID, long timeout)
 	{
 		Timer timer = new Timer(timeout);
 		while(!timer.finished() && Client.getGameState() == GameState.LOGGED_IN
@@ -199,19 +227,13 @@ public class InvEquip {
 			Sleep.sleep(69, 69);
 
 			MethodProvider.log("In WithdrawOne loop for itemID: "+ itemID + " / name: "+new Item(itemID,1).getName());
-			if(Inventory.count(itemID) > 0) return;
+			if(Inventory.count(itemID) > 0) return true;
 			if(!closeBankEquipment()) continue;
 			if(Bankz.openClosest())
 			{
 				if(Inventory.emptySlotCount() < 2)
 				{
-					Item i = Inventory.getItemInSlot(Inventory.getFirstFullSlot());
-					int iD = i.getID();
-					final int count = Inventory.count(iD);
-					if(Bank.deposit(i,1))
-					{
-						MethodProvider.sleepUntil(() -> Inventory.count(iD) < count,Sleep.calculate(2222, 2222));
-					}
+					depositExtraJunk();
 					continue;
 				}
 				if(Bank.withdraw(itemID,1))
@@ -220,6 +242,7 @@ public class InvEquip {
 				}
 			} else Sleep.sleep(666, 666);
 		}
+		return false;
 	}
 	public static void withdrawAll(int itemID, boolean noted, long timeout)
 	{
@@ -530,8 +553,8 @@ public class InvEquip {
 				else return;
 				continue;
 			}
-			if(Bank.contains(coins) || (Bank.contains(coins) && Inventory.emptySlotCount() < 2) || 
-					justCollected ||
+			if(Bank.contains(coins) || Inventory.emptySlotCount() <= 0 || 
+					(justCollected && !collectBank) ||
 					Inventory.count(new Item(itemID,1).getNotedItemID()) > 0)
 			{
 				if(Bank.isOpen())
@@ -543,16 +566,14 @@ public class InvEquip {
 					}
 					if(Bank.getWithdrawMode() == BankMode.ITEM)
 					{
-						if(Inventory.emptySlotCount() < 2)
+						if(Inventory.emptySlotCount() <= 0)
 						{
-							Item i = Inventory.getItemInSlot(Inventory.getFirstFullSlot());
-							int iD = i.getID();
-							if(Bank.depositAll(i))
-							{
-								MethodProvider.sleepUntil(() -> Inventory.count(iD) <= 0,Sleep.calculate(2222, 2222));
-							}
+							depositExtraJunk();
+							MethodProvider.sleep(Timing.sleepLogNormalInteraction());
 							continue;
 						}
+						justCollected = false;
+						
 						if(Bank.withdrawAll(coins))
 						{
 							MethodProvider.sleepUntil(() -> !Bank.contains(coins), Sleep.calculate(2222, 2222));
@@ -582,8 +603,14 @@ public class InvEquip {
 			}
 			if(!GrandExchange.isOpen())
 			{
+				if(Bank.isOpen()) 
+				{
+					Bank.close();
+					continue;
+				}
 				if(Walkz.goToGE(timer.remaining()))
 				{
+					
 					if(GrandExchange.open())
 					{
 						MethodProvider.sleepUntil(() -> GrandExchange.isOpen(), Sleep.calculate(2222, 2222));
@@ -1174,10 +1201,7 @@ public class InvEquip {
 									{
 										if(Inventory.emptySlotCount() < 1)
 										{
-											if(Bank.depositAll(Inventory.getItemInSlot(Inventory.getFirstFullSlot())))
-											{
-												MethodProvider.sleepUntil(() -> Inventory.emptySlotCount() >= 1,Sleep.calculate(2222, 2222));
-											}
+											depositExtraJunk();
 											continue;
 										}
 										if(Bank.withdraw(bankID, 1))
@@ -1382,9 +1406,26 @@ public class InvEquip {
 				//create list of inventoryList and optional IDs to check all items in invy against
 				List<Integer> validIDs = new ArrayList<Integer>();
 				List<Integer> notOKItems = new ArrayList<Integer>();
+				
 				for(Entry<Integer, InventoryItem> entry : inventoryList.entrySet())
 				{
-					final int validID = entry.getValue().noted ? new Item(entry.getKey(),1).getNotedItemID() : entry.getKey();
+					List<Integer> possibleJewelry = new ArrayList<Integer>();
+					if(entry.getKey() == wealth) possibleJewelry.addAll(wearableWealth);
+					if(entry.getKey() == glory) possibleJewelry.addAll(wearableGlory);
+					if(entry.getKey() == games) possibleJewelry.addAll(wearableGames);
+					if(entry.getKey() == passage) possibleJewelry.addAll(wearablePassages);
+					if(entry.getKey() == duel) possibleJewelry.addAll(wearableDuel);
+					if(entry.getKey() == combat) possibleJewelry.addAll(wearableCombats);
+					if(entry.getKey() == skills) possibleJewelry.addAll(wearableSkills);
+					if(possibleJewelry != null && !possibleJewelry.isEmpty())
+					{
+						for(int i : possibleJewelry)
+						{
+							validIDs.add(i);
+						}
+						continue;
+					}
+					final int validID = (entry.getValue().noted ? new Item(entry.getKey(),1).getNotedItemID() : entry.getKey());
 					validIDs.add(validID);
 				}
 				if(!optionalItems.isEmpty())
@@ -1440,6 +1481,39 @@ public class InvEquip {
 			
 			for(Entry<Integer,InventoryItem> listedItem : inventoryList.entrySet())
 			{
+				List<Integer> possibleJewelry = new ArrayList<Integer>();
+				if(listedItem.getKey() == wealth) possibleJewelry.addAll(wearableWealth);
+				if(listedItem.getKey() == glory) possibleJewelry.addAll(wearableGlory);
+				if(listedItem.getKey() == games) possibleJewelry.addAll(wearableGames);
+				if(listedItem.getKey() == passage) possibleJewelry.addAll(wearablePassages);
+				if(listedItem.getKey() == duel) possibleJewelry.addAll(wearableDuel);
+				if(listedItem.getKey() == combat) possibleJewelry.addAll(wearableCombats);
+				if(listedItem.getKey() == skills) possibleJewelry.addAll(wearableSkills);
+				if(possibleJewelry != null && !possibleJewelry.isEmpty())
+				{
+					boolean shouldBreak = false;
+					for(int i : possibleJewelry)
+					{
+						int itemID = i;
+						int min = listedItem.getValue().minQty;
+						int max = listedItem.getValue().maxQty;
+						int count = Inventory.count(itemID);
+						if(count >= min)
+						{
+							if(count <= max)
+							{
+								shouldBreak = true;
+								break;
+							}
+						}
+					}
+					if(shouldBreak) continue;
+					List<Integer> reversed = possibleJewelry;
+					Collections.reverse(reversed);
+					MethodProvider.log("Missing jewelry: "+new Item(reversed.get(0),1).getName());
+					missingInvyItems.put(reversed.get(0),new InventoryItem(reversed.get(0),listedItem.getValue().minQty, listedItem.getValue().maxQty, false, listedItem.getValue().refillQty));
+					continue;
+				}
 				Item itemRef = listedItem.getValue().itemRef;
 				int itemID = listedItem.getValue().noted ? itemRef.getNotedItemID() : listedItem.getKey();
 				int min = listedItem.getValue().minQty;
@@ -1459,7 +1533,6 @@ public class InvEquip {
 			if(missingInvyItems.isEmpty()) return true;
 			for(Entry<Integer,InventoryItem> itemToGet : missingInvyItems.entrySet())
 			{
-
 				Item itemRef = itemToGet.getValue().itemRef;
 				String itemName = itemRef.getName();
 				boolean noted = itemToGet.getValue().noted;
@@ -1569,10 +1642,7 @@ public class InvEquip {
 									{
 										if(Inventory.emptySlotCount() < 1)
 										{
-											if(Bank.depositAll(Inventory.getItemInSlot(Inventory.getFirstFullSlot())))
-											{
-												MethodProvider.sleepUntil(() -> Inventory.emptySlotCount() >= 1,Sleep.calculate(2222, 2222));
-											}
+											depositExtraJunk();
 											continue;
 										}
 										if(Bank.withdraw(unnotedID,neededForMax))
@@ -1591,10 +1661,8 @@ public class InvEquip {
 									else {
 										if(Inventory.emptySlotCount() < 1)
 										{
-											if(Bank.depositAll(Inventory.getItemInSlot(Inventory.getFirstFullSlot())))
-											{
-												MethodProvider.sleepUntil(() -> Inventory.emptySlotCount() >= 1,Sleep.calculate(2222, 2222));
-											}
+											depositExtraJunk();
+											MethodProvider.sleep(Timing.sleepLogNormalInteraction());
 											continue;
 										}
 										if(Bank.withdrawAll(unnotedID))
@@ -1614,10 +1682,8 @@ public class InvEquip {
 								{
 									if(Inventory.emptySlotCount() < 1)
 									{
-										if(Bank.depositAll(Inventory.getItemInSlot(Inventory.getFirstFullSlot())))
-										{
-											MethodProvider.sleepUntil(() -> Inventory.emptySlotCount() >= 1,Sleep.calculate(2222, 2222));
-										}
+										depositExtraJunk();
+										MethodProvider.sleep(Timing.sleepLogNormalInteraction());
 										continue;
 									}
 									if(Bank.withdraw(unnotedID,neededForMax))
@@ -1634,10 +1700,8 @@ public class InvEquip {
 							{
 								if(Inventory.emptySlotCount() < 1)
 								{
-									if(Bank.depositAll(Inventory.getItemInSlot(Inventory.getFirstFullSlot())))
-									{
-										MethodProvider.sleepUntil(() -> Inventory.emptySlotCount() >= 1,Sleep.calculate(2222, 2222));
-									}
+									depositExtraJunk();
+									MethodProvider.sleep(Timing.sleepLogNormalInteraction());
 									continue;
 								}
 								if(Bank.withdrawAll(unnotedID))
@@ -1696,7 +1760,7 @@ public class InvEquip {
 			if(Inventory.interact(ID, action))
 			{
 				MethodProvider.sleepUntil(() -> {
-					if(TrainRanged.shouldEatFood(8)) Combat.eatFood();
+					if(Combat.shouldEatFood(8)) Combat.eatFood();
 					return Equipment.contains(tmp);
 				}, Sleep.calculate(2222, 2222));
 			}
@@ -1705,11 +1769,10 @@ public class InvEquip {
 		}
 		else
 		{
-			if(Widgets.isOpen())
-			{
-				Widgets.closeAll();
-				Sleep.sleep(111, 111);
-			}
+			if(Shop.isOpen()) Shop.close();
+			else if(Bank.isOpen()) Bank.close();
+			else if(GrandExchange.isOpen()) GrandExchange.close();
+			else if(DepositBox.isOpen()) DepositBox.close();
 			else Tabs.open(Tab.INVENTORY);
 		}
 		return false;
@@ -1741,7 +1804,7 @@ public class InvEquip {
 			if(Inventory.interact(itemName, action))
 			{
 				MethodProvider.sleepUntil(() -> {
-					if(TrainRanged.shouldEatFood(8)) Combat.eatFood();
+					if(Combat.shouldEatFood(8)) Combat.eatFood();
 					return Equipment.contains(tmp);
 				}, Sleep.calculate(2222, 2222));
 			}
@@ -1866,9 +1929,55 @@ public class InvEquip {
 		{
 			allJewelry.put(EquipmentSlot.AMULET, jewelry);
 		}
+		allJewelryIDs.addAll(wearableWealth);
+		allJewelryIDs.addAll(wearablePassages);
+		allJewelryIDs.addAll(wearableGames);
+		allJewelryIDs.addAll(wearableSkills);
+		allJewelryIDs.addAll(wearableGlory);
+		allJewelryIDs.addAll(wearableCombats);
+		allJewelryIDs.addAll(wearableDuel);
 		staminas.add(stamina1);staminas.add(stamina2);staminas.add(stamina3);staminas.add(stamina4);
-		
+		antidotes.add(antidote1);antidotes.add(antidote2);antidotes.add(antidote3);antidotes.add(antidote4);
 	}
+	public static final int iceCooler = 6696;
+	public static final int shantayPass = 1854;
+	public static final int waterskin0 = 1831;
+	public static final int waterskin1 = 1829;
+	public static final int waterskin2 = 1827;
+	public static final int waterskin3 = 1825;
+	public static final int waterskin4 = 1823;
+	public static int getWaterskinCharges()
+	{
+		int count = 0;
+		if(Inventory.count(waterskin1) > 0) 
+		{
+			int tmp = ((Inventory.count(waterskin1) * 1) + count);
+			count = tmp;
+		}
+		if(Inventory.count(waterskin2) > 0) 
+		{
+			int tmp = ((Inventory.count(waterskin2) * 2) + count);
+			count = tmp;
+		}
+		if(Inventory.count(waterskin3) > 0) 
+		{
+			int tmp = ((Inventory.count(waterskin3) * 3) + count);
+			count = tmp;
+		}
+		if(Inventory.count(waterskin4) > 0) 
+		{
+			int tmp = ((Inventory.count(waterskin4) * 4) + count);
+			count = tmp;
+		}
+		MethodProvider.log("Waterskin total charges in invy: " + count);
+		return count;
+	}
+	public static final int antidote1 = 5958;
+	public static final int antidote2 = 5956;
+	public static final int antidote3 = 5954;
+	public static final int antidote4 = 5952;
+	public static List<Integer> antidotes = new ArrayList<Integer>();
+	public static List<Integer> allJewelryIDs = new ArrayList<Integer>();
 	public static final int stamina4 = 12625;
 	public static final int stamina3 = 12627;
 	public static final int stamina2 = 12629;

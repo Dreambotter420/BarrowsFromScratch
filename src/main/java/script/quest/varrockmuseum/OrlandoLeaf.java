@@ -12,12 +12,14 @@ import org.dreambot.api.wrappers.interactive.GameObject;
 import org.dreambot.api.wrappers.interactive.NPC;
 
 import script.framework.Leaf;
+import script.utilities.Locations;
 
 @Unobfuscated
 public class OrlandoLeaf extends Leaf {
     @Override
     public boolean isValid() {
-        return Museum.getSettingValue() < 2 || Display.allCompleted();
+        return Museum.getSettingValue() < 2 || Display.allCompleted() || 
+        		!Locations.museumArea.contains(Players.localPlayer());
     }
 
 

@@ -3,6 +3,7 @@ package script.quest.fremenniktrials;
 import org.dreambot.api.methods.MethodProvider;
 import org.dreambot.api.methods.settings.PlayerSettings;
 
+import script.behaviour.DecisionLeaf;
 import script.framework.Leaf;
 import script.framework.Tree;
 import script.quest.varrockmuseum.Timing;
@@ -20,27 +21,44 @@ public class FremennikTrials extends Leaf {
 	public static boolean completedFremennikTrials = false;
     public void onStart() {
         
-        instantiateTree();
         started = true;
     }
-
-    private final Tree tree = new Tree();
-    private void instantiateTree() {
-        
+    public static boolean onExit()
+    {
+    	return true;
     }
+  
     @Override
-    public int onLoop() {
-        if (true) {
-            MethodProvider.log("[UNSCRIPTED] -> Fremennik Trials");
-            completedFremennikTrials = true;
-           	API.mode = null;
-            return Timing.sleepLogNormalSleep();
-        }
-        return tree.onLoop();
-    }
-
-	@Override
 	public boolean isValid() {
 		return API.mode == API.modes.FREMENNIK_TRIALS;
 	}
+    @Override
+    public int onLoop() {
+    	if(true)
+    	{
+    		MethodProvider.log("[UNSCRIPTED] -> Fremennik Trials!");
+    		API.mode = null;
+            return Timing.sleepLogNormalSleep();
+    	}
+    	if (completedFremennikTrials) {
+            MethodProvider.log("[COMPLETED] -> Fremennik Trials!");
+            if(onExit())
+            {
+            	API.mode = null;
+            }
+            return Timing.sleepLogNormalSleep();
+        }
+    	if (DecisionLeaf.taskTimer.finished()) {
+            MethodProvider.log("[TIMEOUT] -> Fremennik Trials");
+            if(onExit())
+            {
+            	API.mode = null;
+            }
+            return Timing.sleepLogNormalSleep();
+        }
+    	
+        return Timing.sleepLogNormalSleep();
+    }
+
+	
 }

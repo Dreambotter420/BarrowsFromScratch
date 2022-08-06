@@ -13,6 +13,7 @@ import script.utilities.InvEquip;
 import script.utilities.ItemsOnGround;
 import script.utilities.Locations;
 import script.utilities.Sleep;
+import script.utilities.id;
 
 
 public class Initialize extends Leaf {
@@ -31,6 +32,7 @@ public class Initialize extends Leaf {
     	//all initial randomizations that depend on new random seed go here
 		InvEquip.clearEquipmentSlots();
 		InvEquip.initializeIntLists();
+		id.initializeAlchList();
 		DecisionLeaf.initialize();
 		ItemsOnGround.initializeLists();
 		TrainRanged.initialize();

@@ -1,6 +1,8 @@
 package script.utilities;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import org.dreambot.api.methods.MethodProvider;
@@ -115,7 +117,6 @@ public class ItemsOnGround {
 		
 		hillGiantsLoot.add(giantKey);
 		hillGiantsLoot.add(natureRune);
-		hillGiantsLoot.add(bigBones);
 		
 		//create list of all loot from slayer monsters 
 		allSlayerLoot.addAll(kalphiteWorkerLoot);
@@ -159,14 +160,6 @@ public class ItemsOnGround {
 		forgottenSoulsLoot.addAll(rareDropTable);
 		
 	}
-	public static boolean groundIDMatchesList(int ID, List<Integer> listToCheck)
-	{
-		for(int i : listToCheck)
-		{
-			if(i == ID) return true;
-		}
-		return false;
-	}
 	public static GroundItem getNearbyGroundItem(List<Integer> listToCheck, Area killingArea)
 	{
 		if(listToCheck == null)
@@ -185,9 +178,42 @@ public class ItemsOnGround {
 			g.distance() <= 15 &&
 			(killingArea.contains(g) || g.getID() != bigBones) &&
 			g.canReach() && 
-			groundIDMatchesList(g.getID(), listToCheck);
+			listToCheck.contains(g.getID());
 		GroundItem g = GroundItems.closest(nearbyGroundItemFilter);
 		return g;
+	}
+	/**
+	 * Gets a nearby ground item according to most valuable above a given threshold. 
+	 * Set boolean shouldBeReachable to false if you intend to telegrab items, true if walking to loot
+	 * 
+	 */
+	public static GroundItem getValuableNearbyItem(int valueThreshold, Area killingArea, boolean shouldBeReachable)
+	{
+		if(valueThreshold <= 0)
+		{
+			MethodProvider.log("Attempted to check ground items value which is 0 or less...");
+			return null;
+		}
+		
+		Filter<GroundItem> nearbyGroundItemFilter = g -> 
+			g != null && 
+			g.exists() &&
+			g.distance() <= 15 &&
+			(killingArea.contains(g) || g.getID() != bigBones) &&
+			((shouldBeReachable && g.canReach()) || !shouldBeReachable) &&
+			g.getItem().getLivePrice() >= valueThreshold;
+		List<GroundItem> g = GroundItems.all(nearbyGroundItemFilter);
+		if(g == null || g.isEmpty()) return null;
+		Collections.sort(g, new Comparator<GroundItem>() {
+			@Override
+			public int compare(GroundItem o1, GroundItem o2) {
+				Integer i = o1.getItem().getValue();
+				Integer i2 = o2.getItem().getValue();
+				return i.compareTo(i2);
+			}
+			});
+		Collections.reverse(g);
+		return g.get(0);
 	}
 	public static void grabNearbyGroundItem(GroundItem g)
 	{

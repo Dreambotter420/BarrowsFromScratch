@@ -4,6 +4,7 @@ import org.dreambot.api.methods.MethodProvider;
 import org.dreambot.api.script.ScriptManager;
 import org.dreambot.api.wrappers.widgets.message.Message;
 
+import script.quest.waterfallquest.WaterfallQuest;
 import script.skills.prayer.TrainPrayer;
 import script.skills.ranged.Mobs;
 import script.utilities.InvEquip;

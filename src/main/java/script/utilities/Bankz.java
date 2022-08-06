@@ -9,12 +9,12 @@ import org.dreambot.api.methods.walking.impl.Walking;
 import script.quest.varrockmuseum.Timing;
 
 public class Bankz {
-	public static boolean openClosest()
+	public static boolean openClosest(int distToTryTeleport)
 	{
 		if(Bank.isOpen()) return true;
 		
 		final double dist = BankLocation.getNearest(Players.localPlayer()).getTile().distance();
-		if(dist >= 100)
+		if(dist >= distToTryTeleport)
 		{
 			MethodProvider.log("Distance to closest bank: " + dist);
 			if(Walkz.useJewelry(InvEquip.wealth,"Grand Exchange") || 

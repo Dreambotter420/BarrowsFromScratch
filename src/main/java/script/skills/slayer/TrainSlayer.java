@@ -343,7 +343,7 @@ public class TrainSlayer extends Leaf{
 				}
 				continue;
 			}
-			if(Bankz.openClosest()) MethodProvider.sleep(Timing.sleepLogNormalSleep());
+			if(Bankz.openClosest(25)) MethodProvider.sleep(Timing.sleepLogNormalSleep());
 			continue;
 			
 		

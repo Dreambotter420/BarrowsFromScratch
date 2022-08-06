@@ -1303,7 +1303,6 @@ public class Mobs {
 	    	{
 	    		if(Locations.veosSarim.getCenter().distance(Players.localPlayer().getTile()) > 75) Walkz.teleportDraynor(180000);
     			else if(Walking.shouldWalk(6) && Walking.walk(Locations.veosSarim.getCenter())) Sleep.sleep(420,666);
-	    		
 	    	}
 			return Timing.sleepLogNormalSleep();
 		}

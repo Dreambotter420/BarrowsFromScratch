@@ -39,8 +39,23 @@ public class Locations {
 	public static final Area rimmington = new Area(2944, 3209, 2960, 3229, 0);
 	public static final Area estateRoom = new Area(2981, 3370, 2984, 3368, 0);
 	public static final Area castleWars = new Area(2446, 3081, 2435, 3098, 0);
+	public static final Area lesserDemonsKillZoneWizardsTower = new Area(3108, 3158, 3112, 3156, 2);
 	public static final Area veosPisc = new Area(1829,3688, 3048, 3252, 0);
 	public static final Area veosSarim = new Area(3055, 3249, 3049, 3245, 0);
+	public static Area haSpot = null;
+	public static final Area waterfallDungeon = new Area(2556, 9919, 2597, 9860);
+	public static final Area waterfallDungeonFoyer = new Area(
+			new Tile(2581, 9882, 0),
+			new Tile(2581, 9856, 0),
+			new Tile(2567, 9861, 0),
+			new Tile(2562, 9881, 0));
+	public static final Area waterfallDungeonLastRoomAirlock = new Area(2570, 9894, 2565, 9901, 0);
+	public static final Area waterfallDungeonLastArea = new Area(2560, 9902, 2571, 9919, 0);
+	public static final Area waterfallDungeonLastAreaChanged = new Area(2598, 9916, 2608, 9901, 0);
+	public static final Tile waterfallLastCrateTile = new Tile(2589,9888,0);
+	public static final Area waterfallLastCrateArea = new Area(2582, 9874, 2600, 9891, 0);
+	public static final Tile HALadderSpot = new Tile(3420, 3185, 0);
+	public static final Area HASpot1 = new Area(3415, 3187, 3421, 3182, 1);
 	public static final Area burthrope = new Area(
 		    new Tile[] {
 		        new Tile(2885, 3606, 0),

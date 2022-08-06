@@ -28,6 +28,8 @@ import org.dreambot.api.wrappers.interactive.Player;
 import org.dreambot.api.wrappers.items.Item;
 import org.dreambot.api.wrappers.widgets.WidgetChild;
 
+import script.quest.varrockmuseum.Timing;
+
 public class MissingAPI {
 	
 	public static void scrollHopWorld(int world)
@@ -40,7 +42,19 @@ public class MissingAPI {
 				Client.isLoggedIn() && 
 				!Players.localPlayer().isInCombat() && 
 				Skills.getRealLevel(Skill.HITPOINTS) > 0)
-		{
+		{	
+			Sleep.sleep(69, 69);
+			if(Dialogues.isProcessing())
+			{
+				MethodProvider.sleepUntil(() -> !Dialogues.isProcessing(), Sleep.calculate(2222, 2222));
+				continue;
+			}
+			if(Dialogues.canContinue())
+			{
+				Dialogues.continueDialogue();
+				MethodProvider.sleep(Timing.sleepLogNormalSleep());
+				continue;
+			}
 			if(Widgets.getWidgetChild(69,2) != null &&
 					Widgets.getWidgetChild(69,2).isVisible() &&
 					Widgets.getWidgetChild(69,2).getText().contains("Loading..."))

@@ -5,8 +5,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
+import org.dreambot.api.Client;
 import org.dreambot.api.ClientSettings;
 import org.dreambot.api.data.ActionMode;
+import org.dreambot.api.input.Mouse;
+import org.dreambot.api.methods.Calculations;
 import org.dreambot.api.methods.MethodProvider;
 import org.dreambot.api.methods.input.Keyboard;
 import org.dreambot.api.methods.settings.PlayerSettings;
@@ -15,6 +18,10 @@ import org.dreambot.api.methods.tabs.Tabs;
 import org.dreambot.api.methods.widget.Widgets;
 import org.dreambot.api.methods.world.World;
 import org.dreambot.api.methods.world.Worlds;
+import org.dreambot.api.script.ScriptManager;
+import org.dreambot.api.utilities.Timer;
+
+import script.Main;
 
 
 public class API {
@@ -197,43 +204,91 @@ public class API {
 	public static void randomAFK(int chance)
 	{
 		int roll = API.rand2.nextInt(100);
+		boolean moveMouse = false;
+		if(API.rand2.nextInt(100) < chance)
+		{
+			moveMouse = true;
+		}
 		if(roll < chance)
 		{
 			int tmp = API.rand2.nextInt(100);
+			int sleep = 0;
 			if(tmp < 2)  
 			{
 				MethodProvider.log("AFK: 1% chance, max 240s");
-				Sleep.sleep(50,84000);
+				sleep = Sleep.calculate(50,84000);
 			}
 			else if(tmp < 6)  
 			{
 				MethodProvider.log("AFK: 5% chance, max 120s");
-				Sleep.sleep(50,40000);
+				sleep = Sleep.calculate(50,40000);
 			}
 			else if(tmp < 25)
 			{
 				MethodProvider.log("AFK: 14% chance, max 40s");
-				Sleep.sleep(50,20000);
+				sleep = Sleep.calculate(50,20000);
 			}
 			else if(tmp < 45)  
 			{
 				MethodProvider.log("AFK: 20% chance, max 20s");
-				Sleep.sleep(50,10000);
+				sleep = Sleep.calculate(50,10000);
 			}
 			else if(tmp < 65)  
 			{
 				MethodProvider.log("AFK: 20% chance, max 6.0s");
-				Sleep.sleep(50,4500);
+				sleep = Sleep.calculate(50,4500);
 			}
 			else if(tmp < 1000)  
 			{
 				MethodProvider.log("AFK: 35% chance, max 3.2s");
-				Sleep.sleep(50,2400);
+				sleep = Sleep.calculate(50,2400);
+			}
+			Timer sleepTimer = new Timer(sleep);
+			final int mean = sleep / 2;
+			final int sigma = sleep * 2 / 5;
+			Timer mouseMoveTimer = new Timer((int) Calculations.nextGaussianRandom(mean, sigma));
+			while(!sleepTimer.finished() && !ScriptManager.getScriptManager().isPaused() &&
+					ScriptManager.getScriptManager().isRunning())
+			{
+				Main.customPaintText1 = "~~~~~~~~~~~~~";
+				Main.customPaintText2 = "~~~~~AFK~~~~~";
+				Main.customPaintText3 = "~~ "+Timer.formatTime(sleepTimer.remaining())+" ~~";
+				Main.customPaintText4 = "~~~~~~~~~~~~~";
+				if(moveMouse && 
+						mouseMoveTimer.finished())
+				{
+					if(Mouse.isMouseInScreen() && 
+							Mouse.moveMouseOutsideScreen())
+					{
+						Sleep.sleep(69,69);
+					}
+				}
+				Sleep.sleep(69, 69);
+				
 			}
 		}
 		
 	}
-	public static int getP2PWorld()
+	
+	public static int round (int number,int multiple){
+
+	    int result = multiple;
+
+	    //If not already multiple of given number
+
+	    if (number % multiple != 0)
+	    {
+
+	        int division = number / multiple;
+
+	        result = division * multiple;
+
+	    }
+
+	    return result;
+
+	}
+	public static int getRandomP2PWorld()
 	{
 		List<World> verifiedWorlds = new ArrayList<World>();
 		for(World tmp : Worlds.noMinimumLevel())
@@ -246,13 +301,13 @@ public class API {
 					&& !tmp.isLeagueWorld()
 					&& !tmp.isSuspicious()
 					&& !tmp.isTargetWorld()
-					&& tmp.getWorld() != 301) //just avoid popular world)
+					&& tmp.getWorld() != 302) //just avoid popular world)
 			{
 				verifiedWorlds.add(tmp);
 			}
 		}
 		Collections.shuffle(verifiedWorlds);
-		return verifiedWorlds.size() > 0 ? verifiedWorlds.get(0).getWorld() : 302; // default world 302 (p2p) if none found
+		return verifiedWorlds.size() > 0 ? verifiedWorlds.get(0).getWorld() : 302; // default world 302 if none found
 	}
 	
 	

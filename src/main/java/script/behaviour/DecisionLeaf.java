@@ -206,7 +206,7 @@ public class DecisionLeaf extends Leaf{
 		
 		if(!fremmyTrialsDone)
 		{
-			if(fightArenaDone && waterfallDone && prayer >= prayerSetpoint && att >= attSetpoint && str >= strSetpoint && validModes.contains(modes.FREMENNIK_TRIALS)) validModes.add(modes.FREMENNIK_TRIALS);
+			if(fightArenaDone && waterfallDone && prayer >= prayerSetpoint && att >= attSetpoint && str >= strSetpoint && !validModes.contains(modes.FREMENNIK_TRIALS)) validModes.add(modes.FREMENNIK_TRIALS);
 			if(!fightArenaDone)
 			{
 				if(waterfallDone && prayer >= prayerSetpoint && !validModes.contains(modes.FIGHT_ARENA)) validModes.add(modes.FIGHT_ARENA);
@@ -303,9 +303,14 @@ public class DecisionLeaf extends Leaf{
 		if(tmp >= 83 && tmp <= 85) mageSetpoint = tmp;
 		else mageSetpoint = 83;
 		
-		tmp =(int) Calculations.nextGaussianRandom(49, 3);
-		if(tmp >= 45 && tmp <= 50) prayerSetpoint = tmp;
-		else prayerSetpoint = 45;
+		if(Skills.getRealLevel(Skill.PRAYER) >= 45) prayerSetpoint = 45;
+		else
+		{
+			tmp =(int) Calculations.nextGaussianRandom(49, 3);
+			if(tmp >= 45 && tmp <= 50) prayerSetpoint = tmp;
+			else prayerSetpoint = 45;
+		}
+		
 		
 		tmp =(int) Calculations.nextGaussianRandom(31, 3);
 		if(tmp >= 30 && tmp <= 32) agilitySetpoint = tmp;

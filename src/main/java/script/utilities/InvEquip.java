@@ -111,7 +111,7 @@ public class InvEquip {
 			else
 			{
 				if(!closeBankEquipment()) return false;
-				if(!Bankz.openClosest()) Sleep.sleep(666,666);
+				if(!Bankz.openClosest(50)) Sleep.sleep(666,666);
 			}
 		}
 		if(Bank.getLastBankHistoryCacheTime() > 0)
@@ -229,7 +229,7 @@ public class InvEquip {
 			MethodProvider.log("In WithdrawOne loop for itemID: "+ itemID + " / name: "+new Item(itemID,1).getName());
 			if(Inventory.count(itemID) > 0) return true;
 			if(!closeBankEquipment()) continue;
-			if(Bankz.openClosest())
+			if(Bankz.openClosest(50))
 			{
 				if(Inventory.emptySlotCount() < 2)
 				{
@@ -254,7 +254,7 @@ public class InvEquip {
 			Sleep.sleep(69, 69);
 			if(Bank.count(itemID) < count || Inventory.isFull()) return;
 			if(closeBankEquipment()) continue;
-			if(Bankz.openClosest())
+			if(Bankz.openClosest(50))
 			{
 				if(noted)
 				{
@@ -1195,7 +1195,7 @@ public class InvEquip {
 							if(continueOrNot2)
 							{
 								if(!closeBankEquipment()) continue;
-								if(Bankz.openClosest())
+								if(Bankz.openClosest(25))
 								{
 									if(Bank.getWithdrawMode() == BankMode.ITEM)
 									{
@@ -1332,7 +1332,7 @@ public class InvEquip {
 						if(!notOKItems.isEmpty())
 						{
 							if(!closeBankEquipment()) continue;
-							if(Bankz.openClosest())
+							if(Bankz.openClosest(25))
 							{
 								if(Bank.depositAllEquipment())
 								{
@@ -1390,7 +1390,7 @@ public class InvEquip {
 					if(!notOKItems.isEmpty())
 					{
 						if(!closeBankEquipment()) continue;
-						if(Bankz.openClosest())
+						if(Bankz.openClosest(25))
 						{
 							if(Bank.depositAllItems()) MethodProvider.sleepUntil(Inventory::isEmpty, Sleep.calculate(2222, 2222));
 						}
@@ -1460,7 +1460,7 @@ public class InvEquip {
 						MethodProvider.log("~~"+new Item(i,1).getName()+"~~");
 					}
 					if(!closeBankEquipment()) continue;
-					if(Bankz.openClosest())
+					if(Bankz.openClosest(25))
 					{
 						for(int depositItem : notOKItems)
 						{
@@ -1526,8 +1526,12 @@ public class InvEquip {
 						continue;
 					}
 				}
-				MethodProvider.log("Missing inventory item: " + itemRef.getName()+", have " + count+" and need between " + min +" - " + max+"!");
-				missingInvyItems.put(itemID,listedItem.getValue());
+				if(listedItem.getValue().refillQty > 0)
+				{
+					MethodProvider.log("Missing inventory item: " + itemRef.getName()+", have " + count+" and need between " + min +" - " + max+"!");
+					missingInvyItems.put(itemID,listedItem.getValue());
+				}
+				
 			}
 			
 			if(missingInvyItems.isEmpty()) return true;
@@ -1583,7 +1587,7 @@ public class InvEquip {
 					if(maxQty <= 0)
 					{
 						if(!closeBankEquipment()) continue;
-						if(Bankz.openClosest())
+						if(Bankz.openClosest(25))
 						{
 							if(Bank.depositAll(requestedID))
 							{
@@ -1600,7 +1604,7 @@ public class InvEquip {
 					{
 						MethodProvider.log("Have something to swap noted <--> item: " + swapDepositID);
 						if(!closeBankEquipment()) continue;
-						if(Bankz.openClosest())
+						if(Bankz.openClosest(25))
 						{
 							if(Bank.depositAll(swapDepositID))
 							{
@@ -1618,7 +1622,7 @@ public class InvEquip {
 					if(bankCount > 0 || tooMuch > 0) 
 					{
 						if(!closeBankEquipment()) continue;
-						if(Bankz.openClosest())
+						if(Bankz.openClosest(25))
 						{
 							//have too much in inventory (over max)
 							if(tooMuch > 0)
@@ -1692,7 +1696,6 @@ public class InvEquip {
 										MethodProvider.sleepUntil(() -> Inventory.count(tmp) == maxQty, Sleep.calculate(2222, 2222));
 									}
 								}
-									
 								continue;
 							}
 							if(Bank.getWithdrawMode() != correctMode) Bank.setWithdrawMode(correctMode);
@@ -1718,6 +1721,8 @@ public class InvEquip {
 						}
 						continue;
 					}
+					
+					if(refillQty == 0) break;
 					
 					//check GE for item
 					MethodProvider.log("Buying item at GE! ~~" + itemRef.getName()+"~~");
@@ -1872,7 +1877,7 @@ public class InvEquip {
 		} 
 		
 		else if(GrandExchange.isOpen()) GrandExchange.close();
-		else if(Bankz.openClosest()) Sleep.sleep(666, 666);
+		else if(Bankz.openClosest(25)) Sleep.sleep(666, 666);
 		
 		return false;
 	}

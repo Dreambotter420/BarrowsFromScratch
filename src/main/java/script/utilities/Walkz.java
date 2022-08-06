@@ -234,10 +234,22 @@ public class Walkz {
 		MethodProvider.log("No tiles found to path to in path :-(");
 		return false;
 	}
+	public static boolean walkToHASpot()
+	{
+		if(Locations.haSpot == Locations.HASpot1)
+		{
+			//this is the one in f2p walking from duel arena to that one spot south of it at altar 2nd floor
+			if(Locations.HASpot1.contains(Players.localPlayer()))
+			{
+				
+			}
+		}
+		return false;
+	}
 	public static boolean exitLumbyCave()
 	{
 		if(!Locations.entireLumbyCave.contains(Players.localPlayer())) return true;
-		if(!Bankz.openClosest())
+		if(!Bankz.openClosest(50))
 		{
 			if(Locations.lumbyCaveFoyer.contains(Players.localPlayer()))
 			{
@@ -682,9 +694,9 @@ public class Walkz {
 				if(Equipment.interact(equipSlot, teleName))
 				{
 					MethodProvider.log("Just used Jewelry teleport: " + teleName +" in slot: " + equipSlot);
-					MethodProvider.sleepUntil(() -> Players.localPlayer().isAnimating(),Sleep.calculate(1111,1111));
 					MethodProvider.sleepWhile(() -> Players.localPlayer().isAnimating(),Sleep.calculate(3333,3333));
-					Sleep.sleep(69,696);
+					MethodProvider.sleepUntil(() -> !Players.localPlayer().isAnimating(),Sleep.calculate(1111,1111));
+					Sleep.sleep(1111,2222);
 				}
 			}
 			else

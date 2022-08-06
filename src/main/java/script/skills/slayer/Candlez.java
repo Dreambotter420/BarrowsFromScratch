@@ -69,7 +69,7 @@ public class Candlez {
 				final int bankmoltenGlass = Bank.count(id.moltenGlass);
 				if(Inventory.emptySlotCount() <= 6)
 				{
-					if(Bankz.openClosest())
+					if(Bankz.openClosest(25))
 					{
 						Bank.depositAllItems();
 					}

@@ -237,7 +237,7 @@ public class DecisionLeaf extends Leaf{
 			}
 			
 			//testing
-			API.mode = modes.FIGHT_ARENA;
+			//API.mode = modes.FIGHT_ARENA;
 			
 			MethodProvider.log("Switching mode: " + API.mode.toString());
 			if(API.mode == modes.ANIMAL_MAGNETISM || 

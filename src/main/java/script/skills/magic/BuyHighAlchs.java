@@ -24,6 +24,7 @@ import org.dreambot.api.methods.interactive.Players;
 import org.dreambot.api.methods.map.Map;
 import org.dreambot.api.methods.tabs.Tab;
 import org.dreambot.api.methods.tabs.Tabs;
+import org.dreambot.api.methods.widget.Widgets;
 import org.dreambot.api.script.ScriptManager;
 import org.dreambot.api.utilities.Timer;
 import org.dreambot.api.wrappers.items.Item;
@@ -189,12 +190,19 @@ public class BuyHighAlchs {
 						}
 						continue;
 					}
-					if(GrandExchange.isBuyOpen() && GrandExchange.goBack()) 
+					if(GrandExchange.isBuyOpen())
 					{
-						MethodProvider.log("Went back on GE");
+						MethodProvider.log("Buy menu open");
+						
+						if(GrandExchange.goBack())
+						{
+							MethodProvider.log("Went back on GE");
+						}
+						
 						continue;
 					}
 					MethodProvider.log("|| Printing timers || ");
+					boolean breakalso = false;
 					for(Entry<Integer,Timer> entry : HABuyTimeouts.entrySet())
 					{
 						if(entry.getValue().finished())
@@ -204,8 +212,14 @@ public class BuyHighAlchs {
 						else
 						{
 							MethodProvider.log("Item: " +new Item(entry.getKey(),1).getName()+ " || Timer: "+Timer.formatTime(entry.getValue().remaining()));
+							if(entry.getKey() == itemID) 
+								{
+								breakalso = true;
+								break;
+								}
 						}
-					}
+					} 
+					if(breakalso) break;
 					boolean collect = false;
 					boolean wait = false;
 					boolean breakWhileLoop = false;
@@ -218,12 +232,16 @@ public class BuyHighAlchs {
 						{
 							if(HABuyTimeouts.get(geItem.getID()).finished())
 							{
-								
-								if(GrandExchange.cancelOffer(geItem.getSlot()))
+								if(Widgets.getWidgetChild(465,(geItem.getSlot() + 7),16) != null && 
+										Widgets.getWidgetChild(465,(geItem.getSlot() + 7),16).isVisible())
 								{
-									collect = true;
-									HABuyTimeouts.remove(geItem.getID());
-									Sleep.sleep(696, 696);
+									if(Widgets.getWidgetChild(465,(geItem.getSlot() + 7),16).interact("Abort"))
+									{
+										MethodProvider.log("Aborted offer via right click");
+										collect = true;
+										HABuyTimeouts.remove(geItem.getID());
+										Sleep.sleep(696, 696);
+									}
 								}
 							}
 							else 

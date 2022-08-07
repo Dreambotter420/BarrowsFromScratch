@@ -694,8 +694,8 @@ public class Walkz {
 				if(Equipment.interact(equipSlot, teleName))
 				{
 					MethodProvider.log("Just used Jewelry teleport: " + teleName +" in slot: " + equipSlot);
-					MethodProvider.sleepWhile(() -> Players.localPlayer().isAnimating(),Sleep.calculate(3333,3333));
-					MethodProvider.sleepUntil(() -> !Players.localPlayer().isAnimating(),Sleep.calculate(1111,1111));
+					MethodProvider.sleepUntil(() -> Players.localPlayer().isAnimating(),Sleep.calculate(1111,1111));
+					MethodProvider.sleepUntil(() -> !Players.localPlayer().isAnimating(),Sleep.calculate(3333,2222));
 					Sleep.sleep(1111,2222);
 				}
 			}

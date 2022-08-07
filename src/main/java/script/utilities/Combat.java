@@ -17,6 +17,7 @@ import org.dreambot.api.methods.widget.Widgets;
 import org.dreambot.api.script.ScriptManager;
 import org.dreambot.api.utilities.Timer;
 import org.dreambot.api.wrappers.items.Item;
+import org.dreambot.api.wrappers.widgets.WidgetChild;
 
 import script.Main;
 import script.skills.ranged.TrainRanged;
@@ -59,7 +60,66 @@ public class Combat {
 		}
 		return false;
 	}
-
+	public static int nextPrayerPotLvl = 0;
+	public static boolean shouldDrinkPrayPot()
+    {
+    	if(nextPrayerPotLvl == 0)
+    	{
+    		int tmp = (int) Calculations.nextGaussianRandom((15),8);
+    		if(tmp > Skills.getRealLevel(Skill.PRAYER)) nextPrayerPotLvl = (Skills.getRealLevel(Skill.PRAYER) - 18);
+    		else if(tmp < 5) nextPrayerPotLvl = 5;
+    		else nextPrayerPotLvl = tmp;
+    	}
+    	Main.customPaintText1 = "Eating next praypot sip at pray lvl: " + nextPrayerPotLvl;
+    	if(Skills.getBoostedLevels(Skill.PRAYER) <= nextPrayerPotLvl)
+    	{
+    		return true;
+    	}
+    	return false;
+    }
+	public static Timer potionAttemptTimer = null;
+	public static boolean drinkPrayPot()
+	{
+		if(potionAttemptTimer != null && !potionAttemptTimer.isPaused() && !potionAttemptTimer.finished())
+		{
+			MethodProvider.log("attempted to sip pray pot " +potionAttemptTimer.elapsed()+"ms ago, continuing");
+			return false;
+		}
+		Main.customPaintText4 = "~~sipping Praypot~~";
+		Timer timer = new Timer(5000);
+		while(!timer.finished() && Client.getGameState() == GameState.LOGGED_IN
+				&& ScriptManager.getScriptManager().isRunning() && !ScriptManager.getScriptManager().isPaused())
+		{
+			Sleep.sleep(69, 69);
+			if(Tabs.isOpen(Tab.INVENTORY))
+			{
+				Item prayPot = Inventory.get(InvEquip.getInvyItem(id.prayPots));
+				if(prayPot == null) return false;
+				final int prayerPotID = prayPot.getID();
+				Main.customPaintText3 = ("Drinking prayer potion: " + new Item(prayerPotID,1).getName());
+				if(Inventory.interact(prayerPotID, "Drink"))
+				{
+					MethodProvider.log("Attempted to drink praypot!");
+					nextFoodHP = 0;
+					potionAttemptTimer = new Timer(1200); 
+					Main.customPaintText3 = "";
+					Main.customPaintText4 = "";
+					return true;
+				}
+			}
+			else
+			{
+				if(Widgets.isOpen())
+				{
+					Widgets.closeAll();
+					Sleep.sleep(111, 111);
+				}
+				else Tabs.open(Tab.INVENTORY);
+			}
+		}
+		
+		return false;
+	}
 	public static int nextFoodHP = 0;
 	public static boolean shouldEatFood(int maxHit)
     {
@@ -142,6 +202,78 @@ public class Combat {
 				else Tabs.open(Tab.INVENTORY);
 			}
 		}
+		return false;
+	}
+	public static final int quickPrayVar = 4102;
+	public static final int eagleEye_protectMelee = 4210688;
+	public static final int protectMelee = 16384;
+	public static final int eagleEye = 4194304;
+	public static boolean setQuickPrayEagleEyeProtectMelee()
+	{
+		final WidgetChild eagleEyeButton = Widgets.getWidgetChild(77,4,22);
+		final WidgetChild protectMeleeButton = Widgets.getWidgetChild(77,4,14);
+		if(PlayerSettings.getBitValue(4102) == eagleEye_protectMelee) //setting for both Eagle Eye + Protekk Melee
+		{
+			if(Widgets.getWidgetChild(77,5) != null && 
+					Widgets.getWidgetChild(77,5).isVisible())
+			{
+				if(Widgets.getWidgetChild(77,5).interact("Done"))
+				{
+					MethodProvider.sleepUntil(() -> Widgets.getWidgetChild(77,5) == null || !Widgets.getWidgetChild(77,5).isVisible(), Sleep.calculate(2222, 2222));
+				}
+				return false;
+			}
+			return true;
+		}
+		if(Widgets.getWidgetChild(77,5) == null || 
+				!Widgets.getWidgetChild(77,5).isVisible())
+		{
+			if(Widgets.getWidgetChild(160, 19) != null && 
+					Widgets.getWidgetChild(160, 19).isVisible())
+			{
+				if(Widgets.getWidgetChild(160, 19).interact("Setup"))
+				{
+					MethodProvider.sleepUntil(() -> Widgets.getWidgetChild(77,5) != null && Widgets.getWidgetChild(77,5).isVisible(), Sleep.calculate(2222, 2222));
+				}
+			}
+			return false;
+		}
+		if(PlayerSettings.getBitValue(4102) == eagleEye)
+		{
+			if(protectMeleeButton.interact("Toggle"))
+			{
+				MethodProvider.sleepUntil(() -> PlayerSettings.getBitValue(4102) == eagleEye_protectMelee, Sleep.calculate(2222, 2222));
+			}
+			return false;
+		}
+		if(PlayerSettings.getBitValue(4102) == protectMelee)
+		{
+			if(eagleEyeButton.interact("Toggle"))
+			{
+				MethodProvider.sleepUntil(() -> PlayerSettings.getBitValue(4102) == eagleEye_protectMelee, Sleep.calculate(2222, 2222));
+			}
+			return false;
+		}
+		if(PlayerSettings.getBitValue(4102) == 0) //none
+		{
+			if((int) Calculations.nextGaussianRandom(100, 50) > 120)
+			{
+				if(eagleEyeButton.interact("Toggle"))
+				{
+					MethodProvider.sleepUntil(() -> PlayerSettings.getBitValue(4102) == eagleEye, Sleep.calculate(2222, 2222));
+				}
+			}
+			else 
+			{
+				if(protectMeleeButton.interact("Toggle"))
+				{
+					MethodProvider.sleepUntil(() -> PlayerSettings.getBitValue(4102) == protectMelee, Sleep.calculate(2222, 2222));
+				}
+			}
+			return false;
+		}
+		
+		
 		return false;
 	}
 }

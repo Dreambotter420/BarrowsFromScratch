@@ -32,7 +32,7 @@ public class Initialize extends Leaf {
     	//all initial randomizations that depend on new random seed go here
 		InvEquip.clearEquipmentSlots();
 		InvEquip.initializeIntLists();
-		id.initializeAlchList();
+		id.initializeIDLists();
 		DecisionLeaf.initialize();
 		ItemsOnGround.initializeLists();
 		TrainRanged.initialize();

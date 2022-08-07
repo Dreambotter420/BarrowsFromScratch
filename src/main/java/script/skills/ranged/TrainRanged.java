@@ -60,10 +60,7 @@ public class TrainRanged extends Leaf {
 	public static int nextRandBoostLvl = 0;
 	public static boolean started = false;
 	public static List<Integer> randCapes = new ArrayList<Integer>();
-	public static int ranged = 0;
-	public static int def = 0;
     public void onStart() {
-        instantiateTree();
         Main.customPaintText1 = "~~~ Training Ranged ~~~";
         started = true;
     }
@@ -101,14 +98,8 @@ public class TrainRanged extends Leaf {
     	return true;
     }
 
-    private final Tree tree = new Tree();
-    private void instantiateTree() {
-    	
-    }
     @Override
     public int onLoop() {
-    	ranged = Skills.getRealLevel(Skill.RANGED);
-    	def = Skills.getRealLevel(Skill.DEFENCE);
         if(DecisionLeaf.taskTimer.finished())
     	{
     		MethodProvider.log("[TIMEOUT] -> Ranged!");
@@ -254,6 +245,7 @@ public class TrainRanged extends Leaf {
     }
     public static boolean shouldDrinkBoost()
     {
+    	final int ranged = Skills.getRealLevel(Skill.RANGED);
     	if(nextRandBoostLvl == 0 || nextRandBoostLvl < ranged)
     	{
     		if(randRangedBoostFactor == 0)
@@ -296,11 +288,11 @@ public class TrainRanged extends Leaf {
     	}
     	return false;
     }
-    
+   
     
     public static int calculateMaxRangedBoost()
     {
-    	return ((int)(((double)ranged) * 0.1)) + 4;
+    	return ((int)(((double)Skills.getRealLevel(Skill.RANGED)) * 0.1)) + 4;
     }
     
     public static final int dorgBow = 8880;
@@ -312,6 +304,8 @@ public class TrainRanged extends Leaf {
 	public static final int cowl = 1167;
     public static int getBestHeadSlot()
     {
+    	final int ranged = Skills.getRealLevel(Skill.RANGED);
+    	final int def = Skills.getRealLevel(Skill.DEFENCE);
     	if(def >= 40 && ranged >= 70) return zamorakCoif;
     	if(def >= 30 && ranged >= 30) return snakeskinBandana;
     	if(ranged >= 20) return coif;
@@ -326,6 +320,8 @@ public class TrainRanged extends Leaf {
 	public static final int leatherBody = 1129;
 	public static int getBestBodySlot()
     {
+		final int ranged = Skills.getRealLevel(Skill.RANGED);
+    	final int def = Skills.getRealLevel(Skill.DEFENCE);
     	if(def >= 40 && ranged >= 70) return blackBody;
     	if(def >= 40 && ranged >= 60) return redBody;
     	if(def >= 40 && ranged >= 50) return blueBody;
@@ -344,6 +340,8 @@ public class TrainRanged extends Leaf {
 	public static final int leatherChaps = 1095;
 	public static int getBestLegSlot()
 	{
+		final int ranged = Skills.getRealLevel(Skill.RANGED);
+    	final int def = Skills.getRealLevel(Skill.DEFENCE);
 		if(def >= 40 && ranged >= 70) return blackLegs;
     	if(def >= 40 && ranged >= 60) return redLegs;
     	if(def >= 40 && ranged >= 50) return blueLegs;
@@ -360,6 +358,7 @@ public class TrainRanged extends Leaf {
 	public static final int avasAccumulator	= 10499;
 	public static int getBestCapeSlot()
 	{
+		final int ranged = Skills.getRealLevel(Skill.RANGED);
 		if(ranged >= 50 && AnimalMagnetism.completedAnimalMagnetism) return avasAccumulator;
     	if(InvEquip.equipmentContains(randCapes)) return InvEquip.getEquipmentItem(randCapes);
     	if(InvEquip.invyContains(randCapes)) return InvEquip.getInvyItem(randCapes);
@@ -371,6 +370,8 @@ public class TrainRanged extends Leaf {
 	public static final int leatherBoots = 1061;
 	public static int getBestBootSlot()
 	{
+		final int ranged = Skills.getRealLevel(Skill.RANGED);
+    	final int def = Skills.getRealLevel(Skill.DEFENCE);
 		if(def >= 30 && ranged >= 30) return snakeskinBoots;
     	return leatherBoots;
 	}
@@ -385,6 +386,7 @@ public class TrainRanged extends Leaf {
 	public static final int greenVambs = 1065;
 	public static int getBestHandSlot()
 	{
+		final int ranged = Skills.getRealLevel(Skill.RANGED);
 		if(ranged >= 70) return guthixBracers;
 		if(ranged >= 60) return redVambs;
 		if(ranged >= 50) return blueVambs;
@@ -407,6 +409,8 @@ public class TrainRanged extends Leaf {
 	public static final int woodenShield = 1171;
 	public static int getBestShieldSlot()
 	{
+		final int ranged = Skills.getRealLevel(Skill.RANGED);
+    	final int def = Skills.getRealLevel(Skill.DEFENCE);
 		if(HorrorFromTheDeep.completedHorrorFromTheDeep) return bookOfLaw;
 		if(def >= 40 && ranged >= 70) return blackShield;
 		if(def >= 40 && ranged >= 60) return redShield;
@@ -423,6 +427,7 @@ public class TrainRanged extends Leaf {
 	public static final int addyDart = 810;
     public static int getBestDart()
     {
+		final int ranged = Skills.getRealLevel(Skill.RANGED);
     	if(ranged >= 30) return addyDart;
     	if(ranged >= 20) return mithDart;
     	if(ranged >= 5) return steelDart;
@@ -430,12 +435,14 @@ public class TrainRanged extends Leaf {
     }
     public static int getNextBestDart()
     {
+		final int ranged = Skills.getRealLevel(Skill.RANGED);
     	if(ranged >= 20) return addyDart;
     	if(ranged >= 5) return mithDart;
     	return steelDart;
     }
     public static int getNextNextBestDart()
     {
+		final int ranged = Skills.getRealLevel(Skill.RANGED);
     	if(ranged >= 5) return addyDart;
     	return mithDart;
     }

@@ -215,7 +215,8 @@ public class InvEquip {
 			} else if(Bank.deposit(i,1)) Sleep.sleep(696, 420);
 			return;
 		}
-		MethodProvider.log("Could not find any un-valuable things to deposit to make room in invy :-( ");
+		MethodProvider.log("Could not find any un-valuable things to deposit to make room in invy :-( Depositing entire invy...");
+		Bank.depositAllItems();
 		return;
 	}
 	public static boolean withdrawOne(int itemID, long timeout)
@@ -1738,9 +1739,10 @@ public class InvEquip {
 	
 	public static boolean equipItem(int ID)
 	{
-		MethodProvider.log("Equipping item: " + new Item(ID,1).getName());
-		if(Equipment.contains(ID)) return true;
 		
+		if(Equipment.contains(ID)) return true;
+		if(!Inventory.contains(ID)) return false;
+		MethodProvider.log("Equipping item: " + new Item(ID,1).getName());
 		if(Tabs.isOpen(Tab.INVENTORY) || Bank.isOpen() ||
 				(Widgets.getWidgetChild(12, 76) != null && Widgets.getWidgetChild(12, 76).isVisible()))
 		{
@@ -1765,7 +1767,7 @@ public class InvEquip {
 			if(Inventory.interact(ID, action))
 			{
 				MethodProvider.sleepUntil(() -> {
-					if(Combat.shouldEatFood(8)) Combat.eatFood();
+					if(Combat.shouldEatFood(15)) Combat.eatFood();
 					return Equipment.contains(tmp);
 				}, Sleep.calculate(2222, 2222));
 			}
@@ -1877,10 +1879,42 @@ public class InvEquip {
 		} 
 		
 		else if(GrandExchange.isOpen()) GrandExchange.close();
-		else if(Bankz.openClosest(25)) Sleep.sleep(666, 666);
+		else if(Bankz.openClosest(75)) Sleep.sleep(666, 666);
 		
 		return false;
 	}
+	public static boolean free1InvySpace()
+	{
+		if(Inventory.isFull())
+		{
+			if(!Inventory.dropAll(i -> i!=null && 
+					i.getID() != -1 && 
+					(i.getID() == TrainRanged.jug || 
+					i.getID() == id.vial)))
+			{
+				Combat.eatFood();
+			}
+			return false;
+		}
+		return true;
+	}
+	public static boolean freeInvySpaces(int emptySpaces)
+	{
+		if(Inventory.emptySlotCount() < emptySpaces)
+		{
+			if(!Inventory.dropAll(i -> i!=null && 
+					i.getID() != -1 && 
+					(i.getID() == TrainRanged.jug || 
+					i.getID() == id.vial)))
+			{
+				Combat.eatFood();
+			}
+			return false;
+		}
+		return true;
+	}
+	
+	
 	public static int coins = 995;
 	
 	public static void initializeIntLists ()

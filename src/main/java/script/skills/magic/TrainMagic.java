@@ -13,6 +13,7 @@ import org.dreambot.api.methods.MethodProvider;
 import org.dreambot.api.methods.container.impl.Inventory;
 import org.dreambot.api.methods.container.impl.bank.Bank;
 import org.dreambot.api.methods.container.impl.bank.BankLocation;
+import org.dreambot.api.methods.container.impl.bank.BankMode;
 import org.dreambot.api.methods.container.impl.equipment.Equipment;
 import org.dreambot.api.methods.container.impl.equipment.EquipmentSlot;
 import org.dreambot.api.methods.dialogues.Dialogues;
@@ -44,6 +45,7 @@ import script.framework.Tree;
 import script.quest.varrockmuseum.Timing;
 import script.skills.ranged.TrainRanged;
 import script.utilities.API;
+import script.utilities.Bankz;
 import script.utilities.Combat;
 import script.utilities.InvEquip;
 import script.utilities.ItemsOnGround;
@@ -170,7 +172,7 @@ public class TrainMagic extends Leaf {
 			if(chance > 60) xpAlch = true;
 			chancedXPAlch = true;
 		}
-		
+		if(!InvEquip.checkedBank()) return;
 		final int natRunePrice = new Item(id.natureRune,1).getLivePrice();
 		API.randomAFK(20);
 		if(Equipment.contains(id.staffOfFire) && Inventory.count(id.natureRune) > 0)
@@ -183,19 +185,48 @@ public class TrainMagic extends Leaf {
 			List<Integer> keys = null;
 			if(xpAlch) keys = longbowKeys;
 			else keys = profitKeys;
-			int notedItems = 0;
+			int alchsCount = 0;
+			boolean bankedAlchs = false;
 			for(Integer i : keys)
 			{
+				if(Bank.count(i) > 0) bankedAlchs = true;
 				if(Inventory.count(i) > 0 || 
 						Inventory.count(new Item(i,1).getNotedItemID()) > 0)
 				{
-					notedItems += Inventory.count(i) + Inventory.count(new Item(i,1).getNotedItemID());
+					alchsCount += (Inventory.count(i) + Inventory.count(new Item(i,1).getNotedItemID()));
 					foundAlch = true;
 				}
 			}
+			if(bankedAlchs)
+			{
+				MethodProvider.log("Found banked alchs");
+				if(Bankz.openClosest(85))
+				{
+					if(Bank.getWithdrawMode() == BankMode.NOTE)
+					{
+						for(Integer i : keys)
+						{
+							if(Bank.count(i) > 0)
+							{
+								MethodProvider.log("Attempting withdraw of item: "+new Item(i,1).getName());
+								if(Bank.withdrawAll(i))
+								{
+									MethodProvider.sleepUntil(() -> Bank.count(i) <= 0, Sleep.calculate(2222, 2222));
+									Sleep.sleep(69, 420);
+								}
+							}
+						}
+						return;
+					}
+					Bank.setWithdrawMode(BankMode.NOTE);
+					return;
+					
+				}
+				return;
+			}
 			if(foundAlch)
 			{
-				
+				MethodProvider.log("Found alch");
 				if(Dialogues.canContinue()) 
 				{
 					Dialogues.continueDialogue();
@@ -242,7 +273,7 @@ public class TrainMagic extends Leaf {
 	    				}
 	    				else
 	    				{
-	    					Keyboard.type(Integer.toString(API.round((int) Calculations.nextGaussianRandom(75000,20000),500)), foundAlch);
+	    					Keyboard.type(Integer.toString(API.roundToMultiple((int) Calculations.nextGaussianRandom(75000,20000),500)), foundAlch);
 	    					Sleep.sleep(1111, 4444);
 	    					return;
 	    				}
@@ -268,6 +299,17 @@ public class TrainMagic extends Leaf {
 							if(HATimer == null)
 							{
 								HATimer = new Timer(2147483646);
+							}
+							if(Bank.isOpen()) 
+							{
+								Bank.close();
+								return;
+							}
+							if(GrandExchange.isOpen())
+							{
+								if(GrandExchange.isReadyToCollect()) GrandExchange.collect();
+								if(!GrandExchange.isReadyToCollect()) GrandExchange.close();
+								return;
 							}
 							if(Magic.isSpellSelected())
 							{
@@ -303,7 +345,17 @@ public class TrainMagic extends Leaf {
 							MethodProvider.log("Alch found but first alch found null!");
 							return;
 						}
-						
+						if(Bank.isOpen()) 
+						{
+							Bank.close();
+							return;
+						}
+						if(GrandExchange.isOpen())
+						{
+							if(GrandExchange.isReadyToCollect()) GrandExchange.collect();
+							if(!GrandExchange.isReadyToCollect()) GrandExchange.close();
+							return;
+						}
 						if(!Tabs.isOpen(Tab.INVENTORY))
 						{
 							Tabs.open(Tab.INVENTORY);
@@ -348,7 +400,8 @@ public class TrainMagic extends Leaf {
 					}
 					if(GrandExchange.isOpen())
 					{
-						GrandExchange.close();
+						if(GrandExchange.isReadyToCollect()) GrandExchange.collect();
+						if(!GrandExchange.isReadyToCollect()) GrandExchange.close();
 						return;
 					}
 					if(Bank.isOpen())
@@ -372,6 +425,17 @@ public class TrainMagic extends Leaf {
 					if(HATimer == null)
 					{
 						HATimer = new Timer(2147483646);
+					}
+					if(Bank.isOpen()) 
+					{
+						Bank.close();
+						return;
+					}
+					if(GrandExchange.isOpen())
+					{
+						if(GrandExchange.isReadyToCollect()) GrandExchange.collect();
+						if(!GrandExchange.isReadyToCollect()) GrandExchange.close();
+						return;
 					}
 					if(Magic.isSpellSelected())
 					{
@@ -414,7 +478,8 @@ public class TrainMagic extends Leaf {
 				}
 				if(GrandExchange.isOpen())
 				{
-					GrandExchange.close();
+					if(GrandExchange.isReadyToCollect()) GrandExchange.collect();
+					if(!GrandExchange.isReadyToCollect()) GrandExchange.close();
 					return;
 				}
 				if(!Tabs.isOpen(Tab.INVENTORY))
@@ -493,7 +558,6 @@ public class TrainMagic extends Leaf {
 			MethodProvider.log("Missing something like wealth, staff of air, or autocast runes");
 			fulfillLesserDemonCasting();
 			return;
-			
 		}
 		if(Locations.lesserDemonWizardsTower.contains(Players.localPlayer()))
 		{
@@ -546,7 +610,7 @@ public class TrainMagic extends Leaf {
 				}
 			}
 			
-			
+			API.randomAFK(3);
 			if(!Casting.isAutocastingHighest())
 			{
 				Main.customPaintText2 = "Setting Autocast: " + Casting.getSpellName(Casting.getHighestSpellConfig());

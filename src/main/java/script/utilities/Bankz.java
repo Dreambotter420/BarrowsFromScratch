@@ -33,7 +33,7 @@ public class Bankz {
 		
 		if(dist <= 8)
 		{
-			if(Bank.openClosest()) return true;
+			if(Bank.open(Bank.getClosestBankLocation())) return true;
 			MethodProvider.sleep(Timing.sleepLogNormalSleep());
 			return false;
 		}
@@ -52,7 +52,7 @@ public class Bankz {
 		final double dist = BankLocation.getNearest(Players.localPlayer()).getTile().distance();
 		if(dist <= 8)
 		{
-			if(Bank.openClosest()) return true;
+			if(Bank.open(Bank.getClosestBankLocation())) return true;
 			MethodProvider.sleep(Timing.sleepLogNormalSleep());
 			return false;
 		}

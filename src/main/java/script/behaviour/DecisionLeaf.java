@@ -209,7 +209,8 @@ public class DecisionLeaf extends Leaf{
 			if(fightArenaDone && waterfallDone && prayer >= prayerSetpoint && att >= attSetpoint && str >= strSetpoint && !validModes.contains(modes.FREMENNIK_TRIALS)) validModes.add(modes.FREMENNIK_TRIALS);
 			if(!fightArenaDone)
 			{
-				if(waterfallDone && prayer >= prayerSetpoint && !validModes.contains(modes.FIGHT_ARENA)) validModes.add(modes.FIGHT_ARENA);
+				if(waterfallDone && ranged >= 50 && prayer >= prayerSetpoint && !validModes.contains(modes.FIGHT_ARENA)) validModes.add(modes.FIGHT_ARENA);
+				if(ranged < 50 && !validModes.contains(modes.TRAIN_RANGE)) validModes.add(modes.TRAIN_RANGE);
 				if(!waterfallDone && !validModes.contains(modes.WATERFALL_QUEST)) validModes.add(modes.WATERFALL_QUEST);
 				if(prayer < prayerSetpoint && validModes.contains(modes.TRAIN_PRAYER)) validModes.add(modes.TRAIN_PRAYER);
 			} else {
@@ -236,7 +237,7 @@ public class DecisionLeaf extends Leaf{
 			}
 			
 			//testing
-			//API.mode = modes.WATERFALL_QUEST;
+			API.mode = modes.FIGHT_ARENA;
 			
 			MethodProvider.log("Switching mode: " + API.mode.toString());
 			if(API.mode == modes.ANIMAL_MAGNETISM || 

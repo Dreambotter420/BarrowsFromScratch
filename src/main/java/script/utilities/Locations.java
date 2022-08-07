@@ -54,6 +54,82 @@ public class Locations {
 	public static final Area waterfallDungeonLastAreaChanged = new Area(2598, 9916, 2608, 9901, 0);
 	public static final Tile waterfallLastCrateTile = new Tile(2589,9888,0);
 	public static final Area waterfallLastCrateArea = new Area(2582, 9874, 2600, 9891, 0);
+	public static final Area fightArenaStartArea = new Area(2559, 3206, 2581, 3190, 0);
+	public static final Area fightArenaChestHouse = new Area(
+			new Tile(2614, 3189, 0),
+			new Tile(2614, 3194, 0),
+			new Tile(2612, 3193, 0),
+			new Tile(2611, 3195, 0),
+			new Tile(2607, 3195, 0),
+			new Tile(2607, 3191, 0),
+			new Tile(2612, 3191, 0),
+			new Tile(2612, 3189, 0));
+	public static final Area fightArenaDrunkGuardArea = new Area(
+			new Tile(2614, 3146, 0),
+			new Tile(2609, 3145, 0),
+			new Tile(2609, 3139, 0),
+			new Tile(2619, 3138, 0),
+			new Tile(2619, 3146, 0));
+	public static final Area fightArenaAlcoholicsArea = new Area(
+			new Tile(2572, 3139, 0),
+			new Tile(2572, 3145, 0),
+			new Tile(2571, 3144, 0),
+			new Tile(2570, 3151, 0),
+			new Tile(2568, 3150, 0),
+			new Tile(2567, 3154, 0),
+			new Tile(2563, 3154, 0),
+			new Tile(2563, 3139, 0));
+	public static final Area fightArenaSammySpace = new Area(
+			new Tile(2617, 3162, 0),
+			new Tile(2619, 3162, 0),
+			new Tile(2619, 3171, 0),
+			new Tile(2613, 3171, 0),
+			new Tile(2617, 3170, 0));
+	public static final Area fightArenaFightArena = new Area(
+			new Tile(2605, 3151, 0),
+			new Tile(2584, 3152, 0),
+			new Tile(2581, 3154, 0),
+			new Tile(2581, 3169, 0),
+			new Tile(2585, 3172, 0),
+			new Tile(2604, 3171, 0),
+			new Tile(2606, 3168, 0),
+			new Tile(2607, 3158, 0),
+			new Tile(2608, 3154, 0));
+	public static final Area fightArenaUpperWing1 = new Area(2619, 3147, 2613, 3151, 0);
+	public static final Area fightArenaUpperWing2 = new Area(
+			new Tile(2616, 3152, 0),
+			new Tile(2618, 3152, 0),
+			new Tile(2618, 3155, 0),
+			new Tile(2619, 3155, 0),
+			new Tile(2619, 3171, 0),
+			new Tile(2614, 3171, 0),
+			new Tile(2614, 3155, 0),
+			new Tile(2615, 3155, 0));
+	public static final Area fightArenaLeftWing1 = new Area(
+			new Tile(2585, 3144, 0),
+			new Tile(2585, 3139, 0),
+			new Tile(2603, 3139, 0),
+			new Tile(2604, 3141, 0),
+			new Tile(2608, 3141, 0),
+			new Tile(2608, 3142, 0),
+			new Tile(2604, 3143, 0),
+			new Tile(2602, 3144, 0));
+	public static final Area fightArenaLeftWing2 = new Area(
+			new Tile(2609, 3143, 0),
+			new Tile(2609, 3145, 0),
+			new Tile(2612, 3146, 0),
+			new Tile(2612, 3151, 0),
+			new Tile(2610, 3152, 0),
+			new Tile(2607, 3153, 0),
+			new Tile(2606, 3151, 0),
+			new Tile(2607, 3149, 0),
+			new Tile(2607, 3143, 0));
+	public static final Area fightArenaOutsideNorthJailDoor = new Area(2607, 3168, 2622, 3180, 0);
+	public static final Area fightArenaOutsideLeftJailDoor = new Area(2575, 3148, 2591, 3135, 0);
+	public static final Area fightArenaHengradWaitingCell = new Area(2601, 3144, 2597, 3142, 0);
+	public static final Area fightArenaOgreCage = new Area(2607, 3167, 2611, 3165, 0);
+	public static final Area fightArenaScorpionCage = new Area(2607, 3158, 2611, 3161, 0);
+	public static final Area fightArenaBouncerCage = new Area(2607, 3162, 2611, 3164, 0);
 	public static final Tile HALadderSpot = new Tile(3420, 3185, 0);
 	public static final Area HASpot1 = new Area(3415, 3187, 3421, 3182, 1);
 	public static final Area burthrope = new Area(

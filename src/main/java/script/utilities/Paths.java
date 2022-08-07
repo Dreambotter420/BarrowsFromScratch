@@ -666,6 +666,7 @@ public class Paths {
 		    new Tile(3320, 3120, 0),
 		    new Tile(3320, 3121, 0)
 		};
+	
 	public static final Tile[] barbarianOutpostToGlarialsTomb = {
 		    new Tile(2524, 3571, 0),
 		    new Tile(2524, 3571, 0),

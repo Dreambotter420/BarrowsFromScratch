@@ -42,7 +42,6 @@ import script.utilities.id;
 public class TrainSlayer extends Leaf{
 	public static int slayerGoal = 18;
 	public static boolean started = false;
-	private final static Tree tree = new Tree();
 	public static void onStart()
 	{
 		Combat.foods.clear();
@@ -52,10 +51,6 @@ public class TrainSlayer extends Leaf{
 		Main.clearCustomPaintText();
 		SlayerSettings.getConfigs();
 		started = true;
-	}
-	public static void initializeTree()
-	{
-		
 	}
 	
 	@Override
@@ -72,7 +67,7 @@ public class TrainSlayer extends Leaf{
             return Timing.sleepLogNormalSleep();
     	}
 		if(!started) onStart();
-		TrainRanged.ranged = Skills.getRealLevel(Skill.RANGED);
+		
 		if(DecisionLeaf.taskTimer.finished())
     	{
     		MethodProvider.log("[TIMEOUT] -> Slayer!");

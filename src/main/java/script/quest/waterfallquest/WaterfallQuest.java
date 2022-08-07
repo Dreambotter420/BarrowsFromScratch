@@ -90,7 +90,7 @@ public class WaterfallQuest extends Leaf {
     	if(!Walkz.isStaminated()) Walkz.drinkStamina();
     	if(!Walking.isRunEnabled() && Walking.getRunEnergy() >= 20) Walking.toggleRun();
     	if(!InvEquip.checkedBank()) return Timing.sleepLogNormalSleep();
-    	switch(WaterfallConfigs.getProgressValue())
+    	switch(getProgressValue())
         { 
         case(10): //have completed quest - still maybe in room
         {
@@ -158,7 +158,7 @@ public class WaterfallQuest extends Leaf {
         	{
         		if(Inventory.interact("Book on baxtorian","Read"))
         		{
-        			MethodProvider.sleepUntil(() -> WaterfallConfigs.getProgressValue() == 3, Sleep.calculate(4444,3333));
+        			MethodProvider.sleepUntil(() -> getProgressValue() == 3, Sleep.calculate(4444,3333));
         		}
         		break;
         	}
@@ -263,29 +263,35 @@ public class WaterfallQuest extends Leaf {
         }
         case(1): //have talked to almera
         {
-        	if(fulfillStart())
+        	if(!Inventory.contains(id.rope) || 
+        			!InvEquip.equipmentContains(InvEquip.wearableWealth) ||
+        			!InvEquip.equipmentContains(InvEquip.wearableGames) ||
+        			!InvEquip.invyContains(InvEquip.staminas) ||
+        			!Inventory.contains(TrainRanged.jugOfWine))
         	{
-        		if(handleDialogues())
-            	{
-            		Sleep.sleep(420,696);
-            		break;
-            	}
-        		if(Locations.waterfallIsland1.contains(Players.localPlayer()))
-        		{
-        			NPC hudon = NPCs.closest("Hudon");
-            		if(hudon == null)
-            		{
-            			MethodProvider.log("Inside river island and hudon is null!");
-            			Sleep.sleep(2222,2222);
-            			break;
-            		}
-            		if(hudon.interact("Talk-to"))
-            		{
-            			MethodProvider.sleepUntil(Dialogues::inDialogue,() -> Players.localPlayer().isMoving(),Sleep.calculate(2222,2222),50);
-            		}
-        		}
-        		teleWalkBoardRaft();
+        		fulfillStart();
+        		break;
         	}
+        	if(handleDialogues())
+        	{
+        		Sleep.sleep(420,696);
+        		break;
+        	}
+    		if(Locations.waterfallIsland1.contains(Players.localPlayer()))
+    		{
+    			NPC hudon = NPCs.closest("Hudon");
+        		if(hudon == null)
+        		{
+        			MethodProvider.log("Inside river island and hudon is null!");
+        			Sleep.sleep(2222,2222);
+        			break;
+        		}
+        		if(hudon.interact("Talk-to"))
+        		{
+        			MethodProvider.sleepUntil(Dialogues::inDialogue,() -> Players.localPlayer().isMoving(),Sleep.calculate(2222,2222),50);
+        		}
+    		}
+    		teleWalkBoardRaft();
         	Sleep.sleep(420,696);
         	break;
         }
@@ -327,36 +333,6 @@ public class WaterfallQuest extends Leaf {
 		return API.mode == API.modes.WATERFALL_QUEST;
 	}
 	
-	public static boolean free1InvySpace()
-	{
-		if(Inventory.isFull())
-		{
-			if(!Inventory.dropAll(i -> i!=null && 
-					i.getID() != -1 && 
-					(i.getID() == TrainRanged.jug || 
-					i.getID() == id.vial)))
-			{
-				Combat.eatFood();
-			}
-			return false;
-		}
-		return true;
-	}
-	public static boolean freeInvySpaces(int emptySpaces)
-	{
-		if(Inventory.emptySlotCount() < emptySpaces)
-		{
-			if(!Inventory.dropAll(i -> i!=null && 
-					i.getID() != -1 && 
-					(i.getID() == TrainRanged.jug || 
-					i.getID() == id.vial)))
-			{
-				Combat.eatFood();
-			}
-			return false;
-		}
-		return true;
-	}
 	
 	public static void walkEnterGlarialsGrave()
 	{
@@ -563,7 +539,7 @@ public class WaterfallQuest extends Leaf {
     	
     	if(Locations.waterfallDungeonLastAreaChanged.contains(Players.localPlayer()))
     	{
-    		if(freeInvySpaces(5))
+    		if(InvEquip.freeInvySpaces(5))
     		{
     			if(handleDialogues()) return;
     			GameObject chalice = GameObjects.closest("Chalice");
@@ -651,7 +627,7 @@ public class WaterfallQuest extends Leaf {
 				}
 				if(Locations.waterfallLastCrateArea.contains(Players.localPlayer()))
 				{
-					if(!free1InvySpace()) return;
+					if(!InvEquip.free1InvySpace()) return;
 					GameObject crate = GameObjects.closest(g -> 
 							g!=null && 
 							g.getTile().equals(Locations.waterfallLastCrateTile) &&
@@ -743,7 +719,7 @@ public class WaterfallQuest extends Leaf {
     		}
     		if(Inventory.count(glarialsUrn) <= 0)
     		{
-    			if(!free1InvySpace()) return;
+    			if(!InvEquip.free1InvySpace()) return;
     			if(Locations.glarialsTomb.contains(Players.localPlayer()))
         		{
         			Filter<GameObject> doorF = g -> 
@@ -766,7 +742,7 @@ public class WaterfallQuest extends Leaf {
     		}
     		if(Inventory.count(glarialsAmulet) <= 0)
     		{
-    			if(!free1InvySpace()) return;
+    			if(!InvEquip.free1InvySpace()) return;
     			if(Locations.glarialsChest.contains(Players.localPlayer()))
         		{
         			Filter<GameObject> doorF = g -> 
@@ -1014,6 +990,10 @@ public class WaterfallQuest extends Leaf {
 		InvEquip.shuffleFulfillOrder();
 		InvEquip.addInvyItem(TrainRanged.jugOfWine,3,23, false, (int) Calculations.nextGaussianRandom(500,100));
 		return InvEquip.fulfillSetup(true, 180000);
+	}
+	public static int getProgressValue()
+	{
+		return PlayerSettings.getConfig(65);
 	}
 	public static boolean handleDialogues()
 	{

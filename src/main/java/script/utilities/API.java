@@ -270,23 +270,15 @@ public class API {
 		
 	}
 	
-	public static int round (int number,int multiple){
-
+	public static int roundToMultiple (int number,int multiple){
 	    int result = multiple;
-
 	    //If not already multiple of given number
-
 	    if (number % multiple != 0)
 	    {
-
 	        int division = number / multiple;
-
 	        result = division * multiple;
-
 	    }
-
 	    return result;
-
 	}
 	public static int getRandomP2PWorld()
 	{

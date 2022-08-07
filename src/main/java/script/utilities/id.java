@@ -30,6 +30,15 @@ public class id {
 	public static final int deathRune = 560;
 	public static final int natureRune = 561;
 	public static final int lawRune = 563;
+
+	public static final int prayPot1 = 143;
+	public static final int prayPot2 = 141;
+	public static final int prayPot3 = 139;
+	public static final int prayPot4 = 2434;
+	public static List<Integer> prayPots = new ArrayList<Integer>();
+	
+	
+	
 	public static final int runeDaggerPP = 5678;
 	public static final int runeSword = 1289;
 	public static final int blueDhideBody = 2499;
@@ -66,7 +75,7 @@ public class id {
 	
 	public static LinkedHashMap<Integer, Integer> approvedAlchs = new LinkedHashMap<Integer,Integer>();
 	public static LinkedHashMap<Integer, Integer> xpAlchs = new LinkedHashMap<Integer,Integer>();
-	public static void initializeAlchList()
+	public static void initializeIDLists()
 	{
 		xpAlchs.put(magicLongbow,18000);
 		xpAlchs.put(yewLongbow,18000);
@@ -95,5 +104,11 @@ public class id {
 		approvedAlchs.put(onyxBoltsE,11000);
 		approvedAlchs.put(mithrilPlatebody,125);
 		approvedAlchs.put(rune2h,70);
+
+		prayPots.add(prayPot1);
+		prayPots.add(prayPot2);
+		prayPots.add(prayPot3);
+		prayPots.add(prayPot4);
+		
 	}
 }

@@ -60,7 +60,7 @@ public class Mobs {
 	public static boolean cantReachThat = false;
 	public static void chooseMob()
 	{
-		if(TrainRanged.ranged < 30) mob = Mob.BOAR;
+		if(Skills.getRealLevel(Skill.RANGED) < 30) mob = Mob.BOAR;
 		else mob = Mob.HILL_GIANT;
 	}
 	public static int trainMob(Mob mob)
@@ -221,8 +221,7 @@ public class Mobs {
 			{
 				MethodProvider.log("did not get lantern within timer limit!");
 				return Timing.sleepLogNormalInteraction();
-			}
-						
+			}		
 		}
 		
 		//check equipment for wealth, if none, get more
@@ -1187,12 +1186,13 @@ public class Mobs {
 	}
 	public static void fightLizardsRanged(Area killingZone)
 	{
+		final int ranged = Skills.getRealLevel(Skill.RANGED);
 		if(Combat.shouldEatFood(15)) Combat.eatFood();
 		if(API.mode == modes.TRAIN_RANGE && TrainRanged.shouldDrinkBoost())
 		{
 			if(TrainRanged.drankRangedPotion()) Sleep.sleep(69, 420);
 		}
-		if(TrainRanged.ranged < 66)
+		if(ranged < 66)
 		{
 			if(org.dreambot.api.methods.combat.Combat.getCombatStyle() != CombatStyle.RANGED_RAPID)
 			{
@@ -1341,6 +1341,7 @@ public class Mobs {
 				//in location to kill mobs
 				if(Locations.kourendGiantsCaveArea.contains(Players.localPlayer()))
     			{
+					if(Dialogues.canContinue()) Dialogues.continueDialogue();
 					if(Inventory.isFull())
 					{
 						if(!Tabs.isOpen(Tab.INVENTORY))
@@ -1407,6 +1408,8 @@ public class Mobs {
 						return Timing.sleepLogNormalSleep();
 					}
 					
+					API.randomAFK(3);
+					
 					final int boostedPrayer = Skills.getBoostedLevels(Skill.PRAYER);
 					final int prayer = Skills.getRealLevel(Skill.PRAYER);
 					
@@ -1441,7 +1444,6 @@ public class Mobs {
 				else if(Locations.isInKourend())
 				{
 					if(Bank.isOpen()) Bank.close();
-					
 					
 					if(!Locations.kourendGiantsCaveEntrance.contains(Players.localPlayer()))
 					{
@@ -1504,7 +1506,7 @@ public class Mobs {
 		{
 			if(TrainRanged.drankRangedPotion()) Sleep.sleep(69, 420);
 		}
-		if(TrainRanged.ranged < 66)
+		if(Skills.getRealLevel(Skill.RANGED) < 66)
 		{
 			if(org.dreambot.api.methods.combat.Combat.getCombatStyle() != CombatStyle.RANGED_RAPID)
 			{

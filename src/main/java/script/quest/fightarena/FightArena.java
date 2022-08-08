@@ -683,8 +683,8 @@ public class FightArena extends Leaf {
     	}
     	InvEquip.addOptionalItem(InvEquip.jewelry);
     	InvEquip.shuffleFulfillOrder();
-    	InvEquip.addInvyItem(InvEquip.coins, 5, API.roundToMultiple((int) Calculations.nextGaussianRandom(5000,3000), 100), false, 0);
     	InvEquip.addInvyItem(TrainRanged.jugOfWine, 5, 27, false, (int) Calculations.nextGaussianRandom(500, 100));
+    	InvEquip.addInvyItem(InvEquip.coins, 5, API.roundToMultiple((int) Calculations.nextGaussianRandom(5000,3000), 100), false, 0);
     	if(InvEquip.fulfillSetup(true, 180000))
 		{
 			MethodProvider.log("[INVEQUIP] -> Fulfilled equipment correctly! (Fight Arena setup)");

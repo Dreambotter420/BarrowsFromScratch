@@ -130,6 +130,28 @@ public class Locations {
 	public static final Area fightArenaOgreCage = new Area(2607, 3167, 2611, 3165, 0);
 	public static final Area fightArenaScorpionCage = new Area(2607, 3158, 2611, 3161, 0);
 	public static final Area fightArenaBouncerCage = new Area(2607, 3162, 2611, 3164, 0);
+	public static final Area restlessGhostSkeletonCoffin = new Area(3247, 3195, 3252, 3190, 0);
+	public static final Area restlessGhostUrhneyHut = new Area(3151, 3173, 3144, 3177, 0);
+	public static final Area wizardTowerBasement = new Area(3093, 9579, 3123, 9551, 0);
+	public static final Area wizardTowerBasementLadder = new Area(3101, 9577, 3109, 9575, 0);
+	public static final Area  wizardTowerBasementAltar = new Area(3121, 9569, 3116, 9564, 0);
+	public static final Area wizardTowerGroundFloorLadder = new Area(
+			new Tile(3102, 3165, 0),
+			new Tile(3102, 3162, 0),
+			new Tile(3103, 3159, 0),
+			new Tile(3107, 3159, 0),
+			new Tile(3108, 3160, 0),
+			new Tile(3105, 3164, 0),
+			new Tile(3104, 3165, 0));
+	public static final Area restlessGhostLumbyChurch = new Area(
+			new Tile(3238, 3211, 0),
+			new Tile(3238, 3209, 0),
+			new Tile(3240, 3208, 0),
+			new Tile(3240, 3204, 0),
+			new Tile(3247, 3204, 0),
+			new Tile(3247, 3215, 0),
+			new Tile(3240, 3215, 0),
+			new Tile(3240, 3212, 0));
 	public static final Tile HALadderSpot = new Tile(3420, 3185, 0);
 	public static final Area HASpot1 = new Area(3415, 3187, 3421, 3182, 1);
 	public static final Area burthrope = new Area(

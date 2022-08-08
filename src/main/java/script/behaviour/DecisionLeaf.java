@@ -59,16 +59,16 @@ public class DecisionLeaf extends Leaf{
      * 3 for long.
      * Most likely will choose the chosen timer. But a chance to choose others.
      */
-    public static void setTimer (int priorityTime)
+    public static void setTaskTimer (int priorityTime)
     {
     	switch(priorityTime) {
     	case(3):
     	{
     		int rand = (int) Calculations.nextGaussianRandom(50, 20);
     		int timer = 0;
-    		if(rand < 30) timer = (int)Calculations.nextGaussianRandom(1200000, 100000);
-    		else if (rand < 38) timer = (int)Calculations.nextGaussianRandom(3000000, 100000);
-    		else timer = (int)Calculations.nextGaussianRandom(6000000, 200000);
+    		if(rand < 30) timer = (int)Calculations.nextGaussianRandom(1200000, 800000);
+    		else if (rand < 38) timer = (int)Calculations.nextGaussianRandom(3000000, 800000);
+    		else timer = (int)Calculations.nextGaussianRandom(6000000, 1200000);
     		taskTimer = new Timer(timer);
     		MethodProvider.log("Set timer for: " + ((double)timer / 60000) +" minutes");
     		break;
@@ -77,9 +77,9 @@ public class DecisionLeaf extends Leaf{
     	{
     		int rand = (int) Calculations.nextGaussianRandom(50, 20);
     		int timer = 0;
-    		if(rand < 30) timer = (int)Calculations.nextGaussianRandom(6000000, 100000);
-    		else if (rand < 38) timer = (int)Calculations.nextGaussianRandom(1200000, 100000);
-    		else timer = (int)Calculations.nextGaussianRandom(3000000, 200000);
+    		if(rand < 30) timer = (int)Calculations.nextGaussianRandom(6000000, 800000);
+    		else if (rand < 38) timer = (int)Calculations.nextGaussianRandom(1200000, 800000);
+    		else timer = (int)Calculations.nextGaussianRandom(3000000, 1200000);
     		taskTimer = new Timer(timer);
     		MethodProvider.log("Set timer for: " + ((double)timer / 60000) +" minutes");
     		break;
@@ -88,15 +88,15 @@ public class DecisionLeaf extends Leaf{
     	{
     		int rand = (int) Calculations.nextGaussianRandom(50, 20);
     		int timer = 0;
-    		if(rand < 30) timer = (int)Calculations.nextGaussianRandom(6000000, 100000);
-    		else if (rand < 38) timer = (int)Calculations.nextGaussianRandom(3000000, 100000);
-    		else timer = (int)Calculations.nextGaussianRandom(1200000, 200000);
+    		if(rand < 30) timer = (int)Calculations.nextGaussianRandom(6000000, 800000);
+    		else if (rand < 38) timer = (int)Calculations.nextGaussianRandom(3000000, 800000);
+    		else timer = (int)Calculations.nextGaussianRandom(1200000, 1200000);
     		taskTimer = new Timer(timer);
     		MethodProvider.log("Set timer for: " + ((double)timer / 60000) +" minutes");
     		break;
     	}
     	default:{
-    		MethodProvider.log("Whoops - enter 1,2,3 into setTimer function! :-)");
+    		MethodProvider.log("Whoops - enter 1,2,3 into setTaskTimer function! :-)");
     		break;
     	}}
     }
@@ -126,7 +126,7 @@ public class DecisionLeaf extends Leaf{
 		final boolean mageArena1Done = MageArena1.completedMageArena1;
 		final boolean mageArena2Done = MageArena2.completedMageArena2;
 		final boolean priestSaved = PriestInPeril.completedPriestInPeril;
-		final boolean restedGhost = RestlessGhost.completedTheRestlessGhost;
+		final boolean restedGhost = RestlessGhost.completedRestlessGhost;
 		final boolean quizzed = VarrockQuiz.completedQuiz;
 		List<API.modes> validModes = new ArrayList<API.modes>();
 		
@@ -237,7 +237,7 @@ public class DecisionLeaf extends Leaf{
 			}
 			
 			//testing
-			//API.mode = modes.FIGHT_ARENA;
+			//API.mode = modes.RESTLESS_GHOST;
 			
 			MethodProvider.log("Switching mode: " + API.mode.toString());
 			if(API.mode == modes.ANIMAL_MAGNETISM || 
@@ -253,24 +253,24 @@ public class DecisionLeaf extends Leaf{
 					API.mode == modes.FIGHT_ARENA || 
 					API.mode == modes.WATERFALL_QUEST)
 			{
-				setTimer(3);
+				setTaskTimer(3);
 			}
 			else if(API.mode == modes.TRAIN_MAGIC || 
 					API.mode == modes.TRAIN_SLAYER || 
 					API.mode == modes.TRAIN_RANGE || 
 					API.mode == modes.TRAIN_MELEE)
 			{
-				setTimer(2);
+				setTaskTimer(2);
 			}
 			else if(API.mode == modes.TRAIN_CRAFTING || 
 					API.mode == modes.TRAIN_WOODCUTTING || 
 					API.mode == modes.TRAIN_PRAYER)
 			{
-				setTimer(1);
+				setTaskTimer(1);
 			}
 			else if(API.mode == modes.BREAK)
 			{
-				setTimer(2);
+				setTaskTimer(2);
 				resetForceBreakTimer();
 			}
 		}

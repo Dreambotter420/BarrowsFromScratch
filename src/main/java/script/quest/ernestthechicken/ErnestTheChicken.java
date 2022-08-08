@@ -380,6 +380,7 @@ public class ErnestTheChicken extends Leaf {
     			return;
     		}
     		API.walkTalkToNPC("Professor Oddenstein","Talk-to", Locations.ernest_3rdfloorMaynor);
+    		Sleep.sleep(696, 666);
     	}
     }
     public static int getProgressValue()
@@ -397,10 +398,9 @@ public class ErnestTheChicken extends Leaf {
 				MethodProvider.log("Saw not poisoned fountain, switching to un-poisoned fountain mode");
 			}
 			if(Dialogues.getNPCDialogue() != null && 
-					Dialogues.getNPCDialogue().contains("... and a lot of piranhas!"))
+					Dialogues.getNPCDialogue().contains("Give \'em here then."))
 			{
-				poisonedFountain = false;
-				MethodProvider.log("Saw not poisoned fountain, switching to un-poisoned fountain mode");
+				if(Dialogues.continueDialogue()) Sleep.sleep(3333,3333);
 			}
 			if(Dialogues.continueDialogue()) Sleep.sleep(69,696);
 			return true;

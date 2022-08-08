@@ -16,6 +16,7 @@ import org.dreambot.api.methods.widget.Widgets;
 import org.dreambot.api.utilities.impl.Condition;
 import org.dreambot.api.wrappers.interactive.NPC;
 
+import script.Main;
 import script.behaviour.DecisionLeaf;
 import script.framework.Leaf;
 import script.framework.Tree;
@@ -58,6 +59,10 @@ public class RestlessGhost extends Leaf {
         if (completedRestlessGhost) {
             MethodProvider.log("[COMPLETED] -> The Restless Ghost!");
            	API.mode = null;
+           	Main.customPaintText1 = "~~~~~~~~~~";
+    		Main.customPaintText2 = "~Quest Complete~";
+    		Main.customPaintText3 = "~The Restless Ghost~";
+    		Main.customPaintText4 = "~~~~~~~~~~";
             return Timing.sleepLogNormalSleep();
         }
         if(Dialogues.getNPCDialogue() != null && !Dialogues.getNPCDialogue().isEmpty())

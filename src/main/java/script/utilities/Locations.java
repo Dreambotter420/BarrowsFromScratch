@@ -152,6 +152,28 @@ public class Locations {
 			new Tile(3247, 3215, 0),
 			new Tile(3240, 3215, 0),
 			new Tile(3240, 3212, 0));
+	
+	public static final Area ernest_puzzleLast = new Area(3090, 9753, 3099, 9757, 0);
+	public static final Area ernest_puzzle1 = new Area(3118, 9757, 3100, 9743, 0);
+	public static final Area ernest_puzzle2 = new Area(3105, 9767, 3112, 9758, 0);
+	public static final Area ernest_puzzle4 = new Area(3096, 9762, 3099, 9758, 0);
+	public static final Area ernest_puzzle3 = new Area(3100, 9762, 3104, 9758, 0);
+	public static final Area ernest_puzzle6 = new Area(3100, 9767, 3104, 9763, 0);
+	public static final Area ernest_puzzle5 = new Area(3096, 9767, 3099, 9763, 0);
+	public static final Area ernest_westWing = new Area(3096, 3363, 3091, 3354, 0);
+	public static final Area ernest_westWingAnd = new Area(3102, 3363, 3091, 3354, 0);
+	public static final Area ernest_2ndStairs = new Area(3104, 3362, 3113, 3368, 1);
+	public static final Area ernest_SkellyTube = new Area(3108, 3368, 3112, 3366, 0);
+	public static final Area ernest_SkellyDoorArea = new Area(3105, 3368, 3112, 3358, 0);
+	public static final Area ernest_fountain = new Area(3085, 3331, 3092, 3340, 0);
+	public static final Area ernest_compost = new Area(3084, 3363, 3090, 3358, 0);
+	public static final Area ernest_spade = new Area(3120, 3360, 3126, 3354, 0);
+	public static final Area ernest_basementMaynor = new Area(3121, 9745, 3086, 9769, 0);
+	public static final Area ernest_3rdfloorMaynor = new Area(3104, 3370, 3112, 3356, 2);
+	public static final Area ernest_2ndfloorMaynor = new Area(3086, 3349, 3132, 3375, 1);
+	public static final Area ernest_fishfood = new Area(3107, 3361, 3110, 3354, 1);
+	public static final Area ernest_veronica = new Area(3104, 3335, 3115, 3325, 0);
+	public static final Area ernest_poison = new Area(3097, 3366, 3101, 3364, 0);
 	public static final Tile HALadderSpot = new Tile(3420, 3185, 0);
 	public static final Area HASpot1 = new Area(3415, 3187, 3421, 3182, 1);
 	public static final Area burthrope = new Area(

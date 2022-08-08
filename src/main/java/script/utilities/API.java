@@ -16,7 +16,9 @@ import org.dreambot.api.methods.input.Keyboard;
 import org.dreambot.api.methods.interactive.GameObjects;
 import org.dreambot.api.methods.interactive.NPCs;
 import org.dreambot.api.methods.interactive.Players;
+import org.dreambot.api.methods.item.GroundItems;
 import org.dreambot.api.methods.map.Area;
+import org.dreambot.api.methods.map.Tile;
 import org.dreambot.api.methods.settings.PlayerSettings;
 import org.dreambot.api.methods.tabs.Tab;
 import org.dreambot.api.methods.tabs.Tabs;
@@ -29,6 +31,7 @@ import org.dreambot.api.utilities.Timer;
 import org.dreambot.api.utilities.impl.Condition;
 import org.dreambot.api.wrappers.interactive.GameObject;
 import org.dreambot.api.wrappers.interactive.NPC;
+import org.dreambot.api.wrappers.items.GroundItem;
 
 import script.Main;
 import script.quest.varrockmuseum.Timing;
@@ -287,6 +290,11 @@ public class API {
 			MethodProvider.log(npcName+" null!");
 			return;
 		}
+		if(!npc.canReach())
+		{
+			if(Walking.walk(npc)) Sleep.sleep(420, 696);
+			return;
+		}
 		if(npc.interact("Talk-to"))
 		{
 			MethodProvider.sleepUntil(Dialogues::inDialogue,
@@ -302,6 +310,11 @@ public class API {
 		if(npc == null)
 		{
 			MethodProvider.log("NPC " +npcName+" with action \'"+action+"\' null!");
+			return;
+		}
+		if(!npc.canReach())
+		{
+			if(Walking.walk(npc)) Sleep.sleep(420, 696);
 			return;
 		}
 		if(npc.interact(action))
@@ -320,6 +333,11 @@ public class API {
 		if(npc == null)
 		{
 			MethodProvider.log("NPC " +npcName+" with action \'"+action+"\' in specified area null!");
+			return;
+		}
+		if(!npc.canReach())
+		{
+			if(Walking.walk(npc)) Sleep.sleep(420, 696);
 			return;
 		}
 		if(npc.interact(action))
@@ -347,6 +365,11 @@ public class API {
 			MethodProvider.log("NPC " +npcName+" with action \'"+action+"\' in specified area null!");
 			return;
 		}
+		if(!npc.canReach())
+		{
+			if(Walking.walk(npc)) Sleep.sleep(420, 696);
+			return;
+		}
 		if(npc.interact(action))
 		{
 			MethodProvider.sleepUntil(Dialogues::inDialogue,
@@ -362,6 +385,11 @@ public class API {
 		if(npc == null)
 		{
 			MethodProvider.log("NPC " +npcName+" with action \'"+action+"\' null!");
+			return;
+		}
+		if(!npc.canReach())
+		{
+			if(Walking.walk(npc)) Sleep.sleep(420, 696);
 			return;
 		}
 		if(npc.interact(action))
@@ -381,6 +409,34 @@ public class API {
 			MethodProvider.log("GameObject " +gameObjectName+" with action \'"+action+"\' null!");
 			return;
 		}
+		if(!go.canReach())
+		{
+			if(Walking.walk(go)) Sleep.sleep(420, 696);
+			return;
+		}
+		if(go.interact(action))
+		{
+			MethodProvider.sleepUntil(() -> go.getSurrounding().contains(Players.localPlayer().getTile()),
+					() -> Players.localPlayer().isMoving(),Sleep.calculate(3333, 2222),66);
+		}
+	}
+	public static void interactWithGameObject(String gameObjectName, String action,Tile tile)
+	{
+		GameObject go = GameObjects.closest(n -> 
+		n != null && 
+		n.getName().contains(gameObjectName) && 
+		n.hasAction(action) && 
+		n.getTile().equals(tile));
+		if(go == null)
+		{
+			MethodProvider.log("GameObject " +gameObjectName+" with action \'"+action+"\' at specified tile null!");
+			return;
+		}
+		if(!go.canReach())
+		{
+			if(Walking.walk(go)) Sleep.sleep(420, 696);
+			return;
+		}
 		if(go.interact(action))
 		{
 			MethodProvider.sleepUntil(() -> go.getSurrounding().contains(Players.localPlayer().getTile()),
@@ -397,6 +453,11 @@ public class API {
 		if(go == null)
 		{
 			MethodProvider.log("GameObject " +gameObjectName+" with action \'"+action+"\' in specified area null!");
+			return;
+		}
+		if(!go.canReach())
+		{
+			if(Walking.walk(go)) Sleep.sleep(420, 696);
 			return;
 		}
 		if(go.interact(action))
@@ -424,6 +485,11 @@ public class API {
 			MethodProvider.log("GameObject " +gameObjectName+" with action \'"+action+"\' in specified area null!");
 			return;
 		}
+		if(!go.canReach())
+		{
+			if(Walking.walk(go)) Sleep.sleep(420, 696);
+			return;
+		}
 		if(go.interact(action))
 		{
 			MethodProvider.sleepUntil(() -> go.getSurrounding().contains(Players.localPlayer().getTile()),
@@ -449,9 +515,44 @@ public class API {
 			MethodProvider.log("GameObject " +gameObjectName+" with action \'"+action+"\' in specified area null!");
 			return;
 		}
+		if(!go.canReach())
+		{
+			if(Walking.walk(go)) Sleep.sleep(420, 696);
+			return;
+		}
 		if(go.interact(action))
 		{
 			MethodProvider.sleepUntil(() -> condition.verify(),
+					() -> Players.localPlayer().isMoving(),Sleep.calculate(3333, 2222),66);
+		}
+	}
+	public static void walkPickupGroundItem(String groundItemName, String action, Area groundItemArea)
+	{
+		if(!groundItemArea.contains(Players.localPlayer()))
+		{
+			if(!Walkz.isStaminated()) Walkz.drinkStamina();
+			if(Walkz.isStaminated() && Walking.getRunEnergy() > 5 && !Walking.isRunEnabled()) Walking.toggleRun();
+			if(Walking.shouldWalk(6) && Walking.walk(groundItemArea.getCenter())) Sleep.sleep(696, 420);
+			return;
+		}
+		GroundItem gi = GroundItems.closest(n -> 
+		n != null && 
+		n.getName().contains(groundItemName) && 
+		n.hasAction(action) && 
+		groundItemArea.contains(n));
+		if(gi == null)
+		{
+			MethodProvider.log("GroundItem " +groundItemName+" with action \'"+action+"\' in specified area null!");
+			return;
+		}
+		if(!gi.canReach())
+		{
+			if(Walking.walk(gi)) Sleep.sleep(420, 696);
+			return;
+		}
+		if(gi.interact(action))
+		{
+			MethodProvider.sleepUntil(() -> gi == null || !gi.exists(),
 					() -> Players.localPlayer().isMoving(),Sleep.calculate(3333, 2222),66);
 		}
 	}

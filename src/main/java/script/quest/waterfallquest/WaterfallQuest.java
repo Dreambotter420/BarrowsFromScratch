@@ -23,6 +23,7 @@ import org.dreambot.api.wrappers.interactive.GameObject;
 import org.dreambot.api.wrappers.interactive.NPC;
 import org.dreambot.api.wrappers.items.Item;
 
+import script.Main;
 import script.behaviour.DecisionLeaf;
 import script.framework.Leaf;
 import script.framework.Tree;
@@ -73,6 +74,10 @@ public class WaterfallQuest extends Leaf {
     	{
     		MethodProvider.log("[COMPLETED] -> Waterfall Quest!");
             API.mode = null;
+            Main.customPaintText1 = "~~~~~~~~~~";
+    		Main.customPaintText2 = "~Quest Complete~";
+    		Main.customPaintText3 = "~Waterfall Quest~";
+    		Main.customPaintText4 = "~~~~~~~~~~";
             return Timing.sleepLogNormalSleep();
     	}
     	if(DecisionLeaf.taskTimer.finished())
@@ -96,6 +101,7 @@ public class WaterfallQuest extends Leaf {
         {
         	if(exitQuest())
         	{
+        		
         		completedWaterfallQuest = true;
         	}
         	break;

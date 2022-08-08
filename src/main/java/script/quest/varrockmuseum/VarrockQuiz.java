@@ -7,6 +7,7 @@ import org.dreambot.api.methods.map.Tile;
 import org.dreambot.api.methods.settings.PlayerSettings;
 import org.dreambot.api.wrappers.interactive.GameObject;
 
+import script.Main;
 import script.framework.Leaf;
 import script.framework.Tree;
 import script.utilities.API;
@@ -78,6 +79,10 @@ public class VarrockQuiz extends Leaf {
     		if(onExit()) //returns true if out of museum dungeon
     		{
     			 MethodProvider.log("[COMPLETED] -> Museum Quiz");
+    			 Main.customPaintText1 = "~~~~~~~~~~";
+         		Main.customPaintText2 = "~Quest Complete~";
+         		Main.customPaintText3 = "~Varrock Museum Quiz~";
+         		Main.customPaintText4 = "~~~~~~~~~~";
     	         completedQuiz = true;
     	         API.mode = null;
     		}

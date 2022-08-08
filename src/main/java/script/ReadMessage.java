@@ -4,6 +4,7 @@ import org.dreambot.api.methods.MethodProvider;
 import org.dreambot.api.script.ScriptManager;
 import org.dreambot.api.wrappers.widgets.message.Message;
 
+import script.quest.ernestthechicken.ErnestTheChicken;
 import script.quest.waterfallquest.WaterfallQuest;
 import script.skills.prayer.TrainPrayer;
 import script.skills.ranged.Mobs;
@@ -40,6 +41,12 @@ public class ReadMessage {
 				txt.contains("Your inventory is too full to take everything"))
 		{
 			InvEquip.collectBank = true;
+		}
+		if(txt.contains("... then die and float to the surface.") || 
+				txt.contains("You pour the poisoned fish food into the fountain.") || 
+				txt.contains("The piranhas start eating the food..."))
+		{
+			ErnestTheChicken.poisonedFountain = true;
 		}
 	}
 }

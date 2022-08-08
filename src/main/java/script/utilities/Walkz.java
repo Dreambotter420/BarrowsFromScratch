@@ -1033,16 +1033,21 @@ public class Walkz {
 	public static boolean walkToArea(Area area,Tile walkableTile)
 	{
 		if(area.contains(Players.localPlayer())) return true;
-		if(!Walking.isRunEnabled() &&
-				Walking.getRunEnergy() > Sleep.calculate(15, 20)) 
+		
+		if(Walking.shouldWalk(6))
 		{
-			Walking.toggleRun();
+			if(Walking.walk(walkableTile)) Sleep.sleep(420,696);
 		}
-		if(Walking.shouldWalk())
+		return area.contains(Players.localPlayer());
+	}
+	public static boolean walkToArea(Area area)
+	{
+		if(area.contains(Players.localPlayer())) return true;
+		
+		if(Walking.shouldWalk(6))
 		{
-			Walking.walk(walkableTile);
+			if(Walking.walk(area.getCenter())) Sleep.sleep(420,696);
 		}
-		Sleep.sleep(666, 1111);
 		return area.contains(Players.localPlayer());
 	}
 	public static boolean walkToTileInRadius(Tile walkableTile,int radius)

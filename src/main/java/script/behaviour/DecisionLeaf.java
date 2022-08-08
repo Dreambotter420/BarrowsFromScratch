@@ -237,7 +237,7 @@ public class DecisionLeaf extends Leaf{
 			}
 			
 			//testing
-			//API.mode = modes.RESTLESS_GHOST;
+			//API.mode = modes.ERNEST_THE_CHIKKEN;
 			
 			MethodProvider.log("Switching mode: " + API.mode.toString());
 			if(API.mode == modes.ANIMAL_MAGNETISM || 

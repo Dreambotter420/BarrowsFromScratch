@@ -30,6 +30,7 @@ public class id {
 	public static final int deathRune = 560;
 	public static final int natureRune = 561;
 	public static final int lawRune = 563;
+	public static final int spade = 952;
 
 	public static final int prayPot1 = 143;
 	public static final int prayPot2 = 141;

@@ -3,41 +3,32 @@ package script.quest.ernestthechicken;
 import org.dreambot.api.methods.Calculations;
 import org.dreambot.api.methods.MethodProvider;
 import org.dreambot.api.methods.container.impl.Inventory;
-import org.dreambot.api.methods.container.impl.equipment.Equipment;
+import org.dreambot.api.methods.container.impl.bank.BankLocation;
 import org.dreambot.api.methods.container.impl.equipment.EquipmentSlot;
 import org.dreambot.api.methods.dialogues.Dialogues;
 import org.dreambot.api.methods.interactive.GameObjects;
 import org.dreambot.api.methods.interactive.Players;
-import org.dreambot.api.methods.item.GroundItems;
 import org.dreambot.api.methods.settings.PlayerSettings;
 import org.dreambot.api.methods.walking.impl.Walking;
 import org.dreambot.api.methods.widget.Widgets;
-import org.dreambot.api.wrappers.items.GroundItem;
-
 import script.Main;
 import script.behaviour.DecisionLeaf;
 import script.framework.Leaf;
-import script.framework.Tree;
 import script.quest.varrockmuseum.Timing;
 import script.skills.ranged.TrainRanged;
 import script.utilities.API;
 import script.utilities.Combat;
 import script.utilities.InvEquip;
 import script.utilities.Locations;
-import script.utilities.MissingAPI;
 import script.utilities.Sleep;
 import script.utilities.Walkz;
 import script.utilities.id;
-
-import java.util.LinkedHashMap;
-import java.util.List;
 /**
  * Completes Ernest The Chikken
  * @author Dreambotter420
  * ^_^
  */
 public class ErnestTheChicken extends Leaf {
-	public static boolean started = false;
 	public static boolean completedErnestTheChikken = false;
 	public static final int poison = 273;
 	public static final int fishfood = 272;
@@ -48,30 +39,56 @@ public class ErnestTheChicken extends Leaf {
 	public static final int oilCan = 277;
 	
 	public static boolean poisonedFountain = false;
-    public void onStart() {
-        
-        started = true;
-    }
-
+    
 	@Override
 	public boolean isValid() {
 		return API.mode == API.modes.ERNEST_THE_CHIKKEN;
 	}
-	
+	public static boolean onExit()
+	{
+		if(Widgets.getWidgetChild(153,16) != null && 
+    			Widgets.getWidgetChild(153,16).isVisible())
+    	{
+    		if(Widgets.getWidgetChild(153,16).interact("Close")) Sleep.sleep(696, 666);
+    		return false;
+    	}
+    	if(Locations.ernest_3rdfloorMaynor.contains(Players.localPlayer()) || 
+    			Locations.ernest_2ndfloorMaynor.contains(Players.localPlayer()) ||
+    			Locations.ernest_SkellyTube.contains(Players.localPlayer()) ||
+    			Locations.ernest_westWing.contains(Players.localPlayer()) ||
+    			Locations.ernest_basementMaynor.contains(Players.localPlayer()))
+    	{
+    		if(!Walkz.useJewelry(InvEquip.wealth, "Grand Exchange") && 
+    				!Walkz.useJewelry(InvEquip.glory,"Edgeville"))
+    		{
+    			MethodProvider.log("Stuck in here in Ernest The Chikken :-( Attempting walking to GE...");
+    			Walking.walk(BankLocation.GRAND_EXCHANGE);
+    		}
+    		return false;
+    	}
+    	return true;
+	}
     @Override
     public int onLoop() {
         if (DecisionLeaf.taskTimer.finished()) {
             MethodProvider.log("[TIMEOUT] -> Ernest the Chikken");
-           	API.mode = null;
+            if(onExit())
+            {
+                API.mode = null;
+            }
             return Timing.sleepLogNormalSleep();
         }
         if (completedErnestTheChikken) {
-            MethodProvider.log("[COMPLETED] -> Ernest the Chikken!");
-            Main.customPaintText1 = "~~~~~~~~~~~~~~~";
-    		Main.customPaintText2 = "~Quest Complete~";
-    		Main.customPaintText3 = "~Ernest The Chikken~";
-    		Main.customPaintText4 = "~~~~~~~~~~~~~~~";
-           	API.mode = null;
+            if(onExit())
+            {
+            	MethodProvider.log("[COMPLETED] -> Ernest the Chikken!");
+                Main.customPaintText1 = "~~~~~~~~~~~~~~~";
+        		Main.customPaintText2 = "~Quest Complete~";
+        		Main.customPaintText3 = "~Ernest The Chikken~";
+        		Main.customPaintText4 = "~~~~~~~~~~~~~~~";
+               	API.mode = null;
+            }
+        	
             return Timing.sleepLogNormalSleep();
         }
         
@@ -84,21 +101,6 @@ public class ErnestTheChicken extends Leaf {
         {
         case(3):
         {
-        	if(Widgets.getWidgetChild(153,16) != null && 
-        			Widgets.getWidgetChild(153,16).isVisible())
-        	{
-        		if(Widgets.getWidgetChild(153,16).interact("Close")) Sleep.sleep(696, 666);
-        		break;
-        	}
-        	if(Locations.ernest_3rdfloorMaynor.contains(Players.localPlayer()))
-        	{
-        		if(!Walkz.useJewelry(InvEquip.wealth, "Grand Exchange") && 
-        				!Walkz.useJewelry(InvEquip.glory,"Edgeville"))
-        		{
-        			MethodProvider.log("Stuck up in here :-(");
-        		}
-        		break;
-        	}
         	completedErnestTheChikken = true;
         	break;
         }

@@ -1370,6 +1370,10 @@ public class Mobs {
 					{
 						if((int) Calculations.nextGaussianRandom(50,30) > 65 && Inventory.interact(ItemsOnGround.bigBones, "Bury")) MethodProvider.sleep(Timing.sleepLogNormalSleep());
 					}
+					if(!Walking.isRunEnabled() && Walking.getRunEnergy() > 5)
+					{
+						if(Walking.toggleRun()) Sleep.sleep(69,666);
+					}
 					GroundItem gi = ItemsOnGround.getNearbyGroundItem(ItemsOnGround.hillGiantsLoot,Locations.kourendGiantsKillingArea_Hill);
 					if(gi != null)
 					{
@@ -1408,7 +1412,7 @@ public class Mobs {
 						return Timing.sleepLogNormalSleep();
 					}
 					
-					API.randomAFK(3);
+					API.randomAFK(5);
 					
 					final int boostedPrayer = Skills.getBoostedLevels(Skill.PRAYER);
 					final int prayer = Skills.getRealLevel(Skill.PRAYER);
@@ -1444,7 +1448,11 @@ public class Mobs {
 				else if(Locations.isInKourend())
 				{
 					if(Bank.isOpen()) Bank.close();
-					
+					if(!Walkz.isStaminated()) 
+					{
+						Walkz.drinkStamina();
+						return Timing.sleepLogNormalSleep();
+					}
 					if(!Locations.kourendGiantsCaveEntrance.contains(Players.localPlayer()))
 					{
 						if(Locations.dreambotFuckedWCGuildSouth.contains(Players.localPlayer()))
@@ -1485,6 +1493,7 @@ public class Mobs {
 				} 
 				else 
 				{
+					MethodProvider.log("Not considered to be inside hill giants cave or Kourend! Teleporting to woodcutting guild..");
 					Walkz.teleportWoodcuttingGuild(180000);
 				}
 			}

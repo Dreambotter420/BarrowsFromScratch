@@ -186,12 +186,10 @@ public class TrainRanged extends Leaf {
 				getNextNextBestDart() != getNextBestDart()) InvEquip.addInvyItem(getNextNextBestDart(), 500, 1000, false, 1000);
     	
     }
-    public static boolean fulfillRangedDartsStaminaAntidote()
+    public static boolean fulfillRangedDartsStamina()
     {
     	InvEquip.clearAll();
-    	
     	setBestRangedEquipment();
-    	
     	InvEquip.addInvyItem(rangePot4, 1, 6, false, (int) Calculations.nextGaussianRandom(20, 5));
     	InvEquip.addInvyItem(InvEquip.games, 1, 1, false, 5);
     	InvEquip.addInvyItem(InvEquip.antidote4, 1, 1, false, 5);
@@ -219,6 +217,37 @@ public class TrainRanged extends Leaf {
 			return false;
 		}
     	
+    }
+    public static boolean fulfillRangedDartsStaminaAntidote()
+    {
+    	InvEquip.clearAll();
+    	setBestRangedEquipment();
+    	InvEquip.addInvyItem(rangePot4, 1, 6, false, (int) Calculations.nextGaussianRandom(20, 5));
+    	InvEquip.addInvyItem(InvEquip.games, 1, 1, false, 5);
+    	InvEquip.addInvyItem(InvEquip.antidote4, 1, 1, false, 5);
+    	InvEquip.addInvyItem(InvEquip.stamina4, 1, 1, false, 5);
+    	
+    	for(int f : Combat.foods)
+    	{
+    		InvEquip.addOptionalItem(f);
+    	}
+    	for(int r : rangedPots)
+    	{
+    		InvEquip.addOptionalItem(r);
+    	}
+    	InvEquip.addOptionalItem(InvEquip.jewelry);
+    	InvEquip.shuffleFulfillOrder();
+    	InvEquip.addInvyItem(jugOfWine, 15, 27, false, (int) Calculations.nextGaussianRandom(500, 100));
+    	InvEquip.addInvyItem(InvEquip.coins, 0, 0, false, 0);
+		if(InvEquip.fulfillSetup(true, 180000))
+		{
+			MethodProvider.log("[INVEQUIP] -> Fulfilled equipment correctly! (antidote + stamina strict)");
+			return true;
+		} else 
+		{
+			MethodProvider.log("[INVEQUIP] -> NOT Fulfilled equipment correctly! (antidote + stamina strict)");
+			return false;
+		}
     }
     public static Timer drankTimer = null;
     public static Timer drinkDelayTimer = null;

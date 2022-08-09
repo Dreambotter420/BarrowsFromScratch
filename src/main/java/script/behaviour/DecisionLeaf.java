@@ -165,7 +165,7 @@ public class DecisionLeaf extends Leaf{
 					else 
 					{
 						MethodProvider.log("Somehow the account has unlocked Morytania with Priest in Peril without");
-						MethodProvider.log("getting 18 slayer! Need to get 18 slayer manually, good luck with morytania tasks.");
+						MethodProvider.log("getting 18 slayer! Need to get 18 slayer manually, good luck with morytania tasks...");
 						return -1;
 					}
 				}
@@ -237,7 +237,7 @@ public class DecisionLeaf extends Leaf{
 			}
 			
 			//testing
-			//API.mode = modes.ERNEST_THE_CHIKKEN;
+			//API.mode = modes.TRAIN_MAGIC;
 			
 			MethodProvider.log("Switching mode: " + API.mode.toString());
 			if(API.mode == modes.ANIMAL_MAGNETISM || 

@@ -118,9 +118,9 @@ public class Walkz {
 			if(Inventory.contains(id.varrockTele))
 			{
 				if(Bank.isOpen()) Bank.close();
-				else if(Inventory.interact(id.varrockTele, "Break"))
+				if(InvEquip.closeBankEquipment())
 				{
-					MethodProvider.sleepUntil(() -> Locations.dontTeleToGEAreaJustWalk.contains(Players.localPlayer()), () -> Players.localPlayer().isAnimating(), Sleep.calculate(4444,2222),50);
+					teleportVarrock(30000);
 				}
 				continue;
 			}
@@ -957,7 +957,7 @@ public class Walkz {
 			//if none found in invy OR bank, stop
 			if(!Bank.contains(tabID)) 
 			{
-				InvEquip.buyItem(tabID, (int) Calculations.nextGaussianRandom(12,5),timeout);
+				InvEquip.buyItem(tabID, (int) Calculations.nextGaussianRandom(12,3),timeout);
 				if(!InvEquip.bankContains(InvEquip.wearableWealth)) InvEquip.buyItem(InvEquip.wealth5, 3, timeout);
 			}
 			

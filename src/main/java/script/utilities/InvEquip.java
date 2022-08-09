@@ -611,7 +611,6 @@ public class InvEquip {
 				}
 				if(Walkz.goToGE(timer.remaining()))
 				{
-					
 					if(GrandExchange.open())
 					{
 						MethodProvider.sleepUntil(() -> GrandExchange.isOpen(), Sleep.calculate(2222, 2222));
@@ -1691,8 +1690,10 @@ public class InvEquip {
 										MethodProvider.sleep(Timing.sleepLogNormalInteraction());
 										continue;
 									}
+									MethodProvider.log("attempting withdraw of item: " + new Item(unnotedID,1).getName() + " in amount: " + neededForMax);
 									if(Bank.withdraw(unnotedID,neededForMax))
 									{
+										MethodProvider.log("success withdraw of item: " + new Item(unnotedID,1).getName());
 										final int tmp = requestedID;
 										MethodProvider.sleepUntil(() -> Inventory.count(tmp) == maxQty, Sleep.calculate(2222, 2222));
 									}

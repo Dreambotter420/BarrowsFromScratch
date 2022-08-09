@@ -21,6 +21,7 @@ import org.dreambot.api.methods.widget.Widgets;
 import org.dreambot.api.wrappers.interactive.GameObject;
 import org.dreambot.api.wrappers.interactive.NPC;
 
+import script.Main;
 import script.behaviour.DecisionLeaf;
 import script.framework.Leaf;
 import script.quest.varrockmuseum.Timing;
@@ -64,6 +65,10 @@ public class FightArena extends Leaf {
         if (completedFightArena) {
             MethodProvider.log("[FINISHED] -> Fight Arena!!");
            	API.mode = null;
+           	Main.customPaintText1 = "~~~~~~~~~~";
+    		Main.customPaintText2 = "~Quest Complete~";
+    		Main.customPaintText3 = "~Fight Arena~";
+    		Main.customPaintText4 = "~~~~~~~~~~";
             return Timing.sleepLogNormalSleep();
         }
         
@@ -190,6 +195,8 @@ public class FightArena extends Leaf {
             		if(Combat.shouldDrinkPrayPot())
             		{
             			Combat.drinkPrayPot();
+
+            			return Timing.sleepLogNormalSleep();
             		}
             		if(Combat.setQuickPrayEagleEyeProtectMelee())
             		{
@@ -238,6 +245,7 @@ public class FightArena extends Leaf {
             		if(Combat.shouldDrinkPrayPot())
             		{
             			Combat.drinkPrayPot();
+            			return Timing.sleepLogNormalSleep();
             		}
             		if(Combat.setQuickPrayEagleEyeProtectMelee())
             		{
@@ -374,6 +382,7 @@ public class FightArena extends Leaf {
         		if(Combat.shouldDrinkPrayPot())
         		{
         			Combat.drinkPrayPot();
+        			return Timing.sleepLogNormalSleep();
         		}
         		if(Combat.setQuickPrayEagleEyeProtectMelee())
         		{

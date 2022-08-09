@@ -72,18 +72,25 @@ public class WaterfallQuest extends Leaf {
     public int onLoop() {
     	if(completedWaterfallQuest)
     	{
-    		MethodProvider.log("[COMPLETED] -> Waterfall Quest!");
-            API.mode = null;
-            Main.customPaintText1 = "~~~~~~~~~~";
-    		Main.customPaintText2 = "~Quest Complete~";
-    		Main.customPaintText3 = "~Waterfall Quest~";
-    		Main.customPaintText4 = "~~~~~~~~~~";
+    		if(exitQuest())
+    		{
+    			MethodProvider.log("[COMPLETED] -> Waterfall Quest!");
+                API.mode = null;
+                Main.customPaintText1 = "~~~~~~~~~~";
+        		Main.customPaintText2 = "~Quest Complete~";
+        		Main.customPaintText3 = "~Waterfall Quest~";
+        		Main.customPaintText4 = "~~~~~~~~~~";
+    		}
+    		
             return Timing.sleepLogNormalSleep();
     	}
     	if(DecisionLeaf.taskTimer.finished())
     	{
     		MethodProvider.log("[TIMEOUT] -> Waterfall Quest!");
-            API.mode = null;
+    		if(exitQuest())
+    		{
+    			API.mode = null;
+    		}
             return Timing.sleepLogNormalSleep();
     	}
     	if(Locations.isInKourend())
@@ -99,11 +106,7 @@ public class WaterfallQuest extends Leaf {
         { 
         case(10): //have completed quest - still maybe in room
         {
-        	if(exitQuest())
-        	{
-        		
-        		completedWaterfallQuest = true;
-        	}
+        	completedWaterfallQuest = true;
         	break;
         }
         case(8): //have completed all runes putting and amulet putting
@@ -518,7 +521,12 @@ public class WaterfallQuest extends Leaf {
 			}
 			return false;
 		}
-		if(Locations.waterfallDungeonLastAreaChanged.contains(Players.localPlayer()))
+		if(Locations.waterfallDungeonLastAreaChanged.contains(Players.localPlayer()) || 
+				Locations.waterfallDungeon1.contains(Players.localPlayer()) || 
+				Locations.waterfallDungeon2.contains(Players.localPlayer()) || 
+				Locations.waterfallIsland1.contains(Players.localPlayer()) || 
+				Locations.waterfallIsland2.contains(Players.localPlayer()) || 
+				Locations.waterfallLedge.equals(Players.localPlayer().getTile()))
 		{
 			if(!Walkz.useJewelry(InvEquip.wealth, "Grand Exchange") && 
 					!Walkz.useJewelry(InvEquip.games, "Barbarian Outpost") && 

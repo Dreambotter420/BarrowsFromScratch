@@ -87,7 +87,7 @@ public class TrainMagic extends Leaf {
         if(DecisionLeaf.taskTimer.finished())
     	{
     		MethodProvider.log("[TIMEOUT] -> Magic!");
-            API.mode = null;
+            if(onExit()) API.mode = null;
             return Timing.sleepLogNormalSleep();
     	}
        	magic = Skills.getRealLevel(Skill.MAGIC);
@@ -123,6 +123,8 @@ public class TrainMagic extends Leaf {
 	public static final int greenBodyPrice = 4300;
 	public static int HACount = 0;
 	public static boolean changeVarbit = false;
+
+	public static int foundAlchLimit = 0;
 	public static Timer HATimer = null;
 	public static final int HAWarningThresholdVarbit = 6091;
 	public static boolean xpAlch = false;
@@ -169,22 +171,34 @@ public class TrainMagic extends Leaf {
 		if(!chancedXPAlch)
 		{
 			int chance = (int) Calculations.nextGaussianRandom(50, 25);
-			if(chance > 60) xpAlch = true;
+			if(chance > 60) 
+				{
+				xpAlch = true;
+				MethodProvider.log("Chose to High Alch Magic/Yew longbows~");
+				}
+			else MethodProvider.log("Chose to High Alch profitable items~");
 			chancedXPAlch = true;
 		}
 		if(!InvEquip.checkedBank()) return;
-		final int natRunePrice = new Item(id.natureRune,1).getLivePrice();
 		API.randomAFK(20);
 		if(Equipment.contains(id.staffOfFire) && Inventory.count(id.natureRune) > 0)
 		{
 			List<Integer> profitKeys = new ArrayList(id.approvedAlchs.keySet());
 			List<Integer> longbowKeys = new ArrayList(id.xpAlchs.keySet());
 			Collections.shuffle(profitKeys);
-			int totalAlchValue = 0;
 			boolean foundAlch = false;
 			List<Integer> keys = null;
-			if(xpAlch) keys = longbowKeys;
-			else keys = profitKeys;
+			if(xpAlch) 
+			{
+				if(foundAlchLimit == 0) foundAlchLimit = (int) Calculations.nextGaussianRandom(1200, 200);
+				keys = longbowKeys;
+			}
+			else 
+				
+			{
+				keys = profitKeys;
+				if(foundAlchLimit == 0) foundAlchLimit = (int) Calculations.nextGaussianRandom(400, 100);
+			}
 			int alchsCount = 0;
 			boolean bankedAlchs = false;
 			for(Integer i : keys)
@@ -193,7 +207,7 @@ public class TrainMagic extends Leaf {
 				if(Inventory.count(i) > 0 || 
 						Inventory.count(new Item(i,1).getNotedItemID()) > 0)
 				{
-					alchsCount += (Inventory.count(i) + Inventory.count(new Item(i,1).getNotedItemID()));
+					alchsCount += (Inventory.count(i) + Inventory.count(new Item(i,1).getNotedItemID()) + Bank.count(i));
 					foundAlch = true;
 				}
 			}
@@ -212,7 +226,7 @@ public class TrainMagic extends Leaf {
 								if(Bank.withdrawAll(i))
 								{
 									MethodProvider.sleepUntil(() -> Bank.count(i) <= 0, Sleep.calculate(2222, 2222));
-									Sleep.sleep(69, 420);
+									Sleep.sleep(69, 1111);
 								}
 							}
 						}
@@ -220,13 +234,13 @@ public class TrainMagic extends Leaf {
 					}
 					Bank.setWithdrawMode(BankMode.NOTE);
 					return;
-					
 				}
 				return;
 			}
 			if(foundAlch)
 			{
-				MethodProvider.log("Found alch");
+				MethodProvider.log("Found alchs in invy already - bank emptied of alchs");
+				
 				if(Dialogues.canContinue()) 
 				{
 					Dialogues.continueDialogue();
@@ -516,8 +530,7 @@ public class TrainMagic extends Leaf {
 		} 
 		else 
 		{
-			if(xpAlch) BuyHighAlchs.buyItems(true);
-			else BuyHighAlchs.buyItems(false);
+			fulfillHA();
 		}
 	}
 	
@@ -748,6 +761,24 @@ public class TrainMagic extends Leaf {
 		} else 
 		{
 			MethodProvider.log("[TRAIN MAGIC] -> NOT fulfilled equipment correctly for camelot casting!");
+			return false;
+		}
+    	
+    }
+	public static boolean fulfillHA()
+    {
+    	InvEquip.clearAll();
+
+    	InvEquip.setEquipItem(EquipmentSlot.WEAPON, id.staffOfFire);
+    	InvEquip.addInvyItem(id.natureRune,100,(int) Calculations.nextGaussianRandom(1200,200),false,(int) Calculations.nextGaussianRandom(1500,100));
+    	InvEquip.shuffleFulfillOrder();
+		if(InvEquip.fulfillSetup(true, 180000))
+		{
+			MethodProvider.log("[TRAIN MAGIC] -> Fulfilled equipment correctly for HA!");
+			return true;
+		} else 
+		{
+			MethodProvider.log("[TRAIN MAGIC] -> NOT fulfilled equipment correctly for HA!");
 			return false;
 		}
     	

@@ -79,6 +79,7 @@ public class BuyHighAlchs {
 				if(Bank.isOpen()) Bank.count(InvEquip.coins); //random API call to update bank cache ...
 				final int totalItemCount = Bank.count(itemID) + Inventory.count(itemID);
 				if(totalItemCount >= (initItemCount + buyLimit))  break;
+				int alchCount = 0;
 				boolean containsAlch = false;
 				for(Integer i : keys)
 				{
@@ -87,7 +88,13 @@ public class BuyHighAlchs {
 						MethodProvider.log("Bank contains alch: " + new Item(i,1).getName());
 						containsAlch = true;
 					}
+					alchCount += Inventory.count(i) + Inventory.count(new Item(i,1).getNotedItemID()) + Bank.count(i);
 				}
+				if(longbowsOrNot)
+				{
+					if(alchCount > 400) return;
+				}
+				else if(alchCount > 200) return;
 				if(Bank.contains(InvEquip.coins) || 
 						Bank.contains(id.natureRune) || 
 						containsAlch ||
@@ -300,6 +307,10 @@ public class BuyHighAlchs {
 					{
 						MethodProvider.log("Waiting, all offers full...");
 						continue;
+					}
+					if(buyLimit > 1000)
+					{
+						buyLimit = (int) Calculations.nextGaussianRandom(1000, 222);
 					}
 					if(GrandExchange.buyItem(itemID, buyLimit, pricePer))
 					{

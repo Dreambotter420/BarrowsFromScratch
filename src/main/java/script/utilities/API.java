@@ -346,6 +346,53 @@ public class API {
 					() -> Players.localPlayer().isMoving(),Sleep.calculate(3333, 2222),66);
 		}
 	}
+	public static void interactNPC(String npcName, String action, Area npcArea, boolean reachable, Condition condition)
+	{
+		NPC npc = NPCs.closest(n -> 
+		n != null && 
+		n.getName().contains(npcName) && 
+		n.hasAction(action) && 
+		npcArea.contains(n));
+		if(npc == null)
+		{
+			MethodProvider.log("NPC " +npcName+" with action \'"+action+"\' in specified area null!");
+			return;
+		}
+		if(reachable && !npc.canReach())
+		{
+			if(Walking.walk(npc)) Sleep.sleep(420, 696);
+			return;
+		}
+		if(npc.interact(action))
+		{
+			MethodProvider.sleepUntil(() -> condition.verify(),
+					() -> Players.localPlayer().isMoving(),Sleep.calculate(3333, 2222),66);
+		}
+	}
+	public static void interactNPC(String npcName, String action,int combatLvl, Area npcArea, boolean reachable, Condition condition)
+	{
+		NPC npc = NPCs.closest(n -> 
+		n != null && 
+		n.getName().contains(npcName) && 
+		n.hasAction(action) && 
+		npcArea.contains(n) && 
+		n.getLevel() == combatLvl);
+		if(npc == null)
+		{
+			MethodProvider.log("NPC " +npcName+" with action \'"+action+"\' in specified area with combat lvl: " + combatLvl+" null!");
+			return;
+		}
+		if(reachable && !npc.canReach())
+		{
+			if(Walking.walk(npc)) Sleep.sleep(420, 696);
+			return;
+		}
+		if(npc.interact(action))
+		{
+			MethodProvider.sleepUntil(() -> condition.verify(),
+					() -> Players.localPlayer().isMoving(),Sleep.calculate(3333, 2222),66);
+		}
+	}
 	public static void walkTalkToNPC(String npcName, String action, Area npcArea)
 	{
 		if(!npcArea.contains(Players.localPlayer()))

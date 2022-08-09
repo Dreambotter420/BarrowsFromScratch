@@ -158,8 +158,7 @@ public class Main extends AbstractScript implements PaintInfo, ChatListener
     	
     	return new String[] {
     			getManifest().name() +" "+ getManifest().version() + " by Dreambotter420 ^_^",
-                "Current Branch: " + API.currentBranch,
-                "Current Task: " + API.currentLeaf,
+                "Current task: " + API.currentLeaf,
                 "Time spent on current task: " + (DecisionLeaf.taskTimer == null ? "N/A" : DecisionLeaf.taskTimer.formatTime()),
                 "Time remaining until next force task switch: " + (DecisionLeaf.taskTimer == null ? "N/A" : Timer.formatTime(DecisionLeaf.taskTimer.remaining())),
                 customPaintText1,

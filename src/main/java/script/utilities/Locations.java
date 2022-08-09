@@ -1,5 +1,8 @@
 package script.utilities;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.dreambot.api.methods.MethodProvider;
 import org.dreambot.api.methods.filter.Filter;
 import org.dreambot.api.methods.interactive.GameObjects;
@@ -174,6 +177,30 @@ public class Locations {
 	public static final Area ernest_fishfood = new Area(3107, 3361, 3110, 3354, 1);
 	public static final Area ernest_veronica = new Area(3104, 3335, 3115, 3325, 0);
 	public static final Area ernest_poison = new Area(3097, 3366, 3101, 3364, 0);
+	public static final Area PiP_undergroundPassDrezel = new Area(3432, 9902, 3444, 9887, 0);
+	public static final Area PiP_dogArena = new Area(8208, 860, 8202, 847, 0);
+	public static final Area PiP_pastramiChurchLvl2 = new Area(3423, 3496, 3406, 3481, 1);
+	public static final Area PiP_pastramiChurchLvl3 = new Area(3421, 3498, 3406, 3481, 2);
+	public static final Area PiP_undergroundPassMonuments = new Area(3415, 9881, 3431, 9899, 0);
+	public static final Area PiP_undergroundPassLadder = new Area(3402, 9908, 3407, 9899, 0);
+	public static final Area PiP_pastramiChurchLvl1 = new Area(3409, 3493, 3418, 3484, 0);
+	public static final Area PiP_undergroundPass = new Area(3399, 9909, 3447, 9877);
+	public static final Area PiP_dogSafespot = new Area(8206, 858, 8206, 858, 0);
+	public static final Area PiP_largeDoors = new Area(3403, 3496, 3409, 3480, 0);
+	public static final Area PiP_trapdoor = new Area(
+			new Tile(3402, 3508, 0),
+			new Tile(3407, 3508, 0),
+			new Tile(3411, 3500, 0),
+			new Tile(3411, 3497, 0),
+			new Tile(3401, 3498, 0));
+	public static final Area PiP_kingRoald = new Area(
+			new Tile(3220, 3478, 0),
+			new Tile(3224, 3478, 0),
+			new Tile(3225, 3470, 0),
+			new Tile(3224, 3469, 0),
+			new Tile(3220, 3469, 0),
+			new Tile(3219, 3471, 0),
+			new Tile(3219, 3473, 0));
 	public static final Tile HALadderSpot = new Tile(3420, 3185, 0);
 	public static final Area HASpot1 = new Area(3415, 3187, 3421, 3182, 1);
 	public static final Area burthrope = new Area(

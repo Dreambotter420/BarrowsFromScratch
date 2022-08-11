@@ -9,6 +9,7 @@ import script.framework.Leaf;
 import script.quest.varrockmuseum.VarrockQuiz;
 import script.skills.ranged.TrainRanged;
 import script.utilities.API;
+import script.utilities.Combatz;
 import script.utilities.InvEquip;
 import script.utilities.ItemsOnGround;
 import script.utilities.Locations;
@@ -34,6 +35,8 @@ public class Initialize extends Leaf {
 		InvEquip.initializeIntLists();
 		id.initializeIDLists();
 		DecisionLeaf.initialize();
+		Combatz.initializeFoods();
+		Locations.initialize();
 		ItemsOnGround.initializeLists();
 		TrainRanged.initialize();
 		if((int) Calculations.nextGammaRandom(100,50) >= 120) Locations.scorpions = Locations.scorpionsKharidNorth;

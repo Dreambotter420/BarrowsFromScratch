@@ -27,7 +27,7 @@ import script.framework.Leaf;
 import script.quest.varrockmuseum.Timing;
 import script.skills.ranged.TrainRanged;
 import script.utilities.API;
-import script.utilities.Combat;
+import script.utilities.Combatz;
 import script.utilities.InvEquip;
 import script.utilities.Locations;
 import script.utilities.Sleep;
@@ -82,8 +82,8 @@ public class FightArena extends Leaf {
         
         if((!InvEquip.equipmentContains(InvEquip.wearableWealth) && !InvEquip.invyContains(InvEquip.wearableWealth)) ||
         		!Equipment.contains(TrainRanged.getBestDart()) || 
-        		(TrainRanged.shouldDrinkBoost() && !InvEquip.invyContains(TrainRanged.rangedPots)) || 
-        		(Combat.shouldDrinkPrayPot() && !InvEquip.invyContains(id.prayPots))) 
+        		(Combatz.shouldDrinkRangedBoost() && !InvEquip.invyContains(TrainRanged.rangedPots)) || 
+        		(Combatz.shouldDrinkPrayPot() && !InvEquip.invyContains(id.prayPots))) 
 		{
         	fulfillFightArenaGear();
         	return Timing.sleepLogNormalSleep();
@@ -184,21 +184,21 @@ public class FightArena extends Leaf {
             	}
             	if(!Locations.fightArenaBouncerCage.contains(bouncer))
             	{
-            		if(Combat.shouldEatFood(15))
+            		if(Combatz.shouldEatFood(15))
             		{
-            			Combat.eatFood();
+            			Combatz.eatFood();
             		}
-            		if(TrainRanged.shouldDrinkBoost())
+            		if(Combatz.shouldDrinkRangedBoost())
             		{
-            			TrainRanged.drankRangedPotion();
+            			Combatz.drinkRangeBoost();
             		}
-            		if(Combat.shouldDrinkPrayPot())
+            		if(Combatz.shouldDrinkPrayPot())
             		{
-            			Combat.drinkPrayPot();
+            			Combatz.drinkPrayPot();
 
             			return Timing.sleepLogNormalSleep();
             		}
-            		if(Combat.setQuickPrayEagleEyeProtectMelee())
+            		if(Combatz.setQuickPrayEagleEyeProtectMelee())
             		{
             			if(!Prayers.isQuickPrayerActive())
             			{
@@ -234,20 +234,20 @@ public class FightArena extends Leaf {
             	}
             	if(!Locations.fightArenaScorpionCage.contains(scorpion))
             	{
-            		if(Combat.shouldEatFood(15))
+            		if(Combatz.shouldEatFood(15))
             		{
-            			Combat.eatFood();
+            			Combatz.eatFood();
             		}
-            		if(TrainRanged.shouldDrinkBoost())
+            		if(Combatz.shouldDrinkRangedBoost())
             		{
-            			TrainRanged.drankRangedPotion();
+            			Combatz.drinkRangeBoost();
             		}
-            		if(Combat.shouldDrinkPrayPot())
+            		if(Combatz.shouldDrinkPrayPot())
             		{
-            			Combat.drinkPrayPot();
+            			Combatz.drinkPrayPot();
             			return Timing.sleepLogNormalSleep();
             		}
-            		if(Combat.setQuickPrayEagleEyeProtectMelee())
+            		if(Combatz.setQuickPrayEagleEyeProtectMelee())
             		{
             			if(!Prayers.isQuickPrayerActive())
             			{
@@ -371,20 +371,20 @@ public class FightArena extends Leaf {
         	}
         	if(!Locations.fightArenaOgreCage.contains(ogre))
         	{
-        		if(Combat.shouldEatFood(15))
+        		if(Combatz.shouldEatFood(15))
         		{
-        			Combat.eatFood();
+        			Combatz.eatFood();
         		}
-        		if(TrainRanged.shouldDrinkBoost())
+        		if(Combatz.shouldDrinkRangedBoost())
         		{
-        			TrainRanged.drankRangedPotion();
+        			Combatz.drinkRangeBoost();
         		}
-        		if(Combat.shouldDrinkPrayPot())
+        		if(Combatz.shouldDrinkPrayPot())
         		{
-        			Combat.drinkPrayPot();
+        			Combatz.drinkPrayPot();
         			return Timing.sleepLogNormalSleep();
         		}
-        		if(Combat.setQuickPrayEagleEyeProtectMelee())
+        		if(Combatz.setQuickPrayEagleEyeProtectMelee())
         		{
         			if(!Prayers.isQuickPrayerActive())
         			{
@@ -680,9 +680,9 @@ public class FightArena extends Leaf {
     	InvEquip.addInvyItem(TrainRanged.rangePot4, 1, 1, false, (int) Calculations.nextGaussianRandom(20, 5));
     	InvEquip.addInvyItem(InvEquip.duel, 1, 1, false, 5);
     	InvEquip.addInvyItem(id.prayPot4, 8, (int) Calculations.nextGaussianRandom(11, 3), false, (int) Calculations.nextGaussianRandom(25, 5));
-    	InvEquip.addInvyItem(InvEquip.stamina4, 1, 1, false, 5);
+    	InvEquip.addInvyItem(id.stamina4, 1, 1, false, 5);
     	
-    	for(int f : Combat.foods)
+    	for(int f : Combatz.foods)
     	{
     		InvEquip.addOptionalItem(f);
     	}

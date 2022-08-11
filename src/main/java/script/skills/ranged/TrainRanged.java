@@ -12,6 +12,8 @@ import org.dreambot.api.methods.container.impl.equipment.EquipmentSlot;
 import org.dreambot.api.methods.dialogues.Dialogues;
 import org.dreambot.api.methods.interactive.NPCs;
 import org.dreambot.api.methods.interactive.Players;
+import org.dreambot.api.methods.magic.Magic;
+import org.dreambot.api.methods.magic.Normal;
 import org.dreambot.api.methods.settings.PlayerSettings;
 import org.dreambot.api.methods.skills.Skill;
 import org.dreambot.api.methods.skills.Skills;
@@ -32,11 +34,12 @@ import script.quest.horrorfromthedeep.HorrorFromTheDeep;
 import script.quest.varrockmuseum.Timing;
 import script.skills.ranged.Mobs.Mob;
 import script.utilities.API;
-import script.utilities.Combat;
+import script.utilities.Combatz;
 import script.utilities.InvEquip;
 import script.utilities.Locations;
 import script.utilities.Sleep;
 import script.utilities.Walkz;
+import script.utilities.id;
 /**
  * Trains prayer 1-45
  * 
@@ -56,8 +59,6 @@ public class TrainRanged extends Leaf {
 	public static final int rangePot2 = 171;
 	public static final int rangePot1 = 173;
 	public static List<Integer> rangedPots = new ArrayList<Integer>();
-	public static int randRangedBoostFactor = 0;
-	public static int nextRandBoostLvl = 0;
 	public static boolean started = false;
 	public static List<Integer> randCapes = new ArrayList<Integer>();
     public void onStart() {
@@ -66,13 +67,6 @@ public class TrainRanged extends Leaf {
     }
     public static void initialize()
     {
-    	Combat.foods.clear();
-        Combat.foods.add(jugOfWine);
-        Combat.highFoods.clear();
-        Combat.highFoods.add(seaTurtle);
-        randRangedBoostFactor = (int) Calculations.nextGaussianRandom(1.5, 3);
-        if(randRangedBoostFactor > 3) randRangedBoostFactor = 3;
-        if(randRangedBoostFactor < 0) randRangedBoostFactor = 0;
         int tmp = (int) Calculations.nextGaussianRandom(10, 5);
         if(tmp > 15) randCape = darkRedCape;
         if(tmp > 12) randCape = lightRedCape;
@@ -94,6 +88,23 @@ public class TrainRanged extends Leaf {
     public boolean onExit() {
         Main.clearCustomPaintText();
         if(!Walkz.exitGiantsCave()) return false;
+        if(Locations.isInIsleOfSouls())
+		{
+			if(!Walkz.useJewelry(InvEquip.glory, "Edgeville") && 
+					!Walkz.useJewelry(InvEquip.wealth, "Grand Exchange") && 
+					!Walkz.useJewelry(InvEquip.combat, "Ranging Guild"))
+			{
+				MethodProvider.log("Appear to be stuck on isle of souls, teleporting home??");
+				if(Players.localPlayer().isAnimating()) 
+				{
+					Sleep.sleep(2222, 2222);
+					return false;
+				}
+				Magic.castSpell(Normal.HOME_TELEPORT);
+				Sleep.sleep(3333,3333);
+			}
+			return false;
+		}
         Mobs.mob = null;
     	return true;
     }
@@ -122,8 +133,9 @@ public class TrainRanged extends Leaf {
     		onStart();
     		return Timing.sleepLogNormalSleep();
     	}
-    	if(Mobs.mob == null) Mobs.chooseMob();
-        return Mobs.trainMob(Mobs.mob);
+    	
+    	if(Mobs.mob == null) Mobs.chooseMob(false);
+        return Mobs.trainMob(false);
     }
     
     
@@ -136,7 +148,7 @@ public class TrainRanged extends Leaf {
     	
     	InvEquip.addInvyItem(rangePot4, 1, 6, false, (int) Calculations.nextGaussianRandom(20, 5));
     	
-    	for(int f : Combat.foods)
+    	for(int f : Combatz.foods)
     	{
     		InvEquip.addOptionalItem(f);
     	}
@@ -192,10 +204,14 @@ public class TrainRanged extends Leaf {
     	setBestRangedEquipment();
     	InvEquip.addInvyItem(rangePot4, 1, 6, false, (int) Calculations.nextGaussianRandom(20, 5));
     	InvEquip.addInvyItem(InvEquip.games, 1, 1, false, 5);
-    	InvEquip.addInvyItem(InvEquip.antidote4, 1, 1, false, 5);
-    	InvEquip.addInvyItem(InvEquip.stamina4, 1, 1, false, 5);
+    	InvEquip.addInvyItem(id.antidote4, 1, 1, false, 5);
+    	if(InvEquip.bankContains(id.staminas))
+    	{
+    		InvEquip.addInvyItem(InvEquip.getBankItem(id.staminas), 1, 1, false, 0);
+    	}
+    	else InvEquip.addInvyItem(id.stamina4, 1, 1, false, (int) Calculations.nextGaussianRandom(20, 5));
     	
-    	for(int f : Combat.foods)
+    	for(int f : Combatz.foods)
     	{
     		InvEquip.addOptionalItem(f);
     	}
@@ -224,10 +240,14 @@ public class TrainRanged extends Leaf {
     	setBestRangedEquipment();
     	InvEquip.addInvyItem(rangePot4, 1, 6, false, (int) Calculations.nextGaussianRandom(20, 5));
     	InvEquip.addInvyItem(InvEquip.games, 1, 1, false, 5);
-    	InvEquip.addInvyItem(InvEquip.antidote4, 1, 1, false, 5);
-    	InvEquip.addInvyItem(InvEquip.stamina4, 1, 1, false, 5);
+    	InvEquip.addInvyItem(id.antidote4, 1, 1, false, 5);
+    	if(InvEquip.bankContains(id.staminas))
+    	{
+    		InvEquip.addInvyItem(InvEquip.getBankItem(id.staminas), 1, 1, false, 0);
+    	}
+    	else InvEquip.addInvyItem(id.stamina4, 1, 1, false, (int) Calculations.nextGaussianRandom(20, 5));
     	
-    	for(int f : Combat.foods)
+    	for(int f : Combatz.foods)
     	{
     		InvEquip.addOptionalItem(f);
     	}
@@ -249,80 +269,7 @@ public class TrainRanged extends Leaf {
 			return false;
 		}
     }
-    public static Timer drankTimer = null;
-    public static Timer drinkDelayTimer = null;
-    public static boolean drankRangedPotion()
-    {
-    	for(int rangePot : rangedPots)
-    	{
-    		if(Inventory.count(rangePot) <= 0) continue;
-    		if(Tabs.isOpen(Tab.INVENTORY) || Bank.isOpen())
-    		{
-    			if(Inventory.interact(rangePot, "Drink")) 
-    			{
-    				nextRandBoostLvl = 0;
-    				drinkDelayTimer = new Timer(1200);
-    				return true;
-    			}
-    			return false;
-    		}
-    		if(Widgets.isOpen()) Widgets.closeAll();
-    		else Tabs.open(Tab.INVENTORY);
-    		return false;
-    	}
-    	return false;
-    }
-    public static boolean shouldDrinkBoost()
-    {
-    	final int ranged = Skills.getRealLevel(Skill.RANGED);
-    	if(nextRandBoostLvl == 0 || nextRandBoostLvl < ranged)
-    	{
-    		if(randRangedBoostFactor == 0)
-        	{
-        		int tmp = (int) Calculations.nextGaussianRandom(ranged, 10);
-        		if(tmp > calculateMaxRangedBoost() + ranged) nextRandBoostLvl = calculateMaxRangedBoost() + ranged - 1;
-        		else if(tmp < ranged) nextRandBoostLvl = ranged;
-        		else nextRandBoostLvl = tmp;
-        	}
-        	else if(randRangedBoostFactor == 1)
-        	{
-        		double median = ranged + (calculateMaxRangedBoost() / 7);
-        		int tmp = (int) Calculations.nextGaussianRandom(median, 10);
-        		if(tmp > calculateMaxRangedBoost() + ranged) nextRandBoostLvl = calculateMaxRangedBoost() + ranged - 1;
-        		else if(tmp < ranged) nextRandBoostLvl = ranged;
-                else nextRandBoostLvl = tmp;
-        	}
-        	else if(randRangedBoostFactor == 2)
-        	{
-        		double median = ranged + (2 * calculateMaxRangedBoost() / 9);
-        		int tmp = (int) Calculations.nextGaussianRandom(median, 10);
-        		if(tmp > calculateMaxRangedBoost() + ranged) nextRandBoostLvl = calculateMaxRangedBoost() + ranged - 1;
-        		else if(tmp < ranged) nextRandBoostLvl = ranged;
-        		else nextRandBoostLvl = tmp;
-        	}
-        	else if(randRangedBoostFactor == 3)
-        	{
-        		double median = ranged + (3 * calculateMaxRangedBoost() / 11);
-        		int tmp = (int) Calculations.nextGaussianRandom(median, 10);
-        		if(tmp > calculateMaxRangedBoost() + ranged) nextRandBoostLvl = calculateMaxRangedBoost() + ranged - 1;
-        		else if(tmp < ranged) nextRandBoostLvl = ranged;
-        		else nextRandBoostLvl = tmp;
-        	}
-    	}
-    	Main.customPaintText2 = "Drinking next ranged pot at boosted lvl: " + nextRandBoostLvl;
-    	if(drinkDelayTimer != null && !drinkDelayTimer.finished() && !drinkDelayTimer.isPaused()) return false;
-    	if(Skills.getBoostedLevels(Skill.RANGED) <= nextRandBoostLvl)
-    	{
-    		return true;
-    	}
-    	return false;
-    }
-   
     
-    public static int calculateMaxRangedBoost()
-    {
-    	return ((int)(((double)Skills.getRealLevel(Skill.RANGED)) * 0.1)) + 4;
-    }
     
     public static final int dorgBow = 8880;
     public static final int boneBolts = 8882;
@@ -371,9 +318,9 @@ public class TrainRanged extends Leaf {
 	{
 		final int ranged = Skills.getRealLevel(Skill.RANGED);
     	final int def = Skills.getRealLevel(Skill.DEFENCE);
-		if(def >= 40 && ranged >= 70) return blackLegs;
-    	if(def >= 40 && ranged >= 60) return redLegs;
-    	if(def >= 40 && ranged >= 50) return blueLegs;
+		if(ranged >= 70) return blackLegs;
+    	if(ranged >= 60) return redLegs;
+    	if(ranged >= 50) return blueLegs;
     	if(def >= 30 && ranged >= 30) return snakeskinChaps;
     	if(ranged >= 20) return studdedChaps;
     	return leatherChaps;
@@ -442,9 +389,7 @@ public class TrainRanged extends Leaf {
     	final int def = Skills.getRealLevel(Skill.DEFENCE);
 		if(HorrorFromTheDeep.completedHorrorFromTheDeep) return bookOfLaw;
 		if(def >= 40 && ranged >= 70) return blackShield;
-		if(def >= 40 && ranged >= 60) return redShield;
-		if(def >= 40 && ranged >= 50) return blueShield;
-		if(def >= 40 && ranged >= 40) return greenShield;
+		//skipping green, blue, and red dhide shields cuz less than 200 traded per day. ...
 		if(def >= 30 && ranged >= 30) return snakeskinShield;
 		if(def >= 10 && ranged >= 20) return hardleatherShield;
 		return woodenShield;

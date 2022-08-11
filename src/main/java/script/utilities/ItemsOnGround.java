@@ -33,6 +33,7 @@ public class ItemsOnGround {
 	public static List<Integer> icefiendLoot = new ArrayList<Integer>();
 	public static List<Integer> kalphiteWorkerLoot = new ArrayList<Integer>();
 	public static List<Integer> minotaurLoot = new ArrayList<Integer>();
+	public static List<Integer> sandcrabsLoot = new ArrayList<Integer>();
 	
 	public static List<Integer> allSlayerLoot = new ArrayList<Integer>();
 	public static final int grimyRanarr = 207;
@@ -51,7 +52,9 @@ public class ItemsOnGround {
 	public static final int natureRune = 561;
 	public static final int chaosRune = 562;
 	public static final int bigBones = 532;
-
+	
+	public static final int ironBoots = 4121;
+	
 	public static final int ensouledKalphiteHead1 = 13489;
 	public static final int ensouledKalphiteHead2 = 13490;
 	
@@ -104,6 +107,10 @@ public class ItemsOnGround {
 		
 		dwarfLoot.add(natureRune);
 		
+		sandcrabsLoot.add(id.casket);
+
+		caveSlimeLoot.add(ironBoots);
+		
 		caveCrawlersLoot.add(natureRune);
 
 		kalphiteWorkerLoot.add(natureRune);
@@ -124,6 +131,7 @@ public class ItemsOnGround {
 		allSlayerLoot.addAll(herbTable);
 		allSlayerLoot.addAll(seedTable);
 		allSlayerLoot.addAll(rareDropTable);
+		allSlayerLoot.add(id.casket);
 		allSlayerLoot.add(fireTalisman);
 		allSlayerLoot.add(bigBones);
 		
@@ -135,6 +143,8 @@ public class ItemsOnGround {
 		kalphiteWorkerLoot.addAll(rareDropTable);
 		
 		icefiendLoot.addAll(rareDropTable);
+		
+		sandcrabsLoot.addAll(rareDropTable);
 		
 		dwarfLoot.addAll(rareDropTable);
 		
@@ -215,9 +225,15 @@ public class ItemsOnGround {
 		Collections.reverse(g);
 		return g.get(0);
 	}
-	public static void grabNearbyGroundItem(GroundItem g)
+	/**
+	 * returns false if inventory is full and no more food or junk to drop,
+	 * returns true otherwise
+	 * @param g
+	 * @return
+	 */
+	public static boolean grabNearbyGroundItem(GroundItem g)
 	{
-		if(g == null) return;
+		if(g == null) return true;
 		if(Inventory.isFull())
 		{
 			if(Inventory.count(TrainRanged.jug) > 0)
@@ -227,7 +243,7 @@ public class ItemsOnGround {
 					MethodProvider.log("Dropped a jug");
 				}
 			}
-			for(int food : Combat.foods)
+			for(int food : Combatz.foods)
 			{
 				if(Inventory.count(food) > 0)
 				{
@@ -241,7 +257,7 @@ public class ItemsOnGround {
 		if(Inventory.isFull())
 		{
 			MethodProvider.log("Inventory full but found nearby ground item, confused wat do?? : "+g.getName());
-			return;
+			return false;
 		}
 		
 		MethodProvider.log("Attempting to grab ground item: "+g.getName() +" in amount: " + g.getAmount());
@@ -251,5 +267,6 @@ public class ItemsOnGround {
 		{
 			MethodProvider.sleepUntil(() -> Inventory.count(g.getID()) > count, Sleep.calculate(2222, 2222));
 		}
+		return true;
 	}
 }

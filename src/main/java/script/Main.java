@@ -74,6 +74,7 @@ public class Main extends AbstractScript implements PaintInfo, ChatListener
         			new OnTutorialIsland(),
         			new OffTutorialIsland().addLeafs(
         					new CustomizeSettings(),
+        					new ReportSpammer(),
         					new DecisionLeaf(),
         					new RestlessGhost(),
         					new PriestInPeril(),

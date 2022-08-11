@@ -3,8 +3,10 @@ package script.utilities;
 import org.dreambot.api.methods.MethodProvider;
 import org.dreambot.api.methods.container.impl.bank.Bank;
 import org.dreambot.api.methods.container.impl.bank.BankLocation;
+import org.dreambot.api.methods.interactive.GameObjects;
 import org.dreambot.api.methods.interactive.Players;
 import org.dreambot.api.methods.walking.impl.Walking;
+import org.dreambot.api.wrappers.interactive.GameObject;
 
 import script.quest.varrockmuseum.Timing;
 
@@ -12,7 +14,22 @@ public class Bankz {
 	public static boolean openClosest(int distToTryTeleport)
 	{
 		if(Bank.isOpen()) return true;
-		
+		if(Locations.mageArenaBank.contains(Players.localPlayer()))
+		{
+			GameObject bank = GameObjects.closest(g -> 
+					g!=null && 
+					g.getName().equals("Bank chest") && 
+					g.hasAction("Use"));
+			if(bank == null) 
+			{
+				MethodProvider.log("Bank null in Mage Arena Bank!");
+			}
+			if(bank.interact("Use"))
+			{
+				MethodProvider.sleepUntil(Bank::isOpen,() ->Players.localPlayer().isMoving(), Sleep.calculate(2222, 2222),69);
+			}
+			return false;
+		}
 		final double dist = BankLocation.getNearest(Players.localPlayer()).getTile().distance();
 		if(dist >= distToTryTeleport)
 		{

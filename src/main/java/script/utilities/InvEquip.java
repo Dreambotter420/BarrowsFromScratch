@@ -205,7 +205,7 @@ public class InvEquip {
 		if(i == null) i = Inventory.get(TrainWoodcutting.oakLogs);
 		if(i == null) i = Inventory.get(InvEquip.skills0);
 		if(i == null) i = Inventory.get(InvEquip.wealth0);
-		if(i == null) i = Combat.getFood();
+		if(i == null) i = Combatz.getFood();
 		if(i == null) i = Inventory.get(InvEquip.getInvyItem(ItemsOnGround.allSlayerLoot));
 		if(i != null)
 		{
@@ -216,7 +216,10 @@ public class InvEquip {
 			return;
 		}
 		MethodProvider.log("Could not find any un-valuable things to deposit to make room in invy :-( Depositing entire invy...");
-		Bank.depositAllItems();
+		if(Bank.depositAllItems())
+		{
+			MethodProvider.sleepUntil(() -> Inventory.isEmpty(), Sleep.calculate(2222, 2222));
+		}
 		return;
 	}
 	public static boolean withdrawOne(int itemID, long timeout)
@@ -238,6 +241,58 @@ public class InvEquip {
 					continue;
 				}
 				if(Bank.withdraw(itemID,1))
+				{
+					MethodProvider.sleepUntil(() -> Inventory.count(itemID) > 0, Sleep.calculate(2222, 2222));
+				}
+			} else Sleep.sleep(666, 666);
+		}
+		return false;
+	}
+	public static boolean depositOne(int itemID, long timeout)
+	{
+		Timer timer = new Timer(timeout);
+		while(!timer.finished() && Client.getGameState() == GameState.LOGGED_IN
+				&& ScriptManager.getScriptManager().isRunning() && !ScriptManager.getScriptManager().isPaused())
+		{
+			Sleep.sleep(69, 69);
+
+			MethodProvider.log("In depositOne loop for itemID: "+ itemID + " / name: "+new Item(itemID,1).getName());
+			if(Inventory.count(itemID) <= 0) return true;
+			if(!closeBankEquipment()) continue;
+			if(Bankz.openClosest(50))
+			{
+				if(Inventory.emptySlotCount() < 2)
+				{
+					depositExtraJunk();
+					continue;
+				}
+				if(Bank.deposit(itemID,1))
+				{
+					MethodProvider.sleepUntil(() -> Inventory.count(itemID) > 0, Sleep.calculate(2222, 2222));
+				}
+			} else Sleep.sleep(666, 666);
+		}
+		return false;
+	}
+	public static boolean depositAll(int itemID, long timeout)
+	{
+		Timer timer = new Timer(timeout);
+		while(!timer.finished() && Client.getGameState() == GameState.LOGGED_IN
+				&& ScriptManager.getScriptManager().isRunning() && !ScriptManager.getScriptManager().isPaused())
+		{
+			Sleep.sleep(69, 69);
+
+			MethodProvider.log("In depositOne loop for itemID: "+ itemID + " / name: "+new Item(itemID,1).getName());
+			if(Inventory.count(itemID) <= 0) return true;
+			if(!closeBankEquipment()) continue;
+			if(Bankz.openClosest(50))
+			{
+				if(Inventory.emptySlotCount() < 2)
+				{
+					depositExtraJunk();
+					continue;
+				}
+				if(Bank.depositAll(itemID))
 				{
 					MethodProvider.sleepUntil(() -> Inventory.count(itemID) > 0, Sleep.calculate(2222, 2222));
 				}
@@ -1740,7 +1795,12 @@ public class InvEquip {
 	
 	public static boolean equipItem(int ID)
 	{
-		
+
+		if(GrandExchange.isOpen()) 
+		{
+			GrandExchange.close();
+			return false;
+		}
 		if(Equipment.contains(ID)) return true;
 		if(!Inventory.contains(ID)) return false;
 		MethodProvider.log("Equipping item: " + new Item(ID,1).getName());
@@ -1768,7 +1828,7 @@ public class InvEquip {
 			if(Inventory.interact(ID, action))
 			{
 				MethodProvider.sleepUntil(() -> {
-					if(Combat.shouldEatFood(15)) Combat.eatFood();
+					if(Combatz.shouldEatFood(15)) Combatz.eatFood();
 					return Equipment.contains(tmp);
 				}, Sleep.calculate(2222, 2222));
 			}
@@ -1779,7 +1839,6 @@ public class InvEquip {
 		{
 			if(Shop.isOpen()) Shop.close();
 			else if(Bank.isOpen()) Bank.close();
-			else if(GrandExchange.isOpen()) GrandExchange.close();
 			else if(DepositBox.isOpen()) DepositBox.close();
 			else Tabs.open(Tab.INVENTORY);
 		}
@@ -1812,7 +1871,7 @@ public class InvEquip {
 			if(Inventory.interact(itemName, action))
 			{
 				MethodProvider.sleepUntil(() -> {
-					if(Combat.shouldEatFood(8)) Combat.eatFood();
+					if(Combatz.shouldEatFood(8)) Combatz.eatFood();
 					return Equipment.contains(tmp);
 				}, Sleep.calculate(2222, 2222));
 			}
@@ -1893,7 +1952,7 @@ public class InvEquip {
 					(i.getID() == TrainRanged.jug || 
 					i.getID() == id.vial)))
 			{
-				Combat.eatFood();
+				Combatz.eatFood();
 			}
 			return false;
 		}
@@ -1908,7 +1967,7 @@ public class InvEquip {
 					(i.getID() == TrainRanged.jug || 
 					i.getID() == id.vial)))
 			{
-				Combat.eatFood();
+				Combatz.eatFood();
 			}
 			return false;
 		}
@@ -1976,8 +2035,7 @@ public class InvEquip {
 		allJewelryIDs.addAll(wearableGlory);
 		allJewelryIDs.addAll(wearableCombats);
 		allJewelryIDs.addAll(wearableDuel);
-		staminas.add(stamina1);staminas.add(stamina2);staminas.add(stamina3);staminas.add(stamina4);
-		antidotes.add(antidote1);antidotes.add(antidote2);antidotes.add(antidote3);antidotes.add(antidote4);
+		
 	}
 	public static final int iceCooler = 6696;
 	public static final int shantayPass = 1854;
@@ -2012,18 +2070,9 @@ public class InvEquip {
 		MethodProvider.log("Waterskin total charges in invy: " + count);
 		return count;
 	}
-	public static final int antidote1 = 5958;
-	public static final int antidote2 = 5956;
-	public static final int antidote3 = 5954;
-	public static final int antidote4 = 5952;
-	public static List<Integer> antidotes = new ArrayList<Integer>();
-	public static List<Integer> allJewelryIDs = new ArrayList<Integer>();
-	public static final int stamina4 = 12625;
-	public static final int stamina3 = 12627;
-	public static final int stamina2 = 12629;
-	public static final int stamina1 = 12631;
-	public static List<Integer> staminas = new ArrayList<Integer>();
 	
+
+	public static List<Integer> allJewelryIDs = new ArrayList<Integer>();
 	public static int jewelry = -10;
 
 	public static Map<EquipmentSlot,Integer> allJewelry = new LinkedHashMap<EquipmentSlot,Integer>();

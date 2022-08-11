@@ -34,12 +34,6 @@ public class FremennikTrials extends Leaf {
 	}
     @Override
     public int onLoop() {
-    	if(true)
-    	{
-    		MethodProvider.log("[UNSCRIPTED] -> Fremennik Trials!");
-    		API.mode = null;
-            return Timing.sleepLogNormalSleep();
-    	}
     	if (completedFremennikTrials) {
             MethodProvider.log("[COMPLETED] -> Fremennik Trials!");
             if(onExit())

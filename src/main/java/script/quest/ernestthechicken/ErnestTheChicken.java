@@ -17,7 +17,7 @@ import script.framework.Leaf;
 import script.quest.varrockmuseum.Timing;
 import script.skills.ranged.TrainRanged;
 import script.utilities.API;
-import script.utilities.Combat;
+import script.utilities.Combatz;
 import script.utilities.InvEquip;
 import script.utilities.Locations;
 import script.utilities.Sleep;
@@ -151,7 +151,7 @@ public class ErnestTheChicken extends Leaf {
     	InvEquip.clearAll();
     	InvEquip.setEquipItem(EquipmentSlot.RING, InvEquip.wealth);
     	InvEquip.setEquipItem(EquipmentSlot.AMULET, InvEquip.glory);
-    	InvEquip.addInvyItem(InvEquip.stamina4, 1, 1, false, 5);
+    	InvEquip.addInvyItem(id.stamina4, 1, 1, false, 5);
     	InvEquip.shuffleFulfillOrder();
     	InvEquip.addInvyItem(InvEquip.coins, 0, 0, false, 0);
 
@@ -208,11 +208,13 @@ public class ErnestTheChicken extends Leaf {
             	{
             		if(!Inventory.contains(poison))
                 	{
+            			if(!InvEquip.free1InvySpace()) return;
                 		API.walkPickupGroundItem("Poison", "Take", Locations.ernest_poison);
                     	return;
                 	}
                 	if(!Inventory.contains(fishfood))
                 	{
+                		if(!InvEquip.free1InvySpace()) return;
                 		API.walkPickupGroundItem("Fish food", "Take", Locations.ernest_fishfood);
                     	return;
                 	}
@@ -228,9 +230,11 @@ public class ErnestTheChicken extends Leaf {
     				}
         			if(!Inventory.contains(id.spade))
                 	{
+        				if(!InvEquip.free1InvySpace()) return;
                 		API.walkPickupGroundItem("Spade", "Take", Locations.ernest_spade);
                     	return;
                 	}
+        			if(!InvEquip.free1InvySpace()) return;
         			API.walkInteractWithGameObject("Compost heap", "Search", Locations.ernest_compost, () -> Inventory.contains(key));
                 	return;
             	}
@@ -242,6 +246,7 @@ public class ErnestTheChicken extends Leaf {
 			}
         	if(Walkz.walkToArea(Locations.ernest_fountain))
         	{
+        		if(!InvEquip.free1InvySpace()) return;
         		if(poisonedFountain) API.walkInteractWithGameObject("Fountain", "Search",Locations.ernest_fountain, () -> Dialogues.inDialogue() || Inventory.contains(gauge));
         		else if(Inventory.get(poisonedFood).useOn(GameObjects.closest("Fountain"))) Sleep.sleep(696, 666);
         	}
@@ -251,7 +256,8 @@ public class ErnestTheChicken extends Leaf {
     	{
     		if(Locations.ernest_SkellyTube.contains(Players.localPlayer()))
     		{
-    			if(Combat.shouldEatFood(6)) Combat.eatFood();
+    			if(Combatz.shouldEatFood(6)) Combatz.eatFood();
+    			if(!InvEquip.free1InvySpace()) return;
     			API.walkPickupGroundItem("Rubber tube","Take",Locations.ernest_SkellyTube);
     			return;
     		}
@@ -259,9 +265,11 @@ public class ErnestTheChicken extends Leaf {
 			{
 				if(!Inventory.contains(id.spade))
             	{
+					if(!InvEquip.free1InvySpace()) return;
             		API.walkPickupGroundItem("Spade", "Take", Locations.ernest_spade);
                 	return;
             	}
+				if(!InvEquip.free1InvySpace()) return;
     			API.walkInteractWithGameObject("Compost heap", "Search", Locations.ernest_compost, () -> Inventory.contains(key));
             	return;
 			}
@@ -279,6 +287,7 @@ public class ErnestTheChicken extends Leaf {
     		{
     			if(isAUp() && isBUp() && !isCUp() && !isDUp() && isEUp() && !isFUp())
     			{
+    				if(!InvEquip.free1InvySpace()) return;
     				API.walkPickupGroundItem("Oil can", "Take", Locations.ernest_puzzleLast);
     				return;
     			}

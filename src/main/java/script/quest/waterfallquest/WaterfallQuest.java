@@ -2,6 +2,7 @@ package script.quest.waterfallquest;
 
 import org.dreambot.api.methods.Calculations;
 import org.dreambot.api.methods.MethodProvider;
+import org.dreambot.api.methods.combat.Combat;
 import org.dreambot.api.methods.container.impl.Inventory;
 import org.dreambot.api.methods.container.impl.bank.Bank;
 import org.dreambot.api.methods.container.impl.equipment.EquipmentSlot;
@@ -30,7 +31,7 @@ import script.framework.Tree;
 import script.quest.varrockmuseum.Timing;
 import script.skills.ranged.TrainRanged;
 import script.utilities.API;
-import script.utilities.Combat;
+import script.utilities.Combatz;
 import script.utilities.InvEquip;
 import script.utilities.Locations;
 import script.utilities.Paths;
@@ -141,13 +142,13 @@ public class WaterfallQuest extends Leaf {
         	}
         	if(Inventory.count(TrainRanged.jugOfWine) <= 0)
         	{
-        		if(Combat.shouldEatFood(8)) 
+        		if(Combatz.shouldEatFood(8)) 
         		{
         			fulfillStart();
         			break;
         		}
         	}
-        	if(Combat.shouldEatFood(8)) Combat.eatFood();
+        	if(Combatz.shouldEatFood(8)) Combatz.eatFood();
         	if(Inventory.count(glarialsPebble) <= 0 && Bank.contains(glarialsPebble))
         	{
         		InvEquip.withdrawOne(glarialsPebble, 180000);
@@ -275,7 +276,7 @@ public class WaterfallQuest extends Leaf {
         	if(!Inventory.contains(id.rope) || 
         			!InvEquip.equipmentContains(InvEquip.wearableWealth) ||
         			!InvEquip.equipmentContains(InvEquip.wearableGames) ||
-        			!InvEquip.invyContains(InvEquip.staminas) ||
+        			!InvEquip.invyContains(id.staminas) ||
         			!Inventory.contains(TrainRanged.jugOfWine))
         	{
         		fulfillStart();
@@ -543,13 +544,13 @@ public class WaterfallQuest extends Leaf {
 	{
 		if(Inventory.count(TrainRanged.jugOfWine) <= 0)
     	{
-    		if(Combat.shouldEatFood(11)) 
+    		if(Combatz.shouldEatFood(11)) 
     		{
     			fulfillLastStep();
         		return;
     		}
     	}
-    	if(Combat.shouldEatFood(11)) Combat.eatFood();
+    	if(Combatz.shouldEatFood(11)) Combatz.eatFood();
     	
     	if(Locations.waterfallDungeonLastAreaChanged.contains(Players.localPlayer()))
     	{
@@ -608,6 +609,10 @@ public class WaterfallQuest extends Leaf {
 				}
 				if(Inventory.count(key2) > 0)
 				{
+					if(Combat.isAutoRetaliateOn())
+			    	{
+			    		Combat.toggleAutoRetaliate(false);
+			    	}
 					if(Skills.getRealLevel(Skill.HITPOINTS) > 11)
 					{
 						Walking.walk(Locations.waterfallDungeonLastArea.getCenter());
@@ -954,7 +959,7 @@ public class WaterfallQuest extends Leaf {
 		MethodProvider.log("Initiating Fulfill Start");
 		InvEquip.clearAll();
 		InvEquip.addInvyItem(id.rope,1,1, false,5);
-		InvEquip.addInvyItem(InvEquip.stamina4, 1, 2, false, 5);
+		InvEquip.addInvyItem(id.stamina4, 1, 2, false, 5);
 		InvEquip.addInvyItem(InvEquip.skills, 1, 1, false, 1);
 		InvEquip.setEquipItem(EquipmentSlot.RING,InvEquip.wealth);
 		InvEquip.setEquipItem(EquipmentSlot.AMULET,InvEquip.games);
@@ -973,7 +978,7 @@ public class WaterfallQuest extends Leaf {
 			return false;
 		}
 		InvEquip.clearAll();
-		InvEquip.addInvyItem(InvEquip.stamina4, 1, 1, false, 5);
+		InvEquip.addInvyItem(id.stamina4, 1, 1, false, 5);
 		InvEquip.addInvyItem(glarialsPebble, 1, 1, false, 0);
 
 		InvEquip.addInvyItem(InvEquip.games, 1, 1, false, 1);
@@ -989,7 +994,7 @@ public class WaterfallQuest extends Leaf {
 		MethodProvider.log("Initiating Fulfill LastStep");
 		InvEquip.clearAll();
 		InvEquip.addInvyItem(id.rope,1,1, false,5);
-		InvEquip.addInvyItem(InvEquip.stamina4, 1, 1, false, 5);
+		InvEquip.addInvyItem(id.stamina4, 1, 1, false, 5);
 		InvEquip.addInvyItem(id.airRune, 6, (int) Calculations.nextGaussianRandom(25,10), false, 100);
 		InvEquip.addInvyItem(id.waterRune, 6, (int) Calculations.nextGaussianRandom(25,10), false, 100);
 		InvEquip.addInvyItem(id.earthRune, 6, (int) Calculations.nextGaussianRandom(25,10), false, 100);

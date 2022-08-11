@@ -6,6 +6,8 @@ import org.dreambot.api.methods.container.impl.equipment.Equipment;
 import org.dreambot.api.methods.magic.Normal;
 import org.dreambot.api.methods.magic.cost.Rune;
 import org.dreambot.api.methods.settings.PlayerSettings;
+import org.dreambot.api.methods.skills.Skill;
+import org.dreambot.api.methods.skills.Skills;
 import org.dreambot.api.methods.tabs.Tab;
 import org.dreambot.api.methods.tabs.Tabs;
 import org.dreambot.api.methods.widget.Widgets;
@@ -68,7 +70,7 @@ public class Casting {
 	
 	public static int getHighestSpellConfig()
 	{
-		final int mage = TrainMagic.magic;
+		final int mage = Skills.getRealLevel(Skill.MAGIC);
 		if(mage < 5) return 1;
 		if(mage < 9) return 2;
 		if(mage < 13) return 3;

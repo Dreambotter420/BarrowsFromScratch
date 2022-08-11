@@ -32,7 +32,7 @@ import script.framework.Tree;
 import script.quest.varrockmuseum.Timing;
 import script.skills.ranged.TrainRanged;
 import script.utilities.API;
-import script.utilities.Combat;
+import script.utilities.Combatz;
 import script.utilities.InvEquip;
 import script.utilities.Locations;
 import script.utilities.Sleep;
@@ -436,18 +436,18 @@ public class PriestInPeril extends Leaf {
             			}
             			break;
             		}
-            		if(Combat.shouldEatFood(8)) 
+            		if(Combatz.shouldEatFood(8)) 
             		{
-            			Combat.eatFood();
+            			Combatz.eatFood();
             			break;
             		}
-            		if(TrainRanged.shouldDrinkBoost()) TrainRanged.drankRangedPotion();
+            		if(Combatz.shouldDrinkRangedBoost()) Combatz.drinkRangeBoost();
         			final int pray = Skills.getRealLevel(Skill.PRAYER);
         			if(pray >= 44)
         			{
-        				if(Combat.shouldDrinkPrayPot())
+        				if(Combatz.shouldDrinkPrayPot())
         				{
-        					Combat.drinkPrayPot();
+        					Combatz.drinkPrayPot();
         					break;
         				}
         				if(!Prayers.isActive(Prayer.EAGLE_EYE))
@@ -458,9 +458,9 @@ public class PriestInPeril extends Leaf {
         			}
         			else if(pray >= 26)
         			{
-        				if(Combat.shouldDrinkPrayPot())
+        				if(Combatz.shouldDrinkPrayPot())
         				{
-        					Combat.drinkPrayPot();
+        					Combatz.drinkPrayPot();
         					break;
         				}
         				if(!Prayers.isActive(Prayer.HAWK_EYE))
@@ -652,20 +652,20 @@ public class PriestInPeril extends Leaf {
         	{
         		Tile ladderTile = GameObjects.closest("Ladder").getTile();
         		final Tile safespotFromLadder = new Tile((ladderTile.getX() + 1),(ladderTile.getY()-1),0);
-        		if(Combat.shouldEatFood(8)) 
+        		if(Combatz.shouldEatFood(8)) 
         		{
-        			Combat.eatFood();
+        			Combatz.eatFood();
         			break;
         		}
         		if(safespotFromLadder.equals(Players.localPlayer().getTile()))
         		{
-        			if(TrainRanged.shouldDrinkBoost()) TrainRanged.drankRangedPotion();
+        			if(Combatz.shouldDrinkRangedBoost()) Combatz.drinkRangeBoost();
         			final int pray = Skills.getRealLevel(Skill.PRAYER);
         			if(pray >= 44)
         			{
-        				if(Combat.shouldDrinkPrayPot())
+        				if(Combatz.shouldDrinkPrayPot())
         				{
-        					Combat.drinkPrayPot();
+        					Combatz.drinkPrayPot();
         					break;
         				}
         				if(!Prayers.isActive(Prayer.EAGLE_EYE))
@@ -676,9 +676,9 @@ public class PriestInPeril extends Leaf {
         			}
         			else if(pray >= 26)
         			{
-        				if(Combat.shouldDrinkPrayPot())
+        				if(Combatz.shouldDrinkPrayPot())
         				{
-        					Combat.drinkPrayPot();
+        					Combatz.drinkPrayPot();
         					break;
         				}
         				if(!Prayers.isActive(Prayer.HAWK_EYE))
@@ -880,8 +880,8 @@ public class PriestInPeril extends Leaf {
     	{
     		InvEquip.addInvyItem(id.prayPot4, 1, Calculations.random(2, 5), false, (int) Calculations.nextGaussianRandom(20, 5));
         }
-    	InvEquip.addInvyItem(InvEquip.stamina4, 1, 2, false, 5);
-    	for(int f : Combat.foods)
+    	InvEquip.addInvyItem(id.stamina4, 1, 2, false, 5);
+    	for(int f : Combatz.foods)
     	{
     		InvEquip.addOptionalItem(f);
     	}
@@ -909,7 +909,7 @@ public class PriestInPeril extends Leaf {
     	InvEquip.clearAll();
     	InvEquip.setEquipItem(EquipmentSlot.RING, InvEquip.wealth);
     	InvEquip.setEquipItem(EquipmentSlot.AMULET, InvEquip.glory);
-    	InvEquip.addInvyItem(InvEquip.stamina4, 1, 2, false, 10);
+    	InvEquip.addInvyItem(id.stamina4, 1, 2, false, 10);
     	InvEquip.addInvyItem(id.pureEss, 25, 25, false, 50);
     	InvEquip.shuffleFulfillOrder();
     	if(InvEquip.fulfillSetup(true, 180000))

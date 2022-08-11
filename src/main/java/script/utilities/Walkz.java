@@ -51,11 +51,11 @@ public class Walkz {
 	
 	public static void drinkStamina()
 	{
-		if(InvEquip.invyContains(InvEquip.staminas))
+		if(InvEquip.invyContains(id.staminas))
 		{
 			if(Tabs.isOpen(Tab.INVENTORY))
 			{
-				if(Inventory.interact(InvEquip.getInvyItem(InvEquip.staminas),"Drink"))
+				if(Inventory.interact(InvEquip.getInvyItem(id.staminas),"Drink"))
 				{
 					Sleep.sleep(69,69);
 				}
@@ -200,9 +200,17 @@ public class Walkz {
 		}
 		return false;
 	}
-	
 	public static boolean walkPath(Tile[] path)
 	{
+		if(InvEquip.invyContains(id.staminas) && !isStaminated())
+		{
+			drinkStamina();
+			Sleep.sleep(69,696);
+		}
+		if(isStaminated() && !Walking.isRunEnabled() && Walking.getRunEnergy() > 5)
+		{
+			if(Walking.toggleRun()) Sleep.sleep(696,666);
+		}
 		List<Tile> pathTiles = new ArrayList<Tile>();
 		for(Tile t : path)
 		{
@@ -922,6 +930,7 @@ public class Walkz {
 	}
 	public static boolean teleport(int tabID, Area teleSpot, long timeout)
 	{
+		MethodProvider.log("Entering generic teletab function");
 		Timer timer = new Timer(timeout);
 		while(!timer.finished() && Client.getGameState() == GameState.LOGGED_IN
 				&& ScriptManager.getScriptManager().isRunning() && !ScriptManager.getScriptManager().isPaused())

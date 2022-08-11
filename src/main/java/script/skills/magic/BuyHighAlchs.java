@@ -21,6 +21,7 @@ import org.dreambot.api.methods.grandexchange.GrandExchangeItem;
 import org.dreambot.api.methods.grandexchange.LivePrices;
 import org.dreambot.api.methods.grandexchange.Status;
 import org.dreambot.api.methods.interactive.Players;
+import org.dreambot.api.methods.magic.Magic;
 import org.dreambot.api.methods.map.Map;
 import org.dreambot.api.methods.tabs.Tab;
 import org.dreambot.api.methods.tabs.Tabs;
@@ -68,6 +69,11 @@ public class BuyHighAlchs {
 					&& ScriptManager.getScriptManager().isRunning() && !ScriptManager.getScriptManager().isPaused())
 			{
 				Sleep.sleep(69, 69);
+				if(Magic.isSpellSelected())
+		    	{
+		    		Magic.deselect();
+		    		continue;
+		    	}
 				int buyLimit = 0;
 				if(longbowsOrNot) buyLimit = id.xpAlchs.get(o);
 				else buyLimit = id.approvedAlchs.get(o);
@@ -230,7 +236,6 @@ public class BuyHighAlchs {
 					boolean collect = false;
 					boolean wait = false;
 					boolean breakWhileLoop = false;
-					boolean haveItem = false;
 					//check existing offers for items with timers ran out
 					for(GrandExchangeItem geItem : GrandExchange.getItems())
 					{
@@ -242,7 +247,7 @@ public class BuyHighAlchs {
 								if(Widgets.getWidgetChild(465,(geItem.getSlot() + 7),16) != null && 
 										Widgets.getWidgetChild(465,(geItem.getSlot() + 7),16).isVisible())
 								{
-									if(Widgets.getWidgetChild(465,(geItem.getSlot() + 7),16).interact("Abort"))
+									if(Widgets.getWidgetChild(465,(geItem.getSlot() + 7),16).interact("Abort offer"))
 									{
 										MethodProvider.log("Aborted offer via right click");
 										collect = true;
@@ -262,7 +267,6 @@ public class BuyHighAlchs {
 									geItem.getName() == null || 
 									geItem.getName().isEmpty()) continue;
 							HABuyTimeouts.put(geItem.getID(), new Timer((int) (Calculations.nextGaussianRandom(50000,15000))));
-							haveItem = true;
 						}
 					}
 					if(breakWhileLoop) 
@@ -277,7 +281,7 @@ public class BuyHighAlchs {
 						Sleep.sleep(420, 696);
 						continue;
 					}
-					if(!haveItem) HABuyTimeouts.clear();
+					
 					int pricePer = itemPrice;
 					int buyQty = buyLimit;
 					int totalPrice = buyLimit * pricePer;

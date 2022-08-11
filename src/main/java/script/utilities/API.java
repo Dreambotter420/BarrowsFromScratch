@@ -89,8 +89,12 @@ public class API {
 		if(ClientSettings.isAcceptAidEnabled())
     	{
     		ClientSettings.toggleAcceptAid(false);
-    		
     	}
+		//else if(ClientSettings.getClientBrightness() < 90)
+    	//{
+    	//	MethodProvider.log("Client brightness: " + ClientSettings.getClientBrightness());
+    	//	ClientSettings.setClientBrightness(50);
+    	//}
 		else if(ClientSettings.roofsEnabled())
     	{
     		ClientSettings.toggleRoofs(false);
@@ -98,37 +102,32 @@ public class API {
 		else if(ClientSettings.getNPCAttackOptionsMode() != ActionMode.ALWAYS_RIGHT_CLICK)
     	{
     		ClientSettings.setNPCAttackOptionsMode(ActionMode.ALWAYS_RIGHT_CLICK);
-    		
     	}
 		else if(ClientSettings.getPlayerAttackOptionsMode() != ActionMode.ALWAYS_RIGHT_CLICK)
     	{
     		ClientSettings.setPlayerAttackOptionsMode(ActionMode.ALWAYS_RIGHT_CLICK);
-    		
     	}
 		else if(!ClientSettings.isShiftClickDroppingEnabled())
     	{
     		ClientSettings.toggleShiftClickDropping(true);
-    		
     	}
 		else if(!ClientSettings.isEscInterfaceClosingEnabled())
     	{
     		ClientSettings.toggleEscInterfaceClosing(true);
-    		
     	}
 		else if(ClientSettings.isGameAudioOn())
     	{
     		ClientSettings.toggleGameAudio(false);
-    		
     	}
     	else if(ClientSettings.isResizableActive())
     	{
     		ClientSettings.toggleResizable(false);
-    		
     	}
     	else if(ClientSettings.isTradeDelayEnabled())
     	{
     		ClientSettings.toggleTradeDelay(false);
     	}
+    	
 		//profanity filter set to ON
     	else if(PlayerSettings.getConfig(1074) == 0)
     	{
@@ -182,7 +181,9 @@ public class API {
     			!ClientSettings.isEscInterfaceClosingEnabled() || 
     			ClientSettings.isGameAudioOn() || 
     			ClientSettings.isResizableActive() || 
-    			ClientSettings.isTradeDelayEnabled())
+    			ClientSettings.isTradeDelayEnabled() 
+    			// || ClientSettings.getClientBrightness() < 90
+				)
 		{
 			MethodProvider.log("Some settings still AIDS");
 			Sleep.sleep(666, 111);
@@ -393,6 +394,7 @@ public class API {
 					() -> Players.localPlayer().isMoving(),Sleep.calculate(3333, 2222),66);
 		}
 	}
+	
 	public static void walkTalkToNPC(String npcName, String action, Area npcArea)
 	{
 		if(!npcArea.contains(Players.localPlayer()))

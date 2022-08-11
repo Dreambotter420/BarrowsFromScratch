@@ -12,7 +12,6 @@ public class CustomizeSettings extends Leaf {
 	 {
 	    return !API.customizeSettings();
 	 }
-   
     @Override
     public int onLoop() {
     	return Timing.sleepLogNormalSleep();

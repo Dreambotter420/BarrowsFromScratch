@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.dreambot.api.methods.MethodProvider;
+import org.dreambot.api.methods.dialogues.Dialogues;
 import org.dreambot.api.methods.filter.Filter;
 import org.dreambot.api.methods.interactive.GameObjects;
+import org.dreambot.api.methods.interactive.NPCs;
 import org.dreambot.api.methods.interactive.Players;
 import org.dreambot.api.methods.map.Area;
 import org.dreambot.api.methods.map.Tile;
@@ -14,9 +16,50 @@ import org.dreambot.api.methods.walking.pathfinding.impl.web.WebFinder;
 import org.dreambot.api.methods.walking.web.node.AbstractWebNode;
 import org.dreambot.api.methods.walking.web.node.impl.BasicWebNode;
 import org.dreambot.api.wrappers.interactive.GameObject;
+import org.dreambot.api.wrappers.interactive.NPC;
+
+import script.quest.varrockmuseum.Timing;
 
 public class Locations {
+	public static void initialize()
+	{
+		sandcrabsArea1 = sandcrabSouls1.getArea(6);
+		sandcrabsArea2 = sandcrabSouls2.getArea(6);
+	}
+	public static Area sandcrabsArea1 = null;
+	public static Area sandcrabsArea2 = null;
 	public static boolean unlockedKourend = true;
+	public static void unlockKourend()
+	{
+		if(isInKourend()) return;
+		//handle dialogue for Veos traveling to Kourend
+		if(Dialogues.inDialogue()) 
+		{
+			if(Dialogues.canContinue()) Dialogues.continueDialogue();
+			else if(Dialogues.areOptionsAvailable()) Dialogues.chooseFirstOptionContaining("That\'s great, can you take me there please?");
+			return;
+		}
+		
+		//search for Veos
+		NPC veos = NPCs.closest("Veos");
+		if(veos != null)
+		{
+			if(!Players.localPlayer().isInteracting(veos))
+    		{
+        		if(veos.interact("Talk-to"))
+    			{
+    				MethodProvider.sleepUntil(Dialogues::inDialogue, () -> Players.localPlayer().isMoving(), Sleep.calculate(2222,2222), 50);
+    			}
+        		else if(Walking.shouldWalk(6) && Walking.walk(Locations.veosSarim.getCenter())) Sleep.sleep(420,666);
+    		}
+			return;
+		}
+    	else
+    	{
+    		if(Locations.veosSarim.getCenter().distance(Players.localPlayer().getTile()) > 75) Walkz.teleportDraynor(180000);
+			else if(Walking.shouldWalk(6) && Walking.walk(Locations.veosSarim.getCenter())) Sleep.sleep(420,666);
+    	}
+	}
 	public static boolean unlockedHouse = true;
 	public static final Area camelotTrees = new Area(
 			new Tile(2752, 3452, 0),
@@ -27,6 +70,47 @@ public class Locations {
 			new Tile(2781, 3467, 0),
 			new Tile(2776, 3480, 0),
 			new Tile(2754, 3480, 0));
+	public static final Area deepWildyEdgevilleLeverPeninsula = new Area(
+			new Tile(3160, 3913, 0),
+			new Tile(3168, 3918, 0),
+			new Tile(3160, 3931, 0),
+			new Tile(3169, 3946, 0),
+			new Tile(3163, 3950, 0),
+			new Tile(3153, 3950, 0),
+			new Tile(3153, 3941, 0),
+			new Tile(3144, 3936, 0),
+			new Tile(3147, 3929, 0),
+			new Tile(3144, 3923, 0));
+	public static final Area mageArenaInnerCircle = new Area(
+			new Tile(3091, 3934, 0),
+			new Tile(3098, 3948, 0),
+			new Tile(3113, 3948, 0),
+			new Tile(3121, 3938, 0),
+			new Tile(3117, 3921, 0),
+			new Tile(3095, 3920, 0));
+	public static final Area mageArenaCaveSouth = new Area(2501, 4680, 2516, 4707, 0);
+	public static final Area mageArenaCaveStatues = new Area(2496, 4712, 2523, 4729, 0);
+	public static final Area mageArenaCave = new Area(2493, 4732, 2529, 4679, 0);
+	public static final Tile mageArenaBankOutsideLeverTile = new Tile(3090,3956,0);
+	public static final Area mageArenaBankWeb1 = new Area(3093, 3953, 3102, 3963, 0);
+	public static final Area mageArenaBankLeverRoom = new Area(
+			new Tile(3092, 3958, 0),
+			new Tile(3092, 3956, 0),
+			new Tile(3091, 3954, 0),
+			new Tile(3090, 3955, 0),
+			new Tile(3090, 3958, 0));
+	public static final Area mageArenaBankOutside = new Area(
+			new Tile(3087, 3950, 0),
+			new Tile(3092, 3950, 0),
+			new Tile(3096, 3953, 0),
+			new Tile(3101, 3954, 0),
+			new Tile(3102, 3965, 0),
+			new Tile(3087, 3967, 0));
+	public static final Area mageArenaBank = new Area(2527, 4709, 2550, 4725, 0);
+	public static final Area mageArenaBankLeverAirlock = new Area(3094, 3958, 3093, 3956, 0);
+	public static final Area deepWildyWeb_EdgevilleLever = new Area(3152, 3946, 3164, 3956, 0);
+	public static final Area edgevillePKLever = new Area(3085, 3482, 3097, 3468, 0);
+	public static final Area lumbyGiantFrogs = new Area(3187, 3197, 3209, 3171, 0);
 	public static final Area museumArea = new Area(1725, 4991, 1793, 4928);
 	public static final Area fallyTeleSpot = new Area(2961, 3384, 2969, 3376, 0);
 	public static final Area houseTeleSpot = new Area(2953, 3227, 2958, 3221, 0);
@@ -441,6 +525,8 @@ public class Locations {
 				isleOfSouls.contains(Players.localPlayer())) return true;
 		return false;
 	}
+	public static final Tile sandcrabSouls1 = new Tile(2283,2804,0);
+	public static final Tile sandcrabSouls2 = new Tile(2277,2792,0);
 	public static final Area edgevilleSoulsPortal = new Area(
 			new Tile(3089, 3483, 0),
 			new Tile(3089, 3486, 0),

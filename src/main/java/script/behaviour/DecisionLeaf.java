@@ -225,7 +225,7 @@ public class DecisionLeaf extends Leaf{
 		if(ranged < rangeSetpoint && !validModes.contains(modes.TRAIN_RANGE)) validModes.add(modes.TRAIN_RANGE);
 		if(mage < mageSetpoint && !validModes.contains(modes.TRAIN_MAGIC)) validModes.add(modes.TRAIN_MAGIC);
 		if(prayer < prayerSetpoint && !validModes.contains(modes.TRAIN_PRAYER)) validModes.add(modes.TRAIN_PRAYER);
-		
+		if(def < 70 && !validModes.contains(modes.TRAIN_MELEE)) validModes.add(modes.TRAIN_MELEE);
 		if(validModes.isEmpty()) MethodProvider.log("Congratulations, you win!");
 		else
 		{
@@ -237,7 +237,7 @@ public class DecisionLeaf extends Leaf{
 			}
 			
 			//testing
-			//API.mode = modes.TRAIN_MAGIC;
+			//API.mode = modes.MAGE_ARENA_1;
 			
 			MethodProvider.log("Switching mode: " + API.mode.toString());
 			if(API.mode == modes.ANIMAL_MAGNETISM || 

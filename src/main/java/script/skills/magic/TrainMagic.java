@@ -46,7 +46,7 @@ import script.quest.varrockmuseum.Timing;
 import script.skills.ranged.TrainRanged;
 import script.utilities.API;
 import script.utilities.Bankz;
-import script.utilities.Combat;
+import script.utilities.Combatz;
 import script.utilities.InvEquip;
 import script.utilities.ItemsOnGround;
 import script.utilities.Locations;
@@ -66,8 +66,6 @@ public class TrainMagic extends Leaf {
 	public static int magic = 0;
 	public static int def = 0;
     public void onStart() {
-        TrainRanged.initialize();
-        instantiateTree();
         Main.clearCustomPaintText();
         initialized = true;
     }
@@ -75,12 +73,12 @@ public class TrainMagic extends Leaf {
     {
     	chancedXPAlch = false;
     	xpAlch = false;
+    	if(Magic.isSpellSelected())
+    	{
+    		Magic.deselect();
+    		return false;
+    	}
     	return true;
-    }
-    private final Tree tree = new Tree();
-    private void instantiateTree() {
-    	
-    	
     }
     @Override
     public int onLoop() {
@@ -214,6 +212,19 @@ public class TrainMagic extends Leaf {
 			if(bankedAlchs)
 			{
 				MethodProvider.log("Found banked alchs");
+				if(Locations.HASpot1.contains(Players.localPlayer()))
+				{
+					if(!Walkz.useJewelry(InvEquip.wealth, "Grand Exchange"))
+					{
+						if(GameObjects.closest("Ladder").interact("Climb-down"))
+						{
+							MethodProvider.sleepUntil(() -> !Locations.HASpot1.contains(Players.localPlayer()),
+									() -> Players.localPlayer().isMoving(),
+									Sleep.calculate(2222, 2222),50);
+						}
+					}
+					return;
+				}
 				if(Bankz.openClosest(85))
 				{
 					if(Bank.getWithdrawMode() == BankMode.NOTE)
@@ -235,6 +246,7 @@ public class TrainMagic extends Leaf {
 					Bank.setWithdrawMode(BankMode.NOTE);
 					return;
 				}
+				
 				return;
 			}
 			if(foundAlch)
@@ -598,7 +610,7 @@ public class TrainMagic extends Leaf {
 								MethodProvider.log("Dropped some jugs");
 								return;
 							}
-							else if(Combat.eatFood()) return;
+							else if(Combatz.eatFood()) return;
 						}
 						else
 						{
@@ -711,7 +723,7 @@ public class TrainMagic extends Leaf {
     	setBestMageArmour();
     	InvEquip.setEquipItem(EquipmentSlot.WEAPON, staffOfAir);
     	
-    	for(int f : Combat.foods)
+    	for(int f : Combatz.foods)
     	{
     		InvEquip.addOptionalItem(f);
     	}
@@ -746,7 +758,7 @@ public class TrainMagic extends Leaf {
     	setBestMageArmour();
     	InvEquip.setEquipItem(EquipmentSlot.WEAPON, staffOfAir);
     	
-    	for(int f : Combat.foods)
+    	for(int f : Combatz.foods)
     	{
     		InvEquip.addOptionalItem(f);
     	}

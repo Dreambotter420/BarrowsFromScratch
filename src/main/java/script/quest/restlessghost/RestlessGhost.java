@@ -225,7 +225,7 @@ public class RestlessGhost extends Leaf {
     	InvEquip.clearAll();
     	InvEquip.setEquipItem(EquipmentSlot.RING, InvEquip.wealth);
     	InvEquip.setEquipItem(EquipmentSlot.AMULET, InvEquip.passage);
-    	InvEquip.addInvyItem(InvEquip.stamina4, 1, 1, false, 5);
+    	InvEquip.addInvyItem(id.stamina4, 1, 1, false, 5);
 
     	InvEquip.addInvyItem(ghostspeakAmulet, 1, 1, false, 0);
     	InvEquip.addInvyItem(id.lumbridgeTele, 2, (int) Calculations.nextGaussianRandom(7, 2), false, 10);

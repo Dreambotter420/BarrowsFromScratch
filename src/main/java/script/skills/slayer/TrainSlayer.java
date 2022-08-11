@@ -31,7 +31,7 @@ import script.skills.ranged.TrainRanged;
 import script.utilities.API;
 import script.utilities.API.modes;
 import script.utilities.Bankz;
-import script.utilities.Combat;
+import script.utilities.Combatz;
 import script.utilities.InvEquip;
 import script.utilities.ItemsOnGround;
 import script.utilities.Locations;
@@ -44,10 +44,6 @@ public class TrainSlayer extends Leaf{
 	public static boolean started = false;
 	public static void onStart()
 	{
-		Combat.foods.clear();
-        Combat.foods.add(TrainRanged.jugOfWine);
-        Combat.highFoods.clear();
-        Combat.highFoods.add(TrainRanged.seaTurtle);
 		Main.clearCustomPaintText();
 		SlayerSettings.getConfigs();
 		started = true;
@@ -353,14 +349,18 @@ public class TrainSlayer extends Leaf{
     	
     	InvEquip.addInvyItem(TrainRanged.rangePot4, 1, 6, false, (int) Calculations.nextGaussianRandom(20, 5));
     	InvEquip.addInvyItem(InvEquip.games, 1, 1, false, 5);
-    	InvEquip.addInvyItem(InvEquip.antidote4, 1, 1, false, 5);
-    	InvEquip.addInvyItem(InvEquip.stamina4, 1, 1, false, 5);
+    	InvEquip.addInvyItem(id.antidote4, 1, 1, false, 5);
+    	if(InvEquip.bankContains(id.staminas))
+    	{
+    		InvEquip.addInvyItem(InvEquip.getBankItem(id.staminas), 1, 1, false, 0);
+    	}
+    	else InvEquip.addInvyItem(id.stamina4, 1, 1, false, (int) Calculations.nextGaussianRandom(20, 5));
     	InvEquip.addInvyItem(InvEquip.shantayPass, 1, 1, false, 50);
     	InvEquip.addInvyItem(InvEquip.waterskin4, 5, 6, false, 50);
     	InvEquip.addInvyItem(InvEquip.iceCooler, 200, 200, false, 0);
     	
     	
-    	for(int f : Combat.foods)
+    	for(int f : Combatz.foods)
     	{
     		InvEquip.addOptionalItem(f);
     	}
@@ -395,10 +395,14 @@ public class TrainSlayer extends Leaf{
     	InvEquip.addInvyItem(TrainRanged.rangePot4, 1, 6, false, (int) Calculations.nextGaussianRandom(20, 5));
     	InvEquip.addInvyItem(InvEquip.games, 1, 1, false, 5);
     	InvEquip.addInvyItem(id.litCandleLantern, 1, 1, false, 1);
-    	InvEquip.addInvyItem(InvEquip.stamina4, 1, 1, false, 5);
+    	if(InvEquip.bankContains(id.staminas))
+    	{
+    		InvEquip.addInvyItem(InvEquip.getBankItem(id.staminas), 1, 1, false, 0);
+    	}
+    	else InvEquip.addInvyItem(id.stamina4, 1, 1, false, (int) Calculations.nextGaussianRandom(20, 5));
     	InvEquip.addInvyItem(Candlez.tinderbox, 1, 1, false, 1);
     	
-    	for(int f : Combat.foods)
+    	for(int f : Combatz.foods)
     	{
     		InvEquip.addOptionalItem(f);
     	}
@@ -433,11 +437,15 @@ public class TrainSlayer extends Leaf{
     	InvEquip.addInvyItem(TrainRanged.rangePot4, 1, 6, false, (int) Calculations.nextGaussianRandom(20, 5));
     	InvEquip.addInvyItem(InvEquip.games, 1, 1, false, 5);
     	InvEquip.addInvyItem(id.litCandleLantern, 1, 1, false, 1);
-    	InvEquip.addInvyItem(InvEquip.antidote4, 1, 1, false, 5);
-    	InvEquip.addInvyItem(InvEquip.stamina4, 1, 1, false, 5);
+    	InvEquip.addInvyItem(id.antidote4, 1, 1, false, 5);
+    	if(InvEquip.bankContains(id.staminas))
+    	{
+    		InvEquip.addInvyItem(InvEquip.getBankItem(id.staminas), 1, 1, false, 0);
+    	}
+    	else InvEquip.addInvyItem(id.stamina4, 1, 1, false, (int) Calculations.nextGaussianRandom(20, 5));
     	InvEquip.addInvyItem(Candlez.tinderbox, 1, 1, false, 1);
     	
-    	for(int f : Combat.foods)
+    	for(int f : Combatz.foods)
     	{
     		InvEquip.addOptionalItem(f);
     	}

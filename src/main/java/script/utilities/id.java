@@ -39,8 +39,33 @@ public class id {
 	public static final int prayPot3 = 139;
 	public static final int prayPot4 = 2434;
 	public static List<Integer> prayPots = new ArrayList<Integer>();
-	
-	
+	public static final int superAtt1 = 149;
+	public static final int superAtt2 = 147;
+	public static final int superAtt3 = 145;
+	public static final int superAtt4 = 2436;
+	public static List<Integer> superAtts = new ArrayList<Integer>();
+	public static final int superStr1 = 161;
+	public static final int superStr2 = 159;
+	public static final int superStr3 = 157;
+	public static final int superStr4 = 2440;
+	public static List<Integer> superStrs = new ArrayList<Integer>();
+	public static final int antidote1 = 5958;
+	public static final int antidote2 = 5956;
+	public static final int antidote3 = 5954;
+	public static final int antidote4 = 5952;
+	public static List<Integer> antidotes = new ArrayList<Integer>();
+	public static final int stamina4 = 12625;
+	public static final int stamina3 = 12627;
+	public static final int stamina2 = 12629;
+	public static final int stamina1 = 12631;
+	public static List<Integer> staminas = new ArrayList<Integer>();
+	public static final int bass = 365;
+	public static final int monkfish = 7946;
+	public static final int swordfish = 373;
+	public static final int pineapplePizza1 = 2303;
+	public static final int pineapplePizza2 = 2301;
+	public static final int seaTurtle = 397;
+	public static final int casket = 405;
 	
 	public static final int runeDaggerPP = 5678;
 	public static final int runeSword = 1289;
@@ -75,6 +100,18 @@ public class id {
 	public static final int magicLongbow = 859;
 	public static final int yewLongbow = 855;
 	
+
+	public static final int giantFrogLegs = 4518;
+	public static final int bloodRune = 565;
+	public static final int cosmicRune = 564;
+	public static final int knife = 946;
+	public static final int saradominCape = 2412;
+	public static final int zamorakCape = 2414;
+	public static final int guthixCape = 2413;
+	public static final int saradominStaff = 2415;
+	public static final int zamorakStaff = 2417;
+	public static final int guthixStaff = 2416;
+	
 	
 	public static LinkedHashMap<Integer, Integer> approvedAlchs = new LinkedHashMap<Integer,Integer>();
 	public static LinkedHashMap<Integer, Integer> xpAlchs = new LinkedHashMap<Integer,Integer>();
@@ -84,9 +121,9 @@ public class id {
 		xpAlchs.put(yewLongbow,18000);
 		
 		approvedAlchs.put(redDhideBodyG,8);
-		approvedAlchs.put(redDhideChaps,70);
-		approvedAlchs.put(blackDhideBody,70);
-		approvedAlchs.put(redDhidevambs,70);
+		approvedAlchs.put(redDhideChaps,65);
+		approvedAlchs.put(blackDhideBody,65);
+		approvedAlchs.put(redDhidevambs,65);
 		approvedAlchs.put(mysticEarthStaff,18000);
 		approvedAlchs.put(initiateSallet,125);
 		approvedAlchs.put(proselyteTasset,70);
@@ -97,21 +134,36 @@ public class id {
 		approvedAlchs.put(mithrilSword,125);
 		approvedAlchs.put(runeDaggerPP,70);
 		approvedAlchs.put(runeSword,70);
-		approvedAlchs.put(blueDhideBody,125);
+		approvedAlchs.put(blueDhideBody,120);
 		approvedAlchs.put(earthBattlestaff,18000);
 		approvedAlchs.put(runeDagger,70);
-		approvedAlchs.put(redDhideBody,70);
-		approvedAlchs.put(adamantPlatebody,125);
-		approvedAlchs.put(runeAxe,40);
-		approvedAlchs.put(greenDhideBody,125);
+		approvedAlchs.put(redDhideBody,65);
+		approvedAlchs.put(adamantPlatebody,120);
+		approvedAlchs.put(runeAxe,35);
+		approvedAlchs.put(greenDhideBody,120);
 		approvedAlchs.put(onyxBoltsE,11000);
-		approvedAlchs.put(mithrilPlatebody,125);
+		approvedAlchs.put(mithrilPlatebody,120);
 		approvedAlchs.put(rune2h,70);
 
 		prayPots.add(prayPot1);
 		prayPots.add(prayPot2);
 		prayPots.add(prayPot3);
 		prayPots.add(prayPot4);
-		
+		superAtts.add(superAtt1);
+		superAtts.add(superAtt2);
+		superAtts.add(superAtt3);
+		superAtts.add(superAtt4);
+		superStrs.add(superStr1);
+		superStrs.add(superStr2);
+		superStrs.add(superStr3);
+		superStrs.add(superStr4);
+		staminas.add(stamina1);
+		staminas.add(stamina2);
+		staminas.add(stamina3);
+		staminas.add(stamina4);
+		antidotes.add(antidote1);
+		antidotes.add(antidote2);
+		antidotes.add(antidote3);
+		antidotes.add(antidote4);
 	}
 }

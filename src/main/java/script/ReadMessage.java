@@ -8,10 +8,13 @@ import org.dreambot.api.wrappers.widgets.message.MessageType;
 import script.behaviour.CustomizeSettings;
 import script.behaviour.ReportSpammer;
 import script.quest.ernestthechicken.ErnestTheChicken;
+import script.quest.fremenniktrials.FremennikTrials;
+import script.quest.fremenniktrials.FremennikTrials.Direction;
 import script.quest.magearena1.MageArena1;
 import script.quest.waterfallquest.WaterfallQuest;
 import script.skills.prayer.TrainPrayer;
 import script.skills.ranged.Mobs;
+import script.utilities.API;
 import script.utilities.InvEquip;
 import script.utilities.Locations;
 
@@ -61,6 +64,26 @@ public class ReadMessage {
 		{
 			ReportSpammer.spammerToReport = null;
 		}
+		if(API.mode == API.modes.FREMENNIK_TRIALS)
+		{
+			if(txt.contains("You empty the keg and refill it with low alcohol beer")) FremennikTrials.filledLowAlcoholKeg = true;
+			if(txt.contains("The Draugen has moved elsewhere")) 
+			{
+				FremennikTrials.currentDirection = null;
+				FremennikTrials.hoppedToRightDraugenWorld = false;
+			}
+			if(txt.contains("You have solved the riddle!")) FremennikTrials.solvedRiddle = true;
+			
+			if(txt.contains("The talisman guides you north-east")) FremennikTrials.currentDirection = Direction.NORTHEAST;
+			if(txt.contains("The talisman guides you south")) FremennikTrials.currentDirection = Direction.SOUTH;
+			if(txt.contains("The talisman guides you south-east")) FremennikTrials.currentDirection = Direction.SOUTHEAST;
+			if(txt.contains("The talisman guides you south-west")) FremennikTrials.currentDirection = Direction.SOUTHWEST;
+			if(txt.contains("The talisman guides you north-west")) FremennikTrials.currentDirection = Direction.NORTHWEST;
+			if(txt.contains("The talisman guides you north")) FremennikTrials.currentDirection = Direction.NORTH;
+			if(txt.contains("The talisman guides you east")) FremennikTrials.currentDirection = Direction.EAST;
+			if(txt.contains("The talisman guides you west")) FremennikTrials.currentDirection = Direction.WEST;
+		}
+		
 		if(msg.getType() == MessageType.PLAYER &&
 				txt.contains("sëriöüsly") || 
 				txt.contains("fütürë") || 

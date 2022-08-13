@@ -72,7 +72,14 @@ public class MageArena1 extends Leaf {
     public int onLoop() {
     	if (completedMageArena1) {
             MethodProvider.log("[FINISHED] -> Mage Arena 1");
-            if(onExit()) API.mode = null;
+            if(onExit()) 
+            {
+            	Main.customPaintText1 = "~~~~~~~~~~~";
+        		Main.customPaintText2 = "~Quest Complete~";
+        		Main.customPaintText3 = "~Mage Arena 1~";
+        		Main.customPaintText4 = "~~~~~~~~~~~";
+            	API.mode = null;
+            }
             return Timing.sleepLogNormalSleep();
         }
     	if (DecisionLeaf.taskTimer.finished()) {

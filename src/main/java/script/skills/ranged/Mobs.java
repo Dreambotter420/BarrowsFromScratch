@@ -1604,9 +1604,24 @@ public class Mobs {
 					Sleep.sleep(69, 696);
 				}
 			}
-			if(resetArea.contains(Players.localPlayer())) enteredResetLocation = true;
+			if(resetArea.contains(Players.localPlayer())) 
+			{
+				MethodProvider.log("Entered reset location! Running back...");
+				enteredResetLocation = true;
+			}
+				
 			if(enteredResetLocation)
 			{
+				if(Locations.sandcrabsArea1.contains(Players.localPlayer()))
+				{
+					needReset = false;
+					return;
+				}
+				if(Locations.sandcrabsArea2.contains(Players.localPlayer()))
+				{
+					needReset = false;
+					return;
+				}
 				if(Players.localPlayer().getTile().equals(comeBackTile)) 
 				{
 					needReset = false;

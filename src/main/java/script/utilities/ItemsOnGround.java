@@ -32,6 +32,7 @@ public class ItemsOnGround {
 	public static List<Integer> dwarfLoot = new ArrayList<Integer>();
 	public static List<Integer> icefiendLoot = new ArrayList<Integer>();
 	public static List<Integer> kalphiteWorkerLoot = new ArrayList<Integer>();
+	public static List<Integer> lanzigLoot = new ArrayList<Integer>();
 	public static List<Integer> minotaurLoot = new ArrayList<Integer>();
 	public static List<Integer> sandcrabsLoot = new ArrayList<Integer>();
 	
@@ -106,6 +107,10 @@ public class ItemsOnGround {
 		skeletonLoot.add(fireTalisman);
 		
 		dwarfLoot.add(natureRune);
+		
+		lanzigLoot.add(id.fremmy_lyre);
+		lanzigLoot.add(grimyRanarr);
+		lanzigLoot.addAll(rareDropTable);
 		
 		sandcrabsLoot.add(id.casket);
 
@@ -189,6 +194,24 @@ public class ItemsOnGround {
 			(killingArea.contains(g) || g.getID() != bigBones) &&
 			g.canReach() && 
 			listToCheck.contains(g.getID());
+		GroundItem g = GroundItems.closest(nearbyGroundItemFilter);
+		return g;
+	}
+	public static GroundItem getNearbyGroundItem(int itemID, Area area)
+	{
+		if(itemID <= 0)
+		{
+			MethodProvider.log("Attempted to check ground itemID list which is less than or equal to 0!");
+			return null;
+		}
+		
+		Filter<GroundItem> nearbyGroundItemFilter = g -> 
+			g != null && 
+			g.exists() &&
+			g.distance() <= 15 &&
+			(area.contains(g) || g.getID() != bigBones) &&
+			g.canReach() && 
+			itemID == g.getID();
 		GroundItem g = GroundItems.closest(nearbyGroundItemFilter);
 		return g;
 	}

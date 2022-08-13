@@ -6,6 +6,7 @@ import org.dreambot.api.methods.Calculations;
 import org.dreambot.api.methods.MethodProvider;
 import org.dreambot.api.methods.widget.Widgets;
 import script.framework.Leaf;
+import script.quest.fremenniktrials.FremennikTrials;
 import script.quest.varrockmuseum.VarrockQuiz;
 import script.skills.ranged.TrainRanged;
 import script.utilities.API;
@@ -37,6 +38,7 @@ public class Initialize extends Leaf {
 		DecisionLeaf.initialize();
 		Combatz.initializeFoods();
 		Locations.initialize();
+		FremennikTrials.initialize();
 		ItemsOnGround.initializeLists();
 		TrainRanged.initialize();
 		if((int) Calculations.nextGammaRandom(100,50) >= 120) Locations.scorpions = Locations.scorpionsKharidNorth;

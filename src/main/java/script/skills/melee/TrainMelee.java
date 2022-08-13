@@ -203,7 +203,7 @@ public class TrainMelee extends Leaf{
 	    		}
 	    	}
 	    	if(!foundCape) InvEquip.setEquipItem(EquipmentSlot.CAPE, getBestCapeSlot());
-	    	InvEquip.addInvyItem(getBestWeapon(), 1, 1, false, 1);
+	    	InvEquip.setEquipItem(EquipmentSlot.WEAPON,getBestWeapon());
 			if(getBestWeapon() != getBestWeapon()) InvEquip.addInvyItem(getBestWeapon(), 1, 1, false, 1);
 			if(getNextNextBestWeapon() != getBestWeapon() && 
 					getNextNextBestWeapon() != getBestWeapon()) InvEquip.addInvyItem(getNextNextBestWeapon(), 1, 1, false, 1);

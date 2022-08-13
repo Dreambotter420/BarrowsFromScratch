@@ -1553,13 +1553,10 @@ public class InvEquip {
 						int min = listedItem.getValue().minQty;
 						int max = listedItem.getValue().maxQty;
 						int count = Inventory.count(itemID);
-						if(count >= min)
+						if(count >= min && count <= max)
 						{
-							if(count <= max)
-							{
-								shouldBreak = true;
-								break;
-							}
+							shouldBreak = true;
+							break;
 						}
 					}
 					if(shouldBreak) continue;
@@ -1574,18 +1571,12 @@ public class InvEquip {
 				int min = listedItem.getValue().minQty;
 				int max = listedItem.getValue().maxQty;
 				int count = Inventory.count(itemID);
-				if(count >= min)
+				if(count >= min && count <= max)
 				{
-					if(count <= max)
-					{
-						continue;
-					}
+					continue;
 				}
-				if(listedItem.getValue().refillQty > 0)
-				{
-					MethodProvider.log("Missing inventory item: " + itemRef.getName()+", have " + count+" and need between " + min +" - " + max+"!");
-					missingInvyItems.put(itemID,listedItem.getValue());
-				}
+				MethodProvider.log("Missing inventory item: " + itemRef.getName()+", have " + count+" and need between " + min +" - " + max+"!");
+				missingInvyItems.put(itemID,listedItem.getValue());
 				
 			}
 			

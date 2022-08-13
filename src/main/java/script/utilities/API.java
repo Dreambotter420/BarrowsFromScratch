@@ -12,6 +12,7 @@ import org.dreambot.api.input.Mouse;
 import org.dreambot.api.methods.Calculations;
 import org.dreambot.api.methods.MethodProvider;
 import org.dreambot.api.methods.dialogues.Dialogues;
+import org.dreambot.api.methods.filter.Filter;
 import org.dreambot.api.methods.input.Keyboard;
 import org.dreambot.api.methods.interactive.GameObjects;
 import org.dreambot.api.methods.interactive.NPCs;
@@ -32,6 +33,7 @@ import org.dreambot.api.utilities.impl.Condition;
 import org.dreambot.api.wrappers.interactive.GameObject;
 import org.dreambot.api.wrappers.interactive.NPC;
 import org.dreambot.api.wrappers.items.GroundItem;
+import org.dreambot.api.wrappers.items.Item;
 
 import script.Main;
 import script.quest.varrockmuseum.Timing;
@@ -281,106 +283,78 @@ public class API {
 				
 			}
 		}
-		
+		Main.customPaintText1 = "";
+		Main.customPaintText2 = "";
+		Main.customPaintText3 = "";
+		Main.customPaintText4 = "";
 	}
 	public static void talkToNPC(String npcName)
 	{
-		NPC npc = NPCs.closest(npcName);
-		if(npc == null)
-		{
-			MethodProvider.log(npcName+" null!");
-			return;
-		}
-		if(!npc.canReach())
-		{
-			if(Walking.walk(npc)) Sleep.sleep(420, 696);
-			return;
-		}
-		if(npc.interact("Talk-to"))
-		{
-			MethodProvider.sleepUntil(Dialogues::inDialogue,
-					() -> Players.localPlayer().isMoving(),Sleep.calculate(3333, 2222),66);
-		}
+		Filter<NPC> filter = n -> n != null && n.getName().contains(npcName);
+		interactNPC(filter,null,false,false,null,null);
 	}
 	public static void talkToNPC(String npcName, String action)
 	{
-		NPC npc = NPCs.closest(n -> 
-			n != null && 
-			n.getName().contains(npcName) && 
-			n.hasAction(action));
-		if(npc == null)
-		{
-			MethodProvider.log("NPC " +npcName+" with action \'"+action+"\' null!");
-			return;
-		}
-		if(!npc.canReach())
-		{
-			if(Walking.walk(npc)) Sleep.sleep(420, 696);
-			return;
-		}
-		if(npc.interact(action))
-		{
-			MethodProvider.sleepUntil(Dialogues::inDialogue,
-					() -> Players.localPlayer().isMoving(),Sleep.calculate(3333, 2222),66);
-		}
+		Filter<NPC> filter = n -> n != null && n.getName().contains(npcName) && n.hasAction(action);
+		interactNPC(filter,action,false,false,null,null);
+	}
+	public static void talkToNPC(String npcName, String action,Condition condition)
+	{
+		Filter<NPC> filter = n -> n != null && n.getName().contains(npcName) && n.hasAction(action);
+		interactNPC(filter,action,false,false,null,condition);
 	}
 	public static void talkToNPC(String npcName, String action, Area npcArea)
 	{
-		NPC npc = NPCs.closest(n -> 
-		n != null && 
-		n.getName().contains(npcName) && 
-		n.hasAction(action) && 
-		npcArea.contains(n));
-		if(npc == null)
-		{
-			MethodProvider.log("NPC " +npcName+" with action \'"+action+"\' in specified area null!");
-			return;
-		}
-		if(!npc.canReach())
-		{
-			if(Walking.walk(npc)) Sleep.sleep(420, 696);
-			return;
-		}
-		if(npc.interact(action))
-		{
-			MethodProvider.sleepUntil(Dialogues::inDialogue,
-					() -> Players.localPlayer().isMoving(),Sleep.calculate(3333, 2222),66);
-		}
+		Filter<NPC> filter = n ->  n != null && n.getName().contains(npcName) && n.hasAction(action) && npcArea.contains(n);
+		interactNPC(filter,action,false,false,npcArea,null);
+	}
+	public static void talkToNPC(String npcName, String action, Area npcArea, Condition condition)
+	{
+		Filter<NPC> filter = n ->  n != null && n.getName().contains(npcName) && n.hasAction(action) && npcArea.contains(n);
+		interactNPC(filter,action,false,false,npcArea,condition);
 	}
 	public static void interactNPC(String npcName, String action, Area npcArea, boolean reachable, Condition condition)
 	{
-		NPC npc = NPCs.closest(n -> 
-		n != null && 
-		n.getName().contains(npcName) && 
-		n.hasAction(action) && 
-		npcArea.contains(n));
-		if(npc == null)
-		{
-			MethodProvider.log("NPC " +npcName+" with action \'"+action+"\' in specified area null!");
-			return;
-		}
-		if(reachable && !npc.canReach())
-		{
-			if(Walking.walk(npc)) Sleep.sleep(420, 696);
-			return;
-		}
-		if(npc.interact(action))
-		{
-			MethodProvider.sleepUntil(() -> condition.verify(),
-					() -> Players.localPlayer().isMoving(),Sleep.calculate(3333, 2222),66);
-		}
+		Filter<NPC> filter = n -> n != null && n.getName().contains(npcName) && n.hasAction(action) && npcArea.contains(n);
+		interactNPC(filter, action, false, reachable,npcArea,condition);
 	}
-	public static void interactNPC(String npcName, String action,int combatLvl, Area npcArea, boolean reachable, Condition condition)
+	public static void walkTalkToNPC(String npcName, String action, Area npcArea)
 	{
-		NPC npc = NPCs.closest(n -> 
-		n != null && 
-		n.getName().contains(npcName) && 
-		n.hasAction(action) && 
-		npcArea.contains(n) && 
-		n.getLevel() == combatLvl);
+		Filter<NPC> filter = n -> n != null && n.getName().contains(npcName) && n.hasAction(action) && npcArea.contains(n);
+		interactNPC(filter, action, true, false,npcArea,null);
+	}
+	public static void walkInteractNPC(String npcName, String action, Area npcArea, Condition condition)
+	{
+		Filter<NPC> filter = n -> n != null && n.getName().contains(npcName) && n.hasAction(action) && npcArea.contains(n);
+		interactNPC(filter, action, true, false,npcArea,condition);
+	}
+	public static void interactNPC(String npcName, String action, int combatLevel, Area npcArea, boolean reachable, Condition condition) 
+	{
+		Filter<NPC> filter = n -> n != null && n.getName().contains(npcName) && n.hasAction(action) && n.getLevel() == combatLevel && npcArea.contains(n);
+		interactNPC(filter, action, false, true,npcArea,condition);
+	}
+	
+	public static void interactNPC(String npcName, String action)
+	{
+		Filter<NPC> filter = n -> 
+			n != null && 
+			n.getName().contains(npcName) && 
+			n.hasAction(action);
+			interactNPC(filter, action, false, false,null,null);
+	}
+	public static void interactNPC(Filter<NPC> filter,String action,boolean walk,boolean reachable,Area area, Condition condition)
+	{
+		if(walk && !area.contains(Players.localPlayer()))
+		{
+			if(!Walkz.isStaminated()) Walkz.drinkStamina();
+			if(Walkz.isStaminated() && Walking.getRunEnergy() > 5 && !Walking.isRunEnabled()) Walking.toggleRun();
+			if(Walking.shouldWalk(6) && Walking.walk(area.getCenter())) Sleep.sleep(696, 666);
+			return;
+		}
+		NPC npc = NPCs.closest(filter);
 		if(npc == null)
 		{
-			MethodProvider.log("NPC " +npcName+" with action \'"+action+"\' in specified area with combat lvl: " + combatLvl+" null!");
+			MethodProvider.log("NPC null!");
 			return;
 		}
 		if(reachable && !npc.canReach())
@@ -388,65 +362,24 @@ public class API {
 			if(Walking.walk(npc)) Sleep.sleep(420, 696);
 			return;
 		}
-		if(npc.interact(action))
+		
+		boolean interacted = false;
+		if(action == null)
 		{
-			MethodProvider.sleepUntil(() -> condition.verify(),
+			if(npc.interact()) interacted = true;
+		}
+		else if(npc.interact(action)) interacted = true;
+		if(interacted)
+		{
+			if(condition == null) condition = Dialogues::inDialogue;
+			final Condition finalCondition = condition;
+			MethodProvider.sleepUntil(() -> finalCondition.verify(),
 					() -> Players.localPlayer().isMoving(),Sleep.calculate(3333, 2222),66);
 		}
 	}
 	
-	public static void walkTalkToNPC(String npcName, String action, Area npcArea)
-	{
-		if(!npcArea.contains(Players.localPlayer()))
-		{
-			if(!Walkz.isStaminated()) Walkz.drinkStamina();
-			if(Walkz.isStaminated() && Walking.getRunEnergy() > 5 && !Walking.isRunEnabled()) Walking.toggleRun();
-			if(Walking.shouldWalk(6) && Walking.walk(npcArea.getCenter())) Sleep.sleep(696, 420);
-			return;
-		}
-		NPC npc = NPCs.closest(n -> 
-		n != null && 
-		n.getName().contains(npcName) && 
-		n.hasAction(action) && 
-		npcArea.contains(n));
-		if(npc == null)
-		{
-			MethodProvider.log("NPC " +npcName+" with action \'"+action+"\' in specified area null!");
-			return;
-		}
-		if(!npc.canReach())
-		{
-			if(Walking.walk(npc)) Sleep.sleep(420, 696);
-			return;
-		}
-		if(npc.interact(action))
-		{
-			MethodProvider.sleepUntil(Dialogues::inDialogue,
-					() -> Players.localPlayer().isMoving(),Sleep.calculate(3333, 2222),66);
-		}
-	}
-	public static void interactNPC(String npcName, String action)
-	{
-		NPC npc = NPCs.closest(n -> 
-			n != null && 
-			n.getName().contains(npcName) && 
-			n.hasAction(action));
-		if(npc == null)
-		{
-			MethodProvider.log("NPC " +npcName+" with action \'"+action+"\' null!");
-			return;
-		}
-		if(!npc.canReach())
-		{
-			if(Walking.walk(npc)) Sleep.sleep(420, 696);
-			return;
-		}
-		if(npc.interact(action))
-		{
-			MethodProvider.sleepUntil(() -> Players.localPlayer().isInteracting(npc),
-					() -> Players.localPlayer().isMoving(),Sleep.calculate(3333, 2222),66);
-		}
-	}
+	
+	
 	public static void interactWithGameObject(String gameObjectName, String action)
 	{
 		GameObject go = GameObjects.closest(n -> 
@@ -466,6 +399,28 @@ public class API {
 		if(go.interact(action))
 		{
 			MethodProvider.sleepUntil(() -> go.getSurrounding().contains(Players.localPlayer().getTile()),
+					() -> Players.localPlayer().isMoving(),Sleep.calculate(3333, 2222),66);
+		}
+	}public static void interactWithGameObject(String gameObjectName, String action,Tile tile,Condition condition)
+	{
+		GameObject go = GameObjects.closest(n -> 
+		n != null && 
+		n.getName().contains(gameObjectName) && 
+		n.hasAction(action) && 
+		n.getTile().equals(tile));
+		if(go == null)
+		{
+			MethodProvider.log("GameObject " +gameObjectName+" with action \'"+action+"\' at specified tile null!");
+			return;
+		}
+		if(!go.canReach())
+		{
+			if(Walking.walk(go)) Sleep.sleep(420, 696);
+			return;
+		}
+		if(go.interact(action))
+		{
+			MethodProvider.sleepUntil(() -> condition.verify(),
 					() -> Players.localPlayer().isMoving(),Sleep.calculate(3333, 2222),66);
 		}
 	}
@@ -575,6 +530,36 @@ public class API {
 					() -> Players.localPlayer().isMoving(),Sleep.calculate(3333, 2222),66);
 		}
 	}
+	public static void walkPickupGroundItem(int groundItemID, String action, boolean reachable,Area groundItemArea)
+	{
+		if(!groundItemArea.contains(Players.localPlayer()))
+		{
+			if(!Walkz.isStaminated()) Walkz.drinkStamina();
+			if(Walkz.isStaminated() && Walking.getRunEnergy() > 5 && !Walking.isRunEnabled()) Walking.toggleRun();
+			if(Walking.shouldWalk(6) && Walking.walk(groundItemArea.getCenter())) Sleep.sleep(696, 420);
+			return;
+		}
+		GroundItem gi = GroundItems.closest(n -> 
+		n != null && 
+		n.getID() == groundItemID && 
+		n.hasAction(action) && 
+		groundItemArea.contains(n));
+		if(gi == null)
+		{
+			MethodProvider.log("GroundItem ID" +groundItemID +" with action \'"+action+"\' in specified area null!");
+			return;
+		}
+		if(reachable && !gi.canReach())
+		{
+			if(Walking.walk(gi)) Sleep.sleep(420, 696);
+			return;
+		}
+		if(gi.interact(action))
+		{
+			MethodProvider.sleepUntil(() -> gi == null || !gi.exists(),
+					() -> Players.localPlayer().isMoving(),Sleep.calculate(3333, 2222),66);
+		}
+	}
 	public static void walkPickupGroundItem(String groundItemName, String action, Area groundItemArea)
 	{
 		if(!groundItemArea.contains(Players.localPlayer()))
@@ -636,6 +621,7 @@ public class API {
 		Collections.shuffle(verifiedWorlds);
 		return verifiedWorlds.size() > 0 ? verifiedWorlds.get(0).getWorld() : 302; // default world 302 if none found
 	}
+	
 	
 	
 	

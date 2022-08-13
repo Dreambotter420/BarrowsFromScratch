@@ -36,8 +36,6 @@ public class DecisionLeaf extends Leaf{
 
 	public static int wcSetpoint;
     public static int mageSetpoint;
-    public static int attSetpoint;
-    public static int strSetpoint;
     public static int rangeSetpoint;
     public static int craftingSetpoint;
     public static int prayerSetpoint;
@@ -56,12 +54,20 @@ public class DecisionLeaf extends Leaf{
      * sets a timer for random length.
      * enter 1 for short,
      * 2 for medium,
-     * 3 for long.
-     * Most likely will choose the chosen timer. But a chance to choose others.
+     * 3 for long,
+     * 4 for guaranteed extra long.
+     * Most likely will choose the chosen timer. But a chance to choose others. Except for 4.
      */
     public static void setTaskTimer (int priorityTime)
     {
     	switch(priorityTime) {
+    	case(4):
+    	{
+    		int timer = (int)Calculations.nextGaussianRandom(12000000, 1200000);
+    		taskTimer = new Timer(timer);
+    		MethodProvider.log("Set timer for: " + ((double)timer / 60000) +" minutes");
+    		break;
+    	}
     	case(3):
     	{
     		int rand = (int) Calculations.nextGaussianRandom(50, 20);
@@ -206,7 +212,7 @@ public class DecisionLeaf extends Leaf{
 		
 		if(!fremmyTrialsDone)
 		{
-			if(fightArenaDone && waterfallDone && prayer >= prayerSetpoint && att >= attSetpoint && str >= strSetpoint && !validModes.contains(modes.FREMENNIK_TRIALS)) validModes.add(modes.FREMENNIK_TRIALS);
+			if(fightArenaDone && waterfallDone && prayer >= prayerSetpoint && att >= 40 && str >= 40 && !validModes.contains(modes.FREMENNIK_TRIALS)) validModes.add(modes.FREMENNIK_TRIALS);
 			if(!fightArenaDone)
 			{
 				if(waterfallDone && ranged >= 50 && prayer >= prayerSetpoint && !validModes.contains(modes.FIGHT_ARENA)) validModes.add(modes.FIGHT_ARENA);
@@ -215,7 +221,7 @@ public class DecisionLeaf extends Leaf{
 				if(prayer < prayerSetpoint && validModes.contains(modes.TRAIN_PRAYER)) validModes.add(modes.TRAIN_PRAYER);
 			} else {
 				if(!waterfallDone && !validModes.contains(modes.WATERFALL_QUEST)) validModes.add(modes.WATERFALL_QUEST);
-				if((att < attSetpoint || str < strSetpoint) && !validModes.contains(modes.TRAIN_MELEE)) validModes.add(modes.TRAIN_MELEE);
+				if((att < 40 || str < 40) && !validModes.contains(modes.TRAIN_MELEE)) validModes.add(modes.TRAIN_MELEE);
 				if(prayer < prayerSetpoint && !validModes.contains(modes.TRAIN_PRAYER)) validModes.add(modes.TRAIN_PRAYER);
 			}
 		}
@@ -237,11 +243,15 @@ public class DecisionLeaf extends Leaf{
 			}
 			
 			//testing
-			//API.mode = modes.MAGE_ARENA_1;
+			//API.mode = modes.FREMENNIK_TRIALS;
 			
 			MethodProvider.log("Switching mode: " + API.mode.toString());
 			if(API.mode == modes.ANIMAL_MAGNETISM || 
-					API.mode == modes.ERNEST_THE_CHIKKEN || 
+					API.mode == modes.FREMENNIK_TRIALS)
+			{
+				setTaskTimer(4);
+			}
+			else if(API.mode == modes.ERNEST_THE_CHIKKEN || 
 					API.mode == modes.MAGE_ARENA_1 || 
 					API.mode == modes.MAGE_ARENA_2 || 
 					API.mode == modes.NATURE_SPIRIT || 
@@ -249,7 +259,6 @@ public class DecisionLeaf extends Leaf{
 					API.mode == modes.VARROCK_QUIZ || 
 					API.mode == modes.PRIEST_IN_PERIL || 
 					API.mode == modes.HORROR_FROM_THE_DEEP || 
-					API.mode == modes.FREMENNIK_TRIALS || 
 					API.mode == modes.FIGHT_ARENA || 
 					API.mode == modes.WATERFALL_QUEST)
 			{
@@ -292,14 +301,6 @@ public class DecisionLeaf extends Leaf{
 		if(tmp >= 75 && tmp <= 78) rangeSetpoint = tmp;
 		else rangeSetpoint = 75;
 		
-		tmp =(int) Calculations.nextGaussianRandom(50, 5);
-		if(tmp >= 45 && tmp <= 55) strSetpoint = tmp;
-		else strSetpoint = 45;
-		
-		tmp =(int) Calculations.nextGaussianRandom(50,5);
-		if(tmp >= 45 && tmp <= 55) attSetpoint = tmp;
-		else attSetpoint = 45;
-
 		tmp =(int) Calculations.nextGaussianRandom(83, 3);
 		if(tmp >= 83 && tmp <= 85) mageSetpoint = tmp;
 		else mageSetpoint = 83;

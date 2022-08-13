@@ -29,7 +29,6 @@ import script.utilities.Walkz;
 import script.utilities.id;
 
 public class Candlez {
-	public static final int tinderbox = 590;
 	private final static Area lightableArea = new Area(3175, 3483, 3152, 3482, 0);
 	
 	
@@ -43,14 +42,14 @@ public class Candlez {
 			MethodProvider.log("In getLantern loop");
 			if(trainCrafting() && trainFiremaking())
 			{
-				if(Inventory.count(tinderbox) > 0 && Inventory.count(id.litCandleLantern) > 0)
+				if(Inventory.count(id.tinderbox) > 0 && Inventory.count(id.litCandleLantern) > 0)
 				{
 					return true;
 				}
 				if(!InvEquip.checkedBank()) return false;
-				if(Inventory.count(tinderbox) <= 0)
+				if(Inventory.count(id.tinderbox) <= 0)
 				{
-					if(!InvEquip.withdrawOne(tinderbox, 180000)) InvEquip.buyItem(tinderbox,1,180000);
+					if(!InvEquip.withdrawOne(id.tinderbox, 180000)) InvEquip.buyItem(id.tinderbox,1,180000);
 					continue;
 				}
 				final int invunlitCandleLanterns = Inventory.count(id.unlitCandleLantern);
@@ -93,7 +92,7 @@ public class Candlez {
 						if(Bank.close()) Sleep.sleep(69, 420);
 						continue;
 					}
-					if(Inventory.get(tinderbox).useOn(Inventory.get(id.unlitCandleLantern)))
+					if(Inventory.get(id.tinderbox).useOn(Inventory.get(id.unlitCandleLantern)))
 					{
 						MethodProvider.sleepUntil(() -> Inventory.count(id.litCandleLantern) > invlitCandleLanterns, Sleep.calculate(2222, 2222));
 					}
@@ -205,7 +204,7 @@ public class Candlez {
 			return true;
 		}
 		if(Inventory.count(TrainWoodcutting.logs) > 0 && 
-				Inventory.count(tinderbox) > 0)
+				Inventory.count(id.tinderbox) > 0)
 		{
 			if(lightableArea.contains(Players.localPlayer()))
 			{
@@ -218,7 +217,7 @@ public class Candlez {
 						g.getTile().equals(Players.localPlayer().getTile()));
 				if(fireUnderMe == null)
 				{
-					if(Inventory.get(TrainWoodcutting.logs).useOn(Inventory.get(tinderbox)))
+					if(Inventory.get(TrainWoodcutting.logs).useOn(Inventory.get(id.tinderbox)))
 					{
 						MethodProvider.sleepUntil(() -> Players.localPlayer().isAnimating(), Sleep.calculate(2222, 2222));
 					}
@@ -258,7 +257,7 @@ public class Candlez {
 		if(Walkz.goToGE(180000))
 		{
 			InvEquip.clearAll();
-			InvEquip.addInvyItem(tinderbox, 1, 1, false, 1);
+			InvEquip.addInvyItem(id.tinderbox, 1, 1, false, 1);
 			InvEquip.addInvyItem(TrainWoodcutting.logs, 1, 27, false, (int) Calculations.nextGaussianRandom(100, 20));
 			InvEquip.shuffleFulfillOrder();
 			InvEquip.fulfillSetup(true, 180000);

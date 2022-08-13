@@ -110,6 +110,53 @@ public class Locations {
 	public static final Area mageArenaBankLeverAirlock = new Area(3094, 3958, 3093, 3956, 0);
 	public static final Area deepWildyWeb_EdgevilleLever = new Area(3152, 3946, 3164, 3956, 0);
 	public static final Area edgevillePKLever = new Area(3085, 3482, 3097, 3468, 0);
+	public static final Area allFremennikProvinceSeersLighthouse = new Area(
+		    new Tile[] {
+		        new Tile(2720, 3744, 0),
+		        new Tile(2776, 3682, 0),
+		        new Tile(2813, 3611, 0),
+		        new Tile(2790, 3523, 0),
+		        new Tile(2786, 3454, 0),
+		        new Tile(2612, 3449, 0),
+		        new Tile(2577, 3577, 0),
+		        new Tile(2466, 3625, 0),
+		        new Tile(2473, 3695, 0),
+		        new Tile(2652, 3748, 0)
+		    }
+		);
+	public static final Area strangeAltar = new Area(2624, 3604, 2628, 3596, 0);
+	public static final Area seersPub = new Area(
+			new Tile(2689, 3488, 0),
+			new Tile(2697, 3488, 0),
+			new Tile(2697, 3494, 0),
+			new Tile(2700, 3495, 0),
+			new Tile(2700, 3498, 0),
+			new Tile(2689, 3498, 0));
+	public static final Area fremmy_koscheiArena = new Area(2637, 10100, 2676, 10062, 2);
+	public static final Area fremmy_askeladden = new Area(2651, 3664, 2667, 3656, 0);
+	public static final Area fremmy_peerTheSeer = new Area(2638, 3667, 2627, 3672, 0);
+	public static final Area fremmy_fisherman = new Area(2641, 3700, 2640, 3690, 0);
+	public static final Area fremmy_peerLeftDoor = new Area(2629, 3671, 2633, 3665, 0);
+	public static final Area fremmy_peerLeftHouse = new Area(2629, 3666, 2633, 3659, 0);
+	public static final Area fremmy_peerUpstairs = new Area(2629, 3665, 2639, 3660, 2);
+	public static final Area fremmy_upstairsHelmetShop = new Area(2666, 3690, 2668, 3695, 1);
+	public static final Area fremmy_helmetShop = new Area(2662, 3695, 2668, 3690, 0);
+	public static final Area fremmy_peerRightHouse = new Area(2638, 3659, 2634, 3666, 0);
+	public static final Area fremmy_yrsa = new Area(2622, 3676, 2626, 3672, 0);
+	public static final Area fremmy_sailor = new Area(2629, 3697, 2632, 3690, 0);
+	public static final Area fremmy_sigmund = new Area(2635, 3683, 2649, 3671, 0);
+	public static final Area fremmy_swensen = new Area(2643, 3662, 2650, 3657, 0);
+	public static final Area fremmy_pipeBomb = new Area(2663, 3676, 2666, 3670, 0);
+	public static final Area fremmy_wholeConcert = new Area(2655, 3682, 2666, 3685, 0);
+	public static final Area fremmy_concertPlatform = new Area(2655, 3685, 2662, 3682, 0);
+	public static final Area fremmy_concertDoor = new Area(2663, 3689, 2671, 3679, 0);
+	public static final Area fremmy_councilWorkman = new Area(2651, 3595, 2658, 3589, 0);
+	public static final Area fremmy_lanzigHut = new Area(2672, 3663, 2677, 3667, 0);
+	public static final Area fremmy_sigliDaHunstman = new Area(2651, 3659, 2666, 3647, 0);
+	public static final Area fremmy_olafDaBeard = new Area(2667, 3679, 2679, 3693, 0);
+	public static final Area fremmy_longHall = new Area(2655, 3681, 2662, 3665, 0);
+	public static final Area fremmy_peerRightDoor = new Area(2634, 3664, 2638, 3669, 0);
+	public static final Area diango = new Area(3075, 3251, 3087, 3242, 0);
 	public static final Area lumbyGiantFrogs = new Area(3187, 3197, 3209, 3171, 0);
 	public static final Area museumArea = new Area(1725, 4991, 1793, 4928);
 	public static final Area fallyTeleSpot = new Area(2961, 3384, 2969, 3376, 0);

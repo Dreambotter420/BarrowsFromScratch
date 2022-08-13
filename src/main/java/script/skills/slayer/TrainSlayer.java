@@ -400,7 +400,7 @@ public class TrainSlayer extends Leaf{
     		InvEquip.addInvyItem(InvEquip.getBankItem(id.staminas), 1, 1, false, 0);
     	}
     	else InvEquip.addInvyItem(id.stamina4, 1, 1, false, (int) Calculations.nextGaussianRandom(20, 5));
-    	InvEquip.addInvyItem(Candlez.tinderbox, 1, 1, false, 1);
+    	InvEquip.addInvyItem(id.tinderbox, 1, 1, false, 1);
     	
     	for(int f : Combatz.foods)
     	{
@@ -443,7 +443,7 @@ public class TrainSlayer extends Leaf{
     		InvEquip.addInvyItem(InvEquip.getBankItem(id.staminas), 1, 1, false, 0);
     	}
     	else InvEquip.addInvyItem(id.stamina4, 1, 1, false, (int) Calculations.nextGaussianRandom(20, 5));
-    	InvEquip.addInvyItem(Candlez.tinderbox, 1, 1, false, 1);
+    	InvEquip.addInvyItem(id.tinderbox, 1, 1, false, 1);
     	
     	for(int f : Combatz.foods)
     	{

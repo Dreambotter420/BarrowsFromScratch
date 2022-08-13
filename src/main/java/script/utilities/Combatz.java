@@ -22,6 +22,7 @@ import org.dreambot.api.wrappers.items.Item;
 import org.dreambot.api.wrappers.widgets.WidgetChild;
 
 import script.Main;
+import script.quest.varrockmuseum.Timing;
 import script.skills.ranged.TrainRanged;
 
 public class Combatz {
@@ -164,6 +165,7 @@ public class Combatz {
     	karma.add(id.superAtts);
     	karma.add(id.superStrs);
     	Collections.shuffle(karma);
+    	karma.add(0,id.superCombats);
     	for(List<Integer> superPots : karma)
     	{
     		Timer timeout = new Timer(7000);
@@ -187,6 +189,18 @@ public class Combatz {
     			}
     			if(Inventory.get(InvEquip.getInvyItem(superPots)).interact("Drink"))
     			{
+    				if(superPots.equals(id.superCombats))
+    				{
+    					MethodProvider.log("Drank supercombat pot!");
+    					int delay = (int) Calculations.nextGaussianRandom(2000,400);
+        				if(delay<1400) delay = 1500;
+        				drinkDelayTimer = new Timer();
+        				nextRandMeleeBoostLvl = 0;
+    					Main.customPaintText3 = "";
+    					Main.customPaintText4 = "";
+    					Sleep.sleep(666, 696);
+        				return;
+    				}
     				MethodProvider.log("Drank "+(id.superStrs == superPots ? "Strength" : "Attack")+" pot!");
     				int delay = (int) Calculations.nextGaussianRandom(2000,400);
     				if(delay<1400) delay = 1500;

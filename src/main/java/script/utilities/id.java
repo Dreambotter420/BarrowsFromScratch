@@ -49,6 +49,11 @@ public class id {
 	public static final int superStr3 = 157;
 	public static final int superStr4 = 2440;
 	public static List<Integer> superStrs = new ArrayList<Integer>();
+	public static final int superCombat1 = 12701;
+	public static final int superCombat2 = 12699;
+	public static final int superCombat3 = 12697;
+	public static final int superCombat4 = 12695;
+	public static List<Integer> superCombats = new ArrayList<Integer>();
 	public static final int antidote1 = 5958;
 	public static final int antidote2 = 5956;
 	public static final int antidote3 = 5954;
@@ -101,6 +106,7 @@ public class id {
 	public static final int yewLongbow = 855;
 	
 
+	public static final int rawShark = 383;
 	public static final int giantFrogLegs = 4518;
 	public static final int bloodRune = 565;
 	public static final int cosmicRune = 564;
@@ -111,7 +117,48 @@ public class id {
 	public static final int saradominStaff = 2415;
 	public static final int zamorakStaff = 2417;
 	public static final int guthixStaff = 2416;
-	
+	public static final int eventRPG = 12727;
+	public static final int fremmy_beerTankard = 3803;
+	public static final int fremmy_kegOfBeer = 3711;
+	public static final int tinderbox = 590;
+	public static final int fremmy_huntersTalisman = 3697;
+	public static final int fremmy_huntersTalismanAbsorbedDraugen = 3696;
+	public static final int fremmy_lowAlcoholKeg = 3712;
+	public static final int fremmy_lyre = 3689;
+	public static final int fremmy_enchantedLyre = 3690;
+	public static final int fremmy_strangeObject1 = 3713;
+	public static final int fremmy_strangeObject2 = 3714;
+	public static final int fremmy_askeladdenPromise = 3709;
+	public static final int fremmy_legendaryCocktail = 3707;
+	public static final int fremmy_championsToken = 3706;
+	public static final int fremmy_warriorsContract = 3710;
+	public static final int fremmy_weatherForecast = 3705;
+	public static final int fremmy_seaFishingMap = 3704;
+	public static final int fremmy_unusualFish = 3703;
+	public static final int fremmy_customBowString = 3702;
+	public static final int fremmy_trackingMap = 3701;
+	public static final int fremmy_fiscalStatement = 3708;
+	public static final int fremmy_customBoots = 3700;
+	public static final int fremmy_fremennikBallad = 3699;
+	public static final int fremmy_exoticFlowers = 3698;
+	public static final int fremmy_redHerring = 3742;
+	public static final int fremmy_emptyJug = 3732;
+	public static final int fremmy_woodenDisk = 3744;
+	public static final int fremmy_oldRedDisk = 9947;
+	public static final int fremmy_emptyBucket = 3727;
+	public static final int fremmy_redGoop = 3746;
+	public static final int fremmy_redDisk = 3743;
+	public static final int fremmy_vaseLid = 3737;
+	public static final int fremmy_fullBucket = 3722;
+	public static final int fremmy_fullJug = 3729;
+	public static final int fremmy_2_5Bucket = 3725;
+	public static final int fremmy_2_3Jug = 3730;
+	public static final int fremmy_4_5Bucket = 3723;
+	public static final int fremmy_vase = 3734;
+	public static final int fremmy_fullVase = 3735;
+	public static final int fremmy_wholeVase = 3740;
+	public static final int fremmy_frozenKey = 3741;
+	public static final int fremmy_unfrozenKey = 3745;
 	
 	public static LinkedHashMap<Integer, Integer> approvedAlchs = new LinkedHashMap<Integer,Integer>();
 	public static LinkedHashMap<Integer, Integer> xpAlchs = new LinkedHashMap<Integer,Integer>();
@@ -157,6 +204,10 @@ public class id {
 		superStrs.add(superStr2);
 		superStrs.add(superStr3);
 		superStrs.add(superStr4);
+		superCombats.add(superCombat1);
+		superCombats.add(superCombat2);
+		superCombats.add(superCombat3);
+		superCombats.add(superCombat4);
 		staminas.add(stamina1);
 		staminas.add(stamina2);
 		staminas.add(stamina3);

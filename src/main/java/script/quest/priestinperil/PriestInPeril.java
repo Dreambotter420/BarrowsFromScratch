@@ -474,7 +474,7 @@ public class PriestInPeril extends Leaf {
         				Sleep.sleep(1111, 1111);
         				if(Players.localPlayer().isInCombat()) break;
         				MethodProvider.log("Attacking monk of zammy!");
-        				API.interactNPC("Monk of Zamorak","Attack", 30,Locations.PiP_pastramiChurchLvl1,false, () -> Players.localPlayer().isInCombat());
+        				API.interactNPC("Monk of Zamorak","Attack", 30,Locations.PiP_pastramiChurchLvl1,true, () -> Players.localPlayer().isInCombat());
             			Sleep.sleep(696, 666);
         			}
         			break;

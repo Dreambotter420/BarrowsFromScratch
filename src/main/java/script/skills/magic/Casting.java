@@ -13,6 +13,7 @@ import org.dreambot.api.methods.tabs.Tabs;
 import org.dreambot.api.methods.widget.Widgets;
 
 import script.utilities.Sleep;
+import script.utilities.Tabz;
 import script.utilities.id;
 
 public class Casting {
@@ -39,7 +40,7 @@ public class Casting {
 		if(getAutocastConfig() == spellConfigID) return true;
 		if(!Tabs.isOpen(Tab.COMBAT))
 		{
-			if(Tabs.open(Tab.COMBAT))
+			if(Tabz.open(Tab.COMBAT))
 			{
 				MethodProvider.sleepUntil(() -> Tabs.isOpen(Tab.COMBAT), Sleep.calculate(2222, 2222));
 			}

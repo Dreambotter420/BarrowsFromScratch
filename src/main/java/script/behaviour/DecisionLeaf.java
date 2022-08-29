@@ -6,11 +6,15 @@ import java.util.List;
 
 import org.dreambot.api.methods.Calculations;
 import org.dreambot.api.methods.MethodProvider;
+import org.dreambot.api.methods.dialogues.Dialogues;
+import org.dreambot.api.methods.interactive.NPCs;
 import org.dreambot.api.methods.skills.Skill;
 import org.dreambot.api.methods.skills.Skills;
 import org.dreambot.api.script.ScriptManager;
 import org.dreambot.api.utilities.Timer;
 
+import script.actionz.UniqueActions;
+import script.actionz.UniqueActions.Actionz;
 import script.framework.Leaf;
 import script.quest.animalmagnetism.AnimalMagnetism;
 import script.quest.ernestthechicken.ErnestTheChicken;
@@ -22,10 +26,14 @@ import script.quest.magearena2.MageArena2;
 import script.quest.naturespirit.NatureSpirit;
 import script.quest.priestinperil.PriestInPeril;
 import script.quest.restlessghost.RestlessGhost;
+import script.quest.varrockmuseum.Timing;
 import script.quest.varrockmuseum.VarrockQuiz;
 import script.quest.waterfallquest.WaterfallQuest;
 import script.utilities.API;
 import script.utilities.API.modes;
+import script.utilities.Dialoguez;
+import script.utilities.Questz;
+import script.utilities.Sleep;
 
 public class DecisionLeaf extends Leaf{
 
@@ -47,7 +55,12 @@ public class DecisionLeaf extends Leaf{
     
     public static void resetForceBreakTimer()
     {
-    	forceBreakTimer = new Timer((int)Calculations.nextGaussianRandom(12000000, 200000));
+    	if(UniqueActions.isActionEnabled(Actionz.TAKE_MORE_BREAKS))
+    	{
+    		forceBreakTimer = new Timer((int)Calculations.nextGaussianRandom(9000000, 3500000));
+    		return;
+    	}
+    	forceBreakTimer = new Timer((int)Calculations.nextGaussianRandom(12000000, 5000000));
     }
     
     /**
@@ -56,7 +69,7 @@ public class DecisionLeaf extends Leaf{
      * 2 for medium,
      * 3 for long,
      * 4 for guaranteed extra long.
-     * Most likely will choose the chosen timer. But a chance to choose others. Except for 4.
+     * Most likely will choose the chosen timer. But a chance to choose others. Except for 4. 4 will choose extra long.
      */
     public static void setTaskTimer (int priorityTime)
     {
@@ -122,18 +135,18 @@ public class DecisionLeaf extends Leaf{
 		final int prayer = Skills.getRealLevel(Skill.PRAYER);
 		final int def = Skills.getRealLevel(Skill.DEFENCE);
 		final int agility = Skills.getRealLevel(Skill.AGILITY);
-		final boolean waterfallDone = WaterfallQuest.completedWaterfallQuest;
-		final boolean fightArenaDone = FightArena.completedFightArena;
-		final boolean fremmyTrialsDone = FremennikTrials.completedFremennikTrials;
+		final boolean waterfallDone = WaterfallQuest.completed();
+		final boolean fightArenaDone = FightArena.completed();
+		final boolean fremmyTrialsDone = FremennikTrials.completed();
 		final boolean horrorDone = HorrorFromTheDeep.completedHorrorFromTheDeep;
-		final boolean ernestDone = ErnestTheChicken.completedErnestTheChikken;
+		final boolean ernestDone = ErnestTheChicken.completed();
 		final boolean animalMagnetized = AnimalMagnetism.completedAnimalMagnetism;
-		final boolean natureSpirited = NatureSpirit.completedNatureSpirit;
-		final boolean mageArena1Done = MageArena1.completedMageArena1;
+		final boolean natureSpirited = true;
+		final boolean mageArena1Done = MageArena1.completed();
 		final boolean mageArena2Done = MageArena2.completedMageArena2;
-		final boolean priestSaved = PriestInPeril.completedPriestInPeril;
-		final boolean restedGhost = RestlessGhost.completedRestlessGhost;
-		final boolean quizzed = VarrockQuiz.completedQuiz;
+		final boolean priestSaved = PriestInPeril.completed();
+		final boolean restedGhost = RestlessGhost.completed();
+		final boolean quizzed = VarrockQuiz.completed();
 		List<API.modes> validModes = new ArrayList<API.modes>();
 		
 		if(!natureSpirited)
@@ -235,7 +248,9 @@ public class DecisionLeaf extends Leaf{
 		if(validModes.isEmpty()) MethodProvider.log("Congratulations, you win!");
 		else
 		{
-			if(Calculations.random(1,100) > 95 || forceBreakTimer.finished()) API.mode = modes.BREAK;
+			int breakChance = Calculations.random(1,100);
+			if(UniqueActions.isActionEnabled(Actionz.TAKE_MORE_BREAKS)) breakChance += 3;
+			if(breakChance > 95 || forceBreakTimer.finished()) API.mode = modes.BREAK;
 			else 
 			{
 				Collections.shuffle(validModes);
@@ -243,7 +258,8 @@ public class DecisionLeaf extends Leaf{
 			}
 			
 			//testing
-			//API.mode = modes.FREMENNIK_TRIALS;
+			//API.mode = modes.NATURE_SPIRIT;
+			
 			
 			MethodProvider.log("Switching mode: " + API.mode.toString());
 			if(API.mode == modes.ANIMAL_MAGNETISM || 
@@ -272,6 +288,7 @@ public class DecisionLeaf extends Leaf{
 				setTaskTimer(2);
 			}
 			else if(API.mode == modes.TRAIN_CRAFTING || 
+					API.mode == modes.TRAIN_AGILITY || 
 					API.mode == modes.TRAIN_WOODCUTTING || 
 					API.mode == modes.TRAIN_PRAYER)
 			{
@@ -279,7 +296,8 @@ public class DecisionLeaf extends Leaf{
 			}
 			else if(API.mode == modes.BREAK)
 			{
-				setTaskTimer(2);
+				if(UniqueActions.isActionEnabled(Actionz.TAKE_LONGER_BREAKS)) setTaskTimer(3);
+				else setTaskTimer(2);
 				resetForceBreakTimer();
 			}
 		}

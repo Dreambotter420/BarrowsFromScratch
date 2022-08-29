@@ -12,14 +12,18 @@ import org.dreambot.api.methods.settings.PlayerSettings;
 import org.dreambot.api.methods.walking.impl.Walking;
 import org.dreambot.api.methods.widget.Widgets;
 import script.Main;
+import script.actionz.UniqueActions;
+import script.actionz.UniqueActions.Actionz;
 import script.behaviour.DecisionLeaf;
 import script.framework.Leaf;
 import script.quest.varrockmuseum.Timing;
 import script.skills.ranged.TrainRanged;
 import script.utilities.API;
 import script.utilities.Combatz;
+import script.utilities.Dialoguez;
 import script.utilities.InvEquip;
 import script.utilities.Locations;
+import script.utilities.Questz;
 import script.utilities.Sleep;
 import script.utilities.Walkz;
 import script.utilities.id;
@@ -29,7 +33,6 @@ import script.utilities.id;
  * ^_^
  */
 public class ErnestTheChicken extends Leaf {
-	public static boolean completedErnestTheChikken = false;
 	public static final int poison = 273;
 	public static final int fishfood = 272;
 	public static final int poisonedFood = 274;
@@ -46,12 +49,7 @@ public class ErnestTheChicken extends Leaf {
 	}
 	public static boolean onExit()
 	{
-		if(Widgets.getWidgetChild(153,16) != null && 
-    			Widgets.getWidgetChild(153,16).isVisible())
-    	{
-    		if(Widgets.getWidgetChild(153,16).interact("Close")) Sleep.sleep(696, 666);
-    		return false;
-    	}
+		if(Questz.closeQuestCompletion()) return false;
     	if(Locations.ernest_3rdfloorMaynor.contains(Players.localPlayer()) || 
     			Locations.ernest_2ndfloorMaynor.contains(Players.localPlayer()) ||
     			Locations.ernest_SkellyTube.contains(Players.localPlayer()) ||
@@ -68,6 +66,10 @@ public class ErnestTheChicken extends Leaf {
     	}
     	return true;
 	}
+	public static boolean completed()
+	{
+		return getProgressValue() == 3;
+	}
     @Override
     public int onLoop() {
         if (DecisionLeaf.taskTimer.finished()) {
@@ -78,7 +80,7 @@ public class ErnestTheChicken extends Leaf {
             }
             return Timing.sleepLogNormalSleep();
         }
-        if (completedErnestTheChikken) {
+        if (completed()) {
             if(onExit())
             {
             	MethodProvider.log("[COMPLETED] -> Ernest the Chikken!");
@@ -91,19 +93,16 @@ public class ErnestTheChicken extends Leaf {
         	
             return Timing.sleepLogNormalSleep();
         }
+        if(Questz.shouldCheckQuestStep()) Questz.checkQuestStep("Ernest the Chicken");
+        
         
         if(Dialogues.getNPCDialogue() != null && !Dialogues.getNPCDialogue().isEmpty())
         {
         	MethodProvider.log("NPC Dialogue: " + Dialogues.getNPCDialogue());
 		}
-        if(handleDialogues()) return Timing.sleepLogNormalSleep();
+        if(Dialoguez.handleDialogues()) return Timing.sleepLogNormalSleep();
         switch(getProgressValue())
         {
-        case(3):
-        {
-        	completedErnestTheChikken = true;
-        	break;
-        }
         case(2):
         {
         	if(!InvEquip.equipmentContains(InvEquip.wearableGlory) || 
@@ -155,7 +154,7 @@ public class ErnestTheChicken extends Leaf {
     	InvEquip.shuffleFulfillOrder();
     	InvEquip.addInvyItem(InvEquip.coins, 0, 0, false, 0);
 
-    	InvEquip.addInvyItem(TrainRanged.jugOfWine, 1, 5, false, (int) Calculations.nextGaussianRandom(500, 209));
+    	InvEquip.addInvyItem(Combatz.lowFood, 1, 5, false, (int) Calculations.nextGaussianRandom(500, 209));
     	if(InvEquip.fulfillSetup(true, 180000))
 		{
 			MethodProvider.log("[INVEQUIP] -> Fulfilled equipment correctly! (ErnestTheChikken)");
@@ -202,6 +201,7 @@ public class ErnestTheChicken extends Leaf {
         }
     	if(!Inventory.contains(gauge))
     	{
+    		API.randomAFK(5);
     		if(!poisonedFountain)
     		{
     			if(!Inventory.contains(poisonedFood))
@@ -261,6 +261,7 @@ public class ErnestTheChicken extends Leaf {
     			API.walkPickupGroundItem("Rubber tube","Take",Locations.ernest_SkellyTube);
     			return;
     		}
+    		API.randomAFK(5);
 			if(!Inventory.contains(key))
 			{
 				if(!Inventory.contains(id.spade))
@@ -276,6 +277,8 @@ public class ErnestTheChicken extends Leaf {
 			API.walkInteractWithGameObject("Door", "Open", Locations.ernest_SkellyDoorArea, () -> Locations.ernest_SkellyTube.contains(Players.localPlayer()));
 			return;
     	}
+
+		API.randomAFK(5);
     	if(Locations.ernest_SkellyTube.contains(Players.localPlayer()))
     	{
 			API.walkInteractWithGameObject("Door", "Open", Locations.ernest_SkellyDoorArea, () -> !Locations.ernest_SkellyTube.contains(Players.localPlayer()));
@@ -398,36 +401,5 @@ public class ErnestTheChicken extends Leaf {
     {
     	return PlayerSettings.getConfig(32);
     }
-    public static boolean handleDialogues()
-	{
-		if(Dialogues.canContinue())
-		{
-			if(Dialogues.getNPCDialogue() != null && 
-					Dialogues.getNPCDialogue().contains("... and a lot of piranhas!"))
-			{
-				poisonedFountain = false;
-				MethodProvider.log("Saw not poisoned fountain, switching to un-poisoned fountain mode");
-			}
-			if(Dialogues.getNPCDialogue() != null && 
-					Dialogues.getNPCDialogue().contains("Give \'em here then."))
-			{
-				if(Dialogues.continueDialogue()) Sleep.sleep(3333,3333);
-			}
-			if(Dialogues.continueDialogue()) Sleep.sleep(69,696);
-			return true;
-		}
-		if(Dialogues.isProcessing())
-		{
-			Sleep.sleep(69,696);
-			return true;
-		}
-		
-		if(Dialogues.areOptionsAvailable())
-		{
-			return Dialogues.chooseOption("Yes.") || 
-					Dialogues.chooseOption("I\'m looking for a guy called Ernest.") || 
-					Dialogues.chooseOption("Change him back this instant!");
-		}
-		return false;
-	}
+    
 }

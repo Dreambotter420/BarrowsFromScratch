@@ -27,21 +27,20 @@ import org.dreambot.api.wrappers.items.Item;
 import script.Main;
 import script.behaviour.DecisionLeaf;
 import script.framework.Leaf;
-import script.framework.Tree;
 import script.quest.varrockmuseum.Timing;
-import script.skills.ranged.TrainRanged;
 import script.utilities.API;
 import script.utilities.Combatz;
+import script.utilities.Dialoguez;
 import script.utilities.InvEquip;
 import script.utilities.Locations;
 import script.utilities.Paths;
+import script.utilities.Questz;
 import script.utilities.Sleep;
 import script.utilities.Walkz;
 import script.utilities.id;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.List;
 /**
  * Completes Waterfall Quest
@@ -49,19 +48,7 @@ import java.util.List;
  * ^_^
  */
 public class WaterfallQuest extends Leaf {
-	public static boolean started = false;
-	public static boolean completedWaterfallQuest = false;
-    public void onStart() {
-        
-        instantiateTree();
-        started = true;
-    }
-
-    private final Tree tree = new Tree();
-    private void instantiateTree() {
-        
-    }
-    
+	
     public static final int key1 = 293;
     public static final int key2 = 298;
     public static final int glarialsPebble = 294;
@@ -69,9 +56,13 @@ public class WaterfallQuest extends Leaf {
     public static final int glarialsAmulet = 295;
     public static Timer spiderHitTimer = null;
     
+    public static boolean completed()
+    {
+	    return getProgressValue() == 10;
+    }
     @Override
     public int onLoop() {
-    	if(completedWaterfallQuest)
+    	if(completed())
     	{
     		if(exitQuest())
     		{
@@ -94,22 +85,21 @@ public class WaterfallQuest extends Leaf {
     		}
             return Timing.sleepLogNormalSleep();
     	}
+
+    	if(Questz.shouldCheckQuestStep()) Questz.checkQuestStep("Waterfall Quest");
     	if(Locations.isInKourend())
     	{
-    		Walkz.leaveKourend(180000);
+    		Walkz.exitKourend(180000);
     		return Timing.sleepLogNormalInteraction();
     	}
     	
     	if(!Walkz.isStaminated()) Walkz.drinkStamina();
-    	if(!Walking.isRunEnabled() && Walking.getRunEnergy() >= 20) Walking.toggleRun();
+    	if(!Walking.isRunEnabled() && Walkz.isStaminated() && Walking.getRunEnergy() >= 10) Walking.toggleRun();
     	if(!InvEquip.checkedBank()) return Timing.sleepLogNormalSleep();
+    	
     	switch(getProgressValue())
         { 
-        case(10): //have completed quest - still maybe in room
-        {
-        	completedWaterfallQuest = true;
-        	break;
-        }
+        
         case(8): //have completed all runes putting and amulet putting
         {
         	doLastStep();
@@ -140,7 +130,7 @@ public class WaterfallQuest extends Leaf {
         		}
         		break;
         	}
-        	if(Inventory.count(TrainRanged.jugOfWine) <= 0)
+        	if(Inventory.count(Combatz.lowFood) <= 0)
         	{
         		if(Combatz.shouldEatFood(8)) 
         		{
@@ -277,12 +267,12 @@ public class WaterfallQuest extends Leaf {
         			!InvEquip.equipmentContains(InvEquip.wearableWealth) ||
         			!InvEquip.equipmentContains(InvEquip.wearableGames) ||
         			!InvEquip.invyContains(id.staminas) ||
-        			!Inventory.contains(TrainRanged.jugOfWine))
+        			!Inventory.contains(Combatz.lowFood))
         	{
         		fulfillStart();
         		break;
         	}
-        	if(handleDialogues())
+        	if(Dialoguez.handleDialogues())
         	{
         		Sleep.sleep(420,696);
         		break;
@@ -309,7 +299,7 @@ public class WaterfallQuest extends Leaf {
         {
         	if(fulfillStart())
         	{
-        		if(handleDialogues())
+        		if(Dialoguez.handleDialogues())
             	{
             		Sleep.sleep(420,696);
             		break;
@@ -384,11 +374,17 @@ public class WaterfallQuest extends Leaf {
 	
 	public static void getGlarialsPebble()
 	{
+		if(Combat.isAutoRetaliateOn())
+		{
+			Combatz.toggleAutoRetaliate(false);
+			Sleep.sleep(111, 420);
+			return;
+		}
     	if(Locations.waterfallDungeon1.contains(Players.localPlayer()))
     	{
     		if(Locations.waterfallDungeonGolrieRoom.contains(Players.localPlayer()))
     		{
-    			if(handleDialogues()) return;
+    			if(Dialoguez.handleDialogues()) return;
     			if(Inventory.isItemSelected()) Inventory.deselect();
     			NPC golrie = NPCs.closest("Golrie");
     			if(golrie == null)
@@ -435,16 +431,22 @@ public class WaterfallQuest extends Leaf {
     			Filter<GameObject> boxF = g -> 
 					g != null && 
 					g.getName().equals("Crate") && 
-					g.hasAction("Search");
+					g.hasAction("Search") && 
+					g.getID() == 1990 && 
+					Locations.waterfallDungeonKeyRoom.contains(g);
 				GameObject box = GameObjects.closest(boxF);
 				if(box == null)
 				{
 					MethodProvider.log("crate with key is null in key room (Waterfall Quest)!!");
+					return;
 				}
-				if(box.interact("Search"))
+				if(InvEquip.free1InvySpace())
 				{
-					MethodProvider.sleepUntil(() -> Inventory.count(key1) >= 1, Sleep.calculate(8888,3333));
-				} else if(Walking.walk(box)) Sleep.sleep(420, 696);
+					if(box.interact("Search"))
+					{
+						MethodProvider.sleepUntil(() -> Inventory.count(key1) >= 1, Sleep.calculate(8888,3333));
+					} else if(Walking.walk(box)) Sleep.sleep(420, 696);
+				}
 				return;
     		}
     		if(Walking.shouldWalk(6) && Walking.walk(Locations.waterfallDungeonKeyRoom.getCenter())) Sleep.sleep(520,696);
@@ -492,14 +494,10 @@ public class WaterfallQuest extends Leaf {
     		return;
     	}
 
-    	if(Walkz.walkPath(Paths.gnomeStrongholdMaze))
-    	{
-    		return;
-    	}
+    	if(Walkz.walkPath(Paths.gnomeStrongholdMaze)) return;
     	
     	if(!Walkz.useJewelry(InvEquip.skills,"Fishing Guild"))
     	{
-    		if(!InvEquip.checkedBank()) return;
     		if(InvEquip.bankContains(InvEquip.wearableSkills))
     		{
     			InvEquip.withdrawOne(InvEquip.getBankItem(InvEquip.wearableSkills), 180000);
@@ -511,7 +509,7 @@ public class WaterfallQuest extends Leaf {
 	
 	public static boolean exitQuest()
 	{
-		if(handleDialogues()) return false;
+		if(Dialoguez.handleDialogues()) return false;
 		if(Widgets.getWidgetChild(153,16) != null && 
 				Widgets.getWidgetChild(153,16).isVisible() && 
 				Widgets.getWidgetChild(153,16).hasAction("Close"))
@@ -542,7 +540,7 @@ public class WaterfallQuest extends Leaf {
 	
 	public static void doLastStep()
 	{
-		if(Inventory.count(TrainRanged.jugOfWine) <= 0)
+		if(Inventory.count(Combatz.lowFood) <= 0)
     	{
     		if(Combatz.shouldEatFood(11)) 
     		{
@@ -551,12 +549,11 @@ public class WaterfallQuest extends Leaf {
     		}
     	}
     	if(Combatz.shouldEatFood(11)) Combatz.eatFood();
-    	
     	if(Locations.waterfallDungeonLastAreaChanged.contains(Players.localPlayer()))
     	{
     		if(InvEquip.freeInvySpaces(5))
     		{
-    			if(handleDialogues()) return;
+    			if(Dialoguez.handleDialogues()) return;
     			GameObject chalice = GameObjects.closest("Chalice");
         		if(chalice == null)
         		{
@@ -607,11 +604,17 @@ public class WaterfallQuest extends Leaf {
 					}
 					return;
 				}
+				if(Combat.isAutoRetaliateOn())
+	    		{
+	    			Combatz.toggleAutoRetaliate(false);
+	    			Sleep.sleep(111, 420);
+	    			return;
+	    		}
 				if(Inventory.count(key2) > 0)
 				{
 					if(Combat.isAutoRetaliateOn())
 			    	{
-			    		Combat.toggleAutoRetaliate(false);
+			    		Combatz.toggleAutoRetaliate(false);
 			    	}
 					if(Skills.getRealLevel(Skill.HITPOINTS) > 11)
 					{
@@ -728,8 +731,16 @@ public class WaterfallQuest extends Leaf {
 			teleWalkBoardRaft();
 			return;
 		}
+		
+		//we do not have urn or amulet - go get them - check first to see if in the dungeon to get them
     	if(Locations.waterfallDungeon2.contains(Players.localPlayer()))
     	{
+    		if(Combat.isAutoRetaliateOn())
+    		{
+    			Combatz.toggleAutoRetaliate(false);
+    			Sleep.sleep(111, 420);
+    			return;
+    		}
     		if(Inventory.count(glarialsUrn) > 0 && 
     				Inventory.count(glarialsAmulet) > 0)
     		{
@@ -965,7 +976,7 @@ public class WaterfallQuest extends Leaf {
 		InvEquip.setEquipItem(EquipmentSlot.AMULET,InvEquip.games);
 
 		InvEquip.shuffleFulfillOrder();
-		InvEquip.addInvyItem(TrainRanged.jugOfWine,5,23, false, (int) Calculations.nextGaussianRandom(500,100));
+		InvEquip.addInvyItem(Combatz.lowFood,5,23, false, (int) Calculations.nextGaussianRandom(500,100));
 		return InvEquip.fulfillSetup(true, 180000);
 	}
 	public static boolean fulfillGlarialsPebble()
@@ -985,7 +996,7 @@ public class WaterfallQuest extends Leaf {
 		InvEquip.setEquipItem(EquipmentSlot.RING,InvEquip.wealth);
 		InvEquip.setEquipItem(EquipmentSlot.AMULET,InvEquip.skills);
 		InvEquip.shuffleFulfillOrder();
-		InvEquip.addInvyItem(TrainRanged.jugOfWine,3,23, false, (int) Calculations.nextGaussianRandom(500,100));
+		InvEquip.addInvyItem(Combatz.lowFood,3,23, false, (int) Calculations.nextGaussianRandom(500,100));
 		return InvEquip.fulfillSetup(true, 180000);
 	}
 	
@@ -1001,41 +1012,17 @@ public class WaterfallQuest extends Leaf {
 		InvEquip.addInvyItem(InvEquip.games, 1, 1, false, 1);
 		InvEquip.addInvyItem(glarialsAmulet, 1, 1, false, 0);
 		InvEquip.addInvyItem(key1, 1, 1, false, 0);
-		InvEquip.addInvyItem(key2, 1, 1, false, 0);
 		InvEquip.addInvyItem(glarialsPebble, 1, 1, false, 0);
 		InvEquip.addInvyItem(glarialsUrn, 1, 1, false, 0);
 		InvEquip.setEquipItem(EquipmentSlot.RING,InvEquip.wealth);
 		InvEquip.setEquipItem(EquipmentSlot.AMULET,InvEquip.skills);
 		InvEquip.shuffleFulfillOrder();
-		InvEquip.addInvyItem(TrainRanged.jugOfWine,3,23, false, (int) Calculations.nextGaussianRandom(500,100));
+		InvEquip.addInvyItem(Combatz.lowFood,3,23, false, (int) Calculations.nextGaussianRandom(500,100));
 		return InvEquip.fulfillSetup(true, 180000);
 	}
 	public static int getProgressValue()
 	{
 		return PlayerSettings.getConfig(65);
 	}
-	public static boolean handleDialogues()
-	{
-		if(Dialogues.canContinue())
-		{
-			if(Dialogues.continueDialogue()) Sleep.sleep(69,696);
-			return true;
-		}
-		if(Dialogues.isProcessing())
-		{
-			Sleep.sleep(420,696);
-			return true;
-		}
-		 
-		if(Dialogues.areOptionsAvailable())
-		{
-			return chooseQuestOption();
-		}
-		return false;
-	}
-	public static boolean chooseQuestOption()
-	{
-		if(Dialogues.chooseOption("Yes.")) return true;
-		return false;
-	}
+	
 }

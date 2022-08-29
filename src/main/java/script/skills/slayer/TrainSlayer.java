@@ -24,7 +24,6 @@ import script.Main;
 import script.behaviour.DecisionLeaf;
 import script.framework.Branch;
 import script.framework.Leaf;
-import script.framework.Tree;
 import script.quest.varrockmuseum.Timing;
 import script.skills.ranged.Mobs;
 import script.skills.ranged.TrainRanged;
@@ -32,9 +31,12 @@ import script.utilities.API;
 import script.utilities.API.modes;
 import script.utilities.Bankz;
 import script.utilities.Combatz;
+import script.utilities.Dialoguez;
+import script.utilities.GrandExchangg;
 import script.utilities.InvEquip;
 import script.utilities.ItemsOnGround;
 import script.utilities.Locations;
+import script.utilities.Skillz;
 import script.utilities.Sleep;
 import script.utilities.Walkz;
 import script.utilities.id;
@@ -108,7 +110,6 @@ public class TrainSlayer extends Leaf{
 		//have to grab new slayer task
 		if(getAssignmentTurael()) return Timing.sleepLogNormalSleep();
 		
-		
 		return Timing.sleepLogNormalSleep();
 	}
 	
@@ -123,30 +124,8 @@ public class TrainSlayer extends Leaf{
 		NPC turael = NPCs.closest(turaelFilter);
 		if(turael != null)
 		{
-			if(Dialogues.canContinue())
-			{
-				if(Dialogues.continueDialogue()) Main.customPaintText2 = "Continuing dialogue";
-				Sleep.sleep(420, 696);
-				return false;
-			}
-			if(Dialogues.isProcessing())
-			{
-				if(Dialogues.continueDialogue()) Main.customPaintText2 = "Dialogue processing...";
-				Sleep.sleep(420, 696);
-				return false;
-			}
-			if(Dialogues.chooseOption("What\'s a slayer?"))
-			{
-				Main.customPaintText2 = "Chose option \"What\'s a slayer?\"";
-				Sleep.sleep(420, 696);
-				return false;
-			}
-			if(Dialogues.chooseOption("Wow, can you teach me?"))
-			{
-				Main.customPaintText2 = "Chose option \"Wow, can you teach me?\"";
-				Sleep.sleep(420, 696);
-				return false;
-			}
+			if(Skillz.shouldCheckSkillInterface()) Skillz.checkSkillProgress(Skill.SLAYER);
+			if(Dialoguez.handleDialogues()) return true;
 			if(turael.canReach())
 			{
 				if(turael.interact("Assignment")) 
@@ -212,10 +191,9 @@ public class TrainSlayer extends Leaf{
 						
 						if(GrandExchange.isOpen())
 						{
-							GrandExchange.close();
+							GrandExchangg.close();
 							Sleep.sleep(420,696);
 							continue;
-							
 						}
 						if(Shop.isOpen())
 						{
@@ -234,7 +212,7 @@ public class TrainSlayer extends Leaf{
 							{
 								MethodProvider.log("Did not deposit any allSlayerLoot");
 								if(Bank.deposit(i -> i != null && 
-										i.getID() == TrainRanged.jugOfWine, (1)))
+										i.getID() == id.jugOfWine, (1)))
 								{
 									MethodProvider.log("Deposited 1 jug of wine");
 								}
@@ -246,9 +224,9 @@ public class TrainSlayer extends Leaf{
 							MethodProvider.sleep(Timing.sleepLogNormalInteraction());
 							continue;
 						}
-						if(Inventory.count(TrainRanged.jugOfWine) > 0) 
+						if(Inventory.count(id.jugOfWine) > 0) 
 						{
-							if(Inventory.drop(TrainRanged.jugOfWine)) Sleep.sleep(222, 696);
+							if(Inventory.drop(id.jugOfWine)) Sleep.sleep(222, 696);
 						}
 						continue;
 					}
@@ -347,7 +325,7 @@ public class TrainSlayer extends Leaf{
     	
     	TrainRanged.setBestRangedEquipment();
     	
-    	InvEquip.addInvyItem(TrainRanged.rangePot4, 1, 6, false, (int) Calculations.nextGaussianRandom(20, 5));
+    	InvEquip.addInvyItem(id.rangePot4, 1, 6, false, (int) Calculations.nextGaussianRandom(20, 5));
     	InvEquip.addInvyItem(InvEquip.games, 1, 1, false, 5);
     	InvEquip.addInvyItem(id.antidote4, 1, 1, false, 5);
     	if(InvEquip.bankContains(id.staminas))
@@ -364,13 +342,13 @@ public class TrainSlayer extends Leaf{
     	{
     		InvEquip.addOptionalItem(f);
     	}
-    	for(int r : TrainRanged.rangedPots)
+    	for(int r : id.rangedPots)
     	{
     		InvEquip.addOptionalItem(r);
     	}
     	InvEquip.addOptionalItem(InvEquip.jewelry);
     	InvEquip.shuffleFulfillOrder();
-    	InvEquip.addInvyItem(TrainRanged.jugOfWine, 10, 17, false, (int) Calculations.nextGaussianRandom(500, 100));
+    	InvEquip.addInvyItem(Combatz.lowFood, 10, 17, false, (int) Calculations.nextGaussianRandom(500, 100));
     	InvEquip.addInvyItem(InvEquip.coins, 0, 0, false, 0);
 		if(InvEquip.fulfillSetup(true, 180000))
 		{
@@ -392,7 +370,7 @@ public class TrainSlayer extends Leaf{
     	{
     		InvEquip.addInvyItem(id.rope, 1, 1, false,5);
     	}
-    	InvEquip.addInvyItem(TrainRanged.rangePot4, 1, 6, false, (int) Calculations.nextGaussianRandom(20, 5));
+    	InvEquip.addInvyItem(id.rangePot4, 1, 6, false, (int) Calculations.nextGaussianRandom(20, 5));
     	InvEquip.addInvyItem(InvEquip.games, 1, 1, false, 5);
     	InvEquip.addInvyItem(id.litCandleLantern, 1, 1, false, 1);
     	if(InvEquip.bankContains(id.staminas))
@@ -406,13 +384,13 @@ public class TrainSlayer extends Leaf{
     	{
     		InvEquip.addOptionalItem(f);
     	}
-    	for(int r : TrainRanged.rangedPots)
+    	for(int r : id.rangedPots)
     	{
     		InvEquip.addOptionalItem(r);
     	}
     	InvEquip.addOptionalItem(InvEquip.jewelry);
     	InvEquip.shuffleFulfillOrder();
-    	InvEquip.addInvyItem(TrainRanged.jugOfWine, 10, 17, false, (int) Calculations.nextGaussianRandom(500, 100));
+    	InvEquip.addInvyItem(Combatz.lowFood, 10, 17, false, (int) Calculations.nextGaussianRandom(500, 100));
     	InvEquip.addInvyItem(InvEquip.coins, 0, 0, false, 0);
 		if(InvEquip.fulfillSetup(true, 180000))
 		{
@@ -434,7 +412,7 @@ public class TrainSlayer extends Leaf{
     	{
     		InvEquip.addInvyItem(id.rope, 1, 1, false,5);
     	}
-    	InvEquip.addInvyItem(TrainRanged.rangePot4, 1, 6, false, (int) Calculations.nextGaussianRandom(20, 5));
+    	InvEquip.addInvyItem(id.rangePot4, 1, 6, false, (int) Calculations.nextGaussianRandom(20, 5));
     	InvEquip.addInvyItem(InvEquip.games, 1, 1, false, 5);
     	InvEquip.addInvyItem(id.litCandleLantern, 1, 1, false, 1);
     	InvEquip.addInvyItem(id.antidote4, 1, 1, false, 5);
@@ -449,13 +427,13 @@ public class TrainSlayer extends Leaf{
     	{
     		InvEquip.addOptionalItem(f);
     	}
-    	for(int r : TrainRanged.rangedPots)
+    	for(int r : id.rangedPots)
     	{
     		InvEquip.addOptionalItem(r);
     	}
     	InvEquip.addOptionalItem(InvEquip.jewelry);
     	InvEquip.shuffleFulfillOrder();
-    	InvEquip.addInvyItem(TrainRanged.jugOfWine, 10, 17, false, (int) Calculations.nextGaussianRandom(500, 100));
+    	InvEquip.addInvyItem(Combatz.lowFood, 10, 17, false, (int) Calculations.nextGaussianRandom(500, 100));
     	InvEquip.addInvyItem(InvEquip.coins, 0, 0, false, 0);
 		if(InvEquip.fulfillSetup(true, 180000))
 		{

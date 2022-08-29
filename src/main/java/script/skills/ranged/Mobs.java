@@ -47,11 +47,14 @@ import script.utilities.API;
 import script.utilities.API.modes;
 import script.utilities.Bankz;
 import script.utilities.Combatz;
+import script.utilities.Dialoguez;
 import script.utilities.InvEquip;
 import script.utilities.ItemsOnGround;
 import script.utilities.Locations;
 import script.utilities.Paths;
+import script.utilities.Skillz;
 import script.utilities.Sleep;
+import script.utilities.Tabz;
 import script.utilities.Walkz;
 import script.utilities.id;
 
@@ -63,6 +66,7 @@ public class Mobs {
 		GIANT_FROG,
 		SANDCRAB
 	}
+	public static Area selectedHillGiantsArea = null;
 	public static boolean cantReachThat = false;
 	/**
 	 * Picks and sets an appropriate mob to fight. Set boolean melee to choose melee gear + setup or false for ranged.
@@ -78,14 +82,13 @@ public class Mobs {
 		if(Mobs.mob == null)
 		{
 			//if(true) Mobs.mob = Mob.SANDCRAB; //testing mobs
-			if((int) Calculations.nextGaussianRandom(100, 50) >= 110) Mobs.mob = Mob.SANDCRAB;
+			if((int) Calculations.nextGaussianRandom(100, 50) >= 135) Mobs.mob = Mob.SANDCRAB;
 		}
 		if(melee)
 		{
-			if((att >= 15 && att < 45) || (str >= 15 && str < 45))
-			{
-				if((int) Calculations.nextGaussianRandom(100, 50) >= 95) Mobs.mob = Mob.GIANT_FROG;
-			}
+			if((att >= 15 && att < 40) || (str >= 15 && str < 40) && (int) Calculations.nextGaussianRandom(100, 50) >= 110) 
+				Mobs.mob = Mob.GIANT_FROG;
+			
 			if(Mobs.mob == null)
 			{
 				if(att < 30 || str < 30 || def < 30) Mobs.mob = Mob.BOAR;
@@ -95,19 +98,34 @@ public class Mobs {
 		}
 		else
 		{
-			if(rng >= 20 && rng <= 50)
-			{
-				if((int) Calculations.nextGaussianRandom(100, 50) >= 95) Mobs.mob = Mob.GIANT_FROG;
-			}
+			if(rng >= 20 && rng <= 45 && (int) Calculations.nextGaussianRandom(100, 50) >= 110)
+				Mobs.mob = Mob.GIANT_FROG;
 			if(Mobs.mob == null)
 			{
 				if(rng < 30) Mobs.mob = Mob.BOAR;
 				else mob = Mob.HILL_GIANT;
 			}
-			
 		}
 		Mobs.mob.name(); 
 		MethodProvider.log("Chose mob: "+Mobs.mob.name()+" using combat style: " +(melee ? "MELEE" : "RANGED"));
+		if(Mobs.mob == Mob.HILL_GIANT)
+		{
+			if(!melee && def < 40) 
+			{
+				selectedHillGiantsArea = Locations.kourendGiantsKillingArea_Hill;
+				MethodProvider.log("Setting Kourend cave safespot for Hill Giants area");
+			}
+			else if((int) Calculations.nextGaussianRandom(100, 50) > 103) 
+			{
+				selectedHillGiantsArea = Locations.kourendGiantsKillingArea_Hill;
+				MethodProvider.log("Setting Kourend cave for Hill Giants area");
+			}
+			else 
+			{
+				selectedHillGiantsArea = Locations.hillGiantsValley;
+				MethodProvider.log("Setting Hill Giants Valley for Hill Giants area");
+			}
+		}
 	}
 	/**
 	 * Pass a chosen mob to fight, and whether or not to use melee. Boolean melee set to true for melee, false for ranged.
@@ -132,160 +150,126 @@ public class Mobs {
 		Locations.isInKourend();
 		if(!Locations.unlockedKourend) //fuck config value 414 we assume unlocked unless get teh game msg
 		{
-			//handle dialogue for Veos traveling to Kourend
-			if(Dialogues.inDialogue()) 
+			Locations.unlockKourend();
+			return Timing.sleepLogNormalSleep();
+		}
+		//check for glory in invy + not equipped -> equip it
+		if(InvEquip.getInvyItem(InvEquip.wearableGlory) != 0 && 
+				!InvEquip.equipmentContains(InvEquip.wearableGlory)) 
+		{
+			InvEquip.equipItem(InvEquip.getInvyItem(InvEquip.wearableGlory));
+			Sleep.sleep(420,696);
+			return Timing.sleepLogNormalSleep();
+		}
+		if(InvEquip.getInvyItem(InvEquip.wearableWealth) != 0 && 
+				!InvEquip.equipmentContains(InvEquip.wearableWealth)) 
+		{
+			InvEquip.equipItem(InvEquip.getInvyItem(InvEquip.wearableWealth));
+			Sleep.sleep(420,696);
+			return Timing.sleepLogNormalSleep();
+		}
+		//check invy for best equipment
+		if(melee)
+		{
+			if(Inventory.contains(TrainMelee.getBestWeapon()))
 			{
-				if(Dialogues.canContinue()) Dialogues.continueDialogue();
-				else if(Dialogues.areOptionsAvailable()) Dialogues.chooseFirstOptionContaining("That\'s great, can you take me there please?");
-    			return Timing.sleepLogNormalSleep();
-			}
-			
-			//search for Veos
-			NPC veos = NPCs.closest("Veos");
-			if(veos != null)
-			{
-				if(!Players.localPlayer().isInteracting(veos))
-	    		{
-	        		if(veos.interact("Talk-to"))
-        			{
-        				MethodProvider.sleepUntil(Dialogues::inDialogue, () -> Players.localPlayer().isMoving(), Sleep.calculate(2222,2222), 50);
-        			} else if(!Players.localPlayer().isMoving() && 
-        					Walking.shouldWalk(6) && 
-        					Walking.walk(veos)) Sleep.sleep(69,696);
-	    		}
+				InvEquip.equipItem(TrainMelee.getBestWeapon());
 				return Timing.sleepLogNormalSleep();
 			}
-	    	else
-	    	{
-	    		//no veos here
-	    		if(Locations.veosSarim.getCenter().distance(Players.localPlayer().getTile()) > 75) Walkz.teleportDraynor(180000);
-    			else if(Walking.shouldWalk(6) && Walking.walk(Locations.veosSarim.getCenter())) Sleep.sleep(420,666);
-	    		
-	    	}
-			return Timing.sleepLogNormalSleep();
+			if(!Equipment.contains(TrainMelee.getBestWeapon()) ||
+				(Combatz.shouldDrinkMeleeBoost() && !InvEquip.invyContains(id.superStrs) && !InvEquip.invyContains(id.superStrs)) ||
+				(Combatz.shouldEatFood(3) && !InvEquip.invyContains(Combatz.foods)) || 
+				!InvEquip.equipmentContains(InvEquip.wearableWealth) || 
+				!InvEquip.equipmentContains(InvEquip.wearableGlory))
+			{
+				TrainMelee.fulfillMelee_Pots_Stam_Bass();
+				return Timing.sleepLogNormalInteraction();
+			}
 		}
 		else
 		{
-			//can travel to kourend now
-
-			//check for glory in invy + not equipped -> equip it
-			if(InvEquip.getInvyItem(InvEquip.wearableGlory) != 0 && 
-					!InvEquip.equipmentContains(InvEquip.wearableGlory)) 
+			if(Inventory.contains(TrainRanged.getBestDart()))
 			{
-				InvEquip.equipItem(InvEquip.getInvyItem(InvEquip.wearableGlory));
-				Sleep.sleep(420,696);
+				InvEquip.equipItem(TrainRanged.getBestDart());
 				return Timing.sleepLogNormalSleep();
 			}
-			if(InvEquip.getInvyItem(InvEquip.wearableWealth) != 0 && 
-					!InvEquip.equipmentContains(InvEquip.wearableWealth)) 
+			if(!Equipment.contains(TrainRanged.getBestDart()) ||
+				(Combatz.shouldDrinkRangedBoost() && !InvEquip.invyContains(id.rangedPots)) ||
+				(Combatz.shouldEatFood(3) && !InvEquip.invyContains(Combatz.foods)) || 
+				!InvEquip.equipmentContains(InvEquip.wearableWealth) || 
+				!InvEquip.equipmentContains(InvEquip.wearableGlory))
 			{
-				InvEquip.equipItem(InvEquip.getInvyItem(InvEquip.wearableWealth));
-				Sleep.sleep(420,696);
+				TrainRanged.fulfillRangedDartsStaminaGames();
+				return Timing.sleepLogNormalInteraction();
+			}
+		}
+		//have some food in invy
+		if(Combatz.getFood() != null)
+		{
+			//should eat at 1 max hit
+			if(Combatz.shouldEatFood(3))
+			{
+				Combatz.eatFood();
+			}
+		}
+		//check for proper ranged lvl boost
+		if(melee)
+		{
+			if(Combatz.shouldDrinkMeleeBoost())
+			{
+				if(Locations.boarZone.contains(Players.localPlayer()))
+				{
+					Combatz.drinkMeleeBoost();
+				}
+			}
+		}
+		else
+		{
+			if(Combatz.shouldDrinkRangedBoost())
+			{
+				if(Locations.boarZone.contains(Players.localPlayer()))
+				{
+					if(!Combatz.drinkRangeBoost()) MethodProvider.log("Not drank ranged Potion");
+				}
+			}
+		}
+		
+		//in location to kill mobs
+		if(Locations.boarZone.contains(Players.localPlayer()))
+		{
+			if(!melee) Mobs.fightMobRanged("Boar",Locations.boarZone);
+			else Mobs.fightMobMelee("Boar",Locations.boarZone);
+			return Timing.sleepLogNormalSleep();
+		}
+		else if(Locations.isInKourend())
+		{
+			if(Bank.isOpen()) Bankz.close();
+			if(Locations.kourendGiantsCaveArea.contains(Players.localPlayer()))
+			{
+				if(!Walkz.exitGiantsCave()) Sleep.sleep(420,696);
 				return Timing.sleepLogNormalSleep();
 			}
-			//check invy for best equipment
-			if(melee)
+			if(Locations.dreambotFuckedShayzien3.contains(Players.localPlayer()))
 			{
-				if(Inventory.contains(TrainMelee.getBestWeapon()))
-				{
-					InvEquip.equipItem(TrainMelee.getBestWeapon());
-					return Timing.sleepLogNormalSleep();
-				}
-				if(!Equipment.contains(TrainMelee.getBestWeapon()) ||
-					(Combatz.shouldDrinkMeleeBoost() && !InvEquip.invyContains(id.superStrs) && !InvEquip.invyContains(id.superStrs)) ||
-					(Combatz.shouldEatFood(3) && !InvEquip.invyContains(Combatz.foods)) || 
-					!InvEquip.equipmentContains(InvEquip.wearableWealth) || 
-					!InvEquip.equipmentContains(InvEquip.wearableGlory))
-				{
-					TrainMelee.fulfillMelee_Pots_Stam_Bass();
-					return Timing.sleepLogNormalInteraction();
-				}
-			}
-			else
-			{
-				if(Inventory.contains(TrainRanged.getBestDart()))
-				{
-					InvEquip.equipItem(TrainRanged.getBestDart());
-					return Timing.sleepLogNormalSleep();
-				}
-				if(!Equipment.contains(TrainRanged.getBestDart()) ||
-					(Combatz.shouldDrinkRangedBoost() && !InvEquip.invyContains(TrainRanged.rangedPots)) ||
-					(Combatz.shouldEatFood(3) && !InvEquip.invyContains(Combatz.foods)) || 
-					!InvEquip.equipmentContains(InvEquip.wearableWealth) || 
-					!InvEquip.equipmentContains(InvEquip.wearableGlory))
-				{
-					TrainRanged.fulfillRangedDartsStamina();
-					return Timing.sleepLogNormalInteraction();
-				}
-			}
-			//have some food in invy
-			if(Combatz.getFood() != null)
-			{
-				//should eat at 1 max hit
-				if(Combatz.shouldEatFood(3))
-				{
-					Combatz.eatFood();
-				}
-			}
-			//check for proper ranged lvl boost
-			if(melee)
-			{
-				if(Combatz.shouldDrinkMeleeBoost())
-				{
-					if(Locations.boarZone.contains(Players.localPlayer()))
-					{
-						Combatz.drinkMeleeBoost();
-					}
-				}
-			}
-			else
-			{
-				if(Combatz.shouldDrinkRangedBoost())
-				{
-					if(Locations.boarZone.contains(Players.localPlayer()))
-					{
-						if(!Combatz.drinkRangeBoost()) MethodProvider.log("Not drank ranged Potion");
-					}
-				}
-			}
-			
-			//in location to kill mobs
-			if(Locations.boarZone.contains(Players.localPlayer()))
-			{
-				if(!melee) Mobs.fightMobRanged("Boar",Locations.boarZone);
-				else Mobs.fightMobMelee("Boar",Locations.boarZone);
+				if(Walking.shouldWalk(6) && Walking.walk(Locations.dreambotFuckedShayzienDest3)) Sleep.sleep(69, 420);
 				return Timing.sleepLogNormalSleep();
 			}
-			else if(Locations.isInKourend())
+			if(Locations.dreambotFuckedShayzien2.contains(Players.localPlayer()))
 			{
-				if(Bank.isOpen()) Bank.close();
-				if(Locations.kourendGiantsCaveArea.contains(Players.localPlayer()))
-				{
-					if(!Walkz.exitGiantsCave()) Sleep.sleep(420,696);
-					return Timing.sleepLogNormalSleep();
-				}
-				if(Locations.dreambotFuckedShayzien3.contains(Players.localPlayer()))
-				{
-					if(Walking.shouldWalk(6) && Walking.walk(Locations.dreambotFuckedShayzienDest3)) Sleep.sleep(69, 420);
-					return Timing.sleepLogNormalSleep();
-				}
-				if(Locations.dreambotFuckedShayzien2.contains(Players.localPlayer()))
-				{
-					
-					if(Walking.shouldWalk(6) && Walking.walk(Locations.dreambotFuckedShayzienDest2)) Sleep.sleep(69, 420);
-					return Timing.sleepLogNormalSleep();
-				}
-				if(Locations.dreambotFuckedShayzien.contains(Players.localPlayer()))
-				{
-					
-					if(Walking.shouldWalk(6) && Walking.walk(Locations.dreambotFuckedShayzienDest)) Sleep.sleep(69, 420);
-					return Timing.sleepLogNormalSleep();
-				}
-				if(Walking.shouldWalk(6) && Walking.walk(Locations.boarZone.getCenter())) Sleep.sleep(69, 420);
-			} else 
-			{
-				Walkz.teleportWoodcuttingGuild(180000);
+				
+				if(Walking.shouldWalk(6) && Walking.walk(Locations.dreambotFuckedShayzienDest2)) Sleep.sleep(69, 420);
+				return Timing.sleepLogNormalSleep();
 			}
+			if(Locations.dreambotFuckedShayzien.contains(Players.localPlayer()))
+			{
+				
+				if(Walking.shouldWalk(6) && Walking.walk(Locations.dreambotFuckedShayzienDest)) Sleep.sleep(69, 420);
+				return Timing.sleepLogNormalSleep();
+			}
+			if(Walking.shouldWalk(6) && Walking.walk(Locations.boarZone.getCenter())) Sleep.sleep(69, 420);
+		} else 
+		{
+			Walkz.teleportWoodcuttingGuild(180000);
 		}
 		return Timing.sleepLogNormalSleep();
 	}
@@ -355,7 +339,7 @@ public class Mobs {
 			if(Combatz.shouldDrinkRangedBoost())
 			{
 				//if have any ranged pots while needing a drink, wait until in killingzone to sip up
-				if(InvEquip.invyContains(TrainRanged.rangedPots))
+				if(InvEquip.invyContains(id.rangedPots))
 				{
 					if(killingZone.contains(Players.localPlayer()))
 					{
@@ -389,11 +373,7 @@ public class Mobs {
 			if(killingZone.contains(Players.localPlayer()))
 			{
 				MethodProvider.log("[SLAYER] -> in killingzone!");
-				if(Dialogues.canContinue()) 
-				{
-					if(Dialogues.continueDialogue()) Sleep.sleep(420, 696);
-					return Timing.sleepLogNormalInteraction();
-				}
+				if(Dialoguez.handleDialogues()) return Timing.sleepLogNormalSleep();
 				if(Combat.isAutoRetaliateOn())
 		    	{
 		    		Combat.toggleAutoRetaliate(true);
@@ -458,7 +438,7 @@ public class Mobs {
 			{
 				if(Locations.isInKourend())
 				{
-					Walkz.leaveKourend(180000);
+					Walkz.exitKourend(180000);
 					return Timing.sleepLogNormalSleep();
 				}
 				
@@ -484,7 +464,7 @@ public class Mobs {
 			{
 				if(Locations.isInKourend())
 				{
-					Walkz.leaveKourend(180000);
+					Walkz.exitKourend(180000);
 					return Timing.sleepLogNormalSleep();
 				}
 				
@@ -510,7 +490,7 @@ public class Mobs {
 			{
 				if(Locations.isInKourend())
 				{
-					Walkz.leaveKourend(180000);
+					Walkz.exitKourend(180000);
 					return Timing.sleepLogNormalSleep();
 				}
 				if(Locations.seagullsSarim.getCenter().distance() >= 100 && Walkz.useJewelry(InvEquip.glory, "Draynor Village")) return Timing.sleepLogNormalInteraction();
@@ -521,7 +501,7 @@ public class Mobs {
 			{
 				if(Locations.isInKourend())
 				{
-					Walkz.leaveKourend(180000);
+					Walkz.exitKourend(180000);
 					return Timing.sleepLogNormalSleep();
 				}
 				if(Locations.entireFremmyDungeon.contains(Players.localPlayer()))
@@ -560,7 +540,7 @@ public class Mobs {
 			{
 				if(Locations.isInKourend())
 				{
-					Walkz.leaveKourend(180000);
+					Walkz.exitKourend(180000);
 					return Timing.sleepLogNormalSleep();
 				}
 				if(Locations.kalphiteCave.contains(Players.localPlayer()))
@@ -596,7 +576,7 @@ public class Mobs {
 			{
 				if(Locations.isInKourend())
 				{
-					Walkz.leaveKourend(180000);
+					Walkz.exitKourend(180000);
 					return Timing.sleepLogNormalSleep();
 				}
 				if(Locations.spidersGE.getCenter().distance() >= 100 && Walkz.useJewelry(InvEquip.wealth, "Grand Exchange")) return Timing.sleepLogNormalInteraction();
@@ -607,7 +587,7 @@ public class Mobs {
 			{
 				if(Locations.isInKourend())
 				{
-					Walkz.leaveKourend(180000);
+					Walkz.exitKourend(180000);
 					return Timing.sleepLogNormalSleep();
 				}
 				if(Locations.bearsFremmy.getCenter().distance() >= 200 && Walkz.teleportCamelot(180000)) return Timing.sleepLogNormalInteraction();
@@ -618,7 +598,7 @@ public class Mobs {
 			{
 				if(Locations.isInKourend())
 				{
-					Walkz.leaveKourend(180000);
+					Walkz.exitKourend(180000);
 					return Timing.sleepLogNormalSleep();
 				}
 				if(Locations.cowsArdy.getCenter().distance() >= 150)
@@ -638,7 +618,7 @@ public class Mobs {
 			{
 				if(Locations.isInKourend())
 				{
-					Walkz.leaveKourend(180000);
+					Walkz.exitKourend(180000);
 					return Timing.sleepLogNormalSleep();
 				}
 				if(Locations.monkeysArdyZoo.getCenter().distance() >= 150)
@@ -659,7 +639,7 @@ public class Mobs {
 				
 				if(Locations.isInKourend())
 				{
-					Walkz.leaveKourend(180000);
+					Walkz.exitKourend(180000);
 					return Timing.sleepLogNormalSleep();
 				}
 				//check for ice coolers first
@@ -911,7 +891,7 @@ public class Mobs {
 			{
 				if(Locations.isInKourend())
 				{
-					Walkz.leaveKourend(180000);
+					Walkz.exitKourend(180000);
 					return Timing.sleepLogNormalSleep();
 				}
 				if(Locations.lumbyCastle2.contains(Players.localPlayer()))
@@ -969,7 +949,7 @@ public class Mobs {
 			{
 				if(Locations.isInKourend())
 				{
-					Walkz.leaveKourend(180000);
+					Walkz.exitKourend(180000);
 					return Timing.sleepLogNormalSleep();
 				}
 				if(Locations.scorpions.getCenter().distance() > 175)
@@ -994,7 +974,7 @@ public class Mobs {
 			{
 				if(Locations.isInKourend())
 				{
-					Walkz.leaveKourend(180000);
+					Walkz.exitKourend(180000);
 					return Timing.sleepLogNormalSleep();
 				}
 				if(Locations.dwarfs.getCenter().distance() > 90)
@@ -1010,7 +990,7 @@ public class Mobs {
 			{
 				if(Locations.isInKourend())
 				{
-					Walkz.leaveKourend(180000);
+					Walkz.exitKourend(180000);
 					return Timing.sleepLogNormalSleep();
 				}
 				if(Locations.icefiends.getCenter().distance() > 105)
@@ -1026,7 +1006,7 @@ public class Mobs {
 			{
 				if(Locations.isInKourend())
 				{
-					Walkz.leaveKourend(180000);
+					Walkz.exitKourend(180000);
 					return Timing.sleepLogNormalSleep();
 				}
 				if(Locations.bats.getCenter().distance() > 175)
@@ -1042,7 +1022,7 @@ public class Mobs {
 			{
 				if(Locations.isInKourend())
 				{
-					Walkz.leaveKourend(180000);
+					Walkz.exitKourend(180000);
 					return Timing.sleepLogNormalSleep();
 				}
 				if(Locations.giantRats.getCenter().distance() > 150)
@@ -1058,7 +1038,7 @@ public class Mobs {
 			{
 				if(Locations.isInKourend())
 				{
-					Walkz.leaveKourend(180000);
+					Walkz.exitKourend(180000);
 					return Timing.sleepLogNormalSleep();
 				}
 				if(Locations.strongholdLvl1.contains(Players.localPlayer()))
@@ -1071,45 +1051,7 @@ public class Mobs {
 						Camera.rotateToPitch(tmp);
 						return Timing.sleepLogNormalInteraction();
 					}
-					if(Dialogues.canContinue()) 
-					{
-						if(Dialogues.continueDialogue()) Sleep.sleep(420,696);
-						return Timing.sleepLogNormalInteraction();
-					}
-					if(Dialogues.isProcessing()) return Timing.sleepLogNormalInteraction();
-					if(Dialogues.chooseOption("Politely tell them no and then use the \'Report Abuse\' button.") || 
-							Dialogues.chooseOption("No way! You\'ll just take my gold for your own! Reported!") || 
-							Dialogues.chooseOption("Report the incident and do not click any links.") || 
-							Dialogues.chooseOption("No, you should never allow anyone to level your account.") || 
-							Dialogues.chooseOption("Report the player for phising.") || 
-							Dialogues.chooseOption("Do not visit the website and report the player who messaged you.") || 
-							Dialogues.chooseOption("Delete it - it\'s a fake!") || 
-							Dialogues.chooseOption("The birthday of a famous person or event.") || 
-							Dialogues.chooseOption("Don\'t give out your password to anyone. Not even close friends.") || 
-							Dialogues.chooseOption("Read the text and follow the advice given.") || 
-							Dialogues.chooseOption("Report the stream as a scam. Real Jagex streams have a \'verified\' mark.") || 
-							Dialogues.chooseOption("Authenticator and two-step login on my registered email.") || 
-							Dialogues.chooseOption("Secure my device and reset my password.") || 
-							Dialogues.chooseOption("Don\'t give them the information and send an \'Abuse report\'.") || 
-							Dialogues.chooseOption("No.") || 
-							Dialogues.chooseOption("Don\'t give them my password.") || 
-							Dialogues.chooseOption("Nobody.") || 
-							Dialogues.chooseOption("Through account settings on oldschool.runescape.com.") || 
-							Dialogues.chooseOption("No, you should never buy an account.") || 
-							Dialogues.chooseOption("Only on the Old School Runescape website.") || 
-							Dialogues.chooseOption("Talk to any banker.") || 
-							Dialogues.chooseOption("Set up 2 step authentication with my email provider.") || 
-							Dialogues.chooseOption("Don\'t share your information and report the player.") || 
-							Dialogues.chooseOption("Virus scan my device then change my password.") || 
-							Dialogues.chooseOption("Don\'t type in my password backwards and report the player.") || 
-							Dialogues.chooseOption("Use the Account Recovery System.") || 
-							Dialogues.chooseOption("Me.") || 
-							Dialogues.chooseOption("No way! I\'m reporting you to Jagex!") || 
-							Dialogues.chooseOption("Nothing, it\'s a fake.") || 
-							Dialogues.chooseOption("Decline the offer and report that player."))
-					{
-						return Timing.sleepLogNormalInteraction();
-					}
+					if(Dialoguez.handleDialogues()) return Timing.sleepLogNormalSleep();
 					if(Locations.strongholdLvl1Foyer.contains(Players.localPlayer()))
 					{
 						GameObject door = GameObjects.closest(f -> f != null && f.getID() == 19207 && f.getTile().equals(new Tile(1859,5238,0)));
@@ -1273,16 +1215,7 @@ public class Mobs {
 		{
 			if(Combatz.drinkRangeBoost()) Sleep.sleep(69, 420);
 		}
-		if(ranged < 66)
-		{
-			if(org.dreambot.api.methods.combat.Combat.getCombatStyle() != CombatStyle.RANGED_RAPID)
-			{
-				org.dreambot.api.methods.combat.Combat.setCombatStyle(CombatStyle.RANGED_RAPID);
-			}
-		} else if(org.dreambot.api.methods.combat.Combat.getCombatStyle() != CombatStyle.RANGED_DEFENCE)
-		{
-			org.dreambot.api.methods.combat.Combat.setCombatStyle(CombatStyle.RANGED_DEFENCE);
-		} 
+		TrainRanged.updateAttStyle();
 		org.dreambot.api.wrappers.interactive.Character lizard = Players.localPlayer().getInteractingCharacter();
 		if(lizard != null && 
 				(lizard.getName().equals("Small Lizard") || lizard.getName().equals("Desert Lizard")))
@@ -1387,8 +1320,8 @@ public class Mobs {
 			if(!Equipment.contains(TrainMelee.getBestWeapon()) ||
 				(Combatz.shouldDrinkMeleeBoost() && !InvEquip.invyContains(id.superStrs) && !InvEquip.invyContains(id.superStrs)) ||
 				(Combatz.shouldEatFood(5) && !InvEquip.invyContains(Combatz.foods)) || 
-				!InvEquip.equipmentContains(InvEquip.wearableWealth) || 
-				!InvEquip.equipmentContains(InvEquip.wearableGlory))
+				(!InvEquip.equipmentContains(InvEquip.wearableWealth) && !InvEquip.invyContains(InvEquip.wearableWealth))  || 
+				(!InvEquip.equipmentContains(InvEquip.wearableGlory) && !InvEquip.invyContains(InvEquip.wearableGlory)))
 			{
 				TrainMelee.fulfillMelee_Pots_Stam_Bass();
 				return Timing.sleepLogNormalInteraction();
@@ -1402,7 +1335,7 @@ public class Mobs {
 				return Timing.sleepLogNormalSleep();
 			}
 			if(!Equipment.contains(TrainRanged.getBestDart()) ||
-				(Combatz.shouldDrinkRangedBoost() && !InvEquip.invyContains(TrainRanged.rangedPots)) ||
+				(Combatz.shouldDrinkRangedBoost() && !InvEquip.invyContains(id.rangedPots)) ||
 				(Combatz.shouldEatFood(5) && !InvEquip.invyContains(Combatz.foods)) || 
 				!InvEquip.equipmentContains(InvEquip.wearableWealth) || 
 				!InvEquip.equipmentContains(InvEquip.wearableGlory))
@@ -1414,6 +1347,7 @@ public class Mobs {
 		
 		if(Locations.isInIsleOfSouls())
 		{
+			if(Skillz.shouldCheckSkillInterface()) Skillz.checkSkillProgress(melee ? TrainMelee.getMeleeSkillToTrain() : Skill.RANGED);
 			if(Combatz.shouldEatFood(6)) Combatz.eatFood();
 			GroundItem gi = ItemsOnGround.getNearbyGroundItem(ItemsOnGround.sandcrabsLoot,Locations.isleOfSouls);
 			if(gi != null)
@@ -1452,7 +1386,7 @@ public class Mobs {
 						}
 						return Timing.sleepLogNormalSleep();
 					}
-					Tabs.open(Tab.SKILLS);
+					Tabz.open(Tab.SKILLS);
 					return Timing.sleepLogNormalSleep();
 				}
 				if(melee && Combatz.shouldDrinkMeleeBoost()) Combatz.drinkMeleeBoost();
@@ -1639,24 +1573,264 @@ public class Mobs {
 		}
 	}
 	/**
-	 * Pass boolean melee as true to fight hill giants in their area, false to safespot as ranged
+	 * Pass boolean melee as true to fight hill giants in their area, false to safespot as ranged if below 40 def
 	 * @param melee
 	 * @return
 	 */
 	public static int trainHillGiants(boolean melee)
 	{
-		Locations.isInKourend();
-		if(!Locations.unlockedKourend) //fuck config value 414 we assume unlocked unless get teh game msg
+		if(selectedHillGiantsArea == Locations.kourendGiantsKillingArea_Hill)
 		{
-			Locations.unlockKourend();
-			return Timing.sleepLogNormalSleep();
+			Locations.isInKourend();
+			if(!Locations.unlockedKourend) //fuck config value 414 we assume unlocked unless get teh game msg
+			{
+				Locations.unlockKourend();
+				return Timing.sleepLogNormalSleep();
+			}else
+			{
+				//can travel to kourend now
+				
+				//check for glory in invy + not equipped -> equip it
+				if(InvEquip.invyContains(InvEquip.wearableGlory) && 
+						!InvEquip.equipmentContains(InvEquip.wearableGlory)) 
+				{
+					InvEquip.equipItem(InvEquip.getInvyItem(InvEquip.wearableGlory));
+					Sleep.sleep(420,696);
+					return Timing.sleepLogNormalSleep();
+				}
+				if(InvEquip.getInvyItem(InvEquip.wearableWealth) != 0 && 
+						!InvEquip.equipmentContains(InvEquip.wearableWealth)) 
+				{
+					InvEquip.equipItem(InvEquip.getInvyItem(InvEquip.wearableWealth));
+					Sleep.sleep(420,696);
+					return Timing.sleepLogNormalSleep();
+				}
+				//check invy for best equipment
+				if(melee)
+				{
+					if(Inventory.contains(TrainMelee.getBestWeapon()))
+					{
+						InvEquip.equipItem(TrainMelee.getBestWeapon());
+						return Timing.sleepLogNormalSleep();
+					}
+					if(!Equipment.contains(TrainMelee.getBestWeapon()) ||
+						(Combatz.shouldDrinkMeleeBoost() && !InvEquip.invyContains(id.superStrs) && !InvEquip.invyContains(id.superStrs)) ||
+						(Combatz.shouldEatFood(5) && !InvEquip.invyContains(Combatz.foods)) || 
+						!InvEquip.equipmentContains(InvEquip.wearableWealth) || 
+						!InvEquip.equipmentContains(InvEquip.wearableGlory))
+					{
+						TrainMelee.fulfillMelee_Pots_Stam_Bass();
+						return Timing.sleepLogNormalInteraction();
+					}
+				}
+				else
+				{
+					if(Inventory.contains(TrainRanged.getBestDart()))
+					{
+						InvEquip.equipItem(TrainRanged.getBestDart());
+						return Timing.sleepLogNormalSleep();
+					}
+					if(!Equipment.contains(TrainRanged.getBestDart()) ||
+						(Combatz.shouldDrinkRangedBoost() && !InvEquip.invyContains(id.rangedPots)) ||
+						(Combatz.shouldEatFood(5) && !InvEquip.invyContains(Combatz.foods)) || 
+						(!InvEquip.equipmentContains(InvEquip.wearableWealth) && !InvEquip.invyContains(InvEquip.wearableWealth))  || 
+						(!InvEquip.equipmentContains(InvEquip.wearableGlory) && !InvEquip.invyContains(InvEquip.wearableGlory)))
+					{
+						MethodProvider.log("Test");
+						TrainRanged.fulfillRangedDartsStamina();
+						return Timing.sleepLogNormalInteraction();
+					}
+				}
+				
+				//in location to kill mobs
+				if(Locations.kourendGiantsCaveArea.contains(Players.localPlayer()))
+				{
+					if(Dialoguez.handleDialogues()) return Sleep.calculate(222,696);
+					if(Inventory.isFull())
+					{
+						if(!Tabs.isOpen(Tab.INVENTORY))
+						{
+							Tabz.open(Tab.INVENTORY);
+						}
+						if(Inventory.count(id.jug) > 0)
+						{
+							Inventory.dropAll(id.jug);
+						}
+						if(Inventory.count(id.bigBones) > 0)
+						{
+							Inventory.interact(id.bigBones, "Bury");
+							Sleep.sleep(69,420);
+						}
+						if(Combatz.eatFood())
+						{
+							return Timing.sleepLogNormalSleep();
+						}
+					}
+					if(Combatz.shouldEatFood(6))
+					{
+						Combatz.eatFood();
+					}
+					GroundItem gi = ItemsOnGround.getNearbyGroundItem(ItemsOnGround.hillGiantsLoot,Locations.kourendGiantsKillingArea_Hill);
+					if(gi != null)
+					{
+						ItemsOnGround.grabNearbyGroundItem(gi);
+						return Timing.sleepLogNormalSleep();
+					}
+					
+					//must be OK to fight hill giants now 
+					//check for proper ranged lvl boost
+					if(melee)
+					{
+						if(InvEquip.invyContains(id.superStrs) || InvEquip.invyContains(id.superAtts))
+						{
+							if(Combatz.shouldDrinkMeleeBoost())
+							{
+								Combatz.drinkMeleeBoost();
+							}	
+						}
+					}
+					else
+					{
+						if(InvEquip.invyContains(id.rangedPots))
+						{
+							if(Combatz.shouldDrinkRangedBoost())
+							{
+								Combatz.drinkRangeBoost();
+							}	
+						}
+					}
+					//safespot
+					if(!melee && selectedHillGiantsArea == Locations.kourendGiantsKillingArea_Hill)
+					{
+						if(!Locations.kourendGiantsSafeSpot_Hill.contains(Players.localPlayer()))
+						{
+							final Tile closestSafespot = Locations.kourendGiantsSafeSpot_Hill.getNearestTile(Players.localPlayer());
+							if(Map.isTileOnScreen(closestSafespot))
+							{
+								if(Walking.walkExact(closestSafespot)) Sleep.sleep(420,696);
+							}
+							
+							else if(!Players.localPlayer().isMoving() && Walking.walk(closestSafespot))
+							{
+								Sleep.sleep(420,696);
+							}
+							return Timing.sleepLogNormalSleep();
+						}
+					}
+					else if(!Locations.kourendGiantsKillingArea_Hill.contains(Players.localPlayer()))
+					{
+						if(Walking.shouldWalk(6) && Walking.walk(Locations.kourendGiantsKillingArea_Hill.getCenter())) Sleep.sleep(696,420);
+						return Timing.sleepLogNormalSleep();
+					}
+					
+					activateOffensivePrayers(melee);
+					Sleep.sleep(69, 2222);
+					if(melee)Mobs.fightMobMelee("Hill Giant", Locations.kourendGiantsKillingArea_Hill);
+					else Mobs.fightMobRanged("Hill Giant", Locations.kourendGiantsKillingArea_Hill);
+					return Timing.sleepLogNormalSleep();
+				}
+				else if(Locations.isInKourend())
+				{
+					if(Bank.isOpen()) Bankz.close();
+					if(InvEquip.invyContains(id.staminas) && !Walkz.isStaminated()) 
+					{
+						Walkz.drinkStamina();
+						return Timing.sleepLogNormalSleep();
+					}
+					if(!Locations.kourendGiantsCaveEntrance.contains(Players.localPlayer()))
+					{
+						if(!Walkz.walkPath(Paths.woodcuttingGuildToHillGiantsCave))
+						{
+							//backup paths to hill giants cave stuff :-(
+							if(Locations.dreambotFuckedWCGuildSouth.contains(Players.localPlayer()))
+							{
+								if(Walking.shouldWalk(6) && Walking.walk(Locations.dreambotFuckedWCGuildDestSouth))
+								{
+									MethodProvider.log("Walking to cave, avoiding dreambot fucked area wc guild");
+									Sleep.sleep(69, 420);
+								}
+							} else 
+							{
+								if(Walking.shouldWalk(6) && Walking.walk(Locations.kourendGiantsCaveEntrance.getCenter())) 
+								{
+									MethodProvider.log("Walking to cave");
+									Sleep.sleep(69, 420);
+								}
+							}
+						}
+					} else 
+					{
+						//check for cave entrance
+						Filter<GameObject> caveFilter = c -> 
+							c != null && 
+							c.exists() && 
+							c.getName().contains("Cave") && 
+							c.hasAction("Enter");
+						GameObject cave = GameObjects.closest(caveFilter);
+						if(cave != null)
+						{
+							if(cave.interact("Enter"))
+							{
+								MethodProvider.sleepUntil(() -> Locations.kourendGiantsCaveArea.contains(Players.localPlayer()),
+										() -> Players.localPlayer().isMoving(),Sleep.calculate(2222,2222), 50);
+							}
+							return Timing.sleepLogNormalSleep();
+						}
+						MethodProvider.log("[SCRIPT] -> Error! In Hill Giants cave entrance in Kourend, but cave not found!");
+					}
+				} 
+				else 
+				{
+					MethodProvider.log("Not considered to be inside hill giants cave or Kourend! Teleporting to woodcutting guild..");
+					Walkz.teleportWoodcuttingGuild(180000);
+				}
+			}
+			return Sleep.calculate(111,696);
+		}
+		
+		//check invy for best equipment
+		if(melee)
+		{
+			if(Inventory.contains(TrainMelee.getBestWeapon()))
+			{
+				InvEquip.equipItem(TrainMelee.getBestWeapon());
+				return Timing.sleepLogNormalSleep();
+			}
+			if(!Equipment.contains(TrainMelee.getBestWeapon()) ||
+				(Combatz.shouldDrinkMeleeBoost() && !InvEquip.invyContains(id.superStrs) && !InvEquip.invyContains(id.superStrs)) ||
+				(Combatz.shouldEatFood(5) && !InvEquip.invyContains(Combatz.foods)) || 
+				(!InvEquip.equipmentContains(InvEquip.wearableWealth) && !InvEquip.invyContains(InvEquip.wearableWealth))  || 
+				(!InvEquip.equipmentContains(InvEquip.wearableGlory) && !InvEquip.invyContains(InvEquip.wearableGlory)))
+			{
+				TrainMelee.fulfillMelee_Pots_Stam_Bass();
+				return Timing.sleepLogNormalInteraction();
+			}
 		}
 		else
 		{
-			//can travel to kourend now
-			
+			if(Inventory.contains(TrainRanged.getBestDart()))
+			{
+				InvEquip.equipItem(TrainRanged.getBestDart());
+				return Timing.sleepLogNormalSleep();
+			}
+			if(!Equipment.contains(TrainRanged.getBestDart()) ||
+				(Combatz.shouldDrinkRangedBoost() && !InvEquip.invyContains(id.rangedPots)) ||
+				(Combatz.shouldEatFood(5) && !InvEquip.invyContains(Combatz.foods)) || 
+				(!InvEquip.equipmentContains(InvEquip.wearableWealth) && !InvEquip.invyContains(InvEquip.wearableWealth))  || 
+				(!InvEquip.equipmentContains(InvEquip.wearableGlory) && !InvEquip.invyContains(InvEquip.wearableGlory)))
+			{
+				MethodProvider.log("Test2");
+				TrainRanged.fulfillRangedDartsStamina();
+				return Timing.sleepLogNormalInteraction();
+			}
+		}
+		
+		//in location to kill mobs
+		if(selectedHillGiantsArea.contains(Players.localPlayer()))
+		{
+			if(Dialoguez.handleDialogues()) return Sleep.calculate(222,696);
 			//check for glory in invy + not equipped -> equip it
-			if(InvEquip.getInvyItem(InvEquip.wearableGlory) != 0 && 
+			if(InvEquip.invyContains(InvEquip.wearableGlory) && 
 					!InvEquip.equipmentContains(InvEquip.wearableGlory)) 
 			{
 				InvEquip.equipItem(InvEquip.getInvyItem(InvEquip.wearableGlory));
@@ -1670,192 +1844,86 @@ public class Mobs {
 				Sleep.sleep(420,696);
 				return Timing.sleepLogNormalSleep();
 			}
-			//check invy for best equipment
-			if(melee)
+			if(Inventory.isFull())
 			{
-				if(Inventory.contains(TrainMelee.getBestWeapon()))
+				if(!Tabs.isOpen(Tab.INVENTORY))
 				{
-					InvEquip.equipItem(TrainMelee.getBestWeapon());
+					Tabz.open(Tab.INVENTORY);
+				}
+				if(Inventory.count(id.jug) > 0)
+				{
+					Inventory.dropAll(id.jug);
+				}
+				if(Inventory.count(id.bigBones) > 0)
+				{
+					Inventory.interact(id.bigBones, "Bury");
+					Sleep.sleep(69,420);
+				}
+				if(Combatz.eatFood())
+				{
 					return Timing.sleepLogNormalSleep();
 				}
-				if(!Equipment.contains(TrainMelee.getBestWeapon()) ||
-					(Combatz.shouldDrinkMeleeBoost() && !InvEquip.invyContains(id.superStrs) && !InvEquip.invyContains(id.superStrs)) ||
-					(Combatz.shouldEatFood(5) && !InvEquip.invyContains(Combatz.foods)) || 
-					!InvEquip.equipmentContains(InvEquip.wearableWealth) || 
-					!InvEquip.equipmentContains(InvEquip.wearableGlory))
+			}
+			if(Combatz.shouldEatFood(6))
+			{
+				Combatz.eatFood();
+			}
+			GroundItem gi = ItemsOnGround.getNearbyGroundItem(ItemsOnGround.hillGiantsLoot,selectedHillGiantsArea);
+			if(gi != null)
+			{
+				ItemsOnGround.grabNearbyGroundItem(gi);
+				return Timing.sleepLogNormalSleep();
+			}
+			//must be OK to fight hill giants now 
+			//check for proper ranged lvl boost
+			if(melee)
+			{
+				if(InvEquip.invyContains(id.superStrs) || InvEquip.invyContains(id.superAtts))
 				{
-					TrainMelee.fulfillMelee_Pots_Stam_Bass();
-					return Timing.sleepLogNormalInteraction();
+					if(Combatz.shouldDrinkMeleeBoost())
+					{
+						Combatz.drinkMeleeBoost();
+					}	
 				}
 			}
 			else
 			{
-				if(Inventory.contains(TrainRanged.getBestDart()))
+				if(InvEquip.invyContains(id.rangedPots))
 				{
-					InvEquip.equipItem(TrainRanged.getBestDart());
-					return Timing.sleepLogNormalSleep();
-				}
-				if(!Equipment.contains(TrainRanged.getBestDart()) ||
-					(Combatz.shouldDrinkRangedBoost() && !InvEquip.invyContains(TrainRanged.rangedPots)) ||
-					(Combatz.shouldEatFood(5) && !InvEquip.invyContains(Combatz.foods)) || 
-					!InvEquip.equipmentContains(InvEquip.wearableWealth) || 
-					!InvEquip.equipmentContains(InvEquip.wearableGlory))
-				{
-					TrainRanged.fulfillRangedDartsStamina();
-					return Timing.sleepLogNormalInteraction();
+					if(Combatz.shouldDrinkRangedBoost())
+					{
+						Combatz.drinkRangeBoost();
+					}	
 				}
 			}
-			
-			//in location to kill mobs
-			if(Locations.kourendGiantsCaveArea.contains(Players.localPlayer()))
-			{
-				if(Dialogues.canContinue()) Dialogues.continueDialogue();
-				if(Inventory.isFull())
-				{
-					if(!Tabs.isOpen(Tab.INVENTORY))
-					{
-						Tabs.openWithFKey(Tab.INVENTORY);
-					}
-					if(Inventory.count(TrainRanged.jug) > 0)
-					{
-						Inventory.dropAll(TrainRanged.jug);
-					}
-					if(Inventory.count(ItemsOnGround.bigBones) > 0)
-					{
-						Inventory.interact(ItemsOnGround.bigBones, "Bury");
-						Sleep.sleep(69,420);
-					}
-					if(Combatz.eatFood())
-					{
-						return Timing.sleepLogNormalSleep();
-					}
-				}
-				if(Combatz.shouldEatFood(6))
-				{
-					Combatz.eatFood();
-				}
-				GroundItem gi = ItemsOnGround.getNearbyGroundItem(ItemsOnGround.hillGiantsLoot,Locations.kourendGiantsKillingArea_Hill);
-				if(gi != null)
-				{
-					ItemsOnGround.grabNearbyGroundItem(gi);
-					return Timing.sleepLogNormalSleep();
-				}
-				
-				//must be OK to fight hill giants now 
-				//check for proper ranged lvl boost
-				if(melee)
-				{
-					if(InvEquip.invyContains(id.superStrs) || InvEquip.invyContains(id.superAtts))
-					{
-						if(Combatz.shouldDrinkMeleeBoost())
-						{
-							Combatz.drinkMeleeBoost();
-						}	
-					}
-				}
-				else
-				{
-					if(InvEquip.invyContains(TrainRanged.rangedPots))
-					{
-						if(Combatz.shouldDrinkRangedBoost())
-						{
-							Combatz.drinkRangeBoost();
-						}	
-					}
-				}
-				
-				if(!melee)
-				{
-					if(!Locations.kourendGiantsSafeSpot_Hill.contains(Players.localPlayer()))
-					{
-						final Tile closestSafespot = Locations.kourendGiantsSafeSpot_Hill.getNearestTile(Players.localPlayer());
-						if(Map.isTileOnScreen(closestSafespot))
-						{
-							if(Walking.walkExact(closestSafespot)) Sleep.sleep(420,696);
-						}
-						
-						else if(!Players.localPlayer().isMoving() && Walking.walk(closestSafespot))
-						{
-							Sleep.sleep(420,696);
-						}
-						return Timing.sleepLogNormalSleep();
-					}
-				}
-				else if(!Locations.kourendGiantsKillingArea_Hill.contains(Players.localPlayer()))
-				{
-					if(Walking.shouldWalk(6) && Walking.walk(Locations.kourendGiantsKillingArea_Hill.getCenter())) Sleep.sleep(696,420);
-					return Timing.sleepLogNormalSleep();
-				}
-				
-				activateOffensivePrayers(melee);
-				Sleep.sleep(69, 2222);
-				if(melee)Mobs.fightMobMelee("Hill Giant", Locations.kourendGiantsKillingArea_Hill);
-				else Mobs.fightMobRanged("Hill Giant", Locations.kourendGiantsKillingArea_Hill);
-				return Timing.sleepLogNormalSleep();
-			}
-			else if(Locations.isInKourend())
-			{
-				if(Bank.isOpen()) Bank.close();
-				if(InvEquip.invyContains(id.staminas) && !Walkz.isStaminated()) 
-				{
-					Walkz.drinkStamina();
-					return Timing.sleepLogNormalSleep();
-				}
-				if(!Locations.kourendGiantsCaveEntrance.contains(Players.localPlayer()))
-				{
-					if(!Walkz.walkPath(Paths.woodcuttingGuildToHillGiantsCave))
-					{
-						//backup paths to hill giants cave stuff :-(
-						if(Locations.dreambotFuckedWCGuildSouth.contains(Players.localPlayer()))
-						{
-							if(Walking.shouldWalk(6) && Walking.walk(Locations.dreambotFuckedWCGuildDestSouth))
-							{
-								MethodProvider.log("Walking to cave, avoiding dreambot fucked area wc guild");
-								Sleep.sleep(69, 420);
-							}
-						} else 
-						{
-							if(Walking.shouldWalk(6) && Walking.walk(Locations.kourendGiantsCaveEntrance.getCenter())) 
-							{
-								MethodProvider.log("Walking to cave");
-								Sleep.sleep(69, 420);
-							}
-						}
-					}
-				} else 
-				{
-					//check for cave entrance
-					Filter<GameObject> caveFilter = c -> 
-						c != null && 
-						c.exists() && 
-						c.getName().contains("Cave") && 
-						c.hasAction("Enter");
-					GameObject cave = GameObjects.closest(caveFilter);
-					if(cave != null)
-					{
-						if(cave.interact("Enter"))
-						{
-							MethodProvider.sleepUntil(() -> Locations.kourendGiantsCaveArea.contains(Players.localPlayer()),
-									() -> Players.localPlayer().isMoving(),Sleep.calculate(2222,2222), 50);
-						}
-						return Timing.sleepLogNormalSleep();
-					}
-					MethodProvider.log("[SCRIPT] -> Error! In Hill Giants cave entrance in Kourend, but cave not found!");
-				}
-			} 
-			else 
-			{
-				MethodProvider.log("Not considered to be inside hill giants cave or Kourend! Teleporting to woodcutting guild..");
-				Walkz.teleportWoodcuttingGuild(180000);
-			}
+			activateOffensivePrayers(melee);
+			Sleep.sleep(69, 2222);
+			if(melee) Mobs.fightMobMelee("Hill Giant", selectedHillGiantsArea);
+			else Mobs.fightMobRanged("Hill Giant", selectedHillGiantsArea);
+			return Timing.sleepLogNormalSleep();
 		}
+		if(Locations.hillGiantsValley.getCenter().distance() > 125) 
+		{
+			if(!Walkz.useJewelry(InvEquip.duel,"PvP Arena"))
+			{
+				if(InvEquip.bankContains(InvEquip.wearableDuel))
+				{
+					InvEquip.withdrawOne(InvEquip.getBankItem(InvEquip.wearableDuel),180000);
+					return Sleep.calculate(420,696);
+				}
+				InvEquip.buyItem(InvEquip.duel8, 3, 180000);
+				return Sleep.calculate(420,696);
+			}
+			return Sleep.calculate(420,696);
+		}
+		if(Walking.shouldWalk(6) && Walking.walk(Locations.hillGiantsValley.getCenter())) Sleep.sleep(696,420);
 		return Timing.sleepLogNormalSleep();
 	}
 	public static int trainGiantFrogs(boolean melee)
 	{
 		if(Locations.isInKourend())
 		{
-			Walkz.leaveKourend(180000);
+			Walkz.exitKourend(180000);
 			return Timing.sleepLogNormalSleep();
 		}
 		
@@ -1885,8 +1953,8 @@ public class Mobs {
 			if(!Equipment.contains(TrainMelee.getBestWeapon()) ||
 				(Combatz.shouldDrinkMeleeBoost() && !InvEquip.invyContains(id.superStrs) && !InvEquip.invyContains(id.superStrs)) ||
 				(Combatz.shouldEatFood(5) && !InvEquip.invyContains(Combatz.foods)) || 
-				!InvEquip.equipmentContains(InvEquip.wearableWealth) || 
-				!InvEquip.equipmentContains(InvEquip.wearableGlory))
+				(!InvEquip.equipmentContains(InvEquip.wearableWealth) && !InvEquip.invyContains(InvEquip.wearableWealth))  || 
+				(!InvEquip.equipmentContains(InvEquip.wearableGlory) && !InvEquip.invyContains(InvEquip.wearableGlory)))
 			{
 				TrainMelee.fulfillMelee_Pots_Stam_Bass();
 				return Timing.sleepLogNormalInteraction();
@@ -1900,12 +1968,12 @@ public class Mobs {
 				return Timing.sleepLogNormalSleep();
 			}
 			if(!Equipment.contains(TrainRanged.getBestDart()) ||
-				(Combatz.shouldDrinkRangedBoost() && !InvEquip.invyContains(TrainRanged.rangedPots)) ||
+				(Combatz.shouldDrinkRangedBoost() && !InvEquip.invyContains(id.rangedPots)) ||
 				(Combatz.shouldEatFood(5) && !InvEquip.invyContains(Combatz.foods)) || 
-				!InvEquip.equipmentContains(InvEquip.wearableWealth) || 
-				!InvEquip.equipmentContains(InvEquip.wearableGlory))
+				(!InvEquip.equipmentContains(InvEquip.wearableWealth) && !InvEquip.invyContains(InvEquip.wearableWealth))  || 
+				(!InvEquip.equipmentContains(InvEquip.wearableGlory) && !InvEquip.invyContains(InvEquip.wearableGlory)))
 			{
-				TrainRanged.fulfillRangedDartsStamina();
+				TrainRanged.fulfillRangedDartsStaminaGames();
 				return Timing.sleepLogNormalInteraction();
 			}
 		}
@@ -1913,7 +1981,7 @@ public class Mobs {
 		//in location to kill mobs
 		if(Locations.lumbyGiantFrogs.contains(Players.localPlayer()))
 		{
-			if(Dialogues.canContinue()) Dialogues.continueDialogue();
+			if(Dialoguez.handleDialogues()) return Sleep.calculate(222,696);
 			if(Combatz.shouldEatFood(6))
 			{
 				Combatz.eatFood();
@@ -1933,7 +2001,7 @@ public class Mobs {
 			}
 			else
 			{
-				if(InvEquip.invyContains(TrainRanged.rangedPots))
+				if(InvEquip.invyContains(id.rangedPots))
 				{
 					if(Combatz.shouldDrinkRangedBoost())
 					{
@@ -1976,7 +2044,7 @@ public class Mobs {
 					{
 						Prayers.toggle(true, Prayer.ULTIMATE_STRENGTH);
 					}
-					else Prayers.openTab();
+					else Tabz.open(Tab.PRAYER);
 					Sleep.sleep(69, 420);
 				}
 			}
@@ -1988,7 +2056,7 @@ public class Mobs {
 					{
 						Prayers.toggle(true, Prayer.SUPERHUMAN_STRENGTH);
 					}
-					else Prayers.openTab();
+					else Tabz.open(Tab.PRAYER);
 					Sleep.sleep(69, 420);
 				}
 			}
@@ -2000,7 +2068,7 @@ public class Mobs {
 					{
 						Prayers.toggle(true, Prayer.BURST_OF_STRENGTH);
 					}
-					else Prayers.openTab();
+					else Tabz.open(Tab.PRAYER);
 					Sleep.sleep(69, 420);
 				}
 			}
@@ -2015,7 +2083,7 @@ public class Mobs {
 					{
 						Prayers.toggle(true, Prayer.EAGLE_EYE);
 					}
-					else Prayers.openTab();
+					else Tabz.open(Tab.PRAYER);
 					Sleep.sleep(69, 420);
 				}
 			}
@@ -2027,7 +2095,7 @@ public class Mobs {
 					{
 						Prayers.toggle(true, Prayer.HAWK_EYE);
 					}
-					else Prayers.openTab();
+					else Tabz.open(Tab.PRAYER);
 					Sleep.sleep(69, 420);
 				}
 			}
@@ -2039,16 +2107,7 @@ public class Mobs {
 		{
 			if(Combatz.drinkRangeBoost()) Sleep.sleep(69, 420);
 		}
-		if(Skills.getRealLevel(Skill.RANGED) < 66)
-		{
-			if(org.dreambot.api.methods.combat.Combat.getCombatStyle() != CombatStyle.RANGED_RAPID)
-			{
-				org.dreambot.api.methods.combat.Combat.setCombatStyle(CombatStyle.RANGED_RAPID);
-			}
-		} else if(org.dreambot.api.methods.combat.Combat.getCombatStyle() != CombatStyle.RANGED_DEFENCE)
-		{
-			org.dreambot.api.methods.combat.Combat.setCombatStyle(CombatStyle.RANGED_DEFENCE);
-		}
+		TrainRanged.updateAttStyle();
 		if(cantReachThat)
 		{
 			Filter<NPC> allMobsFilter = mob ->
@@ -2105,6 +2164,7 @@ public class Mobs {
     		MethodProvider.sleep(Timing.sleepLogNormalSleep());
     		return;
     	}
+    	if(Skillz.shouldCheckSkillInterface()) Skillz.checkSkillProgress(Skill.RANGED);
     	//here we have no mobs attacking us already, so attack some mobs
     	Filter<NPC> newMobsFilter = mob -> 
     			mob != null &&
@@ -2189,6 +2249,9 @@ public class Mobs {
     		MethodProvider.sleep(Timing.sleepLogNormalSleep());
     		return;
     	}
+    	
+    	if(Skillz.shouldCheckSkillInterface()) Skillz.checkSkillProgress(TrainMelee.getMeleeSkillToTrain());
+    	
     	//here we have no mobs attacking us already, so attack some mobs
     	Filter<NPC> newMobsFilter = mob -> 
     			mob != null &&

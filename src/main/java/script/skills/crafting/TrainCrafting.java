@@ -16,7 +16,9 @@ import script.behaviour.DecisionLeaf;
 import script.framework.Leaf;
 import script.quest.varrockmuseum.Timing;
 import script.utilities.API;
+import script.utilities.Bankz;
 import script.utilities.InvEquip;
+import script.utilities.Skillz;
 import script.utilities.Sleep;
 /**
  * Trains crafting 35-40
@@ -53,6 +55,8 @@ public class TrainCrafting extends Leaf {
     }
     public static void doCrafting()
     {
+
+    	if(Skillz.shouldCheckSkillInterface()) Skillz.checkSkillProgress(Skill.CRAFTING);
     	if(!craftLeatherThing(Skills.getRealLevel(Skill.CRAFTING)))
         {
         	InvEquip.clearAll();
@@ -79,7 +83,7 @@ public class TrainCrafting extends Leaf {
     	{
     		if(Bank.isOpen())
         	{
-        		Bank.close();
+        		Bankz.close();
         		return true;
         	}
         	if(ItemProcessing.isOpen())

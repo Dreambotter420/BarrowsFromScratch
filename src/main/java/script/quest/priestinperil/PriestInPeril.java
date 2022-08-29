@@ -18,6 +18,7 @@ import org.dreambot.api.methods.prayer.Prayers;
 import org.dreambot.api.methods.settings.PlayerSettings;
 import org.dreambot.api.methods.skills.Skill;
 import org.dreambot.api.methods.skills.Skills;
+import org.dreambot.api.methods.tabs.Tab;
 import org.dreambot.api.methods.walking.impl.Walking;
 import org.dreambot.api.methods.widget.Widgets;
 import org.dreambot.api.script.ScriptManager;
@@ -33,11 +34,14 @@ import script.quest.varrockmuseum.Timing;
 import script.skills.ranged.TrainRanged;
 import script.utilities.API;
 import script.utilities.Combatz;
+import script.utilities.Dialoguez;
 import script.utilities.InvEquip;
 import script.utilities.Locations;
+import script.utilities.Questz;
 import script.utilities.Sleep;
 import script.utilities.Walkz;
 import script.utilities.id;
+import script.utilities.Tabz;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -48,7 +52,6 @@ import java.util.List;
  * ^_^
  */
 public class PriestInPeril extends Leaf {
-	public static boolean completedPriestInPeril = false;
 	public static final int ironKey = 2945;
 	public static final int goldenKey = 2944;
 	public static final int unblessedBucket = 2953;
@@ -64,34 +67,9 @@ public class PriestInPeril extends Leaf {
     	correctMonument = null;
     	return true;
     }
-    @Override
-    public int onLoop() {
-    	if (DecisionLeaf.taskTimer.finished()) {
-            MethodProvider.log("[TIMEOUT] -> The Restless Ghost");
-           	API.mode = null;
-            return Timing.sleepLogNormalSleep();
-        }
-        if (completedPriestInPeril) {
-            MethodProvider.log("[COMPLETED] -> Priest in Peril!");
-           	API.mode = null;
-           	Main.customPaintText1 = "~~~~~~~~~~";
-    		Main.customPaintText2 = "~Quest Complete~";
-    		Main.customPaintText3 = "~Priest in Peril~";
-    		Main.customPaintText4 = "~~~~~~~~~~";
-            return Timing.sleepLogNormalSleep();
-        }
-        
-        if(Dialogues.getNPCDialogue() != null && !Dialogues.getNPCDialogue().isEmpty())
-    	{
-    		MethodProvider.log("NPC Dialogue: " + Dialogues.getNPCDialogue());
-    	}
-        if(handleDialogues()) return Timing.sleepLogNormalInteraction();
-        if(Inventory.contains(TrainRanged.getBestDart()))
-        {
-        	InvEquip.equipItem(TrainRanged.getBestDart());
-        	return Timing.sleepLogNormalSleep();
-        }
-        if(getProgressValue() == 61)
+    public static boolean completed()
+    {
+    	if(getProgressValue() == 61)
         {
         	if(Locations.PiP_undergroundPass.contains(Players.localPlayer()))
         	{
@@ -100,11 +78,41 @@ public class PriestInPeril extends Leaf {
         		{
         			Walkz.teleportVarrock(30000);
         		}
-        		return Timing.sleepLogNormalInteraction();
+        		return false;
         	}
-        	completedPriestInPeril = true;
-    		return Timing.sleepLogNormalInteraction();
+        	return true;
         }
+    	return false;
+    }
+    @Override
+    public int onLoop() {
+    	if (DecisionLeaf.taskTimer.finished()) {
+            MethodProvider.log("[TIMEOUT] -> The Restless Ghost");
+           	API.mode = null;
+            return Timing.sleepLogNormalSleep();
+        }
+        if (completed()) {
+            MethodProvider.log("[COMPLETED] -> Priest in Peril!");
+           	API.mode = null;
+           	Main.customPaintText1 = "~~~~~~~~~~";
+    		Main.customPaintText2 = "~Quest Complete~";
+    		Main.customPaintText3 = "~Priest in Peril~";
+    		Main.customPaintText4 = "~~~~~~~~~~";
+            return Timing.sleepLogNormalSleep();
+        }
+
+    	if(Questz.shouldCheckQuestStep()) Questz.checkQuestStep("Priest in Peril");
+        if(Dialogues.getNPCDialogue() != null && !Dialogues.getNPCDialogue().isEmpty())
+    	{
+    		MethodProvider.log("NPC Dialogue: " + Dialogues.getNPCDialogue());
+    	}
+        if(Dialoguez.handleDialogues()) return Timing.sleepLogNormalInteraction();
+        if(Inventory.contains(TrainRanged.getBestDart()))
+        {
+        	InvEquip.equipItem(TrainRanged.getBestDart());
+        	return Timing.sleepLogNormalSleep();
+        }
+        
         if(getProgressValue() == 60)
         {
         	//quest done widget - not really have access to morytania until progress value is 61 ... talk to drezel some more...
@@ -385,7 +393,7 @@ public class PriestInPeril extends Leaf {
         			!InvEquip.equipmentContains(InvEquip.wearableWealth) ||
         			!InvEquip.equipmentContains(InvEquip.wearableGlory) ||
         			!Inventory.contains(id.varrockTele) || 
-        			!Inventory.contains(TrainRanged.jugOfWine))
+        			!Inventory.contains(Combatz.lowFood))
         	{
         		fulfillPriestInPerilFight();
         		break;
@@ -452,6 +460,7 @@ public class PriestInPeril extends Leaf {
         				}
         				if(!Prayers.isActive(Prayer.EAGLE_EYE))
         				{
+                			Tabz.open(Tab.PRAYER);
         					Prayers.toggle(true, Prayer.EAGLE_EYE);
         					break;
         				}
@@ -465,6 +474,7 @@ public class PriestInPeril extends Leaf {
         				}
         				if(!Prayers.isActive(Prayer.HAWK_EYE))
         				{
+                			Tabz.open(Tab.PRAYER);
         					Prayers.toggle(true, Prayer.HAWK_EYE);
         					break;
         				}
@@ -554,7 +564,7 @@ public class PriestInPeril extends Leaf {
         			!InvEquip.equipmentContains(InvEquip.wearableWealth) ||
         			!InvEquip.equipmentContains(InvEquip.wearableGlory) ||
         			!Inventory.contains(id.varrockTele) || 
-        			!Inventory.contains(TrainRanged.jugOfWine))
+        			!Inventory.contains(Combatz.lowFood))
         	{
         		fulfillPriestInPerilFight();
         		break;
@@ -592,7 +602,7 @@ public class PriestInPeril extends Leaf {
         			!InvEquip.equipmentContains(InvEquip.wearableWealth) ||
         			!InvEquip.equipmentContains(InvEquip.wearableGlory) ||
         			!Inventory.contains(id.varrockTele) || 
-        			!Inventory.contains(TrainRanged.jugOfWine))
+        			!Inventory.contains(Combatz.lowFood))
         	{
         		fulfillPriestInPerilFight();
         		break;
@@ -602,6 +612,7 @@ public class PriestInPeril extends Leaf {
 			{
         		if(Prayers.isActive(Prayer.EAGLE_EYE))
 				{
+        			Tabz.open(Tab.PRAYER);
 					Prayers.toggle(false, Prayer.EAGLE_EYE);
 					break;
 				}
@@ -610,6 +621,7 @@ public class PriestInPeril extends Leaf {
 			{
 				if(Prayers.isActive(Prayer.HAWK_EYE))
 				{
+        			Tabz.open(Tab.PRAYER);
 					Prayers.toggle(false, Prayer.HAWK_EYE);
 					break;
 				}
@@ -643,7 +655,7 @@ public class PriestInPeril extends Leaf {
         			!InvEquip.equipmentContains(InvEquip.wearableWealth) ||
         			!InvEquip.equipmentContains(InvEquip.wearableGlory) ||
         			!Inventory.contains(id.varrockTele) || 
-        			!Inventory.contains(TrainRanged.jugOfWine))
+        			!Inventory.contains(Combatz.lowFood))
         	{
         		fulfillPriestInPerilFight();
         		break;
@@ -670,6 +682,7 @@ public class PriestInPeril extends Leaf {
         				}
         				if(!Prayers.isActive(Prayer.EAGLE_EYE))
         				{
+                			Tabz.open(Tab.PRAYER);
         					Prayers.toggle(true, Prayer.EAGLE_EYE);
         					break;
         				}
@@ -683,6 +696,7 @@ public class PriestInPeril extends Leaf {
         				}
         				if(!Prayers.isActive(Prayer.HAWK_EYE))
         				{
+                			Tabz.open(Tab.PRAYER);
         					Prayers.toggle(true, Prayer.HAWK_EYE);
         					break;
         				}
@@ -718,7 +732,7 @@ public class PriestInPeril extends Leaf {
         			!InvEquip.equipmentContains(InvEquip.wearableWealth) ||
         			!InvEquip.equipmentContains(InvEquip.wearableGlory) ||
         			!Inventory.contains(id.varrockTele) || 
-        			!Inventory.contains(TrainRanged.jugOfWine))
+        			!Inventory.contains(Combatz.lowFood))
         	{
         		fulfillPriestInPerilFight();
         		break;
@@ -737,7 +751,7 @@ public class PriestInPeril extends Leaf {
         			!InvEquip.equipmentContains(InvEquip.wearableWealth) ||
         			!InvEquip.equipmentContains(InvEquip.wearableGlory) ||
         			!Inventory.contains(id.varrockTele) || 
-        			!Inventory.contains(TrainRanged.jugOfWine))
+        			!Inventory.contains(Combatz.lowFood))
         	{
         		fulfillPriestInPerilFight();
         		break;
@@ -844,36 +858,12 @@ public class PriestInPeril extends Leaf {
     {
     	return PlayerSettings.getConfig(302);
     }
-    public static boolean handleDialogues()
-	{
-		if(Dialogues.canContinue())
-		{
-			if(Dialogues.continueDialogue()) Sleep.sleep(69,696);
-			return true;
-		}
-		if(Dialogues.isProcessing())
-		{
-			Sleep.sleep(420,696);
-			return true;
-		}
-		 
-		if(Dialogues.areOptionsAvailable())
-		{
-			return Dialogues.chooseOption("Yes.") || 
-					Dialogues.chooseOption("Roald sent me to check on Drezel.") ||
-					Dialogues.chooseOption("Sure. I\'m a helpful person!") ||
-					Dialogues.chooseOption("So, what now?") ||
-					Dialogues.chooseOption("Yes, of course.") ||
-					Dialogues.chooseOption("Could you tell me more about this temple?") ||
-					Dialogues.chooseOption("I\'m looking for a quest!");
-		}
-		return false;
-	}
+  
     public static boolean fulfillPriestInPerilFight()
     {
     	InvEquip.clearAll();
     	TrainRanged.setBestRangedEquipment();
-    	InvEquip.addInvyItem(TrainRanged.rangePot4, 1, 1, false, (int) Calculations.nextGaussianRandom(20, 5));
+    	InvEquip.addInvyItem(id.rangePot4, 1, 1, false, (int) Calculations.nextGaussianRandom(20, 5));
     	InvEquip.addInvyItem(id.bucket, 1, 1, false, 1);
     	InvEquip.addInvyItem(id.varrockTele, 5, (int) Calculations.nextGammaRandom(10, 2), false, (int) Calculations.nextGaussianRandom(20, 5));
     	if(Skills.getRealLevel(Skill.PRAYER) >= 26) //minimum pray for Hawk Eye, then eagle eye, then protekk melee
@@ -885,13 +875,13 @@ public class PriestInPeril extends Leaf {
     	{
     		InvEquip.addOptionalItem(f);
     	}
-    	for(int r : TrainRanged.rangedPots)
+    	for(int r : id.rangedPots)
     	{
     		InvEquip.addOptionalItem(r);
     	}
     	InvEquip.addOptionalItem(InvEquip.jewelry);
     	InvEquip.shuffleFulfillOrder();
-    	InvEquip.addInvyItem(TrainRanged.jugOfWine, 5, 10, false, (int) Calculations.nextGaussianRandom(500, 100));
+    	InvEquip.addInvyItem(Combatz.lowFood, 5, 10, false, (int) Calculations.nextGaussianRandom(500, 100));
     	InvEquip.addInvyItem(InvEquip.coins, 0, 0, false, 0);
     	if(InvEquip.fulfillSetup(true, 180000))
 		{

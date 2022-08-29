@@ -32,6 +32,7 @@ import org.dreambot.api.wrappers.items.Item;
 
 import script.quest.varrockmuseum.Timing;
 import script.utilities.Bankz;
+import script.utilities.GrandExchangg;
 import script.utilities.InvEquip;
 import script.utilities.Sleep;
 import script.utilities.Walkz;
@@ -162,7 +163,7 @@ public class BuyHighAlchs {
 						}
 						continue;
 					}
-					if(GrandExchange.isOpen() && GrandExchange.close()) 
+					if(GrandExchange.isOpen() && GrandExchangg.close()) 
 					{
 						Sleep.sleep(696, 420);
 						continue;
@@ -180,7 +181,7 @@ public class BuyHighAlchs {
 				{
 					if(Bank.isOpen()) 
 					{
-						Bank.close();
+						Bankz.close();
 						continue;
 					}
 					if(Walkz.goToGE(timer.remaining()))

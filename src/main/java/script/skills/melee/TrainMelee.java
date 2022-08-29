@@ -22,6 +22,8 @@ import org.dreambot.api.utilities.Timer;
 import org.dreambot.api.wrappers.interactive.NPC;
 
 import script.Main;
+import script.actionz.UniqueActions;
+import script.actionz.UniqueActions.Actionz;
 import script.behaviour.DecisionLeaf;
 import script.framework.Branch;
 import script.framework.Leaf;
@@ -33,6 +35,8 @@ import script.skills.ranged.Mobs;
 import script.skills.ranged.Mobs.Mob;
 import script.skills.ranged.TrainRanged;
 import script.utilities.API;
+import script.utilities.Bankz;
+import script.utilities.GrandExchangg;
 import script.utilities.InvEquip;
 import script.utilities.Locations;
 import script.utilities.Sleep;
@@ -51,19 +55,12 @@ public class TrainMelee extends Leaf{
 		Mobs.mob = null;
 		if(Locations.isInIsleOfSouls())
 		{
-			if(!Walkz.useJewelry(InvEquip.glory, "Edgeville") && 
-					!Walkz.useJewelry(InvEquip.wealth, "Grand Exchange") && 
-					!Walkz.useJewelry(InvEquip.combat, "Ranging Guild"))
-			{
-				MethodProvider.log("Appear to be stuck on isle of souls, teleporting home??");
-				if(Players.localPlayer().isAnimating()) 
-				{
-					Sleep.sleep(2222, 2222);
-					return false;
-				}
-				Magic.castSpell(Normal.HOME_TELEPORT);
-				Sleep.sleep(3333,3333);
-			}
+			Walkz.exitIsleOfSouls(240000);
+			return false;
+		}
+		if(Locations.kourendGiantsCaveArea.contains(Players.localPlayer()))
+		{
+			Walkz.exitGiantsCave();
 			return false;
 		}
 		return true;
@@ -71,9 +68,6 @@ public class TrainMelee extends Leaf{
 	public static boolean onStart()
 	{
 		started = true;
-		
-		
-		
 		return true;
 	}
 	public static Timer attStyleTimer = null;
@@ -86,7 +80,6 @@ public class TrainMelee extends Leaf{
             {
             	API.mode = null;
             }
-			
             return Timing.sleepLogNormalSleep();
 		}
 		if(Equipment.contains(getBestWeapon()) && !updateAttStyle()) 
@@ -126,6 +119,31 @@ public class TrainMelee extends Leaf{
 		}
     	
     }
+	public static Skill getMeleeSkillToTrain()
+	{
+		final int att = Skills.getRealLevel(Skill.ATTACK);
+		final int str = Skills.getRealLevel(Skill.STRENGTH);
+		final int def = Skills.getRealLevel(Skill.DEFENCE);
+		int lowestStat = 0;
+		//train all stats to base 40 first
+		if(att < 40 || str < 40 || def < 40)
+		{
+			List<Integer> meleeStats = new ArrayList<Integer>();
+			meleeStats.add(att);
+			meleeStats.add(str);
+			meleeStats.add(def);
+			Collections.sort(meleeStats);
+			lowestStat = meleeStats.get(0);
+		}
+		//then train str to 60, then att, then def to 70+
+		else if(str < 60) lowestStat = str;
+		else if(att < 60) lowestStat = att;
+		else lowestStat = def;
+		//compare lowest melee stat to all melee stats, starting with str, to consider currently needed att schtoil
+		if(str == lowestStat) return Skill.STRENGTH;
+		else if(att == lowestStat) return Skill.ATTACK;
+		else return Skill.DEFENCE;
+	}
 	public static boolean updateAttStyle()
 	{
 		if(attStyleTimer != null && !attStyleTimer.isPaused() && !attStyleTimer.finished()) 
@@ -169,12 +187,12 @@ public class TrainMelee extends Leaf{
 			}
 			if(Bank.isOpen())
 			{
-				Bank.close();
+				Bankz.close();
 				return false;
 			}
 			if(GrandExchange.isOpen())
 			{
-				GrandExchange.close();
+				GrandExchangg.close();
 				return false;
 			}
 			Combat.setCombatStyle(neededStyle);
@@ -193,7 +211,7 @@ public class TrainMelee extends Leaf{
 	    	InvEquip.setEquipItem(EquipmentSlot.LEGS, getBestLegSlot());
 	    	InvEquip.setEquipItem(EquipmentSlot.RING, InvEquip.wealth);
 	    	boolean foundCape = false;
-	    	for(int capeID : TrainRanged.randCapes)
+	    	for(int capeID : id.randCapes)
 	    	{
 	    		if(Equipment.contains(capeID)) 
 	    		{
@@ -208,71 +226,59 @@ public class TrainMelee extends Leaf{
 			if(getNextNextBestWeapon() != getBestWeapon() && 
 					getNextNextBestWeapon() != getBestWeapon()) InvEquip.addInvyItem(getNextNextBestWeapon(), 1, 1, false, 1);
 	}
-	public static final int dragonMedHelm = 1149;
-	public static final int runeFullHelm = 1163;
-	public static final int addyFullHelm = 1161;
-	public static final int mithFullHelm = 1159;
-	public static final int steelFullHelm = 1157;
-	public static final int ironFullHelm = 1153;
-    public static int getBestHeadSlot()
+	public static int getBestHeadSlot()
     {
     	final int def = Skills.getRealLevel(Skill.DEFENCE);
-    	if(def >= 60) return dragonMedHelm;
-    	if(def >= 40) return runeFullHelm;
-    	if(def >= 30) return addyFullHelm;
-    	if(def >= 20) return mithFullHelm;
-    	if(def >= 5) return steelFullHelm;
-    	return ironFullHelm;
+    	if(def >= 60) return id.dragonMedHelm;
+    	if(def >= 40) return id.runeFullHelm;
+    	if(def >= 30) return id.addyFullHelm;
+    	if(def >= 20) return id.mithFullHelm;
+    	if(def >= 5) return id.steelFullHelm;
+    	return id.ironFullHelm;
     }
 
-	public static final int runePlatelegs = 1079;
-	public static final int addyPlatelegs = 1073;
-	public static final int mithPlatelegs = 1071;
-	public static final int steelPlatelegs = 1069;
-	public static final int ironPlatelegs = 1067;
+	
 	public static int getBestLegSlot()
     {
 		final int def = Skills.getRealLevel(Skill.DEFENCE);
-    	if(def >= 40) return runePlatelegs;
-    	if(def >= 30) return addyPlatelegs;
-    	if(def >= 20) return mithPlatelegs;
-    	if(def >= 5) return steelPlatelegs;
-    	return ironPlatelegs;
+    	if(def >= 40) return id.runePlatelegs;
+    	if(def >= 30) return id.addyPlatelegs;
+    	if(def >= 20) return id.mithPlatelegs;
+    	if(def >= 5) return id.steelPlatelegs;
+    	return id.ironPlatelegs;
     }
 	
-	public static final int runeChainbody = 1113;
-	public static final int addyPlatebody = 1123;
-	public static final int mithPlatebody = 1121;
-	public static final int steelPlatebody = 1119;
-	public static final int ironPlatebody = 1115;
+	
 	public static int getBestBodySlot()
     {
 		final int def = Skills.getRealLevel(Skill.DEFENCE);
-    	if(def >= 40) return runeChainbody;
-    	if(def >= 30) return addyPlatebody;
-    	if(def >= 20) return mithPlatebody;
-    	if(def >= 5) return steelPlatebody;
-    	return ironPlatebody;
+    	if(def >= 40) 
+    	{
+    		if(UniqueActions.isActionEnabled(Actionz.ADDYPLATEBODY_INSTEAD_OF_RUNECHAINBODY)) return id.addyPlatebody;
+    		return id.runeChainbody;
+    	}
+    	if(def >= 30) return id.addyPlatebody;
+    	if(def >= 20) return id.mithPlatebody;
+    	if(def >= 5) return id.steelPlatebody;
+    	return id.ironPlatebody;
     }
 	
 	public static int getBestCapeSlot()
 	{
-		if(InvEquip.equipmentContains(TrainRanged.randCapes)) return InvEquip.getEquipmentItem(TrainRanged.randCapes);
-    	if(InvEquip.invyContains(TrainRanged.randCapes)) return InvEquip.getInvyItem(TrainRanged.randCapes);
-    	if(InvEquip.bankContains(TrainRanged.randCapes)) return InvEquip.getBankItem(TrainRanged.randCapes);
-    	return TrainRanged.randCape;
+		if(InvEquip.equipmentContains(id.randCapes)) return InvEquip.getEquipmentItem(id.randCapes);
+    	if(InvEquip.invyContains(id.randCapes)) return InvEquip.getInvyItem(id.randCapes);
+    	if(InvEquip.bankContains(id.randCapes)) return InvEquip.getBankItem(id.randCapes);
+    	return id.randCape;
 	}
 	
-	public static final int dragonBoots = 11840;
-	public static final int runeBoots = 4131;
-	public static final int addyBoots = 4129;
+	
 	public static int getBestBootSlot()
 	{
     	final int def = Skills.getRealLevel(Skill.DEFENCE);
-		if(def >= 60) return dragonBoots;
-		if(def >= 40) return runeBoots;
-		if(def >= 30) return addyBoots;
-    	return TrainRanged.leatherBoots;
+		if(def >= 60) return id.dragonBoots;
+		if(def >= 40) return id.runeBoots;
+		if(def >= 30) return id.addyBoots;
+    	return id.leatherBoots;
 	}
 	
 	public static int getBestHandSlot()
@@ -285,49 +291,41 @@ public class TrainMelee extends Leaf{
 		return InvEquip.glory;
 	}
 	
-	public static final int runeKiteshield = 1201;
-	public static final int addyKiteshield = 1199;
-	public static final int mithKiteshield = 1197;
-	public static final int steelKiteshield = 1193;
-	public static final int ironKiteshield = 1191;
+	
 	public static int getBestShieldSlot()
     {
 		final int def = Skills.getRealLevel(Skill.DEFENCE);
-    	if(def >= 40) return runeKiteshield;
-    	if(def >= 30) return addyKiteshield;
-    	if(def >= 20) return mithKiteshield;
-    	if(def >= 5) return steelKiteshield;
-    	return ironKiteshield;
+    	if(def >= 40) return id.runeKiteshield;
+    	if(def >= 30) return id.addyKiteshield;
+    	if(def >= 20) return id.mithKiteshield;
+    	if(def >= 5) return id.steelKiteshield;
+    	return id.ironKiteshield;
     }
 	
-    public static final int brineSabre = 11037;
-	public static final int addyScimmy = 1331;
-	public static final int mithScimmy = 1329;
-	public static final int steelScimmy = 1325;
-	public static final int ironScimmy = 1323;
+    
     public static int getBestWeapon()
     {
 		final int att = Skills.getRealLevel(Skill.ATTACK);
-    	if(att >= 40) return brineSabre;
-    	if(att >= 30) return addyScimmy;
-    	if(att >= 20) return mithScimmy;
-    	if(att >= 5) return steelScimmy;
-    	return ironScimmy;
+    	if(att >= 40) return id.brineSabre;
+    	if(att >= 30) return id.addyScimmy;
+    	if(att >= 20) return id.mithScimmy;
+    	if(att >= 5) return id.steelScimmy;
+    	return id.ironScimmy;
     }
     public static int getNextBestWeapon()
     {
     	final int att = Skills.getRealLevel(Skill.ATTACK);
-    	if(att >= 30) return brineSabre;
-    	if(att >= 20) return addyScimmy;
-    	if(att >= 5) return mithScimmy;
-    	return steelScimmy;
+    	if(att >= 30) return id.brineSabre;
+    	if(att >= 20) return id.addyScimmy;
+    	if(att >= 5) return id.mithScimmy;
+    	return id.steelScimmy;
     }
     public static int getNextNextBestWeapon()
     {
     	final int att = Skills.getRealLevel(Skill.ATTACK);
-    	if(att >= 20) return brineSabre;
-    	if(att >= 5) return addyScimmy;
-    	return mithScimmy;
+    	if(att >= 20) return id.brineSabre;
+    	if(att >= 5) return id.addyScimmy;
+    	return id.mithScimmy;
     }
     
     

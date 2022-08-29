@@ -37,98 +37,66 @@ public class ItemsOnGround {
 	public static List<Integer> sandcrabsLoot = new ArrayList<Integer>();
 	
 	public static List<Integer> allSlayerLoot = new ArrayList<Integer>();
-	public static final int grimyRanarr = 207;
-	public static final int grimyAvantoe = 211;
-	public static final int grimyKwuarm = 213;
-	public static final int grimyCadantine = 215;
-	public static final int grimyLantadyme = 2485;
-
-	public static final int snapdragonSeed = 5300;
-	public static final int ranarrSeed = 5295;
-	public static final int torstolSeed = 5304;
-	public static final int toadflaxSeed = 5296;
-	public static final int snapegrassSeed = 22879;
-	
-	public static final int giantKey = 20754;
-	public static final int natureRune = 561;
-	public static final int chaosRune = 562;
-	public static final int bigBones = 532;
-	
-	public static final int ironBoots = 4121;
-	
-	public static final int ensouledKalphiteHead1 = 13489;
-	public static final int ensouledKalphiteHead2 = 13490;
-	
-	public static final int mithBolts = 9142;
-	public static final int lawRune = 563;
-	public static final int fireBattlestaff = 1393;
-	public static final int earthBattlestaff = 1399;
-	public static final int airBattlestaff = 1397;
-	public static final int waterBattlestaff = 1395;
-	
-	public static final int shieldLeftHalf = 2366;
-	public static final int dragonSpear = 1249;
-	public static final int runeSpear = 1247;
-	public static final int keyLoopHalf = 987;
-	public static final int keyToothHalf = 985;
-	public static final int uncutDiamond = 1617;
-	
-	public static final int fireTalisman = 1442;
 	
 	
 	public static void initializeLists()
 	{
-		herbTable.add(grimyRanarr);
-		herbTable.add(grimyAvantoe);
-		herbTable.add(grimyKwuarm);
-		herbTable.add(grimyCadantine);
-		herbTable.add(grimyLantadyme);
+		herbTable.add(id.grimyRanarr);
+		herbTable.add(id.grimyAvantoe);
+		herbTable.add(id.grimyKwuarm);
+		herbTable.add(id.grimyCadantine);
+		herbTable.add(id.grimyLantadyme);
 		
-		seedTable.add(snapdragonSeed);
-		seedTable.add(torstolSeed);
-		seedTable.add(toadflaxSeed);
-		seedTable.add(snapegrassSeed);
+		seedTable.add(id.snapdragonSeed);
+		seedTable.add(id.torstolSeed);
+		seedTable.add(id.toadflaxSeed);
+		seedTable.add(id.snapegrassSeed);
 		
-		rareDropTable.add(shieldLeftHalf);
-		rareDropTable.add(dragonSpear);
-		rareDropTable.add(runeSpear);
-		rareDropTable.add(keyLoopHalf);
-		rareDropTable.add(keyToothHalf);
-		rareDropTable.add(uncutDiamond);
+		rareDropTable.add(id.shieldLeftHalf);
+		rareDropTable.add(id.dragonSpear);
+		rareDropTable.add(id.runeSpear);
+		rareDropTable.add(id.keyLoopHalf);
+		rareDropTable.add(id.keyToothHalf);
+		rareDropTable.add(id.uncutDiamond);
 
-		forgottenSoulsLoot.add(mithBolts);
-		forgottenSoulsLoot.add(lawRune);
-		forgottenSoulsLoot.add(fireBattlestaff);
-		forgottenSoulsLoot.add(earthBattlestaff);
-		forgottenSoulsLoot.add(airBattlestaff);
-		forgottenSoulsLoot.add(waterBattlestaff);
+		forgottenSoulsLoot.add(id.mithBolts);
+		forgottenSoulsLoot.add(id.lawRune);
+		forgottenSoulsLoot.add(id.fireBattlestaff);
+		forgottenSoulsLoot.add(id.earthBattlestaff);
+		forgottenSoulsLoot.add(id.airBattlestaff);
+		forgottenSoulsLoot.add(id.waterBattlestaff);
 		
-		skeletonLoot.add(natureRune);
-		skeletonLoot.add(fireTalisman);
+		skeletonLoot.add(id.natureRune);
+		skeletonLoot.add(id.fireTalisman);
 		
-		dwarfLoot.add(natureRune);
+		dwarfLoot.add(id.natureRune);
 		
 		lanzigLoot.add(id.fremmy_lyre);
-		lanzigLoot.add(grimyRanarr);
+		lanzigLoot.add(id.grimyRanarr);
 		lanzigLoot.addAll(rareDropTable);
 		
 		sandcrabsLoot.add(id.casket);
 
-		caveSlimeLoot.add(ironBoots);
+		caveSlimeLoot.add(id.ironBoots);
 		
-		caveCrawlersLoot.add(natureRune);
+		caveCrawlersLoot.add(id.natureRune);
 
-		kalphiteWorkerLoot.add(natureRune);
-		kalphiteWorkerLoot.add(lawRune);
-		kalphiteWorkerLoot.add(chaosRune);
-		kalphiteWorkerLoot.add(ensouledKalphiteHead1);
-		kalphiteWorkerLoot.add(ensouledKalphiteHead2);
+		kalphiteWorkerLoot.add(id.natureRune);
+		kalphiteWorkerLoot.add(id.lawRune);
+		kalphiteWorkerLoot.add(id.chaosRune);
+		kalphiteWorkerLoot.add(id.ensouledKalphiteHead1);
+		kalphiteWorkerLoot.add(id.ensouledKalphiteHead2);
 		
-		caveBugsLoot.add(natureRune);
-		caveBugsLoot.add(waterBattlestaff);
+		caveBugsLoot.add(id.natureRune);
+		caveBugsLoot.add(id.waterBattlestaff);
 		
-		hillGiantsLoot.add(giantKey);
-		hillGiantsLoot.add(natureRune);
+		hillGiantsLoot.add(id.giantKey);
+		hillGiantsLoot.add(id.natureRune);
+		hillGiantsLoot.add(id.deathRune);
+		hillGiantsLoot.add(id.chaosRune);
+		hillGiantsLoot.add(id.cosmicRune);
+		hillGiantsLoot.add(id.lawRune);
+		hillGiantsLoot.add(id.bodyTalisman);
 		
 		//create list of all loot from slayer monsters 
 		allSlayerLoot.addAll(kalphiteWorkerLoot);
@@ -137,8 +105,8 @@ public class ItemsOnGround {
 		allSlayerLoot.addAll(seedTable);
 		allSlayerLoot.addAll(rareDropTable);
 		allSlayerLoot.add(id.casket);
-		allSlayerLoot.add(fireTalisman);
-		allSlayerLoot.add(bigBones);
+		allSlayerLoot.add(id.fireTalisman);
+		allSlayerLoot.add(id.bigBones);
 		
 		//add each monster to the generic tables which can be shared
 
@@ -191,7 +159,7 @@ public class ItemsOnGround {
 			g != null && 
 			g.exists() &&
 			g.distance() <= 15 &&
-			(killingArea.contains(g) || g.getID() != bigBones) &&
+			(killingArea.contains(g) || g.getID() != id.bigBones) &&
 			g.canReach() && 
 			listToCheck.contains(g.getID());
 		GroundItem g = GroundItems.closest(nearbyGroundItemFilter);
@@ -209,7 +177,7 @@ public class ItemsOnGround {
 			g != null && 
 			g.exists() &&
 			g.distance() <= 15 &&
-			(area.contains(g) || g.getID() != bigBones) &&
+			(area.contains(g) || g.getID() != id.bigBones) &&
 			g.canReach() && 
 			itemID == g.getID();
 		GroundItem g = GroundItems.closest(nearbyGroundItemFilter);
@@ -232,7 +200,7 @@ public class ItemsOnGround {
 			g != null && 
 			g.exists() &&
 			g.distance() <= 15 &&
-			(killingArea.contains(g) || g.getID() != bigBones) &&
+			(killingArea.contains(g) || g.getID() != id.bigBones) &&
 			((shouldBeReachable && g.canReach()) || !shouldBeReachable) &&
 			g.getItem().getLivePrice() >= valueThreshold;
 		List<GroundItem> g = GroundItems.all(nearbyGroundItemFilter);
@@ -259,9 +227,9 @@ public class ItemsOnGround {
 		if(g == null) return true;
 		if(Inventory.isFull())
 		{
-			if(Inventory.count(TrainRanged.jug) > 0)
+			if(Inventory.count(id.jug) > 0)
 			{
-				if(Inventory.dropAll(TrainRanged.jug))
+				if(Inventory.dropAll(id.jug))
 				{
 					MethodProvider.log("Dropped a jug");
 				}

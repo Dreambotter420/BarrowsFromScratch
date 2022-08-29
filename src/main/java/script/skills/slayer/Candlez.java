@@ -89,7 +89,7 @@ public class Candlez {
 				{
 					if(Bank.isOpen())
 					{
-						if(Bank.close()) Sleep.sleep(69, 420);
+						if(Bankz.close()) Sleep.sleep(69, 420);
 						continue;
 					}
 					if(Inventory.get(id.tinderbox).useOn(Inventory.get(id.unlitCandleLantern)))
@@ -112,7 +112,7 @@ public class Candlez {
 					{
 						if(Bank.isOpen())
 						{
-							if(Bank.close()) Sleep.sleep(69, 420);
+							if(Bankz.close()) Sleep.sleep(69, 420);
 							continue;
 						}
 						if(Inventory.get(id.litCandle).useOn(Inventory.get(id.emptyCandleLantern)))
@@ -125,7 +125,7 @@ public class Candlez {
 					{
 						if(Bank.isOpen())
 						{
-							if(Bank.close()) Sleep.sleep(69, 420);
+							if(Bankz.close()) Sleep.sleep(69, 420);
 							continue;
 						}
 						if(Inventory.get(id.unlitCandle).useOn(Inventory.get(id.emptyCandleLantern)))
@@ -158,7 +158,7 @@ public class Candlez {
 					{
 						if(Bank.isOpen())
 						{
-							if(Bank.close()) Sleep.sleep(69, 420);
+							if(Bankz.close()) Sleep.sleep(69, 420);
 							continue;
 						}
 						if(Inventory.get(id.glassblowingPipe).useOn(Inventory.get(id.moltenGlass)))
@@ -203,7 +203,7 @@ public class Candlez {
 		{
 			return true;
 		}
-		if(Inventory.count(TrainWoodcutting.logs) > 0 && 
+		if(Inventory.count(id.logs) > 0 && 
 				Inventory.count(id.tinderbox) > 0)
 		{
 			if(lightableArea.contains(Players.localPlayer()))
@@ -217,7 +217,7 @@ public class Candlez {
 						g.getTile().equals(Players.localPlayer().getTile()));
 				if(fireUnderMe == null)
 				{
-					if(Inventory.get(TrainWoodcutting.logs).useOn(Inventory.get(id.tinderbox)))
+					if(Inventory.get(id.logs).useOn(Inventory.get(id.tinderbox)))
 					{
 						MethodProvider.sleepUntil(() -> Players.localPlayer().isAnimating(), Sleep.calculate(2222, 2222));
 					}
@@ -258,7 +258,7 @@ public class Candlez {
 		{
 			InvEquip.clearAll();
 			InvEquip.addInvyItem(id.tinderbox, 1, 1, false, 1);
-			InvEquip.addInvyItem(TrainWoodcutting.logs, 1, 27, false, (int) Calculations.nextGaussianRandom(100, 20));
+			InvEquip.addInvyItem(id.logs, 1, 27, false, (int) Calculations.nextGaussianRandom(100, 20));
 			InvEquip.shuffleFulfillOrder();
 			InvEquip.fulfillSetup(true, 180000);
 		}

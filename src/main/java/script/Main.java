@@ -4,20 +4,27 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.time.LocalDateTime;
-import org.dreambot.api.Client;
 import org.dreambot.api.methods.MethodProvider;
 import org.dreambot.api.methods.dialogues.Dialogues;
 import org.dreambot.api.methods.input.Keyboard;
 import org.dreambot.api.methods.interactive.GameObjects;
 import org.dreambot.api.methods.map.Area;
+import org.dreambot.api.methods.map.Tile;
 import org.dreambot.api.methods.walking.impl.Walking;
 import org.dreambot.api.methods.walking.pathfinding.impl.obstacle.impl.PassableObstacle;
 import org.dreambot.api.methods.widget.Widgets;
 import org.dreambot.api.script.*;
+import org.dreambot.api.script.listener.ActionListener;
 import org.dreambot.api.script.listener.ChatListener;
 import org.dreambot.api.utilities.Timer;
 import org.dreambot.api.wrappers.interactive.GameObject;
+import org.dreambot.api.wrappers.widgets.MenuRow;
 import org.dreambot.api.wrappers.widgets.message.Message;
+
+import script.actionz.PushCameraUp;
+import script.actionz.ReportSpammer;
+import script.actionz.RuneliteChatPluginPretending;
+import script.actionz.WalkDrunkenly;
 import script.behaviour.*;
 import script.framework.Tree;
 import script.paint.*;
@@ -60,6 +67,8 @@ public class Main extends AbstractScript implements PaintInfo, ChatListener
     	MethodProvider.log("Barrows From Scratch starting!");
     	timer = new Timer(2000000000);
     	Walking.getAStarPathFinder().addObstacle(new PassableObstacle("Wilderness Ditch", "Cross", null, null, null));
+    	Walking.getAStarPathFinder().addObstacle(new PassableObstacle("Gate", "Open", null, null, null));
+    	
     	Keyboard.setWordsPerMinute(150);
     	Sleep.dt = LocalDateTime.now();
         API.started = true;
@@ -72,31 +81,33 @@ public class Main extends AbstractScript implements PaintInfo, ChatListener
         tree.addBranches(new WaitForLogged_N_Loaded(),
         			new Initialize(),
         			new OnTutorialIsland(),
-        			new OffTutorialIsland().addLeafs(
-        					new CustomizeSettings(),
-        					new ReportSpammer(),
-        					new DecisionLeaf(),
-        					new RestlessGhost(),
-        					new PriestInPeril(),
-        					new NatureSpirit(),
-        					new MageArena2(),
-        					new MageArena1(),
-        					new WaterfallQuest(),
-        					new FightArena(),
-        					new FremennikTrials(),
-        					new ErnestTheChicken(),
-        					new AnimalMagnetism(),
-        					new VarrockQuiz(),
-        					new TrainWoodcutting(),
-        					new TrainCrafting(),
-        					new TrainMagic(),
-        					new TrainSlayer(),
-        					new TrainRanged(),
-        					new TrainPrayer(),
-        					new TrainMelee(),
-        					new TrainAgility(),
-        					new LogoutBreak()
-        					));
+        			new LogoutBreak(),
+        			new CustomizeSettings(),
+        			new Test(),
+        			new PushCameraUp(),
+        			new RuneliteChatPluginPretending(),
+					new ReportSpammer(),
+					new WalkDrunkenly(),
+					new DecisionLeaf(),
+					new RestlessGhost(),
+					new PriestInPeril(),
+					new NatureSpirit(),
+					new MageArena2(),
+					new MageArena1(),
+					new WaterfallQuest(),
+					new FightArena(),
+					new FremennikTrials(),
+					new ErnestTheChicken(),
+					new AnimalMagnetism(),
+					new VarrockQuiz(),
+					new TrainWoodcutting(),
+					new TrainCrafting(),
+					new TrainMagic(),
+					new TrainSlayer(),
+					new TrainRanged(),
+					new TrainPrayer(),
+					new TrainMelee(),
+					new TrainAgility());
     }
 
     
@@ -188,6 +199,8 @@ public class Main extends AbstractScript implements PaintInfo, ChatListener
         // Draw the custom paint
         CUSTOM_PAINT.paint(graphics2D);
     }
+    public static long lastClickMillis = 0;
+    
     @Override
     public void onMessage(Message msg)
     {

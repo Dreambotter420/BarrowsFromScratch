@@ -18,6 +18,7 @@ import org.dreambot.api.methods.prayer.Prayers;
 import org.dreambot.api.methods.settings.PlayerSettings;
 import org.dreambot.api.methods.skills.Skill;
 import org.dreambot.api.methods.skills.Skills;
+import org.dreambot.api.methods.tabs.Tab;
 import org.dreambot.api.methods.walking.impl.Walking;
 import org.dreambot.api.wrappers.interactive.GameObject;
 import org.dreambot.api.wrappers.interactive.NPC;
@@ -35,9 +36,12 @@ import script.skills.ranged.TrainRanged;
 import script.utilities.API;
 import script.utilities.Bankz;
 import script.utilities.Combatz;
+import script.utilities.Dialoguez;
 import script.utilities.InvEquip;
 import script.utilities.Locations;
+import script.utilities.Questz;
 import script.utilities.Sleep;
+import script.utilities.Tabz;
 import script.utilities.Walkz;
 import script.utilities.id;
 
@@ -49,7 +53,6 @@ import java.util.List;
  * ^_^
  */
 public class MageArena1 extends Leaf {
-	public static boolean completedMageArena1 = false;
 	public static boolean slashed = false;
     public void onStart() {
         
@@ -67,10 +70,62 @@ public class MageArena1 extends Leaf {
         }
         return true;
     }
- 
+    
+    public static boolean completed()
+    {
+    	if(getProgressValue() == 8) //finished value
+    	{
+    		if(Players.localPlayer().isAnimating())
+        	{
+        		Sleep.sleep(69, 696);
+        		return true;
+        	}
+        	if(Locations.mageArenaCave.contains(Players.localPlayer()))
+        	{
+            	API.randomAFK(5);
+        		if(Inventory.count(id.saradominCape) < 2)
+            	{
+            		getCape("Saradomin");
+            		return true;
+            	}
+            	if(Inventory.count(id.guthixCape) < 2)
+            	{
+            		getCape("Guthix");
+            		return true;
+            	}
+            	if(Inventory.count(id.zamorakCape) < 2)
+            	{
+            		getCape("Zamorak");
+            		return true;
+            	}
+            	API.walkTalkWithGameObject("Sparkling pool", "Step-into",Locations.mageArenaCaveSouth);
+            	return true;
+        	}
+        	if(Locations.mageArenaBank.contains(Players.localPlayer()))
+        	{
+            	API.randomAFK(5);
+        		if(Inventory.contains(id.guthixCape) || 
+        				Inventory.contains(id.guthixStaff) || 
+        				Inventory.contains(id.zamorakCape) || 
+        				Inventory.contains(id.zamorakStaff) || 
+        				Inventory.contains(id.saradominCape) || 
+        				Inventory.contains(id.saradominStaff))
+        		{
+        			if(Bankz.openClosest(50))
+        			{
+        				Bank.depositAllItems();
+        			}
+        			return true;
+        		}
+        	}
+    		return true;
+    	}
+    	return false;
+    }
+    
     @Override
     public int onLoop() {
-    	if (completedMageArena1) {
+    	if (completed()) {
             MethodProvider.log("[FINISHED] -> Mage Arena 1");
             if(onExit()) 
             {
@@ -87,61 +142,18 @@ public class MageArena1 extends Leaf {
             if(onExit()) API.mode = null;
             return Timing.sleepLogNormalSleep();
         }
-        if(handleDialogues()) return Timing.sleepLogNormalSleep();
+
+    	if(Questz.shouldCheckQuestStep()) Questz.checkQuestStep("Mage Arena I");
+        if(Dialoguez.handleDialogues()) return Timing.sleepLogNormalSleep();
         switch(getProgressValue())
         {
-        case(8):
-        {
-        	if(Players.localPlayer().isAnimating())
-        	{
-        		Sleep.sleep(69, 696);
-        		break;
-        	}
-        	if(Locations.mageArenaCave.contains(Players.localPlayer()))
-        	{
-        		if(Inventory.count(id.saradominCape) < 2)
-            	{
-            		getCape("Saradomin");
-            		break;
-            	}
-            	if(Inventory.count(id.guthixCape) < 2)
-            	{
-            		getCape("Guthix");
-            		break;
-            	}
-            	if(Inventory.count(id.zamorakCape) < 2)
-            	{
-            		getCape("Zamorak");
-            		break;
-            	}
-            	API.walkInteractWithGameObject("Sparkling pool", "Step-into",Locations.mageArenaCaveSouth, Dialogues::inDialogue);
-            	break;
-        	}
-        	if(Locations.mageArenaBank.contains(Players.localPlayer()))
-        	{
-        		if(Inventory.contains(id.guthixCape) || 
-        				Inventory.contains(id.guthixStaff) || 
-        				Inventory.contains(id.zamorakCape) || 
-        				Inventory.contains(id.zamorakStaff) || 
-        				Inventory.contains(id.saradominCape) || 
-        				Inventory.contains(id.saradominStaff))
-        		{
-        			if(Bankz.openClosest(50))
-        			{
-        				Bank.depositAllItems();
-        			}
-        			break;
-        		}
-        	}
-        	completedMageArena1 = true;
-        	break;
-        }
         //just prayed at first statue
         case(7):
         {
+        	API.randomAFK(5);
         	if(Players.localPlayer().isAnimating())
         	{
-        		Sleep.sleep(69, 696);
+        		Sleep.sleep(696, 696);
         		break;
         	}
         	if(Locations.mageArenaCave.contains(Players.localPlayer()))
@@ -175,11 +187,13 @@ public class MageArena1 extends Leaf {
         {
         	if(Players.localPlayer().isAnimating())
         	{
-        		Sleep.sleep(69, 696);
+        		Sleep.sleep(696, 696);
         		break;
         	}
+        	API.randomAFK(5);
         	if(Prayers.isActive(Prayer.PROTECT_FROM_MAGIC))
         	{
+        		Tabz.open(Tab.PRAYER);
         		Prayers.toggle(false, Prayer.PROTECT_FROM_MAGIC);
         		Sleep.sleep(69, 696);
         		break;
@@ -196,27 +210,7 @@ public class MageArena1 extends Leaf {
         	}
         	break;
         }
-        case(5):
-        {
-        	fightKolodion();
-        	break;
-        }
-        case(4):
-        {
-        	fightKolodion();
-        	break;
-        }
-        case(3):
-        {
-        	fightKolodion();
-        	break;
-        }
-        case(2):
-        {
-        	fightKolodion();
-        	break;
-        }
-        case(1):
+        case(5):case(4):case(3):case(2):case(1):
         {
         	fightKolodion();
         	break;
@@ -302,6 +296,7 @@ public class MageArena1 extends Leaf {
     		}
     		if(!Prayers.isActive(Prayer.PROTECT_FROM_MAGIC))
     		{
+    			Tabz.open(Tab.PRAYER);
     			Prayers.toggle(true, Prayer.PROTECT_FROM_MAGIC);
     			return;
     		}
@@ -533,8 +528,8 @@ public class MageArena1 extends Leaf {
     public static boolean shouldPanic()
     {
     	if(!Combat.isInWild()) return false;
-		final int maxBracket = Players.localPlayer().getLevel() + Combat.getWildernessLevel();
-		final int minBracket = Players.localPlayer().getLevel() - Combat.getWildernessLevel();
+		final int maxBracket = Players.localPlayer().getLevel() + Combat.getWildernessLevel() + 1;
+		final int minBracket = Players.localPlayer().getLevel() - Combat.getWildernessLevel() - 1;
     	for(Player p : Players.all())
 		{
 			if(p == null || !p.exists() || p.getName().equals(Players.localPlayer().getName()) || p.getHealthPercent() == 0) continue;
@@ -582,7 +577,7 @@ public class MageArena1 extends Leaf {
     	InvEquip.addInvyItem(id.knife, 1, 1, false, 1);
     	
     	InvEquip.shuffleFulfillOrder();
-    	InvEquip.addInvyItem(TrainRanged.seaTurtle, 3, 10, false, (int) Calculations.nextGaussianRandom(50, 10));
+    	InvEquip.addInvyItem(id.seaTurtle, 3, 10, false, (int) Calculations.nextGaussianRandom(50, 10));
     	
     	if(InvEquip.fulfillSetup(true, 180000))
 		{
@@ -595,47 +590,17 @@ public class MageArena1 extends Leaf {
 		}
     	
     }
-	public static boolean handleDialogues()
-	{
-		
-		if(Dialogues.canContinue())
-		{
-			if(Dialogues.getNPCDialogue() != null && Dialogues.getNPCDialogue().contains("You step into the pool of sparkling water."))
-			{
-				MethodProvider.log("Saw sparkling pool dialogue");
-				if(Dialogues.continueDialogue()) Sleep.sleep(2222, 2222);
-				return true;
-			}
-			if(Dialogues.continueDialogue()) Sleep.sleep(69,696);
-			return true;
-		}
-		if(Dialogues.isProcessing())
-		{
-			Sleep.sleep(420,696);
-			return true;
-		}
-		 
-		if(Dialogues.areOptionsAvailable())
-		{
-			return Dialogues.chooseOption("Yes, and don\'t show this warning again.") || 
-					 Dialogues.chooseOption("Can I fight here?") || 
-					 Dialogues.chooseOption("Yes indeedy.") || 
-					 Dialogues.chooseOption("Okay, let\'s fight.") || 
-					 Dialogues.chooseOption("I think I\'ve had enough for now.") || 
-					Dialogues.chooseOption("Yes, I\'m brave.");
-		}
-		return false;
-	}
+	
 	public static void setEquipment()
 	{
-		InvEquip.setEquipItem(EquipmentSlot.CHEST, TrainMagic.blackRobe);
-		InvEquip.setEquipItem(EquipmentSlot.LEGS, TrainMagic.zamorakMonkBottom);
-		InvEquip.setEquipItem(EquipmentSlot.HAT,TrainMagic.creamHat);
+		InvEquip.setEquipItem(EquipmentSlot.CHEST, id.blackRobe);
+		InvEquip.setEquipItem(EquipmentSlot.LEGS, id.zamorakMonkBottom);
+		InvEquip.setEquipItem(EquipmentSlot.HAT,id.creamHat);
 		InvEquip.setEquipItem(EquipmentSlot.HANDS, InvEquip.combat);
 		InvEquip.setEquipItem(EquipmentSlot.AMULET, InvEquip.glory);
-		InvEquip.setEquipItem(EquipmentSlot.SHIELD, TrainRanged.woodenShield);
+		InvEquip.setEquipItem(EquipmentSlot.SHIELD, id.woodenShield);
 		InvEquip.setEquipItem(EquipmentSlot.WEAPON, id.staffOfAir);
-		InvEquip.setEquipItem(EquipmentSlot.FEET, TrainMagic.blueBoots);
+		InvEquip.setEquipItem(EquipmentSlot.FEET, id.blueBoots);
 	}
 	
 }

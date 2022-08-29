@@ -5,12 +5,13 @@ import org.dreambot.api.script.ScriptManager;
 import org.dreambot.api.wrappers.widgets.message.Message;
 import org.dreambot.api.wrappers.widgets.message.MessageType;
 
+import script.actionz.ReportSpammer;
 import script.behaviour.CustomizeSettings;
-import script.behaviour.ReportSpammer;
 import script.quest.ernestthechicken.ErnestTheChicken;
 import script.quest.fremenniktrials.FremennikTrials;
 import script.quest.fremenniktrials.FremennikTrials.Direction;
 import script.quest.magearena1.MageArena1;
+import script.quest.naturespirit.NatureSpirit;
 import script.quest.waterfallquest.WaterfallQuest;
 import script.skills.prayer.TrainPrayer;
 import script.skills.ranged.Mobs;
@@ -21,6 +22,7 @@ import script.utilities.Locations;
 public class ReadMessage {
 	public static void readMessage(Message msg)
 	{
+
 		String txt = msg.getMessage();
 		if(txt.contains("That player is offline, or has privacy mode enabled"))
 		{
@@ -64,6 +66,13 @@ public class ReadMessage {
 		{
 			ReportSpammer.spammerToReport = null;
 		}
+		if(API.mode == API.modes.NATURE_SPIRIT)
+		{
+			if(txt.contains("The stone seems to absorb the fungus.") || 
+					txt.contains("This stone seems to be complete already.")) NatureSpirit.placedFungus = true;
+			if(txt.contains("The stone seems to absorb the used spell scroll.")) NatureSpirit.placedScroll = true;
+		}
+		
 		if(API.mode == API.modes.FREMENNIK_TRIALS)
 		{
 			if(txt.contains("You empty the keg and refill it with low alcohol beer")) FremennikTrials.filledLowAlcoholKeg = true;
@@ -83,15 +92,33 @@ public class ReadMessage {
 			if(txt.contains("The talisman guides you east")) FremennikTrials.currentDirection = Direction.EAST;
 			if(txt.contains("The talisman guides you west")) FremennikTrials.currentDirection = Direction.WEST;
 		}
-		
+		String tx = txt.toLowerCase();
 		if(msg.getType() == MessageType.PLAYER &&
-				txt.contains("sëriöüsly") || 
+				(txt.contains("sëriöüsly") || 
 				txt.contains("fütürë") || 
 				txt.contains("yöü") || 
 				txt.contains("cärëfül") ||
-				txt.contains("scäm"))
+				txt.contains("scäm") || 
+				tx.contains("provably") ||
+				tx.contains("has been paid") ||
+				tx.contains("reported") ||
+				tx.contains("venezuelan") ||
+				tx.contains("venni") ||
+				tx.contains("venny") ||
+				tx.contains("scambot") ||
+				tx.contains("bet") || 
+				tx.contains("gambl") || 
+				tx.contains("jackpot") ||
+				tx.contains("scammer") ||
+				tx.contains("buying tbow") ||
+				tx.contains("2b for?") ||
+				tx.contains("doubling") ||
+				tx.contains("wagers")))
 		{
-			if(ReportSpammer.spammerToReport == null) ReportSpammer.spammerToReport = msg.getUsername();
+	    	//filter ironman etc stuffs from the name string
+	    	String username = msg.getUsername();
+			if(username.contains(">")) username = username.split(">",2)[1];
+			if(ReportSpammer.spammerToReport == null) ReportSpammer.spammerToReport = username;
 		}
 	}
 }

@@ -33,32 +33,16 @@ public class Locations {
 	{
 		if(isInKourend()) return;
 		//handle dialogue for Veos traveling to Kourend
-		if(Dialogues.inDialogue()) 
+		if(Dialoguez.handleDialogues()) return;
+		
+		if(Locations.veosSarim.getCenter().distance(Players.localPlayer().getTile()) > 75) 
 		{
-			if(Dialogues.canContinue()) Dialogues.continueDialogue();
-			else if(Dialogues.areOptionsAvailable()) Dialogues.chooseFirstOptionContaining("That\'s great, can you take me there please?");
+			Walkz.teleportDraynor(180000);
+			Sleep.sleep(420,1111);
 			return;
 		}
 		
-		//search for Veos
-		NPC veos = NPCs.closest("Veos");
-		if(veos != null)
-		{
-			if(!Players.localPlayer().isInteracting(veos))
-    		{
-        		if(veos.interact("Talk-to"))
-    			{
-    				MethodProvider.sleepUntil(Dialogues::inDialogue, () -> Players.localPlayer().isMoving(), Sleep.calculate(2222,2222), 50);
-    			}
-        		else if(Walking.shouldWalk(6) && Walking.walk(Locations.veosSarim.getCenter())) Sleep.sleep(420,666);
-    		}
-			return;
-		}
-    	else
-    	{
-    		if(Locations.veosSarim.getCenter().distance(Players.localPlayer().getTile()) > 75) Walkz.teleportDraynor(180000);
-			else if(Walking.shouldWalk(6) && Walking.walk(Locations.veosSarim.getCenter())) Sleep.sleep(420,666);
-    	}
+		API.walkTalkToNPC("Veos", "Talk-to", Locations.veosSarim);
 	}
 	public static boolean unlockedHouse = true;
 	public static final Area camelotTrees = new Area(
@@ -132,6 +116,58 @@ public class Locations {
 			new Tile(2700, 3495, 0),
 			new Tile(2700, 3498, 0),
 			new Tile(2689, 3498, 0));
+	public static final Area salveGraveyard = new Area(
+			new Tile(3422, 3467, 0),
+			new Tile(3423, 3459, 0),
+			new Tile(3427, 3457, 0),
+			new Tile(3435, 3455, 0),
+			new Tile(3441, 3461, 0),
+			new Tile(3438, 3467, 0),
+			new Tile(3431, 3472, 0));
+	public static final Area natureSpirit_insideGrottoFinished = new Area(3447, 9733, 3436, 9744, 1);
+	public static final Area natureSpirit_insideGrotto = new Area(3447, 9733, 3435, 9744, 0);
+	public static final Area natureSpirit_finalPuzzleTile = new Area(3440, 3335, 3440, 3335, 0);
+	public static final Area natureSpirit_logSpellTile = new Area(3423, 3336, 3423, 3336, 0);
+	public static final Area natureSpiritGrotto_SouthStone = new Area(3440, 3335, 3440, 3335, 0);
+	public static final Area natureSpiritGrotto = new Area(3435, 3331, 3447, 3343, 0);
+	public static final Area natureSpiritGrottoBridgeSouth = new Area(3443, 3329, 3434, 3325, 0);
+	public static final Area morytaniaSwampGateNorth = new Area(
+			new Tile(3437, 3457, 0),
+			new Tile(3441, 3457, 0),
+			new Tile(3442, 3458, 0),
+			new Tile(3445, 3458, 0),
+			new Tile(3447, 3456, 0),
+			new Tile(3452, 3460, 0),
+			new Tile(3448, 3466, 0),
+			new Tile(3442, 3466, 0),
+			new Tile(3437, 3465, 0));
+	public static final Area morytaniaSwampGateSouth = new Area(3443,3457,3444,3457,0);
+	public static final Area entireMorytania = new Area(  new Tile[] {
+		        new Tile(3429, 3472, 0),
+		        new Tile(3429, 3480, 0),
+		        new Tile(3420, 3482, 0),
+		        new Tile(3419, 3494, 0),
+		        new Tile(3405, 3514, 0),
+		        new Tile(3401, 3603, 0),
+		        new Tile(3727, 3572, 0),
+		        new Tile(3825, 3185, 0),
+		        new Tile(3494, 3139, 0),
+		        new Tile(3423, 3210, 0),
+		        new Tile(3421, 3269, 0),
+		        new Tile(3413, 3292, 0),
+		        new Tile(3418, 3308, 0),
+		        new Tile(3416, 3317, 0),
+		        new Tile(3401, 3322, 0),
+		        new Tile(3388, 3344, 0),
+		        new Tile(3402, 3399, 0),
+		        new Tile(3402, 3408, 0),
+		        new Tile(3407, 3415, 0),
+		        new Tile(3401, 3426, 0),
+		        new Tile(3405, 3438, 0),
+		        new Tile(3400, 3448, 0),
+		        new Tile(3409, 3451, 0),
+		        new Tile(3413, 3460, 0)  } );
+	public static final Area natureSpirit_trapdoor = new Area(3421, 3485, 3432, 3484, 0);
 	public static final Area fremmy_koscheiArena = new Area(2637, 10100, 2676, 10062, 2);
 	public static final Area fremmy_askeladden = new Area(2651, 3664, 2667, 3656, 0);
 	public static final Area fremmy_peerTheSeer = new Area(2638, 3667, 2627, 3672, 0);
@@ -156,6 +192,31 @@ public class Locations {
 	public static final Area fremmy_olafDaBeard = new Area(2667, 3679, 2679, 3693, 0);
 	public static final Area fremmy_longHall = new Area(2655, 3681, 2662, 3665, 0);
 	public static final Area fremmy_peerRightDoor = new Area(2634, 3664, 2638, 3669, 0);
+	public static final Area draynorAgilityGround = new Area(3106, 3284, 3080, 3246, 0);
+	public static final Area draynorAgility1 = new Area(3103, 3274, 3106, 3283, 0);
+	public static final Area draynorAgility2 = new Area(3097, 3276, 3102, 3281, 3);
+	public static final Area draynorAgility3 = new Area(
+			new Tile(3090, 3277, 3),
+			new Tile(3087, 3274, 3),
+			new Tile(3090, 3272, 3),
+			new Tile(3093, 3275, 3));
+	public static final Area draynorAgility4 = new Area(3089, 3268, 3095, 3265, 3);
+	public static final Area draynorAgility5 = new Area(3088, 3261, 3087, 3256, 3);
+	public static final Area draynorAgility6 = new Area(3087, 3255, 3094, 3251, 3);
+	public static final Area draynorAgility7 = new Area(3096, 3256, 3101, 3261, 3);
+	public static final Area alkharidAgility1 = new Area(3270, 3201, 3282, 3192, 0);
+	public static final Area alkharidAgility2 = new Area(3269, 3194, 3279, 3180, 3);
+	public static final Area alkharidAgility3 = new Area(3272, 3173, 3265, 3160, 3);
+	public static final Area alkharidAgility4 = new Area(3283, 3176, 3302, 3160, 3);
+	public static final Area alkharidAgility5 = new Area(3313, 3165, 3318, 3160, 1);
+	public static final Area alkharidAgility6 = new Area(3318, 3173, 3312, 3179, 2);
+	public static final Area alkharidAgility7 = new Area(3318, 3180, 3312, 3186, 3);
+	public static final Area alkharidAgility8 = new Area(
+			new Tile(3303, 3185, 3),
+			new Tile(3306, 3189, 3),
+			new Tile(3300, 3194, 3),
+			new Tile(3297, 3190, 3));
+	public static final Area alkharidAgilityGround = new Area(3323, 3199, 3260, 3152);
 	public static final Area diango = new Area(3075, 3251, 3087, 3242, 0);
 	public static final Area lumbyGiantFrogs = new Area(3187, 3197, 3209, 3171, 0);
 	public static final Area museumArea = new Area(1725, 4991, 1793, 4928);
@@ -359,6 +420,7 @@ public class Locations {
 	public static final Area shipPiscVeos = new Area(1818, 3694, 1828, 3696, 1);
 	public static final Area kourendCastle2ndFloor = new Area(1643, 3701, 1587, 3653, 1);
 	public static final Area kourendCastle3rdFloor = new Area(1627, 3654, 1590, 3697, 2);
+	public static final Area hillGiantsValley = new Area(3367, 3156, 3388, 3143, 0);
 	public static final Area entireKourend = new Area(1969, 4073, 1151, 3345, 0);
 	public static final Area kourendGiantsCaveEntrance = new Area(1420, 3587, 1415, 3592, 0);
 	public static final Area kourendGiantsCaveExit = new Area(1429, 9906, 1436, 9914, 0);

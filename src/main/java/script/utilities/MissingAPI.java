@@ -32,10 +32,10 @@ import script.quest.varrockmuseum.Timing;
 
 public class MissingAPI {
 	
-	public static void scrollHopWorld(int world)
+	public static boolean scrollHopWorld(int world)
 	{
-		if(Players.localPlayer().isInCombat() ||
-				Worlds.getCurrentWorld() == world) return;
+		if(Worlds.getCurrentWorld() == world) return true;
+		if(Players.localPlayer().isInCombat()) return false;
 		Timer timeout = new Timer(Sleep.calculate(18000, 5555));
 		while(Worlds.getCurrentWorld() != world && 
 				!timeout.finished() && 
@@ -44,17 +44,7 @@ public class MissingAPI {
 				Skills.getRealLevel(Skill.HITPOINTS) > 0)
 		{	
 			Sleep.sleep(69, 69);
-			if(Dialogues.isProcessing())
-			{
-				MethodProvider.sleepUntil(() -> !Dialogues.isProcessing(), Sleep.calculate(2222, 2222));
-				continue;
-			}
-			if(Dialogues.canContinue())
-			{
-				Dialogues.continueDialogue();
-				MethodProvider.sleep(Timing.sleepLogNormalSleep());
-				continue;
-			}
+			if(Dialoguez.handleDialogues()) continue;
 			if(Widgets.getWidgetChild(69,2) != null &&
 					Widgets.getWidgetChild(69,2).isVisible() &&
 					Widgets.getWidgetChild(69,2).getText().contains("Loading..."))
@@ -72,7 +62,7 @@ public class MissingAPI {
 			}
 			if(!Tabs.isOpen(Tab.LOGOUT))
 			{
-				Tabs.open(Tab.LOGOUT);
+				Tabz.open(Tab.LOGOUT);
 				Sleep.sleep(100, 1111);
 				continue;
 			}
@@ -124,9 +114,19 @@ public class MissingAPI {
 						Sleep.sleep(100, 111);
 						continue;
 					}
-					double yScrollMin = scrollContainer.getRectangle().getMinY();
+					double scrollMinY = scrollContainer.getRectangle().getMinY();
 					int xRand = (int) Calculations.random(scrollContainer.getRectangle().getMinX(), scrollContainer.getRectangle().getMaxX());
-					int yClickPos = (int) ((scrollContainer.getHeight() * offsetRatio) + yScrollMin);
+					int yClickPos = (int) ((scrollContainer.getHeight() * offsetRatio) + scrollMinY);
+					if(yPos >= yMax) 
+					{
+						yClickPos =+ (int) Calculations.random(1, 5);
+						if(yClickPos > scrollContainer.getRectangle().getMaxY()) yClickPos = (int) scrollContainer.getRectangle().getMaxY() - 1;
+					}
+					else if(yPos <= yMin) 
+					{
+						yClickPos =- (int) Calculations.random(1, 5);
+						if(yClickPos < scrollContainer.getRectangle().getMinY()) yClickPos = (int) scrollContainer.getRectangle().getMinY() + 1;
+					}
 					Mouse.click(new Point(xRand,yClickPos));
 				}
 				Sleep.sleep(111, 1111);
@@ -134,6 +134,8 @@ public class MissingAPI {
 			}
 			Sleep.sleep(111, 1111);
 		}
+		if(Worlds.getCurrentWorld() == world) return true;
+		return false;
 	}
 	public static List<Player> getAllPlayersInteractingWith(Player player)
 	{

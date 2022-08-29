@@ -7,6 +7,7 @@ import org.dreambot.api.methods.container.impl.bank.Bank;
 import org.dreambot.api.methods.container.impl.equipment.Equipment;
 import org.dreambot.api.methods.container.impl.equipment.EquipmentSlot;
 import org.dreambot.api.methods.dialogues.Dialogues;
+import org.dreambot.api.methods.input.Keyboard;
 import org.dreambot.api.methods.interactive.NPCs;
 import org.dreambot.api.methods.interactive.Players;
 import org.dreambot.api.methods.settings.PlayerSettings;
@@ -17,13 +18,17 @@ import org.dreambot.api.utilities.impl.Condition;
 import org.dreambot.api.wrappers.interactive.NPC;
 
 import script.Main;
+import script.actionz.UniqueActions;
+import script.actionz.UniqueActions.Actionz;
 import script.behaviour.DecisionLeaf;
 import script.framework.Leaf;
 import script.framework.Tree;
 import script.quest.varrockmuseum.Timing;
 import script.utilities.API;
+import script.utilities.Dialoguez;
 import script.utilities.InvEquip;
 import script.utilities.Locations;
+import script.utilities.Questz;
 import script.utilities.Sleep;
 import script.utilities.Walkz;
 import script.utilities.id;
@@ -36,18 +41,32 @@ import java.util.List;
  * ^_^
  */
 public class RestlessGhost extends Leaf {
-	public static boolean started = false;
-	public static boolean completedRestlessGhost = false;
 	public static final int ghostspeakAmulet = 552;
 	public static final int ghostSkull = 553;
-    public void onStart() {
-        
-        started = true;
-    }
-
 	@Override
 	public boolean isValid() {
 		return API.mode == API.modes.RESTLESS_GHOST;
+	}
+	public static boolean completed()
+	{
+		if(getProgressValue() == 5)
+		{
+			if(Dialogues.getNPCDialogue() != null && 
+	     			Dialogues.getNPCDialogue().contains("Release! Thank you stranger.."))
+	     	{
+	     		Sleep.sleep(696,696);
+	     		API.randomAFK(50);
+	     		return false;
+	     	}
+	     	if(Widgets.getWidgetChild(153,16) != null &&
+	     			Widgets.getWidgetChild(153,16).isVisible())
+	     	{
+	     		if(Widgets.getWidgetChild(153,16).interact("Close")) Sleep.sleep(696, 666);
+	     		return false;
+	     	}
+	     	return true;
+		}
+		return false;
 	}
     @Override
     public int onLoop() {
@@ -56,7 +75,7 @@ public class RestlessGhost extends Leaf {
            	API.mode = null;
             return Timing.sleepLogNormalSleep();
         }
-        if (completedRestlessGhost) {
+        if (completed()) {
             MethodProvider.log("[COMPLETED] -> The Restless Ghost!");
            	API.mode = null;
            	Main.customPaintText1 = "~~~~~~~~~~";
@@ -65,33 +84,18 @@ public class RestlessGhost extends Leaf {
     		Main.customPaintText4 = "~~~~~~~~~~";
             return Timing.sleepLogNormalSleep();
         }
+
+    	if(Questz.shouldCheckQuestStep()) Questz.checkQuestStep("The Restless Ghost");
         if(Dialogues.getNPCDialogue() != null && !Dialogues.getNPCDialogue().isEmpty())
     	{
     		MethodProvider.log("NPC Dialogue: " + Dialogues.getNPCDialogue());
     	}
-        if(handleDialogues()) return Timing.sleepLogNormalInteraction();
+        if(Dialoguez.handleDialogues()) return Timing.sleepLogNormalInteraction();
        
         
         switch(getProgressValue())
         {
-        case(5):
-        {
-        	if(Dialogues.getNPCDialogue() != null && 
-        			Dialogues.getNPCDialogue().contains("Release! Thank you stranger.."))
-        	{
-        		Sleep.sleep(696,696);
-        		API.randomAFK(50);
-        		return Timing.sleepLogNormalInteraction();
-        	}
-        	if(Widgets.getWidgetChild(153,16) != null &&
-        			Widgets.getWidgetChild(153,16).isVisible())
-        	{
-        		if(Widgets.getWidgetChild(153,16).interact("Close")) Sleep.sleep(696, 666);
-        		return Timing.sleepLogNormalInteraction();
-        	}
-        	completedRestlessGhost = true;
-        	return Timing.sleepLogNormalInteraction();
-        }
+       
         case(4):
         {
         	walkSearchCoffin();
@@ -197,12 +201,16 @@ public class RestlessGhost extends Leaf {
         }
         return Timing.sleepLogNormalSleep();
     }
-    public static void getGhostspeakAmulet()
+    /**
+     * Returns true if ghostpeak in invy or equipment. Withdraws from bank or gets more from father urhney
+     */
+    public static boolean getGhostspeakAmulet()
     {
+    	if(Equipment.contains(ghostspeakAmulet) || Inventory.contains(ghostspeakAmulet)) return true;
     	if(Bank.contains(ghostspeakAmulet))
     	{
     		InvEquip.withdrawOne(ghostspeakAmulet, 180000);
-    		return;
+    		return false;
     	}
     	if(Locations.restlessGhostUrhneyHut.getCenter().distance() <= 125)
     	{
@@ -210,7 +218,7 @@ public class RestlessGhost extends Leaf {
     		{
     			API.walkTalkToNPC("Father Urhney","Talk-to",Locations.restlessGhostUrhneyHut);
     		}
-    		return;
+    		return false;
     	}
     	if(Locations.restlessGhostUrhneyHut.getCenter().distance() > 125)
     	{
@@ -219,6 +227,7 @@ public class RestlessGhost extends Leaf {
     			Sleep.sleep(696, 420);
     		}
     	}
+    	return false;
     }
     public static void fulfillStart()
     {
@@ -286,28 +295,4 @@ public class RestlessGhost extends Leaf {
     {
     	return PlayerSettings.getConfig(107);
     }
-    public static boolean handleDialogues()
-	{
-		if(Dialogues.canContinue())
-		{
-			if(Dialogues.continueDialogue()) Sleep.sleep(69,696);
-			return true;
-		}
-		if(Dialogues.isProcessing())
-		{
-			Sleep.sleep(420,696);
-			return true;
-		}
-		 
-		if(Dialogues.areOptionsAvailable())
-		{
-			return Dialogues.chooseOption("Yes.") || 
-					Dialogues.chooseOption("I\'m looking for a quest!") || 
-					Dialogues.chooseOption("Yep, now tell me what the problem is.") || 
-					Dialogues.chooseOption("Father Aereck sent me to talk to you.") || 
-					Dialogues.chooseOption("He\'s got a ghost haunting his graveyard.") || 
-					Dialogues.chooseOption("I\'ve lost the Amulet of Ghostspeak.");
-		}
-		return false;
-	}
 }

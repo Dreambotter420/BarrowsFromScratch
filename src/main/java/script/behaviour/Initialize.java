@@ -5,6 +5,8 @@ import java.time.LocalTime;
 import org.dreambot.api.methods.Calculations;
 import org.dreambot.api.methods.MethodProvider;
 import org.dreambot.api.methods.widget.Widgets;
+
+import script.actionz.UniqueActions;
 import script.framework.Leaf;
 import script.quest.fremenniktrials.FremennikTrials;
 import script.quest.varrockmuseum.VarrockQuiz;
@@ -32,15 +34,16 @@ public class Initialize extends Leaf {
     	Sleep.initSleepMod = 1.2 + (API.rand2.nextDouble()/1.25);
     	Sleep.initSleepMod = Sleep.initSleepMod * Sleep.initSleepMod;
     	//all initial randomizations that depend on new random seed go here
+		UniqueActions.initialize();
 		InvEquip.clearEquipmentSlots();
 		InvEquip.initializeIntLists();
 		id.initializeIDLists();
-		DecisionLeaf.initialize();
 		Combatz.initializeFoods();
 		Locations.initialize();
 		FremennikTrials.initialize();
 		ItemsOnGround.initializeLists();
-		TrainRanged.initialize();
+
+		DecisionLeaf.initialize();
 		if((int) Calculations.nextGammaRandom(100,50) >= 120) Locations.scorpions = Locations.scorpionsKharidNorth;
 		else Locations.scorpions = Locations.scorpionsKharidSouth;
 		if((int) Calculations.nextGammaRandom(100,50) >= 120) Locations.kalphiteWorkersArea = Locations.kalphiteWorkers2;

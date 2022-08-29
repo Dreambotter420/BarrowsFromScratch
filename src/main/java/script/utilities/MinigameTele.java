@@ -89,7 +89,7 @@ public class MinigameTele {
     // Opens minigame tab.
     //*********************************************************************************
     public static void openMinigameTab() {
-        if (Tabs.open(Tab.CLAN)) {
+        if (Tabz.open(Tab.CLAN)) {
             if (!isMinigameTabOpen()) {
                 WidgetChild groupingTab = Widgets.getWidgetChild(GROUPINGTABPARENT, GROUPINGTABCHILD, GROUPINGTABGRANDCHILD);
                 groupingTab.interact();

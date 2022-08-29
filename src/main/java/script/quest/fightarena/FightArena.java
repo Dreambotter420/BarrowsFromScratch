@@ -28,8 +28,11 @@ import script.quest.varrockmuseum.Timing;
 import script.skills.ranged.TrainRanged;
 import script.utilities.API;
 import script.utilities.Combatz;
+import script.utilities.Dialoguez;
 import script.utilities.InvEquip;
 import script.utilities.Locations;
+import script.utilities.Questz;
+import script.utilities.Tabz;
 import script.utilities.Sleep;
 import script.utilities.Walkz;
 import script.utilities.id;
@@ -39,21 +42,55 @@ import script.utilities.id;
  * ^_^
  */
 public class FightArena extends Leaf {
-	public static boolean started = false;
-	public static boolean completedFightArena = false;
     public static final int khaliBrew = 77;
     public static final int khazardCellKeys = 76;
 	public static boolean onExit() {
 		return true;
 	}
-	public static void onStart() {
-        
-        started = true;
-    }
 
 	@Override
 	public boolean isValid() {
 		return API.mode == API.modes.FIGHT_ARENA;
+	}
+	public static boolean completed()
+	{
+		if(Questz.closeQuestCompletion()) return false;
+    	if(!Inventory.contains(khazardCellKeys) && 
+    			!Inventory.contains(khazardHelm) &&
+    			!Inventory.contains(khazardPlatebody) &&
+    			!Equipment.contains(khazardHelm) &&
+    			!Equipment.contains(khazardPlatebody))
+    	{
+    		return true;
+    	}
+    	if(Inventory.contains(khazardCellKeys) || Inventory.contains(khazardHelm) || 
+    			Inventory.contains(khazardPlatebody))
+    	{
+    		if(Inventory.drop(i -> i != null && 
+    				(i.getID() == khazardCellKeys ||
+    				i.getID() == khazardHelm || 
+    				i.getID() == khazardPlatebody))) Sleep.sleep(666, 696);
+    		return false;
+    	}
+    	if(Equipment.contains(khazardHelm) || 
+    			Equipment.contains(khazardPlatebody))
+    	{
+    		if(InvEquip.freeInvySpaces(2))
+        	{
+        		if(!Tabs.isOpen(Tab.EQUIPMENT))
+        		{
+        			if(Tabz.open(Tab.EQUIPMENT)) Sleep.sleep(69, 696);
+        			return false;
+        		}
+        		if(Equipment.unequip(i -> i!=null && 
+        				(i.getID() == khazardHelm || 
+        				i.getID() == khazardPlatebody)))
+        		{
+        			Sleep.sleep(666, 696);
+        		}
+        	}
+    	}
+    	return false;
 	}
     @Override
     public int onLoop() {
@@ -62,7 +99,7 @@ public class FightArena extends Leaf {
            	API.mode = null;
             return Timing.sleepLogNormalSleep();
         }
-        if (completedFightArena) {
+        if (completed()) {
             MethodProvider.log("[FINISHED] -> Fight Arena!!");
            	API.mode = null;
            	Main.customPaintText1 = "~~~~~~~~~~";
@@ -71,8 +108,7 @@ public class FightArena extends Leaf {
     		Main.customPaintText4 = "~~~~~~~~~~";
             return Timing.sleepLogNormalSleep();
         }
-        
-        final int prayerLeft = Skills.getBoostedLevels(Skill.PRAYER);
+        if(Questz.shouldCheckQuestStep()) Questz.checkQuestStep("Fight Arena");
         
         if(Inventory.contains(TrainRanged.getBestDart()))
     	{
@@ -82,64 +118,17 @@ public class FightArena extends Leaf {
         
         if((!InvEquip.equipmentContains(InvEquip.wearableWealth) && !InvEquip.invyContains(InvEquip.wearableWealth)) ||
         		!Equipment.contains(TrainRanged.getBestDart()) || 
-        		(Combatz.shouldDrinkRangedBoost() && !InvEquip.invyContains(TrainRanged.rangedPots)) || 
+        		(Combatz.shouldDrinkRangedBoost() && !InvEquip.invyContains(id.rangedPots)) || 
         		(Combatz.shouldDrinkPrayPot() && !InvEquip.invyContains(id.prayPots))) 
 		{
         	fulfillFightArenaGear();
         	return Timing.sleepLogNormalSleep();
 		}
         
-        if(handleDialogues()) return Timing.sleepLogNormalSleep();
+        if(Dialoguez.handleDialogues()) return Timing.sleepLogNormalSleep();
         
         switch(getProgressValue())
         {
-        case(14):
-        {
-        	if(Widgets.getWidgetChild(153,16) != null && 
-        			Widgets.getWidgetChild(153,16).isVisible())
-        	{
-        		if(Widgets.getWidgetChild(153,16).interact("Close")) Sleep.sleep(666, 696);
-        		return Timing.sleepLogNormalSleep();
-        	}
-        	if(!Inventory.contains(khazardCellKeys) && 
-        			!Inventory.contains(khazardHelm) &&
-        			!Inventory.contains(khazardPlatebody) &&
-        			!Equipment.contains(khazardHelm) &&
-        			!Equipment.contains(khazardPlatebody))
-        	{
-        		completedFightArena = true;
-        		return Timing.sleepLogNormalSleep();
-        	}
-        	if(Inventory.contains(khazardCellKeys) || Inventory.contains(khazardHelm) || 
-        			Inventory.contains(khazardPlatebody))
-        	{
-        		if(Inventory.drop(i -> i != null && 
-        				(i.getID() == khazardCellKeys ||
-        				i.getID() == khazardHelm || 
-        				i.getID() == khazardPlatebody))) Sleep.sleep(666, 696);
-        		return Timing.sleepLogNormalSleep();
-        	}
-        	if(Equipment.contains(khazardHelm) || 
-        			Equipment.contains(khazardPlatebody))
-        	{
-        		if(InvEquip.freeInvySpaces(2))
-            	{
-            		if(!Tabs.isOpen(Tab.EQUIPMENT))
-            		{
-            			if(Tabs.open(Tab.EQUIPMENT)) Sleep.sleep(69, 696);
-            			return Timing.sleepLogNormalSleep();
-            		}
-            		if(Equipment.unequip(i -> i!=null && 
-            				(i.getID() == khazardHelm || 
-            				i.getID() == khazardPlatebody)))
-            		{
-            			Sleep.sleep(666, 696);
-            		}
-            	}
-        	}
-        	
-        	return Timing.sleepLogNormalSleep();
-        }
         case(12):
         {
         	if(Prayers.isQuickPrayerActive() && Prayers.toggleQuickPrayer(false))
@@ -677,7 +666,7 @@ public class FightArena extends Leaf {
     	
     	TrainRanged.setBestRangedEquipment();
     	
-    	InvEquip.addInvyItem(TrainRanged.rangePot4, 1, 1, false, (int) Calculations.nextGaussianRandom(20, 5));
+    	InvEquip.addInvyItem(id.rangePot4, 1, 1, false, (int) Calculations.nextGaussianRandom(20, 5));
     	InvEquip.addInvyItem(InvEquip.duel, 1, 1, false, 5);
     	InvEquip.addInvyItem(id.prayPot4, 8, (int) Calculations.nextGaussianRandom(11, 3), false, (int) Calculations.nextGaussianRandom(25, 5));
     	InvEquip.addInvyItem(id.stamina4, 1, 1, false, 5);
@@ -686,13 +675,13 @@ public class FightArena extends Leaf {
     	{
     		InvEquip.addOptionalItem(f);
     	}
-    	for(int r : TrainRanged.rangedPots)
+    	for(int r : id.rangedPots)
     	{
     		InvEquip.addOptionalItem(r);
     	}
     	InvEquip.addOptionalItem(InvEquip.jewelry);
     	InvEquip.shuffleFulfillOrder();
-    	InvEquip.addInvyItem(TrainRanged.jugOfWine, 5, 27, false, (int) Calculations.nextGaussianRandom(500, 100));
+    	InvEquip.addInvyItem(Combatz.lowFood, 5, 27, false, (int) Calculations.nextGaussianRandom(500, 100));
     	InvEquip.addInvyItem(InvEquip.coins, 5, API.roundToMultiple((int) Calculations.nextGaussianRandom(5000,3000), 100), false, 0);
     	if(InvEquip.fulfillSetup(true, 180000))
 		{
@@ -710,24 +699,5 @@ public class FightArena extends Leaf {
 	{
 		return PlayerSettings.getConfig(17);
 	}
-    public static boolean handleDialogues()
-	{
-		if(Dialogues.canContinue())
-		{
-			if(Dialogues.continueDialogue()) Sleep.sleep(69,696);
-			return true;
-		}
-		if(Dialogues.isProcessing())
-		{
-			Sleep.sleep(420,696);
-			return true;
-		}
-		 
-		if(Dialogues.areOptionsAvailable())
-		{
-			return Dialogues.chooseOption("Yes.") || 
-					Dialogues.chooseOption("I\'d like a Khali brew please.");
-		}
-		return false;
-	}
+    
 }

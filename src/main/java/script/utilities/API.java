@@ -11,6 +11,7 @@ import org.dreambot.api.data.ActionMode;
 import org.dreambot.api.input.Mouse;
 import org.dreambot.api.methods.Calculations;
 import org.dreambot.api.methods.MethodProvider;
+import org.dreambot.api.methods.container.impl.Inventory;
 import org.dreambot.api.methods.dialogues.Dialogues;
 import org.dreambot.api.methods.filter.Filter;
 import org.dreambot.api.methods.input.Keyboard;
@@ -36,6 +37,8 @@ import org.dreambot.api.wrappers.items.GroundItem;
 import org.dreambot.api.wrappers.items.Item;
 
 import script.Main;
+import script.actionz.UniqueActions;
+import script.actionz.UniqueActions.Actionz;
 import script.quest.varrockmuseum.Timing;
 
 
@@ -67,7 +70,8 @@ public class API {
 		FIGHT_ARENA,
 		FREMENNIK_TRIALS,
 		X_MARKS_THE_SPOT,
-		BREAK
+		BREAK,
+		TEST
     }
     
     public static modes mode = null;//change to null to disable, modes.GOHOME for lumby
@@ -81,122 +85,7 @@ public class API {
 	public static boolean initialized = false;
 	public static double sleepMod;
 	
-	/**
-	 * customizes settings to be less AIDS.
-	 * Returns true if no AIDS, false if still AIDS.
-	 * @return
-	 */
-	public static boolean customizeSettings()
-	{
-		if(ClientSettings.isAcceptAidEnabled())
-    	{
-    		ClientSettings.toggleAcceptAid(false);
-    	}
-		//else if(ClientSettings.getClientBrightness() < 90)
-    	//{
-    	//	MethodProvider.log("Client brightness: " + ClientSettings.getClientBrightness());
-    	//	ClientSettings.setClientBrightness(50);
-    	//}
-		else if(ClientSettings.roofsEnabled())
-    	{
-    		ClientSettings.toggleRoofs(false);
-    	}
-		else if(ClientSettings.getNPCAttackOptionsMode() != ActionMode.ALWAYS_RIGHT_CLICK)
-    	{
-    		ClientSettings.setNPCAttackOptionsMode(ActionMode.ALWAYS_RIGHT_CLICK);
-    	}
-		else if(ClientSettings.getPlayerAttackOptionsMode() != ActionMode.ALWAYS_RIGHT_CLICK)
-    	{
-    		ClientSettings.setPlayerAttackOptionsMode(ActionMode.ALWAYS_RIGHT_CLICK);
-    	}
-		else if(!ClientSettings.isShiftClickDroppingEnabled())
-    	{
-    		ClientSettings.toggleShiftClickDropping(true);
-    	}
-		else if(!ClientSettings.isEscInterfaceClosingEnabled())
-    	{
-    		ClientSettings.toggleEscInterfaceClosing(true);
-    	}
-		else if(ClientSettings.isGameAudioOn())
-    	{
-    		ClientSettings.toggleGameAudio(false);
-    	}
-    	else if(ClientSettings.isResizableActive())
-    	{
-    		ClientSettings.toggleResizable(false);
-    	}
-    	else if(ClientSettings.isTradeDelayEnabled())
-    	{
-    		ClientSettings.toggleTradeDelay(false);
-    	}
-    	
-		//profanity filter set to ON
-    	else if(PlayerSettings.getConfig(1074) == 0)
-    	{
-        	//exit button for main Settings menu visible
-        	if(Widgets.getWidgetChild(134,4) != null && Widgets.getWidgetChild(134,4).isVisible())
-        	{
-        		//chat tab of settings window is NOT selected ("select chat" action exists)
-        		if(Widgets.getWidgetChild(134, 23, 2) != null &&
-        				Widgets.getWidgetChild(134, 23, 2).isVisible())
-        		{
-        			if(Widgets.getWidgetChild(134, 23, 2).interact("Select Chat"))
-        			{
-        				MethodProvider.sleepUntil(() -> Widgets.getWidgetChild(134, 23, 2) == null || 
-            					!Widgets.getWidgetChild(134, 23, 2).isVisible(), Sleep.calculate(2222, 2222));
-        			}
-            		Sleep.sleep(333,444);
-        		}
-        		//Enable profanity button toggle is visible
-        		if(Widgets.getWidgetChild(134, 19, 1) != null && Widgets.getWidgetChild(134, 19, 1).isVisible())
-            	{
-        			if(Widgets.getWidgetChild(134, 19, 1).interact("Toggle"))
-        			{
-        				MethodProvider.sleepUntil(() -> PlayerSettings.getConfig(1074) == 1, Sleep.calculate(2222, 2222));
-        			}
-        			Sleep.sleep(420,420);
-                }
-        	} 
-        	else
-        	{
-        		//"All settings" button visible in Settings tab
-        		if(Widgets.getWidgetChild(116,75) != null && Widgets.getWidgetChild(116,75).isVisible())
-            	{
-        			if(Widgets.getWidgetChild(116,75).interact("All Settings"))
-        			{
-        				MethodProvider.sleepUntil(() -> Widgets.getWidgetChild(134,4) != null && Widgets.getWidgetChild(134,4).isVisible(), Sleep.calculate(2222, 2222));
-        			}
-            		Sleep.sleep(333,444);
-                } 
-        		else if(!Tabs.isOpen(Tab.OPTIONS) && Tabs.open(Tab.OPTIONS))
-        		{
-        			MethodProvider.sleepUntil(() -> Tabs.isOpen(Tab.OPTIONS), Sleep.calculate(2222, 2222));
-        		}
-        	}
-    	}
-		if(ClientSettings.isAcceptAidEnabled() || 
-    			ClientSettings.roofsEnabled() || 
-    			PlayerSettings.getConfig(1074) == 0 ||
-    			ClientSettings.getNPCAttackOptionsMode() != ActionMode.ALWAYS_RIGHT_CLICK  || 
-    			ClientSettings.getPlayerAttackOptionsMode() != ActionMode.ALWAYS_RIGHT_CLICK ||
-    			!ClientSettings.isShiftClickDroppingEnabled() || 
-    			!ClientSettings.isEscInterfaceClosingEnabled() || 
-    			ClientSettings.isGameAudioOn() || 
-    			ClientSettings.isResizableActive() || 
-    			ClientSettings.isTradeDelayEnabled() 
-    			// || ClientSettings.getClientBrightness() < 90
-				)
-		{
-			MethodProvider.log("Some settings still AIDS");
-			Sleep.sleep(666, 111);
-			return false;
-		}
-		else
-		{
-			return true;
-		}
-		
-	}
+	
 	/**
 	 * returns true if chatbox is clear
 	 * returns false if chatbox has some contents and cleared one
@@ -216,53 +105,80 @@ public class API {
 		}
 		return true;
 	}
-	
-	public static void randomAFK(int chance)
+	public static void randomLongerAFK(int chance)
 	{
 		int roll = API.rand2.nextInt(100);
 		boolean moveMouse = false;
-		if(API.rand2.nextInt(100) < chance)
+		boolean examineObject = false;
+		int antibanChance = chance;
+		if(UniqueActions.isActionEnabled(Actionz.MOVE_MOUSE_OFFSCREEN) || 
+				UniqueActions.isActionEnabled(Actionz.EXAMINE_RANDOM_OBJECTS))
 		{
-			moveMouse = true;
+			antibanChance = antibanChance * 3;
 		}
-		if(roll < chance)
+			
+		if(API.rand2.nextInt(100) <= antibanChance)
+		{
+			if(UniqueActions.isActionEnabled(Actionz.MOVE_MOUSE_OFFSCREEN) && 
+					UniqueActions.isActionEnabled(Actionz.EXAMINE_RANDOM_OBJECTS))
+			{
+				if(API.rand2.nextInt(100) > 20) moveMouse = true;
+				else examineObject = true;
+			}
+			else if(UniqueActions.isActionEnabled(Actionz.MOVE_MOUSE_OFFSCREEN))
+			{
+				moveMouse = true;
+			}
+			else if(UniqueActions.isActionEnabled(Actionz.EXAMINE_RANDOM_OBJECTS))
+			{
+				if(API.rand2.nextInt(100) > 90) examineObject = true;
+			}
+		}
+		if(roll <= chance)
 		{
 			int tmp = API.rand2.nextInt(100);
 			int sleep = 0;
 			if(tmp < 2)  
 			{
-				MethodProvider.log("AFK: 1% chance, max 240s");
-				sleep = Sleep.calculate(50,84000);
+				MethodProvider.log("Longer AFK: 1% chance");
+				sleep = Sleep.calculate(10000,160000);
+				if(UniqueActions.isActionEnabled(Actionz.AFK_LONGER)) sleep += Calculations.random(1, 100000);
 			}
 			else if(tmp < 6)  
 			{
-				MethodProvider.log("AFK: 5% chance, max 120s");
-				sleep = Sleep.calculate(50,40000);
+				MethodProvider.log("Long AFK: 5% chance");
+				sleep = Sleep.calculate(10000,80000);
+				if(UniqueActions.isActionEnabled(Actionz.AFK_LONGER)) sleep += Calculations.random(1, 60000);
 			}
 			else if(tmp < 25)
 			{
-				MethodProvider.log("AFK: 14% chance, max 40s");
-				sleep = Sleep.calculate(50,20000);
+				MethodProvider.log("Longer AFK: 14% chance");
+				sleep = Sleep.calculate(10000,60000);
+				if(UniqueActions.isActionEnabled(Actionz.AFK_LONGER)) sleep += Calculations.random(1, 50000);
 			}
 			else if(tmp < 45)  
 			{
-				MethodProvider.log("AFK: 20% chance, max 20s");
-				sleep = Sleep.calculate(50,10000);
+				MethodProvider.log("Longer AFK: 20% chance");
+				sleep = Sleep.calculate(10000,40000);
+				if(UniqueActions.isActionEnabled(Actionz.AFK_LONGER)) sleep += Calculations.random(1, 40000);
 			}
 			else if(tmp < 65)  
 			{
-				MethodProvider.log("AFK: 20% chance, max 6.0s");
-				sleep = Sleep.calculate(50,4500);
+				MethodProvider.log("Longer AFK: 20% chance");
+				sleep = Sleep.calculate(10000,30000);
+				if(UniqueActions.isActionEnabled(Actionz.AFK_LONGER)) sleep += Calculations.random(1, 30000);
 			}
 			else if(tmp < 1000)  
 			{
-				MethodProvider.log("AFK: 35% chance, max 3.2s");
-				sleep = Sleep.calculate(50,2400);
+				MethodProvider.log("Longer AFK: 35% chance");
+				sleep = Sleep.calculate(10000,20000);
+				if(UniqueActions.isActionEnabled(Actionz.AFK_LONGER)) sleep += Calculations.random(1, 30000);
 			}
 			Timer sleepTimer = new Timer(sleep);
 			final int mean = sleep / 2;
 			final int sigma = sleep * 2 / 5;
-			Timer mouseMoveTimer = new Timer((int) Calculations.nextGaussianRandom(mean, sigma));
+			boolean examined = false;
+			Timer antibanTimer = new Timer((int) Calculations.nextGaussianRandom(mean, sigma));
 			while(!sleepTimer.finished() && !ScriptManager.getScriptManager().isPaused() &&
 					ScriptManager.getScriptManager().isRunning())
 			{
@@ -270,14 +186,17 @@ public class API {
 				Main.customPaintText2 = "~~~~~AFK~~~~~";
 				Main.customPaintText3 = "~~ "+Timer.formatTime(sleepTimer.remaining())+" ~~";
 				Main.customPaintText4 = "~~~~~~~~~~~~~";
-				if(moveMouse && 
-						mouseMoveTimer.finished())
+				if(antibanTimer.finished())
 				{
-					if(Mouse.isMouseInScreen() && 
-							Mouse.moveMouseOutsideScreen())
+					if(examineObject && !examined)
 					{
-						Sleep.sleep(69,69);
+						UniqueActions.examineRandomObect();
+						examined = true;
 					}
+						
+					if(moveMouse && 
+						Mouse.isMouseInScreen() && 
+						Mouse.moveMouseOutsideScreen()) Sleep.sleep(669,1111);
 				}
 				Sleep.sleep(69, 69);
 				
@@ -288,6 +207,132 @@ public class API {
 		Main.customPaintText3 = "";
 		Main.customPaintText4 = "";
 	}
+	public static void randomAFK(int chance)
+	{
+		int roll = API.rand2.nextInt(100);
+		boolean moveMouse = false;
+		boolean examineObject = false;
+		int antibanChance = chance;
+		if(UniqueActions.isActionEnabled(Actionz.MOVE_MOUSE_OFFSCREEN) || 
+				UniqueActions.isActionEnabled(Actionz.EXAMINE_RANDOM_OBJECTS))
+		{
+			antibanChance = antibanChance * 3;
+		}
+			
+		if(API.rand2.nextInt(100) <= antibanChance)
+		{
+			if(UniqueActions.isActionEnabled(Actionz.MOVE_MOUSE_OFFSCREEN) && 
+					UniqueActions.isActionEnabled(Actionz.EXAMINE_RANDOM_OBJECTS))
+			{
+				if(API.rand2.nextInt(100) > 20) moveMouse = true;
+				else examineObject = true;
+			}
+			else if(UniqueActions.isActionEnabled(Actionz.MOVE_MOUSE_OFFSCREEN))
+			{
+				moveMouse = true;
+			}
+			else if(UniqueActions.isActionEnabled(Actionz.EXAMINE_RANDOM_OBJECTS))
+			{
+				if(API.rand2.nextInt(100) > 90) examineObject = true;
+			}
+		}
+		if(roll < chance)
+		{
+			int tmp = API.rand2.nextInt(100);
+			int sleep = 0;
+			if(tmp < 2)  
+			{
+				MethodProvider.log("AFK: 1% chance, max 240s");
+				sleep = Sleep.calculate(50,84000);
+				if(UniqueActions.isActionEnabled(Actionz.AFK_LONGER)) sleep += Calculations.random(1, 100000);
+			}
+			else if(tmp < 6)  
+			{
+				MethodProvider.log("AFK: 5% chance, max 120s");
+				sleep = Sleep.calculate(50,40000);
+				if(UniqueActions.isActionEnabled(Actionz.AFK_LONGER)) sleep += Calculations.random(1, 70000);
+			}
+			else if(tmp < 25)
+			{
+				MethodProvider.log("AFK: 14% chance, max 40s");
+				sleep = Sleep.calculate(50,20000);
+				if(UniqueActions.isActionEnabled(Actionz.AFK_LONGER)) sleep += Calculations.random(1, 40000);
+			}
+			else if(tmp < 45)  
+			{
+				MethodProvider.log("AFK: 20% chance, max 20s");
+				sleep = Sleep.calculate(50,10000);
+				if(UniqueActions.isActionEnabled(Actionz.AFK_LONGER)) sleep += Calculations.random(1, 20000);
+			}
+			else if(tmp < 65)  
+			{
+				MethodProvider.log("AFK: 20% chance, max 6.0s");
+				sleep = Sleep.calculate(50,4500);
+				if(UniqueActions.isActionEnabled(Actionz.AFK_LONGER)) sleep += Calculations.random(1, 6000);
+			}
+			else if(tmp < 1000)  
+			{
+				MethodProvider.log("AFK: 35% chance, max 3.2s");
+				sleep = Sleep.calculate(50,2400);
+				if(UniqueActions.isActionEnabled(Actionz.AFK_LONGER)) sleep += Calculations.random(1, 3500);
+			}
+			Timer sleepTimer = new Timer(sleep);
+			final int mean = sleep / 2;
+			final int sigma = sleep * 2 / 5;
+			boolean examined = false;
+			Timer antibanTimer = new Timer((int) Calculations.nextGaussianRandom(mean, sigma));
+			while(!sleepTimer.finished() && !ScriptManager.getScriptManager().isPaused() &&
+					ScriptManager.getScriptManager().isRunning())
+			{
+				Main.customPaintText1 = "~~~~~~~~~~~~~";
+				Main.customPaintText2 = "~~~~~AFK~~~~~";
+				Main.customPaintText3 = "~~ "+Timer.formatTime(sleepTimer.remaining())+" ~~";
+				Main.customPaintText4 = "~~~~~~~~~~~~~";
+				if(antibanTimer.finished())
+				{
+					if(examineObject && !examined)
+					{
+						UniqueActions.examineRandomObect();
+						examined = true;
+					}
+						
+					if(moveMouse && 
+						Mouse.isMouseInScreen() && 
+						Mouse.moveMouseOutsideScreen()) Sleep.sleep(669,1111);
+				}
+				Sleep.sleep(69, 69);
+				
+			}
+		}
+		Main.customPaintText1 = "";
+		Main.customPaintText2 = "";
+		Main.customPaintText3 = "";
+		Main.customPaintText4 = "";
+	}
+/*
+    public int randWeightedInt(int min, int max, double mean, double sigma, int weightSkew, int weightBias) {
+        int ra = randBellWeight(min, max, weightSkew, weightBias);
+        int sorted = Math.min(max, Math.max(min, ra));
+        if (min >= 0 && max > 0)
+            return Math.abs(sorted);
+        else
+            return sorted;
+    }
+
+    private int randBellWeight(int min, int max, int weightSkew, int weightBias) {
+        if (max <= min)
+            max = min + 1;
+        return (int) nextSkewedBoundedDouble(min, max, weightSkew / 10d, weightBias / 10d);
+    }
+
+    private double nextSkewedBoundedDouble(double min, double max, double skew, double bias) {
+        double range = max - min;
+        double mid = min + range / 2.0;
+        double unitGaussian = Calculations.nextGaussianRandom();
+        double biasFactor = Math.exp(bias);
+        return mid + (range * (biasFactor / (biasFactor + Math.exp(-unitGaussian / skew)) - 0.5));
+    }
+	*/
 	public static void talkToNPC(String npcName)
 	{
 		Filter<NPC> filter = n -> n != null && n.getName().contains(npcName);
@@ -298,25 +343,20 @@ public class API {
 		Filter<NPC> filter = n -> n != null && n.getName().contains(npcName) && n.hasAction(action);
 		interactNPC(filter,action,false,false,null,null);
 	}
-	public static void talkToNPC(String npcName, String action,Condition condition)
-	{
-		Filter<NPC> filter = n -> n != null && n.getName().contains(npcName) && n.hasAction(action);
-		interactNPC(filter,action,false,false,null,condition);
-	}
 	public static void talkToNPC(String npcName, String action, Area npcArea)
 	{
 		Filter<NPC> filter = n ->  n != null && n.getName().contains(npcName) && n.hasAction(action) && npcArea.contains(n);
 		interactNPC(filter,action,false,false,npcArea,null);
 	}
-	public static void talkToNPC(String npcName, String action, Area npcArea, Condition condition)
-	{
-		Filter<NPC> filter = n ->  n != null && n.getName().contains(npcName) && n.hasAction(action) && npcArea.contains(n);
-		interactNPC(filter,action,false,false,npcArea,condition);
-	}
 	public static void interactNPC(String npcName, String action, Area npcArea, boolean reachable, Condition condition)
 	{
 		Filter<NPC> filter = n -> n != null && n.getName().contains(npcName) && n.hasAction(action) && npcArea.contains(n);
 		interactNPC(filter, action, false, reachable,npcArea,condition);
+	}
+	public static void walkTalkToNPC(String npcName, String action, Area npcArea,String...waitPhrases)
+	{
+		Filter<NPC> filter = n -> n != null && n.getName().contains(npcName) && n.hasAction(action) && npcArea.contains(n);
+		interactNPC(filter, action, true, false,npcArea,null);
 	}
 	public static void walkTalkToNPC(String npcName, String action, Area npcArea)
 	{
@@ -374,221 +414,165 @@ public class API {
 			if(condition == null) condition = Dialogues::inDialogue;
 			final Condition finalCondition = condition;
 			MethodProvider.sleepUntil(() -> finalCondition.verify(),
-					() -> Players.localPlayer().isMoving(),Sleep.calculate(3333, 2222),66);
+					() -> Players.localPlayer().isMoving(),Sleep.calculate(6666, 4444),69);
 		}
 	}
-	
-	
-	
-	public static void interactWithGameObject(String gameObjectName, String action)
+	private static void interactGameObject(Filter<GameObject> filter,String action,boolean walkToArea,boolean reachable,Area area, Condition condition)
 	{
-		GameObject go = GameObjects.closest(n -> 
-		n != null && 
-		n.getName().contains(gameObjectName) && 
-		n.hasAction(action));
-		if(go == null)
-		{
-			MethodProvider.log("GameObject " +gameObjectName+" with action \'"+action+"\' null!");
-			return;
-		}
-		if(!go.canReach())
-		{
-			if(Walking.walk(go)) Sleep.sleep(420, 696);
-			return;
-		}
-		if(go.interact(action))
-		{
-			MethodProvider.sleepUntil(() -> go.getSurrounding().contains(Players.localPlayer().getTile()),
-					() -> Players.localPlayer().isMoving(),Sleep.calculate(3333, 2222),66);
-		}
-	}public static void interactWithGameObject(String gameObjectName, String action,Tile tile,Condition condition)
-	{
-		GameObject go = GameObjects.closest(n -> 
-		n != null && 
-		n.getName().contains(gameObjectName) && 
-		n.hasAction(action) && 
-		n.getTile().equals(tile));
-		if(go == null)
-		{
-			MethodProvider.log("GameObject " +gameObjectName+" with action \'"+action+"\' at specified tile null!");
-			return;
-		}
-		if(!go.canReach())
-		{
-			if(Walking.walk(go)) Sleep.sleep(420, 696);
-			return;
-		}
-		if(go.interact(action))
-		{
-			MethodProvider.sleepUntil(() -> condition.verify(),
-					() -> Players.localPlayer().isMoving(),Sleep.calculate(3333, 2222),66);
-		}
-	}
-	public static void interactWithGameObject(String gameObjectName, String action,Tile tile)
-	{
-		GameObject go = GameObjects.closest(n -> 
-		n != null && 
-		n.getName().contains(gameObjectName) && 
-		n.hasAction(action) && 
-		n.getTile().equals(tile));
-		if(go == null)
-		{
-			MethodProvider.log("GameObject " +gameObjectName+" with action \'"+action+"\' at specified tile null!");
-			return;
-		}
-		if(!go.canReach())
-		{
-			if(Walking.walk(go)) Sleep.sleep(420, 696);
-			return;
-		}
-		if(go.interact(action))
-		{
-			MethodProvider.sleepUntil(() -> go.getSurrounding().contains(Players.localPlayer().getTile()),
-					() -> Players.localPlayer().isMoving(),Sleep.calculate(3333, 2222),66);
-		}
-	}
-	public static void interactWithGameObject(String gameObjectName, String action, Area gameObjectArea)
-	{
-		GameObject go = GameObjects.closest(n -> 
-		n != null && 
-		n.getName().contains(gameObjectName) && 
-		n.hasAction(action) && 
-		gameObjectArea.contains(n));
-		if(go == null)
-		{
-			MethodProvider.log("GameObject " +gameObjectName+" with action \'"+action+"\' in specified area null!");
-			return;
-		}
-		if(!go.canReach())
-		{
-			if(Walking.walk(go)) Sleep.sleep(420, 696);
-			return;
-		}
-		if(go.interact(action))
-		{
-			MethodProvider.sleepUntil(() -> go.getSurrounding().contains(Players.localPlayer().getTile()),
-					() -> Players.localPlayer().isMoving(),Sleep.calculate(3333, 2222),66);
-		}
-	}
-	public static void walkInteractWithGameObject(String gameObjectName, String action, Area gameObjectArea)
-	{
-		if(!gameObjectArea.contains(Players.localPlayer()))
+		if(walkToArea && !area.contains(Players.localPlayer()))
 		{
 			if(!Walkz.isStaminated()) Walkz.drinkStamina();
 			if(Walkz.isStaminated() && Walking.getRunEnergy() > 5 && !Walking.isRunEnabled()) Walking.toggleRun();
-			if(Walking.shouldWalk(6) && Walking.walk(gameObjectArea.getCenter())) Sleep.sleep(696, 420);
+			if(Walking.shouldWalk(6) && Walking.walk(area.getCenter())) Sleep.sleep(696, 666);
 			return;
 		}
-		GameObject go = GameObjects.closest(n -> 
-		n != null && 
-		n.getName().contains(gameObjectName) && 
-		n.hasAction(action) && 
-		gameObjectArea.contains(n));
+		GameObject go = GameObjects.closest(filter);
 		if(go == null)
 		{
-			MethodProvider.log("GameObject " +gameObjectName+" with action \'"+action+"\' in specified area null!");
+			MethodProvider.log("GameObject null!");
 			return;
 		}
-		if(!go.canReach())
+		if(reachable)
 		{
-			if(Walking.walk(go)) Sleep.sleep(420, 696);
-			return;
+			boolean reachableSurrounding = false;
+			for(Tile t : go.getSurrounding())
+			{
+				if(t.canReach())
+				{
+					reachableSurrounding = true;
+					break;
+				}
+			}
+			if(reachableSurrounding == false)
+			{
+				if(Walking.shouldWalk(6) && Walking.walk(go)) Sleep.sleep(696, 666);
+				return;
+			}
+			//must be able to reach it now, continue
 		}
-		if(go.interact(action))
+		boolean interacted = false;
+		if(action == null)
 		{
-			MethodProvider.sleepUntil(() -> go.getSurrounding().contains(Players.localPlayer().getTile()),
-					() -> Players.localPlayer().isMoving(),Sleep.calculate(3333, 2222),66);
+			if(go.interact()) interacted = true;
+		}
+		else if(go.interact(action)) interacted = true;
+		if(interacted)
+		{
+			if(condition == null) condition = () -> go.getSurrounding().contains(Players.localPlayer().getTile());
+			final Condition finalCondition = condition;
+			MethodProvider.sleepUntil(() -> finalCondition.verify(),
+					() -> Players.localPlayer().isMoving(),Sleep.calculate(6666, 4444),69);
 		}
 	}
-	public static void walkInteractWithGameObject(String gameObjectName, String action, Area gameObjectArea, Condition condition)
+	public static void walkTalkWithGameObject(String objectName, String action) {
+		Filter<GameObject> filter = n -> n != null && n.getName().contains(objectName) && n.hasAction(action);
+		interactGameObject(filter, action, false,true,null,Dialogues::inDialogue);
+	}
+	public static void walkTalkWithGameObject(String objectName) {
+		Filter<GameObject> filter = n -> n != null && n.getName().contains(objectName);
+		interactGameObject(filter, null, false,true,null,Dialogues::inDialogue);
+	}
+	public static void walkTalkWithGameObject(String objectName, Area searchArea) {
+		Filter<GameObject> filter = n -> n != null && n.getName().contains(objectName) && searchArea.contains(n);
+		interactGameObject(filter, null, true,true,searchArea,Dialogues::inDialogue);
+	}
+
+	public static void walkTalkWithGameObject(String objectName, String action, Area searchArea) {
+		Filter<GameObject> filter = n -> n != null && n.getName().contains(objectName)  && n.hasAction(action) && searchArea.contains(n);
+		interactGameObject(filter, action, false,true,searchArea,Dialogues::inDialogue);
+	}
+	public static void interactWithGameObject(String objectName, String action)
 	{
-		if(!gameObjectArea.contains(Players.localPlayer()))
+		Filter<GameObject> filter = n -> n != null && n.getName().contains(objectName)  && n.hasAction(action);
+		interactGameObject(filter, action, false,true,null,null);
+	}
+	public static void interactWithGameObject(String objectName, String action,Tile tile,Condition condition)
+	{
+		Filter<GameObject> filter = n -> n != null && n.getName().contains(objectName) && n.hasAction(action) && n.getTile().equals(tile);
+		interactGameObject(filter, action, false,true,null,condition);
+	}
+	public static void interactWithGameObject(String objectName, String action,Condition condition)
+	{
+		Filter<GameObject> filter = n -> n != null && n.getName().contains(objectName) && n.hasAction(action);
+		interactGameObject(filter, action, false,true,null,condition);
+	}
+	public static void interactWithGameObject(String objectName, String action,Tile tile)
+	{
+		Filter<GameObject> filter = n -> n != null && n.getName().contains(objectName) && n.hasAction(action) && n.getTile().equals(tile);
+		interactGameObject(filter, action, false,true,null,null);
+	}
+	public static void interactWithGameObject(String objectName, String action, Area gameObjectArea)
+	{
+		Filter<GameObject> filter = n -> n != null && n.getName().contains(objectName) && n.hasAction(action) && gameObjectArea.contains(n);
+		interactGameObject(filter, action, false,true,null,null);
+	}
+	public static void walkInteractWithGameObject(String objectName, String action, Area gameObjectArea)
+	{
+		Filter<GameObject> filter = n -> n != null && n.getName().contains(objectName) && n.hasAction(action) && gameObjectArea.contains(n);
+		interactGameObject(filter, action, true,true,gameObjectArea,null);
+	}
+	public static void walkInteractWithGameObject(String objectName, String action, Area gameObjectArea, Condition condition)
+	{
+		Filter<GameObject> filter = n -> n != null && n.getName().contains(objectName) && n.hasAction(action) && gameObjectArea.contains(n);
+		interactGameObject(filter, action, true,true,gameObjectArea,condition);
+	}
+	private static void interactGroundItem(Filter<GroundItem> filter,String action,boolean walkToArea,boolean reachable,Area area, Condition condition)
+	{
+		if(walkToArea && !area.contains(Players.localPlayer()))
 		{
 			if(!Walkz.isStaminated()) Walkz.drinkStamina();
 			if(Walkz.isStaminated() && Walking.getRunEnergy() > 5 && !Walking.isRunEnabled()) Walking.toggleRun();
-			if(Walking.shouldWalk(6) && Walking.walk(gameObjectArea.getCenter())) Sleep.sleep(696, 420);
+			if(Walking.shouldWalk(6) && Walking.walk(area.getCenter())) Sleep.sleep(696, 666);
 			return;
 		}
-		GameObject go = GameObjects.closest(n -> 
-		n != null && 
-		n.getName().contains(gameObjectName) && 
-		n.hasAction(action) && 
-		gameObjectArea.contains(n));
+		GroundItem go = GroundItems.closest(filter);
 		if(go == null)
 		{
-			MethodProvider.log("GameObject " +gameObjectName+" with action \'"+action+"\' in specified area null!");
+			MethodProvider.log("GroundItem null!");
 			return;
 		}
-		if(!go.canReach())
+		if(reachable)
 		{
-			if(Walking.walk(go)) Sleep.sleep(420, 696);
-			return;
+			boolean reachableSurrounding = false;
+			for(Tile t : go.getSurroundingArea(1).getTiles())
+			{
+				if(t.canReach())
+				{
+					reachableSurrounding = true;
+					break;
+				}
+			}
+			if(reachableSurrounding == false)
+			{
+				if(Walking.shouldWalk(6) && Walking.walk(go)) Sleep.sleep(696, 666);
+				return;
+			}
+			//must be able to reach it now, continue
 		}
-		if(go.interact(action))
+		boolean interacted = false;
+		if(action == null)
 		{
-			MethodProvider.sleepUntil(() -> condition.verify(),
-					() -> Players.localPlayer().isMoving(),Sleep.calculate(3333, 2222),66);
+			if(go.interact()) interacted = true;
+		}
+		else if(go.interact(action)) interacted = true;
+		if(interacted)
+		{
+			final int count = Inventory.count(go.getID());
+			if(condition == null) condition = () -> Inventory.count(go.getID()) > count;
+			final Condition finalCondition = condition;
+			MethodProvider.sleepUntil(() -> finalCondition.verify(),
+					() -> Players.localPlayer().isMoving(),Sleep.calculate(6666, 4444),69);
 		}
 	}
 	public static void walkPickupGroundItem(int groundItemID, String action, boolean reachable,Area groundItemArea)
 	{
-		if(!groundItemArea.contains(Players.localPlayer()))
-		{
-			if(!Walkz.isStaminated()) Walkz.drinkStamina();
-			if(Walkz.isStaminated() && Walking.getRunEnergy() > 5 && !Walking.isRunEnabled()) Walking.toggleRun();
-			if(Walking.shouldWalk(6) && Walking.walk(groundItemArea.getCenter())) Sleep.sleep(696, 420);
-			return;
-		}
-		GroundItem gi = GroundItems.closest(n -> 
-		n != null && 
-		n.getID() == groundItemID && 
-		n.hasAction(action) && 
-		groundItemArea.contains(n));
-		if(gi == null)
-		{
-			MethodProvider.log("GroundItem ID" +groundItemID +" with action \'"+action+"\' in specified area null!");
-			return;
-		}
-		if(reachable && !gi.canReach())
-		{
-			if(Walking.walk(gi)) Sleep.sleep(420, 696);
-			return;
-		}
-		if(gi.interact(action))
-		{
-			MethodProvider.sleepUntil(() -> gi == null || !gi.exists(),
-					() -> Players.localPlayer().isMoving(),Sleep.calculate(3333, 2222),66);
-		}
+		Filter<GroundItem> filter = n -> n != null && n.getID() == groundItemID && n.hasAction(action) && groundItemArea.contains(n);
+		interactGroundItem(filter, action, true,reachable,groundItemArea,null);
 	}
 	public static void walkPickupGroundItem(String groundItemName, String action, Area groundItemArea)
 	{
-		if(!groundItemArea.contains(Players.localPlayer()))
-		{
-			if(!Walkz.isStaminated()) Walkz.drinkStamina();
-			if(Walkz.isStaminated() && Walking.getRunEnergy() > 5 && !Walking.isRunEnabled()) Walking.toggleRun();
-			if(Walking.shouldWalk(6) && Walking.walk(groundItemArea.getCenter())) Sleep.sleep(696, 420);
-			return;
-		}
-		GroundItem gi = GroundItems.closest(n -> 
-		n != null && 
-		n.getName().contains(groundItemName) && 
-		n.hasAction(action) && 
-		groundItemArea.contains(n));
-		if(gi == null)
-		{
-			MethodProvider.log("GroundItem " +groundItemName+" with action \'"+action+"\' in specified area null!");
-			return;
-		}
-		if(!gi.canReach())
-		{
-			if(Walking.walk(gi)) Sleep.sleep(420, 696);
-			return;
-		}
-		if(gi.interact(action))
-		{
-			MethodProvider.sleepUntil(() -> gi == null || !gi.exists(),
-					() -> Players.localPlayer().isMoving(),Sleep.calculate(3333, 2222),66);
-		}
+		Filter<GroundItem> filter = n -> n != null && n.getName().equals(groundItemName) && n.hasAction(action) && groundItemArea.contains(n);
+		interactGroundItem(filter, action, true,true,groundItemArea,null);
 	}
 	public static int roundToMultiple (int number,int multiple){
 	    int result = multiple;
@@ -612,6 +596,7 @@ public class API {
 					&& !tmp.isHighRisk() 
 					&& !tmp.isLeagueWorld()
 					&& !tmp.isSuspicious()
+					&& !tmp.isPvpArena() 
 					&& !tmp.isTargetWorld()
 					&& tmp.getWorld() != 302) //just avoid popular world)
 			{

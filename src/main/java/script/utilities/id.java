@@ -4,7 +4,17 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+import org.dreambot.api.methods.Calculations;
 import org.dreambot.api.methods.map.Map;
+import org.dreambot.api.methods.skills.Skill;
+import org.dreambot.api.methods.skills.Skills;
+
+import script.Main;
+import script.actionz.UniqueActions;
+import script.actionz.UniqueActions.Actionz;
+import script.quest.animalmagnetism.AnimalMagnetism;
+import script.quest.horrorfromthedeep.HorrorFromTheDeep;
+import script.skills.ranged.TrainRanged;
 
 public class id {
 	public static final int cammyTele = 8010;
@@ -159,9 +169,168 @@ public class id {
 	public static final int fremmy_wholeVase = 3740;
 	public static final int fremmy_frozenKey = 3741;
 	public static final int fremmy_unfrozenKey = 3745;
+	public static final int jugOfWine = 1993;
+	public static final int jug = 1935;
+	public static final int rangePot4 = 2444;
+	public static final int rangePot3 = 169;
+	public static final int rangePot2 = 171;
+	public static final int rangePot1 = 173;
+	public static List<Integer> rangedPots = new ArrayList<Integer>();
+	public static List<Integer> randCapes = new ArrayList<Integer>();
+	public static final int dorgBow = 8880;
+    public static final int boneBolts = 8882;
+
+	public static final int zamorakCoif = 10374;
+	public static final int snakeskinBandana = 6326;
+	public static final int coif = 1169;
+	public static final int cowl = 1167;
+    public static final int blackBody = 2503;
+	public static final int redBody = 2501;
+	public static final int blueBody = 2499;
+	public static final int snakeskinBody = 6322;
+	public static final int studdedBody = 1133;
+	public static final int hardLeatherBody = 1131;
+	public static final int leatherBody = 1129;
+    public static final int blackLegs = 2497;
+	public static final int redLegs = 2495;
+	public static final int blueLegs = 2493;
+	public static final int snakeskinChaps = 6324;
+	public static final int studdedChaps = 1097;
+	public static final int leatherChaps = 1095;
+	public static final int darkRedCape = 4397;
+	public static final int lightRedCape = 4317;
+	public static final int yellowCape = 4337;
+	public static final int lightBlueCape = 4357;
+	public static final int lightGreenCape = 4377;
+	public static int randCape = 0;
+	public static final int avasAccumulator	= 10499;
+	public static final int snakeskinBoots = 6328;
+	public static final int leatherBoots = 1061;
+	public static final int guthixBracers = 10376;
+	public static final int blueVambs = 2487;
+	public static final int redVambs = 2489;
+	public static final int greenVambs = 1065;
+	public static final int bookOfLaw = 12610;
+	public static final int blackShield = 22284;
+	public static final int redShield = 22281;
+	public static final int blueShield = 22278;
+	public static final int greenShield = 22275;
+	public static final int snakeskinShield = 22272;
+	public static final int hardleatherShield = 22269;
+	public static final int woodenShield = 1171;
+    public static final int ironDart = 807;
+	public static final int steelDart = 808;
+	public static final int mithDart = 809;
+	public static final int addyDart = 810;
+	public static final int grimyRanarr = 207;
+	public static final int grimyAvantoe = 211;
+	public static final int grimyKwuarm = 213;
+	public static final int grimyCadantine = 215;
+	public static final int grimyLantadyme = 2485;
+	public static final int silverSickle = 2961;
+	public static final int blessedSickle = 2963;
+	public static final int salveGraveyardTab = 19619;
+	public static final int druidPouch = 2957;
+	public static final int druidPouchFilled = 2958;
+
+	public static final int pieDish = 2313;
+	public static final int applePie1_2 = 2335;
+	public static final int applePie = 2323;
+	public static final int meatPie1_2 = 2331;
+	public static final int meatPie = 2327;
+	public static final int mortFungus = 2970;
+	public static final int rottenFood = 2959;
+	public static final int natureSpirit_mirror = 2966;
+	public static final int natureSpirit_fillimansDiary = 2967;
+	public static final int natureSpirit_usedSpell = 2969;
+	public static final int natureSpirit_spell = 2968;
+	public static final int natureSpirit_washingBowl = 2964;
+
+	public static final int snapdragonSeed = 5300;
+	public static final int ranarrSeed = 5295;
+	public static final int torstolSeed = 5304;
+	public static final int toadflaxSeed = 5296;
+	public static final int snapegrassSeed = 22879;
+	
+	public static final int giantKey = 20754;
+	public static final int bigBones = 532;
+	
+	public static final int ironBoots = 4121;
+	
+	public static final int ensouledKalphiteHead1 = 13489;
+	public static final int ensouledKalphiteHead2 = 13490;
+	
+	public static final int mithBolts = 9142;
+	public static final int fireBattlestaff = 1393;
+	public static final int airBattlestaff = 1397;
+	public static final int waterBattlestaff = 1395;
+	
+	public static final int shieldLeftHalf = 2366;
+	public static final int dragonSpear = 1249;
+	public static final int runeSpear = 1247;
+	public static final int keyLoopHalf = 987;
+	public static final int keyToothHalf = 985;
+	public static final int uncutDiamond = 1617;
+	
+	public static final int fireTalisman = 1442;
+	
+	public static final int blackRobe = 581;
+	public static final int xericianTop = 13387;
+	public static final int robeTopOfDarkness = 20131;
+	public static final int ironAxe = 1349;
+	public static final int steelAxe = 1353;
+	public static final int blackAxe = 1361;
+	public static final int mithAxe = 1355;
+	public static final int addyAxe = 1357;
+	public static final int oakLogs = 1521;
+	public static final int logs = 1511;
+	public static final int guthixCloak = 10448;
+	public static final int mysticBoots = 4097;
+	public static final int blueBoots = 630;
+	public static final int ancientMitre = 12203;
+	public static final int hoodOfDarkness = 20128;
+	public static final int creamHat = 662;
+	public static final int robeBottomOfDarkness = 20137;
+	public static final int xericianRobe = 13389;
+	public static final int zamorakMonkBottom = 1033;
+
+	public static final int occultNecklace = 20137;
+	
+	public static final int dragonMedHelm = 1149;
+	public static final int runeFullHelm = 1163;
+	public static final int addyFullHelm = 1161;
+	public static final int mithFullHelm = 1159;
+	public static final int steelFullHelm = 1157;
+	public static final int ironFullHelm = 1153;
+	public static final int runePlatelegs = 1079;
+	public static final int addyPlatelegs = 1073;
+	public static final int mithPlatelegs = 1071;
+	public static final int steelPlatelegs = 1069;
+	public static final int ironPlatelegs = 1067;
+	public static final int runeChainbody = 1113;
+	public static final int addyPlatebody = 1123;
+	public static final int mithPlatebody = 1121;
+	public static final int steelPlatebody = 1119;
+	public static final int ironPlatebody = 1115;
+	public static final int dragonBoots = 11840;
+	public static final int runeBoots = 4131;
+	public static final int addyBoots = 4129;
+	public static final int runeKiteshield = 1201;
+	public static final int addyKiteshield = 1199;
+	public static final int mithKiteshield = 1197;
+	public static final int steelKiteshield = 1193;
+	public static final int ironKiteshield = 1191;
+    public static final int brineSabre = 11037;
+	public static final int addyScimmy = 1331;
+	public static final int mithScimmy = 1329;
+	public static final int steelScimmy = 1325;
+	public static final int bodyTalisman = 1446;
+	public static final int ironScimmy = 1323;
+	public static final int markOfGrace = 11849;
 	
 	public static LinkedHashMap<Integer, Integer> approvedAlchs = new LinkedHashMap<Integer,Integer>();
 	public static LinkedHashMap<Integer, Integer> xpAlchs = new LinkedHashMap<Integer,Integer>();
+	public static List<Integer> allAlchs = new ArrayList<Integer>();
 	public static void initializeIDLists()
 	{
 		xpAlchs.put(magicLongbow,18000);
@@ -191,7 +360,16 @@ public class id {
 		approvedAlchs.put(onyxBoltsE,11000);
 		approvedAlchs.put(mithrilPlatebody,120);
 		approvedAlchs.put(rune2h,70);
-
+		
+		for(Integer i : xpAlchs.keySet())
+		{
+			allAlchs.add(i);
+		}
+		for(Integer i : approvedAlchs.keySet())
+		{
+			allAlchs.add(i);
+		}
+		
 		prayPots.add(prayPot1);
 		prayPots.add(prayPot2);
 		prayPots.add(prayPot3);
@@ -216,5 +394,22 @@ public class id {
 		antidotes.add(antidote2);
 		antidotes.add(antidote3);
 		antidotes.add(antidote4);
+		int tmp = (int) Calculations.nextGaussianRandom(10, 5);
+        if(tmp > 15) randCape = darkRedCape;
+        if(tmp > 12) randCape = lightRedCape;
+        if(tmp > 10) randCape = yellowCape;
+        if(tmp > 8) randCape = lightGreenCape;
+        if(randCape == 0) randCape = lightBlueCape;
+
+        
+        randCapes.add(darkRedCape);
+        randCapes.add(lightRedCape);
+        randCapes.add(yellowCape);
+        randCapes.add(lightGreenCape);
+        randCapes.add(lightBlueCape);
+        rangedPots.add(rangePot1);
+        rangedPots.add(rangePot2);
+        rangedPots.add(rangePot3);
+        rangedPots.add(rangePot4);
 	}
 }

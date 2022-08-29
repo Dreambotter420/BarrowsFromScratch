@@ -1,6 +1,7 @@
 package script.utilities;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -15,13 +16,14 @@ import org.dreambot.api.methods.container.impl.bank.BankLocation;
 import org.dreambot.api.methods.container.impl.equipment.Equipment;
 import org.dreambot.api.methods.container.impl.equipment.EquipmentSlot;
 import org.dreambot.api.methods.depositbox.DepositBox;
-import org.dreambot.api.methods.dialogues.Dialogues;
 import org.dreambot.api.methods.filter.Filter;
 import org.dreambot.api.methods.grandexchange.GrandExchange;
 import org.dreambot.api.methods.interactive.GameObjects;
 import org.dreambot.api.methods.interactive.NPCs;
 import org.dreambot.api.methods.interactive.Players;
 import org.dreambot.api.methods.item.GroundItems;
+import org.dreambot.api.methods.magic.Magic;
+import org.dreambot.api.methods.magic.Normal;
 import org.dreambot.api.methods.map.Area;
 import org.dreambot.api.methods.map.Map;
 import org.dreambot.api.methods.map.Tile;
@@ -35,9 +37,8 @@ import org.dreambot.api.utilities.Timer;
 import org.dreambot.api.wrappers.interactive.GameObject;
 import org.dreambot.api.wrappers.interactive.NPC;
 import org.dreambot.api.wrappers.items.GroundItem;
-import org.dreambot.api.wrappers.items.Item;
-
-import script.Main;
+import script.actionz.UniqueActions;
+import script.actionz.UniqueActions.Actionz;
 import script.quest.varrockmuseum.Timing;
 import script.skills.prayer.TrainPrayer;
 import script.skills.ranged.TrainRanged;
@@ -62,7 +63,7 @@ public class Walkz {
 				return;
 			}
 			
-			Tabs.open(Tab.INVENTORY);
+			Tabz.open(Tab.INVENTORY);
 			
 		}
 	}
@@ -98,7 +99,7 @@ public class Walkz {
 				else
 				{
 					if(Widgets.isOpen()) Widgets.closeAll();
-					Tabs.openWithFKey(Tab.EQUIPMENT);
+					Tabz.open(Tab.EQUIPMENT);
 				}
 				continue;
 			}
@@ -117,7 +118,7 @@ public class Walkz {
 			if(ringFound) continue;
 			if(Inventory.contains(id.varrockTele))
 			{
-				if(Bank.isOpen()) Bank.close();
+				if(Bank.isOpen()) Bankz.close();
 				if(InvEquip.closeBankEquipment())
 				{
 					teleportVarrock(30000);
@@ -140,7 +141,7 @@ public class Walkz {
 					continue;
 				} 
 				//no options left - go to GE by walking
-				else if(Locations.isInKourend()) leaveKourend(240000);
+				else if(Locations.isInKourend()) exitKourend(240000);
 				else if(Walking.shouldWalk(6) && Walking.walk(Locations.GE)) Sleep.sleep(666, 666);
 			}
 			//found item in bank - withdraw it
@@ -195,10 +196,16 @@ public class Walkz {
 		{
 			if(!walkPath(Paths.path_otherSideOfIsleOfSoulsToForgottenSouls))
 			{
-				MethodProvider.log(":-(");
+				MethodProvider.log(":-( cannot find valid path to forgotten souls on Isle of Souls!");
 			}
 		}
 		return false;
+	}
+	public static boolean walkBackwardsPath(Tile[] path)
+	{
+		List<Tile> pathTiles = Arrays.asList(path);
+		Collections.reverse(pathTiles);
+		return walkPath((Tile[])pathTiles.toArray());
 	}
 	public static boolean walkPath(Tile[] path)
 	{
@@ -221,20 +228,24 @@ public class Walkz {
 		{
 			if(Map.isTileOnMap(t))
 			{
-				if(Walking.shouldWalk(6) && Walking.walk(t))
+				if(Walking.shouldWalk(6))
 				{
-					MethodProvider.log("Walked on path(regular walk)!");
-					Sleep.sleep(696,420);
-				}
-				else if(Walking.shouldWalk(6) && Walking.clickTileOnMinimap(t))
-				{
-					MethodProvider.log("Walked on path (map)!");
-					Sleep.sleep(696,420);
-				}
-				else if(Walking.shouldWalk(6) && Map.interact(t,"Walk here"))
-				{
-					MethodProvider.log("Walked here on path (screen)!");
-					Sleep.sleep(696,420);
+					if(Walking.walk(t))
+					{
+						MethodProvider.log("Walked on path(regular walk)!");
+						Sleep.sleep(696,420);
+					}
+					else if(Walking.clickTileOnMinimap(t))
+					{
+						MethodProvider.log("Walked on path (map)!");
+						Sleep.sleep(696,420);
+					}
+					else if(Map.interact(t,"Walk here"))
+					{
+						MethodProvider.log("Walked here on path (screen)!");
+						Sleep.sleep(696,420);
+					}
+					else MethodProvider.log("Missed path walk on valid tile");
 				}
 				return true;
 			}
@@ -242,6 +253,7 @@ public class Walkz {
 		MethodProvider.log("No tiles found to path to in path :-(");
 		return false;
 	}
+	
 	public static boolean walkToHASpot()
 	{
 		if(Locations.haSpot == Locations.HASpot1)
@@ -316,7 +328,7 @@ public class Walkz {
 						i.getID() == InvEquip.waterskin1 || 
 						i.getID() == InvEquip.waterskin2 || 
 						i.getID() == InvEquip.waterskin3 || 
-						i.getID() == TrainRanged.jug))) 
+						i.getID() == id.jug))) 
 				{
 					MethodProvider.sleep(Timing.sleepLogNormalInteraction());
 					continue;
@@ -379,7 +391,7 @@ public class Walkz {
 						{
 							MethodProvider.log("Did not deposit any allSlayerLoot");
 							if(Bank.deposit(i -> i != null && 
-									i.getID() == TrainRanged.jugOfWine, (neededInvySlots - emptySlots)))
+									i.getID() == id.jugOfWine, (neededInvySlots - emptySlots)))
 							{
 								MethodProvider.log("Deposited "+(neededInvySlots - emptySlots)+" jugs of wine");
 							}
@@ -427,7 +439,7 @@ public class Walkz {
 				{
 					if(Bank.isOpen()) 
 					{
-						if(Bank.close())
+						if(Bankz.close())
 						{
 							MethodProvider.sleep(Timing.sleepLogNormalInteraction());
 						}
@@ -559,12 +571,10 @@ public class Walkz {
 		}
 		return false;
 	}
-	public static boolean leaveKourend(long timeout)
+	public static boolean exitKourend(long timeout)
 	{
 		Timer timer = new Timer(timeout);
-		boolean foundShortest = false;
-		Area area = null;
-		String veos = null;
+		String veos = "Veos";
 		while(!timer.finished() && Client.getGameState() == GameState.LOGGED_IN
 				&& ScriptManager.getScriptManager().isRunning() && !ScriptManager.getScriptManager().isPaused())
 		{
@@ -589,23 +599,6 @@ public class Walkz {
 					exitGiantsCave();
 					continue;
 				}
-				if(!foundShortest)
-				{
-					double distLandsEnd = Locations.veosLandsEnd.distance(Players.localPlayer().getTile());
-					double distPisc = Locations.veosPisc.distance(Players.localPlayer().getTile());
-					if(true) 
-					{
-						//faster maybe to go to Piscarillius
-						area = Locations.veosPisc;
-						veos = "Veos";
-					}
-					else
-					{
-						area = Locations.veosLandsEnd;
-						veos = "Captain Magoro";
-					}
-					foundShortest = true;
-				}
 				NPC closestVeos = NPCs.closest(veos);
 				if(closestVeos != null)
 				{
@@ -613,12 +606,61 @@ public class Walkz {
 					{
 						MethodProvider.sleepUntil(() -> Locations.shipSarimVeos.contains(Players.localPlayer()),
 								() -> Players.localPlayer().isMoving(), 
-								Sleep.calculate(3333, 2222),50);
+								Sleep.calculate(8888, 5555),50);
 					} else if(Walking.shouldWalk(5) && Walking.walk(closestVeos)) Sleep.sleep(69, 420);
 					continue;
 				}
-				MethodProvider.log("Walking to Veos: "+area.getCenter().toString());
-				if(Walking.shouldWalk(6) && Walking.walk(area.getCenter())) Sleep.sleep(69, 420);
+				if(Walking.shouldWalk(6) && Walking.walk(Locations.veosLandsEnd.getCenter())) 
+				{
+					MethodProvider.log("Walking to Veos: "+Locations.veosLandsEnd.getCenter().toString());
+					Sleep.sleep(111, 1111);
+				}
+			}
+			else return true;
+		}
+		return false;
+	}
+	public static boolean exitIsleOfSouls(long timeout)
+	{
+		Timer timer = new Timer(timeout);
+		while(!timer.finished() && Client.getGameState() == GameState.LOGGED_IN
+				&& ScriptManager.getScriptManager().isRunning() && !ScriptManager.getScriptManager().isPaused())
+		{
+			Sleep.sleep(69,69);
+			if(Locations.isleOfSouls.contains(Players.localPlayer()))
+			{
+				if(useJewelry(InvEquip.wealth,"Grand Exchange")) continue;
+				if(useJewelry(InvEquip.glory,"Edgeville")) continue;
+				if(useJewelry(InvEquip.combat,"Ranging Guild")) continue;
+				if(useJewelry(InvEquip.skills,"Fishing Guild")) continue;
+				if(useJewelry(InvEquip.duel,"Castle Wars")) continue;
+				if(useJewelry(InvEquip.passage,"Wizards\' Tower")) continue;
+				if(useJewelry(InvEquip.games,"Barbarian Outpost")) continue;
+				
+				GameObject portal = GameObjects.closest(p -> p!=null && p.getName().equals("Portal") && p.hasAction("Edgeville"));
+				if(portal != null)
+				{
+					if(portal.distance() < 10 && portal.interact("Edgeville"))
+					{
+						MethodProvider.sleepUntil(() -> Locations.edgevilleSoulsPortal.contains(Players.localPlayer()),
+								() -> Players.localPlayer().isMoving(), 
+								Sleep.calculate(5555, 3333),50);
+						continue;
+					}
+				}
+				if(!Walkz.walkBackwardsPath(Paths.soulWarsLobbyToSandcrabs) && 
+							!Walkz.walkBackwardsPath(Paths.path_soulWarsLobbyToForgottenSouls) && 
+							!Walkz.walkBackwardsPath(Paths.path_otherSideOfIsleOfSoulsToForgottenSouls))
+				{
+					MethodProvider.log("Appear to be stuck on isle of souls, teleporting home??");
+					if(Players.localPlayer().isAnimating()) 
+					{
+						Sleep.sleep(2222, 2222);
+						return false;
+					}
+					Magic.castSpell(Normal.HOME_TELEPORT);
+					Sleep.sleep(3333,3333);
+				}
 			}
 			else return true;
 		}
@@ -694,35 +736,34 @@ public class Walkz {
 			equipSlot = EquipmentSlot.AMULET;
 			wearableJewelry = InvEquip.wearablePassages;
 			}
+		if(InvEquip.invyContains(wearableJewelry))
+		{
+			final int jewelryID = InvEquip.getInvyItem(wearableJewelry);
+			InvEquip.equipItem(jewelryID);
+			MethodProvider.sleepUntil(() -> Equipment.contains(jewelryID), Sleep.calculate(4444, 3333));
+		}
 		if(InvEquip.equipmentContains(wearableJewelry))
 		{
-			
+			if(Shop.isOpen()) Shop.close();
+			else if(Bank.isOpen()) Bankz.close();
+			else if(GrandExchange.isOpen()) GrandExchangg.close();
+			else if(DepositBox.isOpen()) DepositBox.close();
+			Tabz.open(Tab.EQUIPMENT);
+			MethodProvider.sleepUntil(() -> Tabs.isOpen(Tab.EQUIPMENT),Sleep.calculate(3333, 2222));
 			if(Tabs.isOpen(Tab.EQUIPMENT))
 			{
 				if(Equipment.interact(equipSlot, teleName))
 				{
 					MethodProvider.log("Just used Jewelry teleport: " + teleName +" in slot: " + equipSlot);
-					MethodProvider.sleepUntil(() -> Players.localPlayer().isAnimating(),Sleep.calculate(1111,1111));
-					MethodProvider.sleepUntil(() -> !Players.localPlayer().isAnimating(),Sleep.calculate(3333,2222));
-					Sleep.sleep(1111,2222);
+					MethodProvider.sleepUntil(() -> Players.localPlayer().isAnimating(),Sleep.calculate(4444,4444));
+					MethodProvider.sleepUntil(() -> !Players.localPlayer().isAnimating(), 
+							() -> Players.localPlayer().isAnimating(), Sleep.calculate(3333,2222),69);
+					Sleep.sleep(111,1111);
 				}
 			}
-			else
-			{
-				if(Shop.isOpen()) Shop.close();
-				else if(Bank.isOpen()) Bank.close();
-				else if(GrandExchange.isOpen()) GrandExchange.close();
-				else if(DepositBox.isOpen()) DepositBox.close();
-				else Tabs.open(Tab.EQUIPMENT);
-			}
 			return true;
 		}
-		if(InvEquip.invyContains(wearableJewelry))
-		{
-			final int jewelryID = InvEquip.getInvyItem(wearableJewelry);
-			InvEquip.equipItem(jewelryID);
-			return true;
-		}
+		
 		return false;
 	}
 	public static boolean goToCastleWars(long timeout)
@@ -901,7 +942,7 @@ public class Walkz {
 			//check if have cammy tab in invy, use it
 			if(Inventory.contains(id.cammyTele))
 			{
-				if(Bank.isOpen()) Bank.close();
+				if(Bank.isOpen()) Bankz.close();
 				else if(Inventory.interact(id.cammyTele, "Break"))
 				{
 					MethodProvider.sleepUntil(() -> Locations.camelotTrees.contains(Players.localPlayer()), () -> Players.localPlayer().isAnimating(), Sleep.calculate(4444,2222),50);
@@ -928,6 +969,13 @@ public class Walkz {
 		
 		return false;
 	}
+	/**
+	 * Returns true if in telespot, false otherwise. Tries to teleport using tab, withdraws or buys more.
+	 * @param tabID
+	 * @param teleSpot
+	 * @param timeout
+	 * @return
+	 */
 	public static boolean teleport(int tabID, Area teleSpot, long timeout)
 	{
 		MethodProvider.log("Entering generic teletab function");
@@ -953,10 +1001,13 @@ public class Walkz {
 			//check if have fally tab in invy, use it
 			if(Inventory.contains(tabID))
 			{
-				if(Bank.isOpen()) Bank.close();
-				else if(Inventory.interact(tabID, "Break"))
+				if(Bank.isOpen()) Bankz.close();
+				if(Tabz.open(Tab.INVENTORY))
 				{
-					MethodProvider.sleepUntil(() -> teleSpot.contains(Players.localPlayer()), () -> Players.localPlayer().isAnimating(), Sleep.calculate(4444,2222),50);
+					if(Inventory.interact(tabID, "Break"))
+					{
+						MethodProvider.sleepUntil(() -> teleSpot.contains(Players.localPlayer()), () -> Players.localPlayer().isAnimating(), Sleep.calculate(4444,2222),50);
+					}
 				}
 				continue;
 			}
@@ -1005,7 +1056,7 @@ public class Walkz {
 			//check if have fally tab in invy, use it
 			if(Inventory.contains(id.houseTele))
 			{
-				if(Bank.isOpen()) Bank.close();
+				if(Bank.isOpen()) Bankz.close();
 				else if(Inventory.interact(id.houseTele, "Break"))
 				{
 					MethodProvider.sleepUntil(() -> Locations.isInstanced() || Locations.houseTeleSpot.contains(Players.localPlayer()), () -> Players.localPlayer().isAnimating(), Sleep.calculate(4444,2222),50);
@@ -1141,4 +1192,5 @@ public class Walkz {
 		}
 		return false;
 	}
+	
 }

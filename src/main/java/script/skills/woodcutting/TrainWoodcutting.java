@@ -28,10 +28,14 @@ import script.framework.Leaf;
 import script.framework.Tree;
 import script.quest.varrockmuseum.Timing;
 import script.utilities.API;
+import script.utilities.Dialoguez;
 import script.utilities.InvEquip;
 import script.utilities.Locations;
+import script.utilities.Skillz;
 import script.utilities.Sleep;
+import script.utilities.Tabz;
 import script.utilities.Walkz;
+import script.utilities.id;
 /**
  * Trains woodcutting 35-40
  * 
@@ -46,13 +50,7 @@ public class TrainWoodcutting extends Leaf {
 	
 	public static boolean initialized = false;
 	public static boolean completedWoodcutting = false;
-	public static final int ironAxe = 1349;
-	public static final int steelAxe = 1353;
-	public static final int blackAxe = 1361;
-	public static final int mithAxe = 1355;
-	public static final int addyAxe = 1357;
-	public static final int oakLogs = 1521;
-	public static final int logs = 1511;
+	
 	public static final int tree1 = 1278;
 	public static final int tree2 = 1276;
 	public static final int oakTree = 10820;
@@ -85,13 +83,10 @@ public class TrainWoodcutting extends Leaf {
             return Timing.sleepLogNormalSleep();
     	}
     	API.randomAFK(5);
-    	if(Dialogues.canContinue())
+    	if(Dialoguez.handleDialogues()) return Sleep.calculate(420, 696);
+    	if(Skillz.shouldCheckSkillInterface())
     	{
-    		boolean skip = (Calculations.nextGaussianRandom(500,5) > 501 ? true : false);
-    		if(!skip) 
-    		{
-    			if(Dialogues.continueDialogue()) Sleep.sleep(222,1111);
-    		}
+    		Skillz.checkSkillProgress(Skill.WOODCUTTING);
     	}
     	GroundItem birdNest = GroundItems.closest(nest -> 
     			nest != null && 
@@ -103,14 +98,14 @@ public class TrainWoodcutting extends Leaf {
     		final int count = Inventory.fullSlotCount();
     		if(count == 28)
     		{
-    			if(Inventory.contains(logs))
+    			if(Inventory.contains(id.logs))
     			{
-    				if(Inventory.drop(logs)) MethodProvider.sleepUntil(() -> Inventory.fullSlotCount() > count, () -> Players.localPlayer().isMoving(),Sleep.calculate(2222, 2222), 50);
+    				if(Inventory.drop(id.logs)) MethodProvider.sleepUntil(() -> Inventory.fullSlotCount() > count, () -> Players.localPlayer().isMoving(),Sleep.calculate(2222, 2222), 50);
     				return Timing.sleepLogNormalSleep();
     			}
-    			if(Inventory.contains(oakLogs))
+    			if(Inventory.contains(id.oakLogs))
     			{
-    				if(Inventory.drop(oakLogs)) MethodProvider.sleepUntil(() -> Inventory.fullSlotCount() > count, () -> Players.localPlayer().isMoving(),Sleep.calculate(2222, 2222), 50);
+    				if(Inventory.drop(id.oakLogs)) MethodProvider.sleepUntil(() -> Inventory.fullSlotCount() > count, () -> Players.localPlayer().isMoving(),Sleep.calculate(2222, 2222), 50);
     				return Timing.sleepLogNormalSleep();
     			}
     			else 
@@ -150,38 +145,38 @@ public class TrainWoodcutting extends Leaf {
     	//add axes to inventory
     	if(wc < 6) 
     	{
-    		InvEquip.addInvyItem(ironAxe, 1, 1, false, 1);
-    		InvEquip.addInvyItem(steelAxe, 1, 1, false, 1);
-    		InvEquip.addInvyItem(blackAxe, 1, 1, false, 1);
-    		InvEquip.addInvyItem(mithAxe, 1, 1, false, 1);
-    		InvEquip.addInvyItem(addyAxe, 1, 1, false, 1);
-    		careAboutAxe = ironAxe;
+    		InvEquip.addInvyItem(id.ironAxe, 1, 1, false, 1);
+    		InvEquip.addInvyItem(id.steelAxe, 1, 1, false, 1);
+    		InvEquip.addInvyItem(id.blackAxe, 1, 1, false, 1);
+    		InvEquip.addInvyItem(id.mithAxe, 1, 1, false, 1);
+    		InvEquip.addInvyItem(id.addyAxe, 1, 1, false, 1);
+    		careAboutAxe = id.ironAxe;
     	}
     	else if(wc < 11) 
     	{
-    		InvEquip.addInvyItem(steelAxe, 1, 1, false, 1);
-    		InvEquip.addInvyItem(blackAxe, 1, 1, false, 1);
-    		InvEquip.addInvyItem(mithAxe, 1, 1, false, 1);
-    		InvEquip.addInvyItem(addyAxe, 1, 1, false, 1);
-    		careAboutAxe = steelAxe;
+    		InvEquip.addInvyItem(id.steelAxe, 1, 1, false, 1);
+    		InvEquip.addInvyItem(id.blackAxe, 1, 1, false, 1);
+    		InvEquip.addInvyItem(id.mithAxe, 1, 1, false, 1);
+    		InvEquip.addInvyItem(id.addyAxe, 1, 1, false, 1);
+    		careAboutAxe = id.steelAxe;
     	}
     	else if(wc < 21) 
     	{
-    		InvEquip.addInvyItem(blackAxe, 1, 1, false, 1);
-    		InvEquip.addInvyItem(mithAxe, 1, 1, false, 1);
-    		InvEquip.addInvyItem(addyAxe, 1, 1, false, 1);
-    		careAboutAxe = blackAxe;
+    		InvEquip.addInvyItem(id.blackAxe, 1, 1, false, 1);
+    		InvEquip.addInvyItem(id.mithAxe, 1, 1, false, 1);
+    		InvEquip.addInvyItem(id.addyAxe, 1, 1, false, 1);
+    		careAboutAxe = id.blackAxe;
     	}
     	else if(wc < 31) 
     	{
-    		InvEquip.addInvyItem(mithAxe, 1, 1, false, 1);
-    		InvEquip.addInvyItem(addyAxe, 1, 1, false, 1);
-    		careAboutAxe = mithAxe;
+    		InvEquip.addInvyItem(id.mithAxe, 1, 1, false, 1);
+    		InvEquip.addInvyItem(id.addyAxe, 1, 1, false, 1);
+    		careAboutAxe = id.mithAxe;
     	}
     	else //adamant axe max 
     	{
-    		InvEquip.addInvyItem(addyAxe, 1, 1, false, 1);
-    		careAboutAxe = addyAxe;
+    		InvEquip.addInvyItem(id.addyAxe, 1, 1, false, 1);
+    		careAboutAxe = id.addyAxe;
     	}
     	InvEquip.addOptionalItem(InvEquip.jewelry);
     	InvEquip.shuffleFulfillOrder();
@@ -283,7 +278,7 @@ public class TrainWoodcutting extends Leaf {
 				boolean openInvy = (Calculations.nextGaussianRandom(500,5) > 491 ? false : true);
 				if(openInvy) 
 				{
-					if(Tabs.open(Tab.INVENTORY)) Sleep.sleep(222,1111);
+					if(Tabz.open(Tab.INVENTORY)) Sleep.sleep(222,1111);
 				}
 			}
 			

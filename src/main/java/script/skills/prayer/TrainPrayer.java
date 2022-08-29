@@ -45,10 +45,13 @@ import script.framework.Leaf;
 import script.framework.Tree;
 import script.quest.varrockmuseum.Timing;
 import script.utilities.API;
+import script.utilities.Dialoguez;
 import script.utilities.InvEquip;
 import script.utilities.Locations;
 import script.utilities.MissingAPI;
+import script.utilities.Skillz;
 import script.utilities.Sleep;
+import script.utilities.Tabz;
 import script.utilities.Walkz;
 import script.utilities.id;
 /**
@@ -135,7 +138,7 @@ public class TrainPrayer extends Leaf {
     	}
     	else
     	{
-    		Tabs.open(Tab.OPTIONS);
+    		Tabz.open(Tab.OPTIONS);
     	}
     	return false;
     }
@@ -252,7 +255,7 @@ public class TrainPrayer extends Leaf {
     	}
     	if(Dialogues.canContinue())
     	{
-    		Dialogues.continueDialogue();
+    		Dialoguez.continueDialogue();
     		return Timing.sleepLogNormalSleep();
     	}
     	if(Widgets.getWidgetChild(219, 1, 1) != null && 
@@ -260,16 +263,16 @@ public class TrainPrayer extends Leaf {
     			Widgets.getWidgetChild(219, 1, 1).getText().contains("Exchange")) 
     	{ 
     		//have at least one option to exchange items, check for "all" and if none, choose "1"
-    		if(!Dialogues.chooseFirstOptionContaining("Exchange All:")) Keyboard.type("1",false);
+    		if(!Dialoguez.chooseFirstOptionContaining("Exchange All:")) Dialoguez.chooseOptionIndex(1);
     		return Timing.sleepLogNormalSleep();
     	}
     	if(Inventory.count(constructionBook) > 0)
     	{
     		if(Tabs.isOpen(Tab.INVENTORY)) Inventory.drop(constructionBook);
-    		else Tabs.open(Tab.INVENTORY);
+    		else Tabz.open(Tab.INVENTORY);
     		return Timing.sleepLogNormalSleep();
     	}
-    	
+    	if(Skillz.shouldCheckSkillInterface()) Skillz.checkSkillProgress(Skill.PRAYER);
     	if(Locations.isInstanced())
     	{
     		if(Inventory.count(dBones) <= 0 || forceLeaveShitHouse) 
@@ -405,7 +408,7 @@ public class TrainPrayer extends Leaf {
         				usedSlots.add(boneSlots.get(0));
         				lastBone.interact("Use");
     				} else if(Widgets.isOpen()) Widgets.closeAll();
-    				else Tabs.open(Tab.INVENTORY);
+    				else Tabz.open(Tab.INVENTORY);
     				Sleep.sleep(69, 69);
     			}
     			else if(!Inventory.getSelectedItemName().contains(new Item(dBones,1).getName()))
@@ -515,7 +518,7 @@ public class TrainPrayer extends Leaf {
     	    		{
     	        		if(!Tabs.isOpen(Tab.INVENTORY))
     	        		{
-    	        			Tabs.open(Tab.INVENTORY);
+    	        			Tabz.open(Tab.INVENTORY);
     	        			return Timing.sleepLogNormalInteraction();
     	        		}
     	    			Item bonesNoted = Inventory.get(new Item(TrainPrayer.dBones,1).getNotedItemID());

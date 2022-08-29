@@ -8,6 +8,7 @@ import org.dreambot.api.Client;
 import org.dreambot.api.data.GameState;
 import org.dreambot.api.methods.Calculations;
 import org.dreambot.api.methods.MethodProvider;
+import org.dreambot.api.methods.combat.Combat;
 import org.dreambot.api.methods.container.impl.Inventory;
 import org.dreambot.api.methods.container.impl.bank.Bank;
 import org.dreambot.api.methods.settings.PlayerSettings;
@@ -22,7 +23,8 @@ import org.dreambot.api.wrappers.items.Item;
 import org.dreambot.api.wrappers.widgets.WidgetChild;
 
 import script.Main;
-import script.quest.varrockmuseum.Timing;
+import script.actionz.UniqueActions;
+import script.actionz.UniqueActions.Actionz;
 import script.skills.ranged.TrainRanged;
 
 public class Combatz {
@@ -30,13 +32,15 @@ public class Combatz {
 	public static List<Integer> highFoods = new ArrayList<Integer>();
 	public static Timer foodEatTimer = null;
 	public static Timer foodAttemptTimer = null;
-
+	public static int lowFood = -1;
 	public static int nextRandMeleeBoostLvl = 0;
 	public static int nextRandRangedBoostLvl = 0;
 	public static void initializeFoods()
 	{
+		if(UniqueActions.isActionEnabled(Actionz.BASS_OR_LOBSTER_INSTEAD_OF_JUGSOFWINE)) lowFood = id.bass;
+		else lowFood = id.jugOfWine;
 		foods.add(id.pineapplePizza1);
-		foods.add(TrainRanged.jugOfWine);
+		foods.add(id.jugOfWine);
 		foods.add(id.bass);
 		foods.add(id.swordfish);
 		foods.add(id.monkfish);
@@ -57,6 +61,17 @@ public class Combatz {
 	}
 	public static Timer antidoteDrinkTimer = null;
 	
+	public static void toggleAutoRetaliate(boolean on)
+	{
+		if(Combat.isAutoRetaliateOn() == on) return;
+		if(!Tabs.isOpen(Tab.COMBAT))
+		{
+			if(Tabz.open(Tab.COMBAT)) MethodProvider.sleepUntil(() -> Tabs.isOpen(Tab.COMBAT),Sleep.calculate(420, 696));
+			return;
+		}
+		if(Combat.toggleAutoRetaliate(on)) MethodProvider.sleepUntil(() -> Combat.isAutoRetaliateOn() == on, Sleep.calculate(2222, 2222));
+	}
+	
 	public static boolean drinkAntidote()
 	{
 		if(antidoteDrinkTimer != null && !antidoteDrinkTimer.finished()) return true;
@@ -71,7 +86,7 @@ public class Combatz {
 			
 			if(!Tabs.isOpen(Tab.INVENTORY))
 			{
-				Tabs.open(Tab.INVENTORY);
+				Tabz.open(Tab.INVENTORY);
 			}
 			return true;
 		}
@@ -88,7 +103,7 @@ public class Combatz {
 	}
     public static boolean drinkRangeBoost()
     {
-    	for(int rangePot : TrainRanged.rangedPots)
+    	for(int rangePot : id.rangedPots)
     	{
     		if(Inventory.count(rangePot) <= 0) continue;
     		if(Tabs.isOpen(Tab.INVENTORY) || Bank.isOpen())
@@ -102,7 +117,7 @@ public class Combatz {
     			return false;
     		}
     		if(Widgets.isOpen()) Widgets.closeAll();
-    		else Tabs.open(Tab.INVENTORY);
+    		else Tabz.open(Tab.INVENTORY);
     		return false;
     	}
     	return false;
@@ -183,7 +198,7 @@ public class Combatz {
     			}
     			if(!Tabs.isOpen(Tab.INVENTORY)) 
     			{
-    				Tabs.open(Tab.INVENTORY);
+    				Tabz.open(Tab.INVENTORY);
     				Sleep.sleep(69, 420);
     				continue;
     			}
@@ -277,7 +292,7 @@ public class Combatz {
 					Widgets.closeAll();
 					Sleep.sleep(111, 111);
 				}
-				else Tabs.open(Tab.INVENTORY);
+				else Tabz.open(Tab.INVENTORY);
 			}
 		}
 		
@@ -363,7 +378,7 @@ public class Combatz {
 					Widgets.closeAll();
 					Sleep.sleep(111, 111);
 				}
-				else Tabs.open(Tab.INVENTORY);
+				else Tabz.open(Tab.INVENTORY);
 			}
 		}
 		return false;

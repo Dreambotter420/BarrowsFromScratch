@@ -195,14 +195,14 @@ public class InvEquip {
 	}
 	public static void depositExtraJunk()
 	{
-		Item i = Inventory.get(TrainRanged.jug);
+		Item i = Inventory.get(id.jug);
 		if(i == null) i = Inventory.get(id.vial);
 		if(i == null) i = Inventory.get(InvEquip.waterskin0);
 		if(i == null) i = Inventory.get(InvEquip.waterskin1);
 		if(i == null) i = Inventory.get(InvEquip.waterskin2);
 		if(i == null) i = Inventory.get(InvEquip.waterskin3);
-		if(i == null) i = Inventory.get(TrainWoodcutting.logs);
-		if(i == null) i = Inventory.get(TrainWoodcutting.oakLogs);
+		if(i == null) i = Inventory.get(id.logs);
+		if(i == null) i = Inventory.get(id.oakLogs);
 		if(i == null) i = Inventory.get(InvEquip.skills0);
 		if(i == null) i = Inventory.get(InvEquip.wealth0);
 		if(i == null) i = Combatz.getFood();
@@ -300,50 +300,49 @@ public class InvEquip {
 		}
 		return false;
 	}
-	public static void withdrawAll(int itemID, boolean noted, long timeout)
+	public static boolean withdrawAll(int itemID, boolean noted, long timeout)
 	{
 		Timer timer = new Timer(timeout);
-		final int count = Bank.count(itemID);
 		while(!timer.finished() && Client.getGameState() == GameState.LOGGED_IN
 				&& ScriptManager.getScriptManager().isRunning() && !ScriptManager.getScriptManager().isPaused())
 		{
 			Sleep.sleep(69, 69);
-			if(Bank.count(itemID) < count || Inventory.isFull()) return;
-			if(closeBankEquipment()) continue;
+
+			MethodProvider.log("In WithdrawOne loop for itemID: "+ itemID + " / name: "+new Item(itemID,1).getName());
+			if(Bank.count(itemID) <= 0) return true;
+			if(!closeBankEquipment()) continue;
 			if(Bankz.openClosest(50))
 			{
-				if(noted)
+				if(Inventory.emptySlotCount() < 2)
 				{
-					if(Bank.getWithdrawMode() != BankMode.NOTE)
-					{
-						if(Bank.setWithdrawMode(BankMode.NOTE))
-						{
-							MethodProvider.sleepUntil(() -> Bank.getWithdrawMode() == BankMode.NOTE, Sleep.calculate(2222, 2222));
-						}
-					}
+					depositExtraJunk();
+					continue;
 				}
-				else
+				if(noted && Bank.getWithdrawMode() == BankMode.ITEM) 
 				{
-					if(Bank.getWithdrawMode() != BankMode.ITEM)
+					if(Bank.setWithdrawMode(BankMode.NOTE))
 					{
-						if(Bank.setWithdrawMode(BankMode.ITEM))
-						{
-							MethodProvider.sleepUntil(() -> Bank.getWithdrawMode() == BankMode.ITEM, Sleep.calculate(2222, 2222));
-						}
+						MethodProvider.sleepUntil(() -> Bank.getWithdrawMode() == BankMode.NOTE, Sleep.calculate(2222, 2222));
 					}
+					continue;
 				}
-				if((noted && Bank.getWithdrawMode() == BankMode.NOTE) || 
-						(!noted && Bank.getWithdrawMode() == BankMode.ITEM))
+				if(!noted && Bank.getWithdrawMode() == BankMode.NOTE) 
 				{
-					
-					if(Bank.withdrawAll(itemID))
+					if(Bank.setWithdrawMode(BankMode.ITEM))
 					{
-						MethodProvider.sleepUntil(() -> Bank.count(itemID) < count, Sleep.calculate(2222, 2222));
+						MethodProvider.sleepUntil(() -> Bank.getWithdrawMode() == BankMode.ITEM, Sleep.calculate(2222, 2222));
 					}
+					continue;
+				}
+				if(Bank.withdrawAll(itemID))
+				{
+					MethodProvider.sleepUntil(() -> Bank.count(itemID) <= 0, Sleep.calculate(2222, 2222));
 				}
 			} else Sleep.sleep(666, 666);
 		}
+		return false;
 	}
+	
 	
 	/**
 	 * Checks for Inventory and Equipment fulfilled. If strict, returns false if anything else in equipment or inventory.
@@ -575,12 +574,8 @@ public class InvEquip {
 		MethodProvider.log("Not fulfilled equipment! (strict: "+strict+")");
 		return false;
 	}
-	/**
-	 * Buys a thing at the GE for ever increasing price until we have total qty in bank + invy
-	 */
-	public static void buyItem(int itemID, int qty, long timeout)
+	public static void buyItem(int itemID, int qty, int pricePerItem, long timeout)
 	{
-		
 		if(qty <= 0) 
 		{
 			MethodProvider.log("Invoked Buy function with qty of 0! Returning ~~"+new Item(itemID,1).getName()+"~~");
@@ -605,7 +600,7 @@ public class InvEquip {
 			final int totalItemCount = Bank.count(itemID) + Inventory.count(itemID);
 			if(totalItemCount >= (initItemCount + qty)) 
 			{
-				if(GrandExchange.isOpen()) GrandExchange.close();
+				if(GrandExchange.isOpen()) GrandExchangg.close();
 				else return;
 				continue;
 			}
@@ -643,7 +638,7 @@ public class InvEquip {
 					continue;
 				}
 				if(!closeBankEquipment()) continue;
-				if(GrandExchange.isOpen() && GrandExchange.close()) 
+				if(GrandExchange.isOpen() && GrandExchangg.close()) 
 				{
 					Sleep.sleep(696, 420);
 					continue;
@@ -651,7 +646,7 @@ public class InvEquip {
 				if(BankLocation.GRAND_EXCHANGE.distance(Players.localPlayer().getTile()) < 50 && 
 						Bank.open(BankLocation.GRAND_EXCHANGE) )
 				{
-					Sleep.sleep(420, 696);
+					MethodProvider.sleepUntil(() -> Bank.isOpen(), Sleep.calculate(2222, 2222));
 					continue;
 				}
 				Walkz.goToGE(timer.remaining());
@@ -661,7 +656,7 @@ public class InvEquip {
 			{
 				if(Bank.isOpen()) 
 				{
-					Bank.close();
+					Bankz.close();
 					continue;
 				}
 				if(Walkz.goToGE(timer.remaining()))
@@ -711,8 +706,15 @@ public class InvEquip {
 					Sleep.sleep(420, 1111);
 					continue;
 				}
-				
-				int pricePer = (int)(priceIncrease * ((LivePrices.getHigh(itemID) * 1.25) + (LivePrices.getHigh(itemID) * (Calculations.random(25.0, 50.0) / 100))));
+				int purchaseTimeout = Sleep.calculate(5555, 5555); //amt of time to wait after purchase for sale to go through
+				int pricePer = pricePerItem;
+				if(pricePer <= 0) 
+				{
+					pricePer = (int)(priceIncrease * ((LivePrices.getHigh(itemID) * 1.25) + (LivePrices.getHigh(itemID) * (Calculations.random(25.0, 50.0) / 100))));
+					purchaseTimeout = (int) timer.remaining() - 10000;
+					if(purchaseTimeout < 5000) purchaseTimeout = 5000;
+				}
+				//have coins for this purchase?
 				int totalPrice = qty * pricePer;
 				if(Inventory.count(coins) < totalPrice)
 				{
@@ -722,7 +724,7 @@ public class InvEquip {
 				}
 				if(GrandExchange.buyItem(itemID, qty, pricePer))
 				{
-					MethodProvider.sleepUntil(() -> GrandExchange.isReadyToCollect(), Sleep.calculate(16666, 5555));
+					MethodProvider.sleepUntil(() -> GrandExchange.isReadyToCollect(), purchaseTimeout);
 					double tmp = priceIncrease + 0.2;
 					priceIncrease = tmp;
 					Sleep.sleep(111, 111);
@@ -731,6 +733,13 @@ public class InvEquip {
 			}
 		}
 		
+	}
+	/**
+	 * Buys a thing at the GE for ever increasing price until we have total qty in bank + invy
+	 */
+	public static void buyItem(int itemID, int qty, long timeout)
+	{
+		buyItem(itemID,qty,-1,timeout); //pass -1 as pricePerItem to trigger increasing price function rather than set price
 	}
 	
 	/**
@@ -1121,7 +1130,7 @@ public class InvEquip {
 							{
 								if(GrandExchange.isOpen()) 
 								{
-									if(GrandExchange.close())
+									if(GrandExchangg.close())
 									{
 										MethodProvider.sleepUntil(() -> !GrandExchange.isOpen(), Sleep.calculate(2222,2222));
 									}
@@ -1136,7 +1145,7 @@ public class InvEquip {
 								}
 								else
 								{
-									Tabs.open(Tab.INVENTORY);
+									Tabz.open(Tab.INVENTORY);
 								}
 								Sleep.sleep(69, 69);
 								continue;
@@ -1789,7 +1798,7 @@ public class InvEquip {
 
 		if(GrandExchange.isOpen()) 
 		{
-			GrandExchange.close();
+			GrandExchangg.close();
 			return false;
 		}
 		if(Equipment.contains(ID)) return true;
@@ -1815,13 +1824,9 @@ public class InvEquip {
 					break;
 				}
 			}
-			final int tmp = ID;
 			if(Inventory.interact(ID, action))
 			{
-				MethodProvider.sleepUntil(() -> {
-					if(Combatz.shouldEatFood(15)) Combatz.eatFood();
-					return Equipment.contains(tmp);
-				}, Sleep.calculate(2222, 2222));
+				MethodProvider.sleepUntil(() -> Equipment.contains(ID), Sleep.calculate(2222, 2222));
 			}
 			if(Equipment.contains(ID)) return true;
 			return false;
@@ -1829,9 +1834,9 @@ public class InvEquip {
 		else
 		{
 			if(Shop.isOpen()) Shop.close();
-			else if(Bank.isOpen()) Bank.close();
+			else if(Bank.isOpen()) Bankz.close();
 			else if(DepositBox.isOpen()) DepositBox.close();
-			else Tabs.open(Tab.INVENTORY);
+			else Tabz.open(Tab.INVENTORY);
 		}
 		return false;
 	}
@@ -1876,7 +1881,7 @@ public class InvEquip {
 				Widgets.closeAll();
 				Sleep.sleep(111, 111);
 			}
-			else Tabs.open(Tab.INVENTORY);
+			else Tabz.open(Tab.INVENTORY);
 		}
 		return false;
 	}
@@ -1929,7 +1934,7 @@ public class InvEquip {
 			return false;
 		} 
 		
-		else if(GrandExchange.isOpen()) GrandExchange.close();
+		else if(GrandExchange.isOpen()) GrandExchangg.close();
 		else if(Bankz.openClosest(75)) Sleep.sleep(666, 666);
 		
 		return false;
@@ -1940,7 +1945,7 @@ public class InvEquip {
 		{
 			if(!Inventory.dropAll(i -> i!=null && 
 					i.getID() != -1 && 
-					(i.getID() == TrainRanged.jug || 
+					(i.getID() == id.jug || 
 					i.getID() == id.vial)))
 			{
 				Combatz.eatFood();
@@ -1955,7 +1960,7 @@ public class InvEquip {
 		{
 			if(!Inventory.dropAll(i -> i!=null && 
 					i.getID() != -1 && 
-					(i.getID() == TrainRanged.jug || 
+					(i.getID() == id.jug || 
 					i.getID() == id.vial)))
 			{
 				Combatz.eatFood();
@@ -2143,7 +2148,4 @@ public class InvEquip {
 	public static int wealth5 = 11980;
 	public static boolean collectBank = false;
 	
-	public static final int ironDart = 807;
-	public static final int steelDart = 808;
-	public static final int mithDart = 809;
 }

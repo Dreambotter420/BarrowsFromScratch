@@ -16,8 +16,7 @@ public class OnTutorialIsland extends Leaf
 
 	@Override
 	public int onLoop() {
-		MethodProvider.log("Please complete tutorial island manually thanks ;-) it reduces ban-rates ya know? K thx bye");
-		
+		MethodProvider.log("Please complete tutorial island, preferrably legit on RuneLite or Mobile ;-) it reduces ban-rates ya know? K thx bye");
 		return -1;
 	}
     

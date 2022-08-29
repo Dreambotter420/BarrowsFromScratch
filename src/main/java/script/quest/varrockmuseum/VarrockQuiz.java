@@ -12,6 +12,7 @@ import script.framework.Leaf;
 import script.framework.Tree;
 import script.utilities.API;
 import script.utilities.Locations;
+import script.utilities.Questz;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -22,7 +23,6 @@ import java.util.List;
  */
 public class VarrockQuiz extends Leaf {
 	public static boolean started = false;
-	public static boolean completedQuiz = false;
 	private final static Tile stairTile = new Tile(1759,4958,0);
     public static int onStart() {
         MethodProvider.log("Generating Random Pattern: ");
@@ -71,22 +71,23 @@ public class VarrockQuiz extends Leaf {
         );
     }
     
-    
+    public static boolean completed()
+    {
+    	return PlayerSettings.getBitValue(3688) == 1;
+    }
     @Override
     public int onLoop() {
         if(!started) return onStart();
-    	if (PlayerSettings.getBitValue(3688) == 1) {
+    	if (completed()) {
     		if(onExit()) //returns true if out of museum dungeon
     		{
-    			 MethodProvider.log("[COMPLETED] -> Museum Quiz");
-    			 Main.customPaintText1 = "~~~~~~~~~~";
+    			MethodProvider.log("[COMPLETED] -> Museum Quiz");
+    			Main.customPaintText1 = "~~~~~~~~~~";
          		Main.customPaintText2 = "~Quest Complete~";
          		Main.customPaintText3 = "~Varrock Museum Quiz~";
          		Main.customPaintText4 = "~~~~~~~~~~";
-    	         completedQuiz = true;
-    	         API.mode = null;
+    	        API.mode = null;
     		}
-            
             return Timing.sleepLogNormalSleep();
         }
     	

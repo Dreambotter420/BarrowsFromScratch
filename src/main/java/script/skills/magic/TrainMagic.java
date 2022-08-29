@@ -1,5 +1,6 @@
 package script.skills.magic;
 
+import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -47,11 +48,14 @@ import script.skills.ranged.TrainRanged;
 import script.utilities.API;
 import script.utilities.Bankz;
 import script.utilities.Combatz;
+import script.utilities.GrandExchangg;
 import script.utilities.InvEquip;
 import script.utilities.ItemsOnGround;
 import script.utilities.Locations;
 import script.utilities.Paths;
+import script.utilities.Skillz;
 import script.utilities.Sleep;
+import script.utilities.Tabz;
 import script.utilities.Walkz;
 import script.utilities.id;
 /**
@@ -63,8 +67,6 @@ import script.utilities.id;
 public class TrainMagic extends Leaf {
 	public static boolean initialized = false;
 	public static boolean completedMagic = false;
-	public static int magic = 0;
-	public static int def = 0;
     public void onStart() {
         Main.clearCustomPaintText();
         initialized = true;
@@ -88,8 +90,8 @@ public class TrainMagic extends Leaf {
             if(onExit()) API.mode = null;
             return Timing.sleepLogNormalSleep();
     	}
-       	magic = Skills.getRealLevel(Skill.MAGIC);
-       	def = Skills.getRealLevel(Skill.DEFENCE);
+       	int magic = Skills.getRealLevel(Skill.MAGIC);
+       	int def = Skills.getRealLevel(Skill.DEFENCE);
     	if(magic >= DecisionLeaf.mageSetpoint) {
             MethodProvider.log("[COMPLETE] -> lvl "+DecisionLeaf.mageSetpoint+" magic!");
             if(onExit()) 
@@ -100,6 +102,8 @@ public class TrainMagic extends Leaf {
             
             return Timing.sleepLogNormalSleep();
         }
+
+    	if(Skillz.shouldCheckSkillInterface()) Skillz.checkSkillProgress(Skill.MAGIC);
     	if(magic < 45) trainLesserDemon();
     	else if(magic < 55) teleportCamelot();
     	else if(magic < 75) highAlch();
@@ -178,7 +182,7 @@ public class TrainMagic extends Leaf {
 			chancedXPAlch = true;
 		}
 		if(!InvEquip.checkedBank()) return;
-		API.randomAFK(20);
+		API.randomAFK(10);
 		if(Equipment.contains(id.staffOfFire) && Inventory.count(id.natureRune) > 0)
 		{
 			List<Integer> profitKeys = new ArrayList(id.approvedAlchs.keySet());
@@ -234,11 +238,7 @@ public class TrainMagic extends Leaf {
 							if(Bank.count(i) > 0)
 							{
 								MethodProvider.log("Attempting withdraw of item: "+new Item(i,1).getName());
-								if(Bank.withdrawAll(i))
-								{
-									MethodProvider.sleepUntil(() -> Bank.count(i) <= 0, Sleep.calculate(2222, 2222));
-									Sleep.sleep(69, 1111);
-								}
+								InvEquip.withdrawAll(i, true, 180000);
 							}
 						}
 						return;
@@ -250,9 +250,7 @@ public class TrainMagic extends Leaf {
 				return;
 			}
 			if(foundAlch)
-			{
-				MethodProvider.log("Found alchs in invy already - bank emptied of alchs");
-				
+			{				
 				if(Dialogues.canContinue()) 
 				{
 					Dialogues.continueDialogue();
@@ -299,14 +297,14 @@ public class TrainMagic extends Leaf {
 	    				}
 	    				else
 	    				{
-	    					Keyboard.type(Integer.toString(API.roundToMultiple((int) Calculations.nextGaussianRandom(75000,20000),500)), foundAlch);
+	    					Keyboard.type(Integer.toString(API.roundToMultiple((int) Calculations.nextGaussianRandom(75000,20000),500)), true);
 	    					Sleep.sleep(1111, 4444);
 	    					return;
 	    				}
 		    		}
 					if(!Tabs.isOpen(Tab.MAGIC))
 					{
-						Tabs.open(Tab.MAGIC);
+						Tabz.open(Tab.MAGIC);
 						return;
 					}
 					if(Magic.interact(Normal.HIGH_LEVEL_ALCHEMY, "Warnings"))
@@ -328,13 +326,13 @@ public class TrainMagic extends Leaf {
 							}
 							if(Bank.isOpen()) 
 							{
-								Bank.close();
+								Bankz.close();
 								return;
 							}
 							if(GrandExchange.isOpen())
 							{
 								if(GrandExchange.isReadyToCollect()) GrandExchange.collect();
-								if(!GrandExchange.isReadyToCollect()) GrandExchange.close();
+								if(!GrandExchange.isReadyToCollect()) GrandExchangg.close();
 								return;
 							}
 							if(Magic.isSpellSelected())
@@ -373,18 +371,18 @@ public class TrainMagic extends Leaf {
 						}
 						if(Bank.isOpen()) 
 						{
-							Bank.close();
+							Bankz.close();
 							return;
 						}
 						if(GrandExchange.isOpen())
 						{
 							if(GrandExchange.isReadyToCollect()) GrandExchange.collect();
-							if(!GrandExchange.isReadyToCollect()) GrandExchange.close();
+							if(!GrandExchange.isReadyToCollect()) GrandExchangg.close();
 							return;
 						}
 						if(!Tabs.isOpen(Tab.INVENTORY))
 						{
-							Tabs.open(Tab.INVENTORY);
+							Tabz.open(Tab.INVENTORY);
 							return;
 						}
 						
@@ -427,19 +425,18 @@ public class TrainMagic extends Leaf {
 					if(GrandExchange.isOpen())
 					{
 						if(GrandExchange.isReadyToCollect()) GrandExchange.collect();
-						if(!GrandExchange.isReadyToCollect()) GrandExchange.close();
+						if(!GrandExchange.isReadyToCollect()) GrandExchangg.close();
 						return;
 					}
 					if(Bank.isOpen())
 					{
-						Bank.close();
+						Bankz.close();
 						return;
 					}
 					if(!Walkz.walkPath(Paths.toHASpot1) && 
 							!Walkz.walkPath(Paths.toHASpot2) && 
 							!Walkz.useJewelry(InvEquip.duel, "PvP Arena"))
 					{
-						
 						InvEquip.buyItem(InvEquip.duel8, (int) Calculations.nextGaussianRandom(2, 1), 180000);
 					}
 					return;
@@ -454,13 +451,13 @@ public class TrainMagic extends Leaf {
 					}
 					if(Bank.isOpen()) 
 					{
-						Bank.close();
+						Bankz.close();
 						return;
 					}
 					if(GrandExchange.isOpen())
 					{
 						if(GrandExchange.isReadyToCollect()) GrandExchange.collect();
-						if(!GrandExchange.isReadyToCollect()) GrandExchange.close();
+						if(!GrandExchange.isReadyToCollect()) GrandExchangg.close();
 						return;
 					}
 					if(Magic.isSpellSelected())
@@ -499,18 +496,18 @@ public class TrainMagic extends Leaf {
 				}
 				if(Bank.isOpen()) 
 				{
-					Bank.close();
+					Bankz.close();
 					return;
 				}
 				if(GrandExchange.isOpen())
 				{
 					if(GrandExchange.isReadyToCollect()) GrandExchange.collect();
-					if(!GrandExchange.isReadyToCollect()) GrandExchange.close();
+					if(!GrandExchange.isReadyToCollect()) GrandExchangg.close();
 					return;
 				}
 				if(!Tabs.isOpen(Tab.INVENTORY))
 				{
-					Tabs.open(Tab.INVENTORY);
+					Tabz.open(Tab.INVENTORY);
 					return;
 				}
 				
@@ -545,6 +542,274 @@ public class TrainMagic extends Leaf {
 			fulfillHA();
 		}
 	}
+	public static Timer quickHATimer = null;
+	public static final Rectangle perfectHAClickSpot = new Rectangle(709,302,13,14);
+	/**
+	 * returns true if have HA items in inventory.
+	 * returns false otherwise and tries to withdraw/buy more
+	 * @return
+	 */
+	public static boolean haveHAItems()
+	{
+		if(!InvEquip.checkedBank() ||
+				(quickHATimer != null && !quickHATimer.finished())) return false;
+		if(Equipment.contains(id.staffOfFire) && Inventory.count(id.natureRune) > 0)
+		{
+			//combine profit and longbow alch lists
+			List<Integer> profitKeys = new ArrayList(id.approvedAlchs.keySet());
+			List<Integer> longbowKeys = new ArrayList(id.xpAlchs.keySet());
+			List<Integer> keys = new ArrayList<Integer>();
+			keys.addAll(profitKeys);
+			keys.addAll(longbowKeys);
+			Collections.shuffle(keys);
+			boolean foundAlch = false;
+			boolean bankedAlchs = false;
+			for(Integer i : keys)
+			{
+				if(Bank.count(i) > 0) bankedAlchs = true;
+				if(Inventory.count(i) > 0 || 
+						Inventory.count(new Item(i,1).getNotedItemID()) > 0)
+				{
+					foundAlch = true;
+				}
+			}
+			if(bankedAlchs)
+			{
+				MethodProvider.log("Found banked alchs");
+				if(Locations.HASpot1.contains(Players.localPlayer()))
+				{
+					if(!Walkz.useJewelry(InvEquip.wealth, "Grand Exchange"))
+					{
+						if(GameObjects.closest("Ladder").interact("Climb-down"))
+						{
+							MethodProvider.sleepUntil(() -> !Locations.HASpot1.contains(Players.localPlayer()),
+									() -> Players.localPlayer().isMoving(),
+									Sleep.calculate(2222, 2222),50);
+						}
+					}
+					return false;
+				}
+				if(Bankz.openClosest(85))
+				{
+					if(Bank.getWithdrawMode() == BankMode.NOTE)
+					{
+						for(Integer i : keys)
+						{
+							if(Bank.count(i) > 0)
+							{
+								MethodProvider.log("Attempting withdraw of item: "+new Item(i,1).getName());
+								if(Bank.withdrawAll(i))
+								{
+									MethodProvider.sleepUntil(() -> Bank.count(i) <= 0, Sleep.calculate(2222, 2222));
+									Sleep.sleep(69, 1111);
+								}
+							}
+						}
+						return false;
+					}
+					Bank.setWithdrawMode(BankMode.NOTE);
+					return false;
+				}
+				return false;
+			}
+			if(foundAlch)
+			{
+				return true;
+			}
+			else BuyHighAlchs.buyItems(true);
+		} 
+		else 
+		{
+			fulfillHA();
+		}
+		return false;
+	}
+	public static void quickHighAlch()
+	{
+		if(Dialogues.canContinue()) 
+		{
+			Dialogues.continueDialogue();
+			return;
+		}
+		if(Dialogues.isProcessing()) return;
+		if((Widgets.getWidgetChild(193,2) != null && 
+				Widgets.getWidgetChild(193,2).isVisible() && 
+				Widgets.getWidgetChild(193,2).getText().contains("That item is considered <col=6f0000>valuable") ||
+				(Dialogues.areOptionsAvailable() && Dialogues.chooseFirstOptionContaining("Proceed to cast High Alchemy on it."))))
+		{
+			changeVarbit = true;
+			return;
+		}
+		if(changeVarbit)
+		{
+			if(PlayerSettings.getBitValue(HAWarningThresholdVarbit) >= 50000)
+			{
+				MethodProvider.log("Succesfully changed HA Warnings to greater than 50k!");
+				changeVarbit = false;
+				return;
+			}
+			if(Dialogues.canContinue()) 
+			{
+				Dialogues.continueDialogue();
+				return;
+			}
+			if(Dialogues.areOptionsAvailable())
+			{
+				if(Dialogues.chooseFirstOptionContaining("Set value threshold")) return;
+				MethodProvider.log("Options are available but not the set value threshold one we want in HA varbit function...");
+				Map.interact(Players.localPlayer().getTile());
+				Sleep.sleep(420, 696);
+				return;
+			}
+			if(Widgets.getWidgetChild(162, 41) != null && 
+        			Widgets.getWidgetChild(162, 41).isVisible() && 
+        			Widgets.getWidgetChild(162, 41).getText().contains("Set value threshold for alchemy warnings:"))
+        	{
+				if(Widgets.getWidgetChild(162, 42).getText().length() > 1)
+				{
+					Keyboard.typeSpecialKey(8);
+					return;
+				}
+				else
+				{
+					Keyboard.type(Integer.toString(API.roundToMultiple((int) Calculations.nextGaussianRandom(75000,20000),500)), true);
+					Sleep.sleep(1111, 4444);
+					return;
+				}
+    		}
+			if(!Tabs.isOpen(Tab.MAGIC))
+			{
+				Tabz.open(Tab.MAGIC);
+				return;
+			}
+			if(Magic.interact(Normal.HIGH_LEVEL_ALCHEMY, "Warnings"))
+			{
+				MethodProvider.sleepUntil(Dialogues::inDialogue,Sleep.calculate(2222, 2222));
+				return;
+			}
+			return;
+		}
+		if(id.allAlchs.contains(new Item(Inventory.getIdForSlot(11),1).getUnnotedItemID()))
+		{
+			//can HA now :-)
+			if(Bank.isOpen()) 
+			{
+				Bankz.close();
+				return;
+			}
+			if(GrandExchange.isOpen())
+			{
+				if(GrandExchange.isReadyToCollect()) GrandExchange.collect();
+				if(!GrandExchange.isReadyToCollect()) GrandExchangg.close();
+				return;
+			}
+			if(Magic.isSpellSelected())
+			{
+				if(Magic.getSelectedSpellName().contains("High Level Alchemy"))
+				{
+					if(!Tabs.isOpen(Tab.INVENTORY))
+					{
+						Tabz.open(Tab.INVENTORY);
+						Sleep.sleep(69, 111);
+						return;
+					}
+					if(perfectHAClickSpot.contains(Mouse.getPosition()))
+					{
+						if(Mouse.click(ClickMode.LEFT_CLICK))
+						{
+							quickHATimer = new Timer((int) Calculations.nextGaussianRandom(3500, 500));
+							Sleep.sleep(69, 420);
+						}
+						return;
+					}
+					if(Mouse.move(perfectHAClickSpot))
+					{
+						Sleep.sleep(111, 696);
+					}
+					return;
+				}
+			}
+			if(!Tabs.isOpen(Tab.MAGIC))
+			{
+				Tabz.open(Tab.MAGIC);
+				Sleep.sleep(69, 111);
+				return;
+			}
+			if(Mouse.move(perfectHAClickSpot))
+			{
+				Sleep.sleep(69, 420);
+			}
+			if(perfectHAClickSpot.contains(Mouse.getPosition()))
+			{
+				if(Mouse.click(ClickMode.LEFT_CLICK))
+				{
+					Sleep.sleep(69, 420);
+					if(Mouse.click(ClickMode.LEFT_CLICK))
+					{
+						quickHATimer = new Timer((int) Calculations.nextGaussianRandom(3500, 500));
+						Sleep.sleep(69, 420);
+					}
+				}
+				return;
+			}
+			return;
+		}
+		//have to drag another HA item to slot 11 to be able to double-click cast HA
+		final List<Integer> keysFinal = id.allAlchs; //???
+		Item alch = Inventory.get(i -> i!=null && 
+				keysFinal.contains(i.getUnnotedItemID()));
+		if(alch == null)
+		{
+			MethodProvider.log("Alch found but first alch found null!");
+			return;
+		}
+		if(Bank.isOpen()) 
+		{
+			Bankz.close();
+			return;
+		}
+		if(GrandExchange.isOpen())
+		{
+			if(GrandExchange.isReadyToCollect()) GrandExchange.collect();
+			if(!GrandExchange.isReadyToCollect()) GrandExchangg.close();
+			return;
+		}
+		if(!Tabs.isOpen(Tab.INVENTORY))
+		{
+			Tabz.open(Tab.INVENTORY);
+			return;
+		}
+		if(Magic.isSpellSelected())
+		{
+			Magic.deselect();
+			return;
+		}
+		if(Inventory.isItemSelected())
+		{
+			Inventory.deselect();
+			return;
+		}
+		
+		if(Mouse.move(Inventory.slotBounds(alch.getSlot())))
+		{
+			Sleep.sleep(69, 696);
+		}
+		
+		if(!Inventory.slotBounds(alch.getSlot()).contains(Mouse.getPosition()))
+		{
+			if(Mouse.move(Inventory.slotBounds(alch.getSlot())))
+			{
+				Sleep.sleep(69, 696);
+			}
+		}
+		if(Inventory.slotBounds(alch.getSlot()).contains(Mouse.getPosition()))
+		{
+			if(Mouse.drag(Inventory.slotBounds(11)))
+			{
+				Sleep.sleep(696, 696);
+			}
+		}
+	}
 	
 	public static void teleportCamelot()
 	{
@@ -558,19 +823,19 @@ public class TrainMagic extends Leaf {
 		}
 		if(Bank.isOpen()) 
 		{
-			Bank.close();
+			Bankz.close();
 			Sleep.sleep(420, 696);
 			return;
 		}
 		if(Tabs.isOpen(Tab.MAGIC))
 		{
-			API.randomAFK(17);
+			API.randomAFK(10);
 			Magic.castSpell(Normal.CAMELOT_TELEPORT);
 			Sleep.sleep(696, 696);
 			MethodProvider.sleepUntil(() -> !Players.localPlayer().isAnimating(), Sleep.calculate(2222, 2222));
 			return;
 		} 
-		Tabs.open(Tab.MAGIC);
+		Tabz.open(Tab.MAGIC);
 		Sleep.sleep(420, 696);
 	}
 	public static void trainLesserDemon()
@@ -596,6 +861,8 @@ public class TrainMagic extends Leaf {
 			//check for glory in invy + not equipped -> equip it
 			if(InvEquip.getInvyItem(InvEquip.wearableGlory) != 0 && 
 					!InvEquip.equipmentContains(InvEquip.wearableGlory)) InvEquip.equipItem(InvEquip.getInvyItem(InvEquip.wearableGlory));
+
+	       	int magic = Skills.getRealLevel(Skill.MAGIC);
 			if(magic >= 33)
 			{
 				GroundItem gi = ItemsOnGround.getValuableNearbyItem(7000, Locations.lesserDemonsKillZoneWizardsTower, completedMagic);
@@ -605,7 +872,7 @@ public class TrainMagic extends Leaf {
 					{
 						if(Inventory.isFull())
 						{
-							if(Inventory.dropAll(TrainRanged.jug))
+							if(Inventory.dropAll(id.jug))
 							{
 								MethodProvider.log("Dropped some jugs");
 								return;
@@ -738,7 +1005,7 @@ public class TrainMagic extends Leaf {
     	
     	InvEquip.addInvyItem(InvEquip.passage, 1, 1, false, 2);
     	InvEquip.shuffleFulfillOrder();
-    	InvEquip.addInvyItem(TrainRanged.jugOfWine, 3, 10, false, (int) Calculations.nextGaussianRandom(500, 100));
+    	InvEquip.addInvyItem(Combatz.lowFood, 3, 10, false, (int) Calculations.nextGaussianRandom(500, 100));
     	InvEquip.addInvyItem(InvEquip.coins, 0, 0, false, 0);
 		if(InvEquip.fulfillSetup(true, 180000))
 		{
@@ -784,13 +1051,13 @@ public class TrainMagic extends Leaf {
     	InvEquip.setEquipItem(EquipmentSlot.WEAPON, id.staffOfFire);
     	InvEquip.addInvyItem(id.natureRune,100,(int) Calculations.nextGaussianRandom(1200,200),false,(int) Calculations.nextGaussianRandom(1500,100));
     	InvEquip.shuffleFulfillOrder();
-		if(InvEquip.fulfillSetup(true, 180000))
+		if(InvEquip.fulfillSetup(false, 180000))
 		{
-			MethodProvider.log("[TRAIN MAGIC] -> Fulfilled equipment correctly for HA!");
+			MethodProvider.log("[TRAIN MAGIC] -> Fulfilled equipment correctly for quick HA!");
 			return true;
 		} else 
 		{
-			MethodProvider.log("[TRAIN MAGIC] -> NOT fulfilled equipment correctly for HA!");
+			MethodProvider.log("[TRAIN MAGIC] -> NOT fulfilled equipment correctly for quick HA!");
 			return false;
 		}
     	
@@ -807,56 +1074,54 @@ public class TrainMagic extends Leaf {
     	
     }
 
-	public static final int blackRobe = 581;
-	public static final int xericianTop = 13387;
-	public static final int robeTopOfDarkness = 20131;
 	public static int getBestBodySlot()
 	{
-		if(def >= 20 && magic >= 40) return robeTopOfDarkness;
-		if(def >= 10 && magic >= 20) return xericianTop;
-		return blackRobe;
+       	int magic = Skills.getRealLevel(Skill.MAGIC);
+       	int def = Skills.getRealLevel(Skill.DEFENCE);
+		if(def >= 20 && magic >= 40) return id.robeTopOfDarkness;
+		if(def >= 10 && magic >= 20) return id.xericianTop;
+		return id.blackRobe;
 	}
 	
 	
 	
-	public static final int guthixCloak = 10448;
 	public static int getBestCapeSlot()
 	{
-		if(Skills.getRealLevel(Skill.PRAYER) >= 40) return guthixCloak;
-		if(InvEquip.equipmentContains(TrainRanged.randCapes)) return InvEquip.getEquipmentItem(TrainRanged.randCapes);
-    	if(InvEquip.invyContains(TrainRanged.randCapes)) return InvEquip.getInvyItem(TrainRanged.randCapes);
-    	if(InvEquip.bankContains(TrainRanged.randCapes)) return InvEquip.getBankItem(TrainRanged.randCapes);
-    	return TrainRanged.randCape;
+		//guthix cloaks maybe wont ever buy due to extreme low traded qty :-(
+		//if(Skills.getRealLevel(Skill.PRAYER) >= 40) return id.guthixCloak; 
+		if(InvEquip.equipmentContains(id.randCapes)) return InvEquip.getEquipmentItem(id.randCapes);
+    	if(InvEquip.invyContains(id.randCapes)) return InvEquip.getInvyItem(id.randCapes);
+    	if(InvEquip.bankContains(id.randCapes)) return InvEquip.getBankItem(id.randCapes);
+    	return id.randCape;
 	}
-	public static final int mysticBoots = 4097;
-	public static final int blueBoots = 630;
 	public static int getBestBootSlot()
 	{
-		if(def >= 20 && magic >= 40) return mysticBoots;
-		return blueBoots;
+       	int magic = Skills.getRealLevel(Skill.MAGIC);
+       	int def = Skills.getRealLevel(Skill.DEFENCE);
+		if(def >= 20 && magic >= 40) return id.mysticBoots;
+		return id.blueBoots;
 	}
-	public static final int ancientMitre = 12203;
-	public static final int hoodOfDarkness = 20128;
-	public static final int creamHat = 662;
 	public static int getBestHatSlot()
 	{
-		if(Skills.getRealLevel(Skill.PRAYER) >= 40 && magic >= 40) return ancientMitre;
-		if(def >= 20 && magic >= 40) return hoodOfDarkness;
-		return creamHat;
+       	int magic = Skills.getRealLevel(Skill.MAGIC);
+       	int def = Skills.getRealLevel(Skill.DEFENCE);
+		if(Skills.getRealLevel(Skill.PRAYER) >= 40 && magic >= 40) return id.ancientMitre;
+		if(def >= 20 && magic >= 40) return id.hoodOfDarkness;
+		return id.creamHat;
 	}
-	public static final int robeBottomOfDarkness = 20137;
-	public static final int xericianRobe = 13389;
-	public static final int zamorakMonkBottom = 1033;
 	public static int getBestLegsSlot()
 	{
-		if(def >= 20 && magic >= 40) return robeBottomOfDarkness;
-		if(def >= 10 && magic >= 20) return xericianRobe;
-		return zamorakMonkBottom;
+       	int magic = Skills.getRealLevel(Skill.MAGIC);
+       	int def = Skills.getRealLevel(Skill.DEFENCE);
+		if(def >= 20 && magic >= 40) return id.robeBottomOfDarkness;
+		if(def >= 10 && magic >= 20) return id.xericianRobe;
+		return id.zamorakMonkBottom;
 	}
 
 	public static final int occultNecklace = 20137;
 	public static int getBestNecklaceSlot()
 	{
+       	int magic = Skills.getRealLevel(Skill.MAGIC);
 		if(magic >= 60) return occultNecklace;
 		return InvEquip.glory;
 	}

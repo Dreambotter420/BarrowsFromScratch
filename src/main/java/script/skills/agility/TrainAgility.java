@@ -52,11 +52,6 @@ public class TrainAgility extends Leaf{
 			final int agility = Skills.getRealLevel(Skill.AGILITY);
 			if(agility < 10) course = courses.GNOME_STRONGHOLD;
 			else if(agility < 20) course = courses.DRAYNOR;
-			else if(agility < 30) 
-			{
-				if((int) Calculations.nextGaussianRandom(100, 50) >= 500) course = courses.DRAYNOR;
-				else course = courses.AL_KHARID;
-			}
 			else course = courses.VARROCK;
 			MethodProvider.log("Set agility course: " + course.toString());
 			courseCheckTimer = new Timer((int) Calculations.nextGaussianRandom(900000, 180000));

@@ -140,8 +140,8 @@ public class DecisionLeaf extends Leaf{
 		final boolean fremmyTrialsDone = FremennikTrials.completed();
 		final boolean horrorDone = HorrorFromTheDeep.completedHorrorFromTheDeep;
 		final boolean ernestDone = ErnestTheChicken.completed();
-		final boolean animalMagnetized = AnimalMagnetism.completedAnimalMagnetism;
-		final boolean natureSpirited = true;
+		final boolean animalMagnetized = AnimalMagnetism.completed();
+		final boolean natureSpirited = NatureSpirit.completed();
 		final boolean mageArena1Done = MageArena1.completed();
 		final boolean mageArena2Done = MageArena2.completedMageArena2;
 		final boolean priestSaved = PriestInPeril.completed();
@@ -160,11 +160,6 @@ public class DecisionLeaf extends Leaf{
 						if(ranged >= 30 && !validModes.contains(modes.TRAIN_SLAYER)) validModes.add(modes.TRAIN_SLAYER);
 						else if(!validModes.contains(modes.TRAIN_RANGE)) validModes.add(modes.TRAIN_RANGE);
 					}
-					else {
-						MethodProvider.log("Somehow the account has unlocked Morytania with Priest in Peril without");
-						MethodProvider.log("getting 18 slayer! Need to get 18 slayer manually, good luck with morytania tasks.");
-						return -1;
-					}
 				}
 			} else { // slayer past point!! Can do priest in peril now :-)
 				if(!priestSaved && !validModes.contains(modes.PRIEST_IN_PERIL)) validModes.add(modes.PRIEST_IN_PERIL);
@@ -174,18 +169,13 @@ public class DecisionLeaf extends Leaf{
 		
 		if(!animalMagnetized)
 		{
+			if(slayer >= slayerSetpoint && ranged >= 50 && crafting >= craftingSetpoint && ernestDone && restedGhost && natureSpirited) validModes.add(modes.ANIMAL_MAGNETISM);
 			if(slayer < slayerSetpoint) {
 				if(!quizzed && !validModes.contains(modes.VARROCK_QUIZ)) validModes.add(modes.VARROCK_QUIZ);
 				else {
 					if(!priestSaved) {
 						if(ranged >= 50 && !validModes.contains(modes.TRAIN_SLAYER)) validModes.add(modes.TRAIN_SLAYER);
 						else if(!validModes.contains(modes.TRAIN_RANGE)) validModes.add(modes.TRAIN_RANGE);
-					}
-					else 
-					{
-						MethodProvider.log("Somehow the account has unlocked Morytania with Priest in Peril without");
-						MethodProvider.log("getting 18 slayer! Need to get 18 slayer manually, good luck with morytania tasks...");
-						return -1;
 					}
 				}
 			} else { // slayer past point!! Can do priest in peril now :-)
@@ -258,7 +248,7 @@ public class DecisionLeaf extends Leaf{
 			}
 			
 			//testing
-			//API.mode = modes.NATURE_SPIRIT;
+			//API.mode = modes.ANIMAL_MAGNETISM;
 			
 			
 			MethodProvider.log("Switching mode: " + API.mode.toString());

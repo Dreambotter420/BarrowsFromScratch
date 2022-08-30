@@ -63,7 +63,6 @@ import script.utilities.id;
 public class TrainPrayer extends Leaf {
 	public static final int constructionBook = 8463;
 	public static boolean initialized = false;
-	public static final int dBones = 536;
 	public static int neededBones = 0;
 	public static final int xpPerBone = 252;
 	public static int bonesToGoal = 0;
@@ -275,7 +274,7 @@ public class TrainPrayer extends Leaf {
     	if(Skillz.shouldCheckSkillInterface()) Skillz.checkSkillProgress(Skill.PRAYER);
     	if(Locations.isInstanced())
     	{
-    		if(Inventory.count(dBones) <= 0 || forceLeaveShitHouse) 
+    		if(Inventory.count(id.dBones) <= 0 || forceLeaveShitHouse) 
     		{
     			leaveHouse();
     			return Timing.sleepLogNormalSleep();
@@ -389,7 +388,7 @@ public class TrainPrayer extends Leaf {
     					List<Integer> boneSlots = new ArrayList<Integer>();
         				for(Item bones : Inventory.all())
         				{
-        					if(bones != null && bones.getID() == dBones) 
+        					if(bones != null && bones.getID() == id.dBones) 
         					{
         						boolean break1 = false;
         						for(int bannedSlot : usedSlots) {
@@ -411,7 +410,7 @@ public class TrainPrayer extends Leaf {
     				else Tabz.open(Tab.INVENTORY);
     				Sleep.sleep(69, 69);
     			}
-    			else if(!Inventory.getSelectedItemName().contains(new Item(dBones,1).getName()))
+    			else if(!Inventory.getSelectedItemName().contains(new Item(id.dBones,1).getName()))
     			{
     				MethodProvider.log("Something NOT dbones selected: "+Inventory.getSelectedItemName());
     				
@@ -455,12 +454,12 @@ public class TrainPrayer extends Leaf {
 					if(Players.localPlayer().isMoving()) MethodProvider.sleepUntil(() -> !Players.localPlayer().isMoving(), Sleep.calculate(2222, 2222));
 		    		if(Players.localPlayer().isAnimating())
 		    		{
-		    			MethodProvider.sleepUntil(() -> Inventory.count(dBones) <= 0 || 
+		    			MethodProvider.sleepUntil(() -> Inventory.count(id.dBones) <= 0 || 
 		    					Dialogues.inDialogue() || 
 		    					!Locations.isInstanced() ||
 		    					GameObjects.all(litBurnersFilter).size() <= 1,
 		    					() -> (Players.localPlayer().isAnimating() || Players.localPlayer().isMoving()), Sleep.calculate(2222, 2222),50);
-		    		 	if(Inventory.count(dBones) <= 0 || 
+		    		 	if(Inventory.count(id.dBones) <= 0 || 
 		    		 			GameObjects.all(litBurnersFilter).size() <= 1 || 
 		    		 			Locations.isInstanced()) return Timing.sleepLogNormalSleep();
 		    		}
@@ -499,16 +498,16 @@ public class TrainPrayer extends Leaf {
     		usedSlots.clear();
     		forceLeaveShitHouse = false;
     		announcedShitHouse = false;
-    		if(Inventory.count(dBones) >= 1)
+    		if(Inventory.count(id.dBones) >= 1)
     		{
     			if(Locations.rimmington.contains(Players.localPlayer())) 
     			{
     				chooseRandomAltarHouse();
     			}
-    			else Walkz.teleportHouse(180000);
+    			else Walkz.teleportOutsideHouse(180000);
     			return Timing.sleepLogNormalSleep();
     		} 
-    		if(Inventory.count(new Item(dBones,1).getNotedItemID()) > 0) 
+    		if(Inventory.count(new Item(id.dBones,1).getNotedItemID()) > 0) 
     		{
     			//check if Phials nearby
     	    	NPC phials = NPCs.closest("Phials");
@@ -521,7 +520,7 @@ public class TrainPrayer extends Leaf {
     	        			Tabz.open(Tab.INVENTORY);
     	        			return Timing.sleepLogNormalInteraction();
     	        		}
-    	    			Item bonesNoted = Inventory.get(new Item(TrainPrayer.dBones,1).getNotedItemID());
+    	    			Item bonesNoted = Inventory.get(new Item(id.dBones,1).getNotedItemID());
     	        		if(bonesNoted.useOn(phials))
 	        			{
 	        				MethodProvider.sleepUntil(Dialogues::inDialogue, () -> Players.localPlayer().isMoving(), Sleep.calculate(2222,2222), 50);
@@ -530,7 +529,7 @@ public class TrainPrayer extends Leaf {
     	    	}
     	    	else
     	    	{
-    	    		if(Locations.rimmington.distance(Players.localPlayer().getTile()) > 45) Walkz.teleportHouse(180000);
+    	    		if(Locations.rimmington.distance(Players.localPlayer().getTile()) > 45) Walkz.teleportOutsideHouse(180000);
         			else if(Walking.shouldWalk(6) && Walking.walk(Locations.rimmington.getCenter())) Sleep.sleep(420,1111);
     	    		
     	    	}
@@ -538,7 +537,7 @@ public class TrainPrayer extends Leaf {
     		} 
     		//check bank for stuff
 	    	if(!InvEquip.checkedBank()) return Timing.sleepLogNormalSleep();
-	    	final int totalBones = Bank.count(dBones) + Inventory.count(dBones) + Inventory.count(new Item(dBones,1).getNotedItemID());
+	    	final int totalBones = Bank.count(id.dBones) + Inventory.count(id.dBones) + Inventory.count(new Item(id.dBones,1).getNotedItemID());
 	    	if(totalBones < bonesToGoal)
 	    	{
 	    		neededBones = bonesToGoal - totalBones;
@@ -546,7 +545,7 @@ public class TrainPrayer extends Leaf {
 	    	Main.customPaintText3 = "total # bones (invy unnoted + noted + bank): " + totalBones;
 	    	Main.customPaintText4 = "total # bones missing to goal: " + neededBones;
 	    	//withdraw all dBones noted
-	    	if(Bank.contains(dBones) || totalBones < bonesToGoal || Inventory.count(id.houseTele) > 1)
+	    	if(Bank.contains(id.dBones) || totalBones < bonesToGoal || Inventory.count(id.houseTele) > 1)
 	    	{
 	    		if(Locations.isInstanced())
 	    		{
@@ -554,7 +553,7 @@ public class TrainPrayer extends Leaf {
 	    			return Timing.sleepLogNormalSleep();
 	    		}
 	    		InvEquip.clearAll();
-	    		InvEquip.addInvyItem(dBones, bonesToGoal, bonesToGoal, true, neededBones);
+	    		InvEquip.addInvyItem(id.dBones, bonesToGoal, bonesToGoal, true, neededBones);
 	    		InvEquip.addInvyItem(id.houseTele, 1, 1, false, 10);
 	    		InvEquip.setEquipItem(EquipmentSlot.RING, InvEquip.wealth);
 	    		if(!Locations.unlockedHouse)

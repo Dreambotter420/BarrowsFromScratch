@@ -7,6 +7,7 @@ import org.dreambot.api.wrappers.widgets.message.MessageType;
 
 import script.actionz.ReportSpammer;
 import script.behaviour.CustomizeSettings;
+import script.quest.animalmagnetism.AnimalMagnetism;
 import script.quest.ernestthechicken.ErnestTheChicken;
 import script.quest.fremenniktrials.FremennikTrials;
 import script.quest.fremenniktrials.FremennikTrials.Direction;
@@ -25,6 +26,10 @@ public class ReadMessage {
 
 		String txt = msg.getMessage();
 		if(txt.contains("That player is offline, or has privacy mode enabled"))
+		{
+			TrainPrayer.visitedLast = false;
+		}
+		if(txt.contains("You put some ectoplasm and bonemeal into the Ectofunctus, and worship it.")) AnimalMagnetism.worshipped = true;
 		{
 			TrainPrayer.visitedLast = false;
 		}

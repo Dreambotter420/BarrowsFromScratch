@@ -47,6 +47,7 @@ public class Walkz {
 
 	public static boolean isStaminated()
 	{
+		if(Walking.getRunEnergy() >= 80) return true;
 		return (PlayerSettings.getBitValue(25) == 0 ? false : true);
 	}
 	
@@ -986,18 +987,7 @@ public class Walkz {
 			if(teleSpot.contains(Players.localPlayer())) return true;
 			
 			Sleep.sleep(69,69);
-			//check if within reasonable walking distance
-			double dist = teleSpot.distance(Players.localPlayer().getTile());
 			
-			if(dist <= 30)
-			{
-				if(Walking.shouldWalk(6) && Walking.walk(teleSpot.getCenter()))
-				{
-					MethodProvider.log("Distance to tele area is: " + dist + "... walking...");
-					Sleep.sleep(666, 1111);
-				}
-				continue;
-			}
 			//check if have fally tab in invy, use it
 			if(Inventory.contains(tabID))
 			{
@@ -1030,7 +1020,7 @@ public class Walkz {
 	{
 		return teleport(id.fallyTele,Locations.fallyTeleSpot,timeout);
 	}
-	public static boolean teleportHouse(long timeout)
+	public static boolean teleportOutsideHouse(long timeout)
 	{
 		Timer timer = new Timer(timeout);
 		while(!timer.finished() && Client.getGameState() == GameState.LOGGED_IN
@@ -1057,7 +1047,7 @@ public class Walkz {
 			if(Inventory.contains(id.houseTele))
 			{
 				if(Bank.isOpen()) Bankz.close();
-				else if(Inventory.interact(id.houseTele, "Break"))
+				else if(Inventory.interact(id.houseTele, "Outside"))
 				{
 					MethodProvider.sleepUntil(() -> Locations.isInstanced() || Locations.houseTeleSpot.contains(Players.localPlayer()), () -> Players.localPlayer().isAnimating(), Sleep.calculate(4444,2222),50);
 				}

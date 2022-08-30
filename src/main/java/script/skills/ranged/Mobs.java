@@ -1700,7 +1700,7 @@ public class Mobs {
 						}
 					}
 					//safespot
-					if(!melee && selectedHillGiantsArea == Locations.kourendGiantsKillingArea_Hill)
+					if(!melee && Skills.getRealLevel(Skill.DEFENCE) < 40 && selectedHillGiantsArea == Locations.kourendGiantsKillingArea_Hill)
 					{
 						if(!Locations.kourendGiantsSafeSpot_Hill.contains(Players.localPlayer()))
 						{

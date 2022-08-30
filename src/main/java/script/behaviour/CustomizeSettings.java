@@ -9,10 +9,13 @@ import org.dreambot.api.data.ActionMode;
 import org.dreambot.api.input.Mouse;
 import org.dreambot.api.methods.Calculations;
 import org.dreambot.api.methods.MethodProvider;
+import org.dreambot.api.methods.dialogues.Dialogues;
 import org.dreambot.api.methods.filter.Filter;
+import org.dreambot.api.methods.interactive.Players;
 import org.dreambot.api.methods.settings.PlayerSettings;
 import org.dreambot.api.methods.tabs.Tab;
 import org.dreambot.api.methods.tabs.Tabs;
+import org.dreambot.api.methods.walking.impl.Walking;
 import org.dreambot.api.methods.widget.Widgets;
 import org.dreambot.api.wrappers.widgets.WidgetChild;
 
@@ -50,6 +53,16 @@ public class CustomizeSettings extends Leaf {
     
 	public static int customizeSettings()
 	{
+		if(Dialogues.canContinue())
+		{
+			Dialogues.continueDialogue();
+			return Sleep.calculate(420, 696);
+		}
+		if(Dialogues.areOptionsAvailable())
+		{
+			Walking.clickTileOnMinimap(Players.localPlayer().getTile());
+			return Sleep.calculate(420, 696);
+		}
 		if(ClientSettings.isAcceptAidEnabled()) ClientSettings.toggleAcceptAid(false);
 		else if(shouldToggleProfanity()) toggleProfanity();
 		else if(ClientSettings.roofsEnabled()) ClientSettings.toggleRoofs(false);
@@ -279,23 +292,33 @@ public class CustomizeSettings extends Leaf {
 	public static boolean openSettingsSubTab(String subtabName)
 	{
 		Filter<WidgetChild> tabFilter = w -> w!=null && w.isVisible() && w.getID() == 23 && 
-				w.getParentID() == 132 && (w.getIndex() <= 7 && w.getIndex() >= 0);
+				w.getParentID() == 134 && (w.getIndex() <= 7 && w.getIndex() >= 0);
 		boolean foundTab = false;
+		int tabGC = 0;
 		for(WidgetChild tab : Widgets.getWidgets(tabFilter))
 		{
-			for(String action : tab.getActions())
+			if(tab == null || !tab.isVisible()) continue;
+			String[] actions = tab.getActions();
+			if(actions == null || actions.length <= 0) continue;
+			for(String action : actions)
 			{
 				if(action == null || action.isEmpty() || action.equals("null")) continue;
-				if(action.contains(subtabName)) foundTab = true;
+				if(action.contains(subtabName)) 
+				{
+					foundTab = true;
+					tabGC = tab.getIndex();
+				}
 			}
 		}
+		final int tabGCFinal = tabGC;
 		if(!foundTab) return true;
 		if(Widgets.getWidgetChild(134,4) == null || !Widgets.getWidgetChild(134,4).isVisible()) return false;
-		Filter<WidgetChild> chosenTabFilter = w -> w!=null && w.isVisible() && 
+		Filter<WidgetChild> chosenTabFilter = w -> 
+				w!=null && 
+				w.isVisible() && 
 				w.getID() == 23 && 
-				w.getParentID() == 132 && 
-				(w.getIndex() <= 7 && w.getIndex() >= 0) && 
-				Arrays.asList(w.getActions()).contains(subtabName);
+				w.getParentID() == 134 && 
+				w.getIndex() == tabGCFinal;
 		WidgetChild chosenTab = Widgets.getMatchingWidget(chosenTabFilter);
 		if(chosenTab != null && chosenTab.isVisible())
 		{

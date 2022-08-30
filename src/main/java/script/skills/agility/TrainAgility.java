@@ -50,9 +50,7 @@ public class TrainAgility extends Leaf{
 		if(courseCheckTimer == null || courseCheckTimer.finished())
 		{
 			final int agility = Skills.getRealLevel(Skill.AGILITY);
-			if(agility < 10) course = courses.GNOME_STRONGHOLD;
-			else if(agility < 20) course = courses.DRAYNOR;
-			else course = courses.VARROCK;
+			course = courses.DRAYNOR;
 			MethodProvider.log("Set agility course: " + course.toString());
 			courseCheckTimer = new Timer((int) Calculations.nextGaussianRandom(900000, 180000));
 		}
@@ -64,10 +62,7 @@ public class TrainAgility extends Leaf{
 	public static courses course = null;
 	public static Timer courseCheckTimer = null;
 	public static enum courses {
-			GNOME_STRONGHOLD,
-			DRAYNOR,
-			VARROCK,
-			AL_KHARID
+			DRAYNOR
 	}
 	@Override
 	public int onLoop()
@@ -86,7 +81,7 @@ public class TrainAgility extends Leaf{
 			fulfillJewelry();
             return Timing.sleepLogNormalSleep();
 		}
-		API.randomAFK(10);
+		API.randomAFK(5);
 		API.randomLongerAFK(1);
 
     	if(Skillz.shouldCheckSkillInterface()) Skillz.checkSkillProgress(Skill.AGILITY);
@@ -95,7 +90,7 @@ public class TrainAgility extends Leaf{
 		Main.customPaintText3 = "Marks of grace: " + (Inventory.contains(id.markOfGrace) ? Inventory.count(id.markOfGrace) : "none");
 		switch(course)
 		{
-		case AL_KHARID:
+		/*case AL_KHARID:
 		{
 			if(ha && !TrainMagic.haveHAItems()) break;
 			if(!Walking.isRunEnabled() && Walking.getRunEnergy() >= 99 && (int) Calculations.nextGaussianRandom(100,50) > 120)
@@ -178,7 +173,7 @@ public class TrainAgility extends Leaf{
 			Walkz.useJewelry(InvEquip.glory,"Al Kharid");
 			
 			break;
-		}
+		}*/
 		case DRAYNOR:
 		{
 			if(ha && !TrainMagic.haveHAItems()) break;
@@ -256,12 +251,12 @@ public class TrainAgility extends Leaf{
 			
 			break;
 		}
-		case GNOME_STRONGHOLD:
+		/*case GNOME_STRONGHOLD:
 		{
 			MethodProvider.log("GNOMESTRONGHOLD AGILITY Unscripted :-(");
 			API.mode = null;
 			break;
-		}
+		}*/
 		default:break;
 		}
 		return Timing.sleepLogNormalSleep();
@@ -270,6 +265,11 @@ public class TrainAgility extends Leaf{
 	{
 		if((int) Calculations.nextGaussianRandom(1000, 100) >= 1010)
 		{
+			if(Inventory.isFull() && !Inventory.contains(InvEquip.coins))
+			{
+				InvEquip.free1InvySpace();
+				return;
+			}
 			TrainMagic.quickHighAlch();
 		}
 	}
@@ -279,6 +279,11 @@ public class TrainAgility extends Leaf{
 		
 		if(markOfGrace != null)
 		{
+			if(Inventory.isFull() && !Inventory.contains(id.markOfGrace))
+			{
+				InvEquip.free1InvySpace();
+				return true;
+			}
 			final int count = Inventory.count(id.markOfGrace);
 			if(markOfGrace.interact("Take"))
 			{

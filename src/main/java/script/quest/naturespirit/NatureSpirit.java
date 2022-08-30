@@ -67,6 +67,17 @@ public class NatureSpirit extends Leaf {
 				}
 				return false;
 			}
+			if(Inventory.contains(id.rottenFood,id.druidPouch,id.druidPouchFilled,id.pieDish,
+					id.applePie,id.meatPie,id.natureSpirit_washingBowl,
+					id.natureSpirit_mirror,id.natureSpirit_usedSpell,
+					id.natureSpirit_spell,id.vial))
+			{
+				Inventory.dropAll(id.rottenFood,id.druidPouch,id.druidPouchFilled,id.pieDish,
+						id.applePie,id.meatPie,id.natureSpirit_washingBowl,
+						id.natureSpirit_mirror,id.natureSpirit_usedSpell,
+						id.natureSpirit_spell,id.vial);
+				return false;
+			}
 			return true;
 		}
 		return false;
@@ -669,6 +680,7 @@ public class NatureSpirit extends Leaf {
 		InvEquip.setEquipItem(EquipmentSlot.AMULET, InvEquip.glory);
 		InvEquip.setEquipItem(EquipmentSlot.HANDS, InvEquip.combat);
 		InvEquip.setEquipItem(EquipmentSlot.RING, InvEquip.wealth);
+		InvEquip.shuffleFulfillOrder();
 		if(InvEquip.fulfillSetup(true, 240000))
 		{
 			MethodProvider.log("[NATURE SPIRIT] -> Fulfilled step 0 correctly!");

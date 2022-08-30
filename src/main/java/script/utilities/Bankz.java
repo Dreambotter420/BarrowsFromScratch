@@ -22,18 +22,6 @@ import script.actionz.UniqueActions.Actionz;
 import script.quest.varrockmuseum.Timing;
 
 public class Bankz {
-	public static double getClosestBankDistance()
-	{
-		List<BankLocation> bls = Arrays.asList(BankLocation.values());
-		final Tile loc = Players.localPlayer().getTile();
-		Collections.sort(bls, new Comparator<BankLocation>() {
-	          @Override
-	          public int compare(BankLocation o1, BankLocation o2) {
-	        	  return (int) (o2.distance(loc) - o2.distance(loc));
-	          }
-	    });
-		return bls.get(0).distance(loc);
-	}
 	public static boolean openClosest(int distToTryTeleport)
 	{
 		if(Bank.isOpen()) return true;
@@ -54,8 +42,6 @@ public class Bankz {
 			}
 			return false;
 		}
-		final double distCust = getClosestBankDistance();
-		MethodProvider.log("Distance to closest bank (custom sort): " + distCust);
 		final double dist = Bank.getClosestBankLocation().getTile().distance();
 		MethodProvider.log("Distance to closest bank: " + dist);
 		if(dist >= distToTryTeleport || Players.localPlayer().getZ() > 0)

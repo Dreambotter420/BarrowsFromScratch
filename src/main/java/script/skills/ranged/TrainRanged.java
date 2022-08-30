@@ -8,6 +8,7 @@ import org.dreambot.api.methods.Calculations;
 import org.dreambot.api.methods.MethodProvider;
 import org.dreambot.api.methods.combat.Combat;
 import org.dreambot.api.methods.combat.CombatStyle;
+import org.dreambot.api.methods.container.impl.Inventory;
 import org.dreambot.api.methods.container.impl.bank.Bank;
 import org.dreambot.api.methods.container.impl.equipment.Equipment;
 import org.dreambot.api.methods.container.impl.equipment.EquipmentSlot;
@@ -17,7 +18,10 @@ import org.dreambot.api.methods.magic.Magic;
 import org.dreambot.api.methods.magic.Normal;
 import org.dreambot.api.methods.skills.Skill;
 import org.dreambot.api.methods.skills.Skills;
+import org.dreambot.api.methods.widget.Widgets;
+import org.dreambot.api.script.ScriptManager;
 import org.dreambot.api.utilities.Timer;
+import org.dreambot.api.wrappers.widgets.WidgetChild;
 
 import script.Main;
 import script.actionz.UniqueActions;
@@ -94,7 +98,12 @@ public class TrainRanged extends Leaf {
     		onStart();
     		return Timing.sleepLogNormalSleep();
     	}
-
+    	if(!InvEquip.checkedBank()) return Sleep.calculate(420, 696);
+    	if(outOfAvas())
+    	{
+    		buyMoreAvas();
+    		return Sleep.calculate(420, 696);
+    	}
         if(Equipment.contains(getBestDart()) && !updateAttStyle()) 
 		{
 			MethodProvider.log("Failed to update attack style with best melee weapon equipped!");
@@ -103,6 +112,85 @@ public class TrainRanged extends Leaf {
     	if(Mobs.mob == null) Mobs.chooseMob(false);
         return Mobs.trainMob(false);
     }
+    public static void buyMoreAvas()
+    {
+    	final int qty = (int) Calculations.nextGaussianRandom(7, 3);
+    	final int steelArrowQty = qty * 75;
+    	final int coinsQty = qty * 1000;
+    	MethodProvider.log("Entering function to buy avas accumulators in qty: "+ qty);
+    	Timer timeout = new Timer(300000);
+    	boolean haveSteelArrowsAndMoney = false;
+    	while(!timeout.finished() && ScriptManager.getScriptManager().isRunning() && 
+    			!ScriptManager.getScriptManager().isPaused())
+    	{
+    		Sleep.sleep(420, 1111);
+    		if(haveSteelArrowsAndMoney)
+    		{
+    			if(Inventory.count(InvEquip.coins) < 999 || 
+    					Inventory.count(id.steelArrow) < 75)
+    			{
+    				if(Inventory.contains(id.avasAccumulator))
+    				{
+    					if(Locations.dontTeleToGEAreaJustWalk.contains(Players.localPlayer()))
+    					{
+    						MethodProvider.log("Sucessfully bought more avas!");
+    						return;
+    					}
+    					Walkz.useJewelry(InvEquip.wealth, "Grand Exchange");
+    				}
+					continue;
+    			}
+    			WidgetChild accumulatorButton = Widgets.getWidgetChild(67, 7);
+    			if(accumulatorButton != null && accumulatorButton.isVisible())
+    			{
+    				if(accumulatorButton.interact()) Sleep.sleep(696, 420);
+    				continue;
+    			}
+    			walkDevicesAva();
+    			continue;
+    		}
+    		if(Inventory.count(id.steelArrow) >= steelArrowQty && 
+    				Inventory.count(InvEquip.coins) >= coinsQty)
+    		{
+    			haveSteelArrowsAndMoney = true;
+    		}
+    		//need steel arrows and money
+    		InvEquip.clearAll();
+    		InvEquip.setEquipItem(EquipmentSlot.RING, InvEquip.wealth);
+    		InvEquip.addInvyItem(id.draynorTab, 1, 1, false, 1);
+    		InvEquip.addInvyItem(InvEquip.coins, coinsQty, coinsQty, false, 0);
+    		InvEquip.addInvyItem(id.steelArrow, steelArrowQty, steelArrowQty, false, steelArrowQty);
+    		InvEquip.shuffleFulfillOrder();
+    		InvEquip.fulfillSetup(true, 180000);
+    	}
+    }
+    public static void walkDevicesAva()
+    {
+    	if(Locations.ernest_westWing.contains(Players.localPlayer()))
+    	{
+    		API.talkToNPC("Ava","Devices");
+    		return;
+    	}
+    	if(Locations.ernest_westWing.getCenter().distance() > 75) 
+    	{
+    		Walkz.teleport(id.draynorTab, Locations.draynorMaynorTeleSpot, 180000);
+    		return;
+    	}
+		API.walkInteractWithGameObject("Bookcase", "Search", Locations.ernest_westWingAnd, () -> Locations.ernest_westWing.contains(Players.localPlayer()));
+    	
+    }
+    public static boolean outOfAvas()
+    {
+    	if(AnimalMagnetism.completed())
+    	{
+    		if(!Equipment.contains(id.avasAccumulator) && 
+    				!Inventory.contains(id.avasAccumulator) && 
+    				!Bank.contains(id.avasAccumulator))
+    			return true;
+    	}
+    	return false;
+    }
+    
     public static boolean updateAttStyle()
 	{
     	if(Combat.getCombatStyle() == CombatStyle.RANGED_RAPID) return true;
@@ -326,7 +414,7 @@ public class TrainRanged extends Leaf {
 	public static int getBestCapeSlot()
 	{
 		final int ranged = Skills.getRealLevel(Skill.RANGED);
-		if(ranged >= 50 && AnimalMagnetism.completedAnimalMagnetism) return id.avasAccumulator;
+		if(ranged >= 50 && AnimalMagnetism.completed()) return id.avasAccumulator;
     	if(InvEquip.equipmentContains(id.randCapes)) return InvEquip.getEquipmentItem(id.randCapes);
     	if(InvEquip.invyContains(id.randCapes)) return InvEquip.getInvyItem(id.randCapes);
     	if(InvEquip.bankContains(id.randCapes)) return InvEquip.getBankItem(id.randCapes);

@@ -237,6 +237,11 @@ public class TrainMagic extends Leaf {
 						{
 							if(Bank.count(i) > 0)
 							{
+								if(Inventory.isFull())
+								{
+									InvEquip.depositExtraJunk();
+									return;
+								}
 								MethodProvider.log("Attempting withdraw of item: "+new Item(i,1).getName());
 								InvEquip.withdrawAll(i, true, 180000);
 							}
@@ -597,6 +602,11 @@ public class TrainMagic extends Leaf {
 						{
 							if(Bank.count(i) > 0)
 							{
+								if(Inventory.isFull())
+								{
+									InvEquip.depositExtraJunk();
+									return false;
+								}
 								MethodProvider.log("Attempting withdraw of item: "+new Item(i,1).getName());
 								if(Bank.withdrawAll(i))
 								{

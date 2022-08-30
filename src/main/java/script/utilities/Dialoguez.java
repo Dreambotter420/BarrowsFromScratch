@@ -16,6 +16,8 @@ import script.Main;
 import script.Test;
 import script.actionz.UniqueActions;
 import script.actionz.UniqueActions.Actionz;
+import script.quest.animalmagnetism.AnimalMagnetism;
+import script.quest.animalmagnetism.AnimalMagnetism.Lover;
 import script.quest.ernestthechicken.ErnestTheChicken;
 import script.quest.fremenniktrials.FremennikTrials;
 import script.quest.naturespirit.NatureSpirit;
@@ -316,9 +318,35 @@ public class Dialoguez {
 					chooseOption("I think I\'ve solved the puzzle!") ||
 					chooseOption("How can I help?") ||
 					chooseOption("How long have you been a ghost?") ||
-					chooseOption("How long have you been a ghost?") ||
-					chooseOption("How long have you been a ghost?") ||
 					chooseOption("Is there anything else interesting to do around here?");
+		}
+		case ANIMAL_MAGNETISM:
+		{
+			for(String option : Dialogues.getOptions())
+			{
+				if(option == null || option.isEmpty() || option.equalsIgnoreCase("null")) continue;
+				if(option.equals("Okay"))
+				{
+					if(chooseOption("Okay")) 
+					{
+						MethodProvider.sleepUntil(() -> Locations.portPhasmatysCharterShip.contains(Players.localPlayer()), Sleep.calculate(5555,5555));
+					}
+					Sleep.sleep(420,2222);
+					return true;
+				}
+			}
+			return chooseOption("I would be happy to make your home into a better place.") || 
+					chooseOption("I\'m here about the farmers east of here.") || 
+					chooseOption("Yes.") || 
+					chooseOption("Yes") || 
+					chooseOption("Okay, you need it more than I do, I suppose.") || 
+					chooseOption("Could I buy those chickens now, then?") || 
+					chooseOption("Could I buy those chickens now?") || 
+					chooseOption("Could I buy 2 chickens?") || 
+					chooseOption("Could I buy two chickens?") || 
+					chooseOption("Hello, I\'m here about those trees again.") || 
+					chooseOption("I\'d love one, thanks.") || 
+					chooseOption("I\'m here about a quest.");
 		}
 			
 		case RESTLESS_GHOST:
@@ -437,6 +465,29 @@ public class Dialoguez {
 				Test.test = true;
 			}
 			break;
+		}
+		case ANIMAL_MAGNETISM:
+		{
+			if(npcDialogue.contains("Talk to my wife and I\'ll think about it.") || 
+					npcDialogue.contains("Go tell \'er now, if you\'re not a double-dealin\' scammer,") || 
+					npcDialogue.contains("Any luck wiv me wife?") ||
+					npcDialogue.contains("A warning to ya, too: annoy her and I\'ll haunt ya til"))
+			{
+				AnimalMagnetism.talkTo = Lover.ALICE;
+			}
+			
+			if(npcDialogue.contains("Can\'t you see, he is dead. I can\'t talk to the dead.") || 
+					npcDialogue.contains("Have you spoken to my husband yet?") ||
+					npcDialogue.contains("I tried that once, but all those other ghosts - and even") || 
+					npcDialogue.contains("Have you asked him about the bank pass?") ||
+					npcDialogue.contains("I\'ll have a word with him, then; magic has its uses I") )
+			{
+				AnimalMagnetism.talkTo = Lover.HUSBAND;
+			}
+			if(npcDialogue.contains("ridiculous fashion accessories. Those earmuffs he sells"))
+			{
+				AnimalMagnetism.needTalkToTurael = true;
+			}
 		}
 		case NATURE_SPIRIT:
 		{

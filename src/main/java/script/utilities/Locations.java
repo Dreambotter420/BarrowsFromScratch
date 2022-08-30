@@ -124,6 +124,68 @@ public class Locations {
 			new Tile(3441, 3461, 0),
 			new Tile(3438, 3467, 0),
 			new Tile(3431, 3472, 0));
+	public static final Area karamjaF2P = new Area(
+		    new Tile[] {
+		        new Tile(2816, 3205, 0),
+		        new Tile(2816, 3143, 0),
+		        new Tile(2972, 3114, 0),
+		        new Tile(2958, 3182, 0),
+		        new Tile(2823, 3218, 0)
+		    }
+		);
+	public static final Area portPhasmatysRough = new Area(
+		    new Tile[] {
+		        new Tile(3712, 3454, 0),
+		        new Tile(3702, 3454, 0),
+		        new Tile(3700, 3453, 0),
+		        new Tile(3694, 3453, 0),
+		        new Tile(3692, 3455, 0),
+		        new Tile(3675, 3455, 0),
+		        new Tile(3674, 3453, 0),
+		        new Tile(3665, 3453, 0),
+		        new Tile(3659, 3456, 0),
+		        new Tile(3650, 3456, 0),
+		        new Tile(3649, 3471, 0),
+		        new Tile(3652, 3474, 0),
+		        new Tile(3653, 3484, 0),
+		        new Tile(3653, 3507, 0),
+		        new Tile(3669, 3507, 0),
+		        new Tile(3677, 3517, 0),
+		        new Tile(3686, 3517, 0),
+		        new Tile(3686, 3534, 0),
+		        new Tile(3730, 3529, 0)
+		    }
+		);
+	public static final Area phasmatys_southOfNorthGateArea = new Area(
+			new Tile(3653, 3500, 0),
+			new Tile(3653, 3505, 0),
+			new Tile(3654, 3508, 0),
+			new Tile(3669, 3507, 0),
+			new Tile(3675, 3515, 0),
+			new Tile(3673, 3491, 0),
+			new Tile(3653, 3492, 0));
+	public static final Area draynorUndeadTree = new Area(3105, 3353, 3113, 3344, 0);
+	public static final Area draynorMaynorWitch = new Area(3101, 3373, 3097, 3367, 0);
+	public static final Area crowsHouse = new Area(3460, 3556, 3466, 3560, 0);
+	public static final Area animalMagnetism_alicesHusband = new Area(
+			new Tile(3625, 3531, 0),
+			new Tile(3625, 3523, 0),
+			new Tile(3621, 3523, 0),
+			new Tile(3620, 3521, 0),
+			new Tile(3616, 3521, 0),
+			new Tile(3614, 3523, 0),
+			new Tile(3610, 3523, 0),
+			new Tile(3609, 3525, 0),
+			new Tile(3609, 3530, 0));
+	public static final Area fenkensteinTeleSpot = new Area(3545, 3531, 3552, 3526, 0);
+	public static final Area animalMagnetism_alice = new Area(3626, 3527, 3630, 3524, 0);
+	public static final Area ectofunctus_2ndFloor = new Area(3668, 3510, 3649, 3527, 1);
+	public static final Area ectofunctus_ground = new Area(3667, 3508, 3651, 3531, 0);
+	public static final Area phasmatysNorthGates = new Area(3658, 3509, 3661, 3504, 0);
+	public static final Area portPhasmatysCharterPort = new Area(3701, 3507, 3702, 3496, 0);
+	public static final Area karamjaCharterPort = new Area(2955, 3160, 2953, 3148, 0);
+	public static final Area portPhasmatysCharterShip = new Area(3705, 3499, 3707, 3509, 1);
+	public static final Area draynorMaynorTeleSpot = new Area(3106, 3353, 3111, 3349, 0);
 	public static final Area natureSpirit_insideGrottoFinished = new Area(3447, 9733, 3436, 9744, 1);
 	public static final Area natureSpirit_insideGrotto = new Area(3447, 9733, 3435, 9744, 0);
 	public static final Area natureSpirit_finalPuzzleTile = new Area(3440, 3335, 3440, 3335, 0);

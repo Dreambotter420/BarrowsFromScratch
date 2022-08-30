@@ -245,15 +245,34 @@ public class id {
 	public static final int natureSpirit_usedSpell = 2969;
 	public static final int natureSpirit_spell = 2968;
 	public static final int natureSpirit_washingBowl = 2964;
-
+	public static final int pot = 1931;
+	public static final int dBones = 536;
+	public static final int draynorTab = 19615;
+	public static final int fenkensteinTab = 19621;
+	public static final int polishedButtons = 10496;
+	public static final int ironBar = 2351;
+	public static final int ectotokens = 4278;
+	public static final int holySymbol = 1718;
+	public static final int hardLeather = 1743;
+	public static final int bucketOfSlime = 4286;
+	public static final int potOfDBones = 4261;
+	public static final int hammer = 2347;
+	public static final int undeadChicken = 10487;
+	public static final int barMagnet = 10489;
+	public static final int selectedIron = 10488;
+	public static final int blessedAxe = 10491;
+	public static final int undeadTwigs = 10490;
+	public static final int researchNotes = 10492;
+	public static final int translatedNotes = 10493;
+	public static final int aPattern = 10494;
 	public static final int snapdragonSeed = 5300;
 	public static final int ranarrSeed = 5295;
 	public static final int torstolSeed = 5304;
 	public static final int toadflaxSeed = 5296;
 	public static final int snapegrassSeed = 22879;
-	
 	public static final int giantKey = 20754;
 	public static final int bigBones = 532;
+	public static final int steelArrow = 886;
 	
 	public static final int ironBoots = 4121;
 	

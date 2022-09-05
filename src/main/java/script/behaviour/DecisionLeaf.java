@@ -16,6 +16,7 @@ import org.dreambot.api.utilities.Timer;
 import script.actionz.UniqueActions;
 import script.actionz.UniqueActions.Actionz;
 import script.framework.Leaf;
+import script.quest.alfredgrimhand.AlfredGrimhandsBarcrawl;
 import script.quest.animalmagnetism.AnimalMagnetism;
 import script.quest.ernestthechicken.ErnestTheChicken;
 import script.quest.fightarena.FightArena;
@@ -29,6 +30,7 @@ import script.quest.restlessghost.RestlessGhost;
 import script.quest.varrockmuseum.Timing;
 import script.quest.varrockmuseum.VarrockQuiz;
 import script.quest.waterfallquest.WaterfallQuest;
+import script.skills.herblore.TrainHerblore;
 import script.utilities.API;
 import script.utilities.API.modes;
 import script.utilities.Dialoguez;
@@ -138,8 +140,9 @@ public class DecisionLeaf extends Leaf{
 		final boolean waterfallDone = WaterfallQuest.completed();
 		final boolean fightArenaDone = FightArena.completed();
 		final boolean fremmyTrialsDone = FremennikTrials.completed();
-		final boolean horrorDone = HorrorFromTheDeep.completedHorrorFromTheDeep;
+		final boolean horrorDone = HorrorFromTheDeep.completed();
 		final boolean ernestDone = ErnestTheChicken.completed();
+		final boolean barcrawled = AlfredGrimhandsBarcrawl.completed();
 		final boolean animalMagnetized = AnimalMagnetism.completed();
 		final boolean natureSpirited = NatureSpirit.completed();
 		final boolean mageArena1Done = MageArena1.completed();
@@ -169,7 +172,7 @@ public class DecisionLeaf extends Leaf{
 		
 		if(!animalMagnetized)
 		{
-			if(slayer >= slayerSetpoint && ranged >= 50 && crafting >= craftingSetpoint && ernestDone && restedGhost && natureSpirited) validModes.add(modes.ANIMAL_MAGNETISM);
+			if(slayer >= slayerSetpoint && ranged >= 50 && crafting >= craftingSetpoint && wc >= 35 && ernestDone && restedGhost && natureSpirited) validModes.add(modes.ANIMAL_MAGNETISM);
 			if(slayer < slayerSetpoint) {
 				if(!quizzed && !validModes.contains(modes.VARROCK_QUIZ)) validModes.add(modes.VARROCK_QUIZ);
 				else {
@@ -190,10 +193,13 @@ public class DecisionLeaf extends Leaf{
 		
 		if(!horrorDone)
 		{
-			if(ranged >= 46 && mage >= 35 && agility >= agilitySetpoint && !validModes.contains(modes.HORROR_FROM_THE_DEEP)) validModes.add(modes.HORROR_FROM_THE_DEEP);
+			if(prayer >= 40 && barcrawled && ranged >= 46 && mage >= 41 && agility >= agilitySetpoint && !validModes.contains(modes.HORROR_FROM_THE_DEEP)) validModes.add(modes.HORROR_FROM_THE_DEEP);
 			if(ranged < 46 && !validModes.contains(modes.TRAIN_RANGE)) validModes.add(modes.TRAIN_RANGE);
-			if(mage < 35 && !validModes.contains(modes.TRAIN_MAGIC)) validModes.add(modes.TRAIN_MAGIC);
+			if(mage < 41 && !validModes.contains(modes.TRAIN_MAGIC)) validModes.add(modes.TRAIN_MAGIC);
 			if(agility < agilitySetpoint && !validModes.contains(modes.TRAIN_AGILITY)) validModes.add(modes.TRAIN_AGILITY);
+			if(!barcrawled) validModes.add(modes.ALFRED_GRIMHANDS_BARCRAWL);
+			if(prayer < 40 && !validModes.contains(modes.TRAIN_PRAYER)) validModes.add(modes.TRAIN_PRAYER);
+			
 		}
 		
 		if(!mageArena2Done)
@@ -248,23 +254,24 @@ public class DecisionLeaf extends Leaf{
 			}
 			
 			//testing
-			//API.mode = modes.ANIMAL_MAGNETISM;
+			//API.mode = modes.HORROR_FROM_THE_DEEP;
 			
 			
 			MethodProvider.log("Switching mode: " + API.mode.toString());
 			if(API.mode == modes.ANIMAL_MAGNETISM || 
+					API.mode == modes.HORROR_FROM_THE_DEEP || 
+					API.mode == modes.MAGE_ARENA_2 || 
 					API.mode == modes.FREMENNIK_TRIALS)
 			{
 				setTaskTimer(4);
 			}
 			else if(API.mode == modes.ERNEST_THE_CHIKKEN || 
 					API.mode == modes.MAGE_ARENA_1 || 
-					API.mode == modes.MAGE_ARENA_2 || 
 					API.mode == modes.NATURE_SPIRIT || 
 					API.mode == modes.RESTLESS_GHOST || 
 					API.mode == modes.VARROCK_QUIZ || 
 					API.mode == modes.PRIEST_IN_PERIL || 
-					API.mode == modes.HORROR_FROM_THE_DEEP || 
+					API.mode == modes.ALFRED_GRIMHANDS_BARCRAWL || 
 					API.mode == modes.FIGHT_ARENA || 
 					API.mode == modes.WATERFALL_QUEST)
 			{
@@ -289,6 +296,11 @@ public class DecisionLeaf extends Leaf{
 				if(UniqueActions.isActionEnabled(Actionz.TAKE_LONGER_BREAKS)) setTaskTimer(3);
 				else setTaskTimer(2);
 				resetForceBreakTimer();
+			}
+			else if(API.mode == modes.TRAIN_HERBLORE)
+			{
+				if(TrainHerblore.completedDruidicRitual()) setTaskTimer(1);
+				else setTaskTimer(2);
 			}
 		}
 		return 10;

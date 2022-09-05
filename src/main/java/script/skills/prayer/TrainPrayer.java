@@ -40,6 +40,7 @@ import org.dreambot.api.wrappers.widgets.Menu;
 import org.dreambot.api.wrappers.widgets.WidgetChild;
 
 import script.Main;
+import script.p;
 import script.behaviour.DecisionLeaf;
 import script.framework.Leaf;
 import script.framework.Tree;
@@ -105,7 +106,7 @@ public class TrainPrayer extends Leaf {
     	{
     		if(portal.interact("Enter"))
     		{
-    			MethodProvider.sleepUntil(() -> !Locations.isInstanced(), () -> Players.localPlayer().isMoving(), Sleep.calculate(2222, 2222), 50);
+    			MethodProvider.sleepUntil(() -> !Locations.isInstanced(), () -> p.l.isMoving(), Sleep.calculate(2222, 2222), 50);
     		} else {
     			if(Walking.shouldWalk(6) && Walking.walk(portal)) Sleep.sleep(420, 696);
     		}
@@ -116,7 +117,7 @@ public class TrainPrayer extends Leaf {
     	{
     		if(Widgets.getWidgetChild(370,18).interact("Leave House"))
     		{
-    			MethodProvider.sleepUntil(() -> Locations.rimmington.contains(Players.localPlayer()), Sleep.calculate(2222, 2222));
+    			MethodProvider.sleepUntil(() -> Locations.rimmington.contains(p.l), Sleep.calculate(2222, 2222));
     			return true;
     		}
     		return false;
@@ -195,7 +196,7 @@ public class TrainPrayer extends Leaf {
     		{
     			if(houseAd.interact("Visit-last"))
         		{
-        			MethodProvider.sleepUntil(() -> Locations.isInstanced(), () -> Players.localPlayer().isMoving(), Sleep.calculate(2222,2222),50);
+        			MethodProvider.sleepUntil(() -> Locations.isInstanced(), () -> p.l.isMoving(), Sleep.calculate(2222,2222),50);
         			Sleep.sleep(420, 696);
         			if(!Locations.isInstanced()) visitedLast = false;
         		}
@@ -204,13 +205,13 @@ public class TrainPrayer extends Leaf {
     		if(houseAd.interact("View"))
     		{
     			MethodProvider.sleepUntil(() -> Widgets.getWidgetChild(52,13) != null && 
-    	    			Widgets.getWidgetChild(52,13).isVisible(), () -> Players.localPlayer().isMoving(), Sleep.calculate(2222, 2222),50);
+    	    			Widgets.getWidgetChild(52,13).isVisible(), () -> p.l.isMoving(), Sleep.calculate(2222, 2222),50);
     		}
     		else if(Walking.shouldWalk(6) && Walking.walk(houseAd))Sleep.sleep(69, 1111);
     		return;
     	}
     	//check if near rimmington at all
-    	if(Locations.rimmington.contains(Players.localPlayer()) || Locations.rimmington.distance(Players.localPlayer().getTile()) < 50)
+    	if(Locations.rimmington.contains(p.l) || Locations.rimmington.distance(p.l.getTile()) < 50)
     	{
     		if(Walking.shouldWalk(6) && Walking.walk(Locations.rimmington.getCenter())) Sleep.sleep(696, 420);
     		return;
@@ -257,12 +258,18 @@ public class TrainPrayer extends Leaf {
     		Dialoguez.continueDialogue();
     		return Timing.sleepLogNormalSleep();
     	}
-    	if(Widgets.getWidgetChild(219, 1, 1) != null && 
-    			Widgets.getWidgetChild(219, 1, 1).isVisible() && 
-    			Widgets.getWidgetChild(219, 1, 1).getText().contains("Exchange")) 
+    	if(Dialogues.areOptionsAvailable()) 
     	{ 
     		//have at least one option to exchange items, check for "all" and if none, choose "1"
-    		if(!Dialoguez.chooseFirstOptionContaining("Exchange All:")) Dialoguez.chooseOptionIndex(1);
+    		for(String option : Dialogues.getOptions())
+    		{
+    			if(option == null || option.isEmpty() || option.equalsIgnoreCase("null")) continue;
+    			if(option.contains("Exchange All:")) {
+    				Dialogues.chooseOption(option);
+    				return Timing.sleepLogNormalSleep();
+    			}
+    		}
+    		Dialoguez.chooseOptionIndex(1);
     		return Timing.sleepLogNormalSleep();
     	}
     	if(Inventory.count(constructionBook) > 0)
@@ -403,8 +410,11 @@ public class TrainPrayer extends Leaf {
         					}
         				}
         				Collections.reverse(boneSlots);
-        				Item lastBone = Inventory.getItemInSlot(boneSlots.get(0));
-        				usedSlots.add(boneSlots.get(0));
+        				int slot = 0;
+        				if(boneSlots.isEmpty()) slot = Inventory.get(id.dBones).getSlot();
+        				else slot = boneSlots.get(0);
+        				Item lastBone = Inventory.getItemInSlot(slot);
+        				usedSlots.add(slot);
         				lastBone.interact("Use");
     				} else if(Widgets.isOpen()) Widgets.closeAll();
     				else Tabz.open(Tab.INVENTORY);
@@ -427,7 +437,7 @@ public class TrainPrayer extends Leaf {
 						{
 							if(Menu.clickAction(useAction, altar)) 
 							{
-								MethodProvider.sleepUntil(() -> Players.localPlayer().isMoving() || Players.localPlayer().isAnimating(), Sleep.calculate(2222, 2222));
+								MethodProvider.sleepUntil(() -> p.l.isMoving() || p.l.isAnimating(), Sleep.calculate(2222, 2222));
 								Sleep.sleep(69,69);
 							}
 						}
@@ -451,14 +461,14 @@ public class TrainPrayer extends Leaf {
 						}
 						return Sleep.calculate(69, 69);
 					}
-					if(Players.localPlayer().isMoving()) MethodProvider.sleepUntil(() -> !Players.localPlayer().isMoving(), Sleep.calculate(2222, 2222));
-		    		if(Players.localPlayer().isAnimating())
+					if(p.l.isMoving()) MethodProvider.sleepUntil(() -> !p.l.isMoving(), Sleep.calculate(2222, 2222));
+		    		if(p.l.isAnimating())
 		    		{
 		    			MethodProvider.sleepUntil(() -> Inventory.count(id.dBones) <= 0 || 
 		    					Dialogues.inDialogue() || 
 		    					!Locations.isInstanced() ||
 		    					GameObjects.all(litBurnersFilter).size() <= 1,
-		    					() -> (Players.localPlayer().isAnimating() || Players.localPlayer().isMoving()), Sleep.calculate(2222, 2222),50);
+		    					() -> (p.l.isAnimating() || p.l.isMoving()), Sleep.calculate(2222, 2222),50);
 		    		 	if(Inventory.count(id.dBones) <= 0 || 
 		    		 			GameObjects.all(litBurnersFilter).size() <= 1 || 
 		    		 			Locations.isInstanced()) return Timing.sleepLogNormalSleep();
@@ -467,7 +477,7 @@ public class TrainPrayer extends Leaf {
 					{
 						if(Menu.clickAction(useAction, altar)) 
 						{
-							MethodProvider.sleepUntil(() -> Players.localPlayer().isMoving() || Players.localPlayer().isAnimating(), Sleep.calculate(2222, 2222));
+							MethodProvider.sleepUntil(() -> p.l.isMoving() || p.l.isAnimating(), Sleep.calculate(2222, 2222));
 							Sleep.sleep(69,69);
 						}
 					}
@@ -500,7 +510,7 @@ public class TrainPrayer extends Leaf {
     		announcedShitHouse = false;
     		if(Inventory.count(id.dBones) >= 1)
     		{
-    			if(Locations.rimmington.contains(Players.localPlayer())) 
+    			if(Locations.rimmington.contains(p.l)) 
     			{
     				chooseRandomAltarHouse();
     			}
@@ -513,7 +523,7 @@ public class TrainPrayer extends Leaf {
     	    	NPC phials = NPCs.closest("Phials");
     	    	if(phials != null)
     	    	{
-    	    		if(!Players.localPlayer().isInteracting(phials))
+    	    		if(!p.l.isInteracting(phials))
     	    		{
     	        		if(!Tabs.isOpen(Tab.INVENTORY))
     	        		{
@@ -523,13 +533,13 @@ public class TrainPrayer extends Leaf {
     	    			Item bonesNoted = Inventory.get(new Item(id.dBones,1).getNotedItemID());
     	        		if(bonesNoted.useOn(phials))
 	        			{
-	        				MethodProvider.sleepUntil(Dialogues::inDialogue, () -> Players.localPlayer().isMoving(), Sleep.calculate(2222,2222), 50);
+	        				MethodProvider.sleepUntil(Dialogues::inDialogue, () -> p.l.isMoving(), Sleep.calculate(2222,2222), 50);
 	        			}
     	    		}
     	    	}
     	    	else
     	    	{
-    	    		if(Locations.rimmington.distance(Players.localPlayer().getTile()) > 45) Walkz.teleportOutsideHouse(180000);
+    	    		if(Locations.rimmington.distance(p.l.getTile()) > 45) Walkz.teleportOutsideHouse(180000);
         			else if(Walking.shouldWalk(6) && Walking.walk(Locations.rimmington.getCenter())) Sleep.sleep(420,1111);
     	    		
     	    	}
@@ -571,7 +581,7 @@ public class TrainPrayer extends Leaf {
 	    	
 	    	if(Inventory.interact(id.houseTele, "Break"))
 			{
-				MethodProvider.sleepUntil(() -> Locations.isInstanced(), () -> Players.localPlayer().isAnimating(), Sleep.calculate(4444,2222),50);
+				MethodProvider.sleepUntil(() -> Locations.isInstanced(), () -> p.l.isAnimating(), Sleep.calculate(4444,2222),50);
 				return Timing.sleepLogNormalSleep();
 			}
     	}
@@ -615,7 +625,7 @@ public class TrainPrayer extends Leaf {
     		{
     			if(Dialogues.getOptionIndexContaining("Yes please!") == -1)
     			{
-    				Mouse.click(Map.tileToMiniMap(Players.localPlayer().getTile()));
+    				Mouse.click(Map.tileToMiniMap(p.l.getTile()));
     				Sleep.sleep(696,420);
     				return false;
     			} else
@@ -656,7 +666,7 @@ public class TrainPrayer extends Leaf {
     			{
     				if(doorfuckery.interact("Close")) Sleep.sleep(696, 420);
     				{
-    					MethodProvider.sleepWhile(() -> Players.localPlayer().isMoving(), Sleep.calculate(2222,2222));
+    					MethodProvider.sleepWhile(() -> p.l.isMoving(), Sleep.calculate(2222,2222));
     				}
     				return false;
     			}
@@ -666,7 +676,7 @@ public class TrainPrayer extends Leaf {
     		return false;
     	}
     	//see how close we are to estate room - walk if close
-    	final double dist = Locations.estateRoom.distance(Players.localPlayer().getTile());
+    	final double dist = Locations.estateRoom.distance(p.l.getTile());
     	if(dist <= 45)
     	{
     		if(Walking.shouldWalk(6) && Walking.walk(Locations.estateRoom.getCenter())) Sleep.sleep(666,1111);

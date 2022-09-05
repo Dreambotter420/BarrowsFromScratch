@@ -30,6 +30,7 @@ import org.dreambot.api.script.ScriptManager;
 import org.dreambot.api.utilities.Timer;
 import org.dreambot.api.wrappers.items.Item;
 
+import script.p;
 import script.quest.varrockmuseum.Timing;
 import script.utilities.Bankz;
 import script.utilities.GrandExchangg;
@@ -52,6 +53,8 @@ public class BuyHighAlchs {
 		InvEquip.addInvyItem(id.natureRune,200,5000, false, (int) Calculations.nextGaussianRandom(2000,100));
 		InvEquip.addInvyItem(InvEquip.coins,1,9999999, false, 0);
 		InvEquip.addInvyItem(InvEquip.duel,1,1,false,3);
+		InvEquip.addOptionalItem(id.airRune);
+		InvEquip.addOptionalItem(id.lawRune);
 		InvEquip.setEquipItem(EquipmentSlot.WEAPON,id.staffOfFire);
 		InvEquip.setEquipItem(EquipmentSlot.RING,InvEquip.wealth);
 		if(!InvEquip.fulfillSetup(true, 180000)) return;
@@ -168,7 +171,7 @@ public class BuyHighAlchs {
 						Sleep.sleep(696, 420);
 						continue;
 					}
-					if(BankLocation.GRAND_EXCHANGE.distance(Players.localPlayer().getTile()) < 50 && 
+					if(BankLocation.GRAND_EXCHANGE.distance(p.l.getTile()) < 50 && 
 							Bank.open(BankLocation.GRAND_EXCHANGE) )
 					{
 						Sleep.sleep(420, 696);

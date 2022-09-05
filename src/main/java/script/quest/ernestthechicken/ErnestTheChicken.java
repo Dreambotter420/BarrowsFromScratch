@@ -12,6 +12,7 @@ import org.dreambot.api.methods.settings.PlayerSettings;
 import org.dreambot.api.methods.walking.impl.Walking;
 import org.dreambot.api.methods.widget.Widgets;
 import script.Main;
+import script.p;
 import script.actionz.UniqueActions;
 import script.actionz.UniqueActions.Actionz;
 import script.behaviour.DecisionLeaf;
@@ -50,11 +51,11 @@ public class ErnestTheChicken extends Leaf {
 	public static boolean onExit()
 	{
 		if(Questz.closeQuestCompletion()) return false;
-    	if(Locations.ernest_3rdfloorMaynor.contains(Players.localPlayer()) || 
-    			Locations.ernest_2ndfloorMaynor.contains(Players.localPlayer()) ||
-    			Locations.ernest_SkellyTube.contains(Players.localPlayer()) ||
-    			Locations.ernest_westWing.contains(Players.localPlayer()) ||
-    			Locations.ernest_basementMaynor.contains(Players.localPlayer()))
+    	if(Locations.ernest_3rdfloorMaynor.contains(p.l) || 
+    			Locations.ernest_2ndfloorMaynor.contains(p.l) ||
+    			Locations.ernest_SkellyTube.contains(p.l) ||
+    			Locations.ernest_westWing.contains(p.l) ||
+    			Locations.ernest_basementMaynor.contains(p.l))
     	{
     		if(!Walkz.useJewelry(InvEquip.wealth, "Grand Exchange") && 
     				!Walkz.useJewelry(InvEquip.glory,"Edgeville"))
@@ -191,9 +192,9 @@ public class ErnestTheChicken extends Leaf {
     }
     public static void gatherSuppliesThenTalkToOddenstein()
     {
-    	if(!Locations.ernest_2ndfloorMaynor.contains(Players.localPlayer()) && 
-    			!Locations.ernest_3rdfloorMaynor.contains(Players.localPlayer()) && 
-    			!Locations.ernest_basementMaynor.contains(Players.localPlayer()) &&
+    	if(!Locations.ernest_2ndfloorMaynor.contains(p.l) && 
+    			!Locations.ernest_3rdfloorMaynor.contains(p.l) && 
+    			!Locations.ernest_basementMaynor.contains(p.l) &&
     			Locations.ernest_veronica.getCenter().distance() > 100)
         {
         	Walkz.useJewelry(InvEquip.glory, "Draynor Village");
@@ -223,7 +224,7 @@ public class ErnestTheChicken extends Leaf {
             	}
     			if(!Inventory.contains(rubberTube) && !Inventory.contains(key))
             	{
-    				if(Locations.ernest_2ndfloorMaynor.contains(Players.localPlayer()))
+    				if(Locations.ernest_2ndfloorMaynor.contains(p.l))
     				{
     					API.interactWithGameObject("Staircase","Climb-down",Locations.ernest_2ndStairs);
     					return;
@@ -239,7 +240,7 @@ public class ErnestTheChicken extends Leaf {
                 	return;
             	}
     		}
-    		if(Locations.ernest_2ndfloorMaynor.contains(Players.localPlayer()))
+    		if(Locations.ernest_2ndfloorMaynor.contains(p.l))
 			{
 				API.interactWithGameObject("Staircase","Climb-down",Locations.ernest_2ndStairs);
 				return;
@@ -254,7 +255,7 @@ public class ErnestTheChicken extends Leaf {
     	}
     	if(!Inventory.contains(rubberTube))
     	{
-    		if(Locations.ernest_SkellyTube.contains(Players.localPlayer()))
+    		if(Locations.ernest_SkellyTube.contains(p.l))
     		{
     			if(Combatz.shouldEatFood(6)) Combatz.eatFood();
     			if(!InvEquip.free1InvySpace()) return;
@@ -274,19 +275,19 @@ public class ErnestTheChicken extends Leaf {
     			API.walkInteractWithGameObject("Compost heap", "Search", Locations.ernest_compost, () -> Inventory.contains(key));
             	return;
 			}
-			API.walkInteractWithGameObject("Door", "Open", Locations.ernest_SkellyDoorArea, () -> Locations.ernest_SkellyTube.contains(Players.localPlayer()));
+			API.walkInteractWithGameObject("Door", "Open", Locations.ernest_SkellyDoorArea, () -> Locations.ernest_SkellyTube.contains(p.l));
 			return;
     	}
 
 		API.randomAFK(5);
-    	if(Locations.ernest_SkellyTube.contains(Players.localPlayer()))
+    	if(Locations.ernest_SkellyTube.contains(p.l))
     	{
-			API.walkInteractWithGameObject("Door", "Open", Locations.ernest_SkellyDoorArea, () -> !Locations.ernest_SkellyTube.contains(Players.localPlayer()));
+			API.walkInteractWithGameObject("Door", "Open", Locations.ernest_SkellyDoorArea, () -> !Locations.ernest_SkellyTube.contains(p.l));
 			return;
     	}
     	if(!Inventory.contains(oilCan))
     	{
-    		if(Locations.ernest_basementMaynor.contains(Players.localPlayer()))
+    		if(Locations.ernest_basementMaynor.contains(p.l))
     		{
     			if(isAUp() && isBUp() && !isCUp() && !isDUp() && isEUp() && !isFUp())
     			{
@@ -373,27 +374,27 @@ public class ErnestTheChicken extends Leaf {
     				return;
     			}
     		}
-    		if(Locations.ernest_westWing.contains(Players.localPlayer()))
+    		if(Locations.ernest_westWing.contains(p.l))
         	{
-    			API.walkInteractWithGameObject("Ladder", "Climb-down", Locations.ernest_westWing, () -> Locations.ernest_basementMaynor.contains(Players.localPlayer()));
+    			API.walkInteractWithGameObject("Ladder", "Climb-down", Locations.ernest_westWing, () -> Locations.ernest_basementMaynor.contains(p.l));
             	return;
         	}
-    		API.walkInteractWithGameObject("Bookcase", "Search", Locations.ernest_westWingAnd, () -> Locations.ernest_westWing.contains(Players.localPlayer()));
+    		API.walkInteractWithGameObject("Bookcase", "Search", Locations.ernest_westWingAnd, () -> Locations.ernest_westWing.contains(p.l));
         	return;
     	}
     	if(Inventory.contains(oilCan))
     	{
-    		if(Locations.ernest_basementMaynor.contains(Players.localPlayer()))
+    		if(Locations.ernest_basementMaynor.contains(p.l))
     		{
-    			API.walkInteractWithGameObject("Ladder", "Climb-up", Locations.ernest_puzzle1, () -> Locations.ernest_westWing.contains(Players.localPlayer()));
+    			API.walkInteractWithGameObject("Ladder", "Climb-up", Locations.ernest_puzzle1, () -> Locations.ernest_westWing.contains(p.l));
     			return;
     		}
-    		if(Locations.ernest_westWing.contains(Players.localPlayer()))
+    		if(Locations.ernest_westWing.contains(p.l))
     		{
-    			API.walkInteractWithGameObject("Lever","Pull",Locations.ernest_westWing,() -> !Locations.ernest_westWing.contains(Players.localPlayer()));
+    			API.walkInteractWithGameObject("Lever","Pull",Locations.ernest_westWing,() -> !Locations.ernest_westWing.contains(p.l));
     			return;
     		}
-    		API.walkTalkToNPC("Professor Oddenstein","Talk-to", Locations.ernest_3rdfloorMaynor);
+    		API.walkTalkToNPC("Professor Oddenstein","Talk-to",true, Locations.ernest_3rdfloorMaynor);
     		Sleep.sleep(696, 666);
     	}
     }

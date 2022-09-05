@@ -26,6 +26,7 @@ import org.dreambot.api.wrappers.interactive.Player;
 import org.dreambot.api.wrappers.items.GroundItem;
 
 import script.Main;
+import script.p;
 import script.behaviour.DecisionLeaf;
 import script.framework.Leaf;
 import script.framework.Tree;
@@ -58,7 +59,7 @@ public class MageArena1 extends Leaf {
         
     }
     public boolean onExit() {
-        if(Locations.mageArenaBank.contains(Players.localPlayer()))
+        if(Locations.mageArenaBank.contains(p.l))
         {
         	if(!Walkz.useJewelry(InvEquip.glory, "Edgeville") && !Walkz.useJewelry(InvEquip.combat, "Ranging Guild"))
         	{
@@ -75,12 +76,12 @@ public class MageArena1 extends Leaf {
     {
     	if(getProgressValue() == 8) //finished value
     	{
-    		if(Players.localPlayer().isAnimating())
+    		if(p.l.isAnimating())
         	{
         		Sleep.sleep(69, 696);
         		return true;
         	}
-        	if(Locations.mageArenaCave.contains(Players.localPlayer()))
+        	if(Locations.mageArenaCave.contains(p.l))
         	{
             	API.randomAFK(5);
         		if(Inventory.count(id.saradominCape) < 2)
@@ -101,7 +102,7 @@ public class MageArena1 extends Leaf {
             	API.walkTalkWithGameObject("Sparkling pool", "Step-into",Locations.mageArenaCaveSouth);
             	return true;
         	}
-        	if(Locations.mageArenaBank.contains(Players.localPlayer()))
+        	if(Locations.mageArenaBank.contains(p.l))
         	{
             	API.randomAFK(5);
         		if(Inventory.contains(id.guthixCape) || 
@@ -151,12 +152,12 @@ public class MageArena1 extends Leaf {
         case(7):
         {
         	API.randomAFK(5);
-        	if(Players.localPlayer().isAnimating())
+        	if(p.l.isAnimating())
         	{
         		Sleep.sleep(696, 696);
         		break;
         	}
-        	if(Locations.mageArenaCave.contains(Players.localPlayer()))
+        	if(Locations.mageArenaCave.contains(p.l))
         	{
         		if(Inventory.count(id.saradominCape) < 2)
             	{
@@ -185,7 +186,7 @@ public class MageArena1 extends Leaf {
         //just defeated kolodion, should teleport back into mage arena bank
         case(6):
         {
-        	if(Players.localPlayer().isAnimating())
+        	if(p.l.isAnimating())
         	{
         		Sleep.sleep(696, 696);
         		break;
@@ -198,12 +199,12 @@ public class MageArena1 extends Leaf {
         		Sleep.sleep(69, 696);
         		break;
         	}
-        	if(Locations.mageArenaCave.contains(Players.localPlayer()))
+        	if(Locations.mageArenaCave.contains(p.l))
         	{
         		API.walkInteractWithGameObject("Statue of Saradomin", "Pray-at", Locations.mageArenaCaveStatues, Dialogues::inDialogue);
     			break;
         	}
-        	if(Locations.mageArenaBank.contains(Players.localPlayer()))
+        	if(Locations.mageArenaBank.contains(p.l))
         	{
         		API.walkInteractWithGameObject("Sparkling pool", "Step-into", Locations.mageArenaBank, Dialogues::inDialogue);
         		break;
@@ -287,7 +288,7 @@ public class MageArena1 extends Leaf {
     		InvEquip.depositAll(InvEquip.coins, 180000);
     		return;
     	}
-    	if(Locations.mageArenaInnerCircle.contains(Players.localPlayer()))
+    	if(Locations.mageArenaInnerCircle.contains(p.l))
     	{
     		if(Combatz.shouldDrinkPrayPot()) 
     		{
@@ -315,16 +316,16 @@ public class MageArena1 extends Leaf {
     			Casting.setHighestAutocast();
     			return;
     		}
-    		if(!Players.localPlayer().isInCombat())
+    		if(!p.l.isInCombat())
     		{
-    			API.interactNPC("Kolodion", "Attack", Locations.mageArenaInnerCircle, true, () -> Players.localPlayer().isInCombat());
+    			API.interactNPC("Kolodion", "Attack", Locations.mageArenaInnerCircle, true, () -> p.l.isInCombat());
     		}
     		return;
     	}
     	if(goToMageArenaBank())
     	{
     		Sleep.sleep(2222, 2222);
-    		if(Locations.mageArenaBank.contains(Players.localPlayer()))
+    		if(Locations.mageArenaBank.contains(p.l))
     		{
     			API.talkToNPC("Kolodion");
     		}
@@ -334,7 +335,7 @@ public class MageArena1 extends Leaf {
     public static boolean goToMageArenaBank()
     {
     	slashed = false;
-    	if(Locations.mageArenaBank.contains(Players.localPlayer())) return true;
+    	if(Locations.mageArenaBank.contains(p.l)) return true;
     	if(Combatz.shouldEatFood(20))
     	{
     		Combatz.eatFood();
@@ -366,7 +367,7 @@ public class MageArena1 extends Leaf {
     	{
     		Combat.toggleAutoRetaliate(false);
     	}
-    	if(Locations.mageArenaBankOutside.contains(Players.localPlayer()))
+    	if(Locations.mageArenaBankOutside.contains(p.l))
     	{
     		GameObject lever = GameObjects.closest(g -> 
 			g!=null && 
@@ -375,7 +376,7 @@ public class MageArena1 extends Leaf {
 			Locations.mageArenaBankLeverRoom.contains(g));
     		if(lever == null) //lever being pulled!! Go to lever tile and wait..
     		{
-    			if(Locations.mageArenaBankOutsideLeverTile.equals(Players.localPlayer().getTile())) return false;
+    			if(Locations.mageArenaBankOutsideLeverTile.equals(p.l.getTile())) return false;
     		}
     		
     		if(!Locations.mageArenaBankOutsideLeverTile.canReach())
@@ -388,7 +389,7 @@ public class MageArena1 extends Leaf {
 					g.getName().equals("Web") && 
 					g.hasAction("Slash") && 
 					g.getTile().equals(new Tile(3092,3957,0)));
-    			if(Locations.mageArenaBankLeverAirlock.contains(Players.localPlayer()))
+    			if(Locations.mageArenaBankLeverAirlock.contains(p.l))
     			{
     				if(web2 != null)
     				{
@@ -401,7 +402,7 @@ public class MageArena1 extends Leaf {
     				}
     				return false;
     			}
-    			if(Locations.mageArenaBankOutside.contains(Players.localPlayer()))
+    			if(Locations.mageArenaBankOutside.contains(p.l))
     			{
     				if(web1 != null)
     				{
@@ -436,13 +437,13 @@ public class MageArena1 extends Leaf {
     		{
     			MethodProvider.log("Pulled lever!");
     			if(shouldPanic()) return false;
-    			MethodProvider.sleepUntil(() -> Locations.mageArenaBank.contains(Players.localPlayer()), 
-    					() -> Players.localPlayer().isMoving(),
+    			MethodProvider.sleepUntil(() -> Locations.mageArenaBank.contains(p.l), 
+    					() -> p.l.isMoving(),
     					Sleep.calculate(2222, 2222),69);
     		}
     		return false;
     	}
-    	if(Locations.deepWildyEdgevilleLeverPeninsula.contains(Players.localPlayer()))
+    	if(Locations.deepWildyEdgevilleLeverPeninsula.contains(p.l))
     	{
     		final Tile slashTile = new Tile(3158,3950,0);
     		GameObject web = GameObjects.closest(g -> 
@@ -466,7 +467,7 @@ public class MageArena1 extends Leaf {
     				MethodProvider.log("Web slashed!");
     				if(shouldPanic()) return false;
     				MethodProvider.sleepUntil(() -> slashed, 
-    					() -> Players.localPlayer().isMoving(), Sleep.calculate(2222, 2222),69);
+    					() -> p.l.isMoving(), Sleep.calculate(2222, 2222),69);
 					Sleep.sleep(420, 696);
     				return false;
     			} else
@@ -490,7 +491,7 @@ public class MageArena1 extends Leaf {
     		else if(Walking.shouldWalk(6) && Walking.walk(Locations.mageArenaBankOutsideLeverTile)) Sleep.sleep(420, 696);
     		return false;
     	}
-    	if(Locations.edgevillePKLever.contains(Players.localPlayer()))
+    	if(Locations.edgevillePKLever.contains(p.l))
     	{
     		GameObject lever = GameObjects.closest(g -> 
 			g!=null && 
@@ -504,8 +505,8 @@ public class MageArena1 extends Leaf {
     		}
     		if(lever.interact("Pull"))
     		{
-    			MethodProvider.sleepUntil(() -> Locations.deepWildyEdgevilleLeverPeninsula.contains(Players.localPlayer()),
-    					() -> Players.localPlayer().isMoving(),
+    			MethodProvider.sleepUntil(() -> Locations.deepWildyEdgevilleLeverPeninsula.contains(p.l),
+    					() -> p.l.isMoving(),
     					Sleep.calculate(3333, 3333),69);
     		}
     		return false;
@@ -528,14 +529,14 @@ public class MageArena1 extends Leaf {
     public static boolean shouldPanic()
     {
     	if(!Combat.isInWild()) return false;
-		final int maxBracket = Players.localPlayer().getLevel() + Combat.getWildernessLevel() + 1;
-		final int minBracket = Players.localPlayer().getLevel() - Combat.getWildernessLevel() - 1;
-    	for(Player p : Players.all())
+		final int maxBracket = p.l.getLevel() + Combat.getWildernessLevel() + 1;
+		final int minBracket = p.l.getLevel() - Combat.getWildernessLevel() - 1;
+    	for(Player p2 : Players.all())
 		{
-			if(p == null || !p.exists() || p.getName().equals(Players.localPlayer().getName()) || p.getHealthPercent() == 0) continue;
-			if(p.distance() <= 10 && 
-					p.getLevel() >= minBracket && 
-					p.getLevel() <= maxBracket) 
+			if(p2 == null || !p2.exists() || p2.getName().equals(p.l.getName()) || p2.getHealthPercent() == 0) continue;
+			if(p2.distance() <= 10 && 
+					p2.getLevel() >= minBracket && 
+					p2.getLevel() <= maxBracket) 
 			{
 				MethodProvider.log("PKer Panic!");
 				return true;

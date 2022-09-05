@@ -22,6 +22,7 @@ import org.dreambot.api.utilities.Timer;
 import org.dreambot.api.wrappers.interactive.NPC;
 
 import script.Main;
+import script.p;
 import script.actionz.UniqueActions;
 import script.actionz.UniqueActions.Actionz;
 import script.behaviour.DecisionLeaf;
@@ -58,7 +59,7 @@ public class TrainMelee extends Leaf{
 			Walkz.exitIsleOfSouls(240000);
 			return false;
 		}
-		if(Locations.kourendGiantsCaveArea.contains(Players.localPlayer()))
+		if(Locations.kourendGiantsCaveArea.contains(p.l))
 		{
 			Walkz.exitGiantsCave();
 			return false;

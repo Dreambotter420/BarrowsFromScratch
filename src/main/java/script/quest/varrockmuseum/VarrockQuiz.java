@@ -8,6 +8,7 @@ import org.dreambot.api.methods.settings.PlayerSettings;
 import org.dreambot.api.wrappers.interactive.GameObject;
 
 import script.Main;
+import script.p;
 import script.framework.Leaf;
 import script.framework.Tree;
 import script.utilities.API;
@@ -42,12 +43,12 @@ public class VarrockQuiz extends Leaf {
     }
     public static boolean onExit()
     {
-    	if(Locations.museumArea.contains(Players.localPlayer()))
+    	if(Locations.museumArea.contains(p.l))
     	{
     		 GameObject gameObject = GameObjects.closest(g -> g.getName().contains("Stairs") && g.hasAction("Walk-up"));
     	     if (gameObject != null && gameObject.distance() < 8 && gameObject.interact("Walk-up")) 
     	     {
-    	    	 MethodProvider.sleepUntil(() -> Locations.museumArea.contains(Players.localPlayer()), (1000 + Timing.sleepLogNormalInteraction()));
+    	    	 MethodProvider.sleepUntil(() -> Locations.museumArea.contains(p.l), (1000 + Timing.sleepLogNormalInteraction()));
     	    	 MethodProvider.sleep(Timing.sleepLogNormalSleep());
     	    	 return false;
     	     }

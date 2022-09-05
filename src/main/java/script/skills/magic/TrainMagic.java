@@ -40,6 +40,7 @@ import org.dreambot.api.wrappers.items.GroundItem;
 import org.dreambot.api.wrappers.items.Item;
 
 import script.Main;
+import script.p;
 import script.behaviour.DecisionLeaf;
 import script.framework.Leaf;
 import script.framework.Tree;
@@ -80,6 +81,7 @@ public class TrainMagic extends Leaf {
     		Magic.deselect();
     		return false;
     	}
+    	Main.clearCustomPaintText();
     	return true;
     }
     @Override
@@ -91,7 +93,6 @@ public class TrainMagic extends Leaf {
             return Timing.sleepLogNormalSleep();
     	}
        	int magic = Skills.getRealLevel(Skill.MAGIC);
-       	int def = Skills.getRealLevel(Skill.DEFENCE);
     	if(magic >= DecisionLeaf.mageSetpoint) {
             MethodProvider.log("[COMPLETE] -> lvl "+DecisionLeaf.mageSetpoint+" magic!");
             if(onExit()) 
@@ -99,14 +100,35 @@ public class TrainMagic extends Leaf {
             	completedMagic = true;
                	API.mode = null;
             }
-            
             return Timing.sleepLogNormalSleep();
         }
 
     	if(Skillz.shouldCheckSkillInterface()) Skillz.checkSkillProgress(Skill.MAGIC);
-    	if(magic < 45) trainLesserDemon();
-    	else if(magic < 55) teleportCamelot();
-    	else if(magic < 75) highAlch();
+    	if(magic < 45) 
+    	{
+    		trainLesserDemon();
+            return Timing.sleepLogNormalSleep();
+    	}
+    	if(magic < 55) 
+    	{
+    		teleportCamelot();
+            return Timing.sleepLogNormalSleep();
+    	}
+    	
+    	//55 magic and beyond decide to tele-alch camelot or to alch normally
+    	if(!chancedTeleAlch)
+    	{
+			int chance = (int) Calculations.nextGaussianRandom(50, 25);
+			if(chance > 60) //less chance to tele-alch than to alch normally
+			{
+				teleAlch = true;
+				MethodProvider.log("[MAGIC] -> lvl 55+, Chose to Tele-Alch~");
+			}
+			else MethodProvider.log("[MAGIC] -> lvl 55+, Chose to High Alch normally~");
+			chancedTeleAlch = true;
+		}
+    	if(teleAlch) teleAlch();
+    	else highAlch();
         return Timing.sleepLogNormalSleep();
     }
 
@@ -130,6 +152,8 @@ public class TrainMagic extends Leaf {
 	public static Timer HATimer = null;
 	public static final int HAWarningThresholdVarbit = 6091;
 	public static boolean xpAlch = false;
+	public static boolean teleAlch = false;
+	public static boolean chancedTeleAlch = false;
 	public static boolean chancedXPAlch = false;
 	public static void checkProfitItems () {
 		final int natRunePrice = new Item(id.natureRune,1).getLivePrice();
@@ -166,7 +190,258 @@ public class TrainMagic extends Leaf {
 		MethodProvider.log("Done  ~~");
 		Sleep.sleep(6969, 4420);
 	}
-	
+	public static boolean teleElseAlch = false;
+	public static void teleAlch()
+	{
+		if(!InvEquip.checkedBank()) return;
+		API.randomAFK(5);
+		if(!Equipment.contains(id.staffOfFire) || 
+				Inventory.count(id.natureRune) <= 0 ||
+				Inventory.count(id.lawRune) <= 0 ||
+				Inventory.count(id.airRune) < 5)
+		{
+			fulfillTeleHA();
+			return;
+		}
+		List<Integer> profitKeys = new ArrayList(id.approvedAlchs.keySet());
+		profitKeys.addAll(id.xpAlchs.keySet());
+		Collections.shuffle(profitKeys);
+		boolean foundAlch = false;
+		int alchsCount = 0;
+		boolean bankedAlchs = false;
+		for(Integer i : profitKeys)
+		{
+			if(Bank.count(i) > 0) bankedAlchs = true;
+			if(Inventory.count(i) > 0 || 
+					Inventory.count(new Item(i,1).getNotedItemID()) > 0)
+			{
+				alchsCount += (Inventory.count(i) + Inventory.count(new Item(i,1).getNotedItemID()) + Bank.count(i));
+				foundAlch = true;
+			}
+		}
+		if(bankedAlchs)
+		{
+			MethodProvider.log("Found banked alchs");
+			if(Locations.HASpot1.contains(p.l))
+			{
+				if(!Walkz.useJewelry(InvEquip.wealth, "Grand Exchange"))
+				{
+					if(GameObjects.closest("Ladder").interact("Climb-down"))
+					{
+						MethodProvider.sleepUntil(() -> !Locations.HASpot1.contains(p.l),
+								() -> p.l.isMoving(),
+								Sleep.calculate(2222, 2222),50);
+					}
+				}
+				return;
+			}
+			if(Bankz.openClosest(85))
+			{
+				if(Bank.getWithdrawMode() == BankMode.NOTE)
+				{
+					for(Integer i : profitKeys)
+					{
+						if(Bank.count(i) > 0)
+						{
+							if(Inventory.isFull())
+							{
+								InvEquip.depositExtraJunk();
+								return;
+							}
+							MethodProvider.log("Attempting withdraw of item: "+new Item(i,1).getName());
+							InvEquip.withdrawAll(i, true, 180000);
+						}
+					}
+					return;
+				}
+				Bank.setWithdrawMode(BankMode.NOTE);
+				return;
+			}
+			return;
+		}
+		if(!foundAlch)
+		{
+			BuyHighAlchs.buyItems(true);
+			return;
+		}
+		
+		if(Dialogues.canContinue()) 
+		{
+			Dialogues.continueDialogue();
+			return;
+		}
+		if(Dialogues.isProcessing()) return;
+		
+		if(shouldChangeHAThreshold())
+		{
+			changeHAThreshold();
+			return;
+		}
+
+		if(Bank.isOpen()) 
+		{
+			Bankz.close();
+			return;
+		}
+		if(GrandExchange.isOpen())
+		{
+			if(GrandExchange.isReadyToCollect()) GrandExchange.collect();
+			if(!GrandExchange.isReadyToCollect()) GrandExchangg.close();
+			return;
+		}
+		
+		if(profitKeys.contains(new Item(Inventory.getIdForSlot(11),1).getUnnotedItemID()))
+		{
+			//can HA now :-)
+			if(HATimer == null)
+			{
+				HATimer = new Timer(2147483646);
+			}
+			//invy must be open if HA spell selected
+			if(Magic.isSpellSelected() && Magic.getSelectedSpellName().contains("High Level Alchemy"))
+			{
+				final Rectangle HABounds = Inventory.slotBounds(11);
+				if(p.l.isAnimating())
+				{
+					if(!HABounds.contains(Mouse.getPosition()) && Mouse.move(HABounds))
+					{
+						Sleep.sleep(111, 420);
+					}
+					MethodProvider.sleepUntil(() -> !p.l.isAnimating(), Sleep.calculate(4444, 3333));
+				}
+				if(!HABounds.contains(Mouse.getPosition()) && Mouse.move(HABounds))
+				{
+					Sleep.sleep(111, 420);
+				}
+				if(Inventory.slotBounds(11).contains(Mouse.getPosition()))
+				{
+					if(Mouse.click(ClickMode.LEFT_CLICK))
+					{
+						HACount++;
+						teleElseAlch = true;
+						Sleep.sleep(42, 420);
+					}
+					return;
+				}
+				return;
+			}
+			if(!Tabs.isOpen(Tab.MAGIC)) Tabs.openWithFKey(Tab.MAGIC);
+			//teleport spell rather than cast HA
+			if(teleElseAlch)
+			{
+				if(Magic.castSpell(Normal.CAMELOT_TELEPORT))
+				{
+					Sleep.sleep(42, 696);
+					teleElseAlch = false;
+				}
+				return;
+			}
+			if(Magic.castSpell(Normal.HIGH_LEVEL_ALCHEMY))
+			{
+				Sleep.sleep(42, 420);
+			}
+			return;
+		}
+		
+		//item dragging function - rearrange HA item to beneath HA spell
+		final List<Integer> keysFinal = profitKeys; //final required for filter
+		Item alch = Inventory.get(i -> i!=null && 
+				keysFinal.contains(i.getUnnotedItemID()));
+		if(alch == null)
+		{
+			MethodProvider.log("Alch found but first alch found null!");
+			return;
+		}
+		if(!Tabs.isOpen(Tab.INVENTORY))
+		{
+			Tabz.open(Tab.INVENTORY);
+			return;
+		}
+		
+		if(Mouse.move(Inventory.slotBounds(alch.getSlot())))
+		{
+			Sleep.sleep(69, 696);
+		}
+		
+		if(!Inventory.slotBounds(alch.getSlot()).contains(Mouse.getPosition()))
+		{
+			if(Mouse.move(Inventory.slotBounds(alch.getSlot())))
+			{
+				Sleep.sleep(69, 696);
+			}
+		}
+		if(Inventory.slotBounds(alch.getSlot()).contains(Mouse.getPosition()))
+		{
+			if(Mouse.drag(Inventory.slotBounds(11)))
+			{
+				Sleep.sleep(696, 696);
+			}
+		}
+	}
+	/**
+	 * Pretend that we cannot automatically detect the HA threshold,
+	 * and wait until we are prompted to change it, look at it, then proceed with HA, and change it
+	 * @return
+	 */
+	public static boolean shouldChangeHAThreshold()
+	{
+		if(Widgets.getWidgetChild(193,2) != null && 
+				Widgets.getWidgetChild(193,2).isVisible() && 
+				Widgets.getWidgetChild(193,2).getText().contains("That item is considered <col=6f0000>valuable") ||
+				(Dialogues.areOptionsAvailable() && Dialogues.chooseFirstOptionContaining("Proceed to cast High Alchemy on it.")))
+		{
+			changeVarbit = true;
+		}
+		return changeVarbit;
+	}
+	public static void changeHAThreshold()
+	{
+		if(PlayerSettings.getBitValue(HAWarningThresholdVarbit) >= 50000)
+		{
+			MethodProvider.log("Succesfully changed HA Warnings to greater than 50k!");
+			changeVarbit = false;
+			return;
+		}
+		if(Dialogues.canContinue()) 
+		{
+			Dialogues.continueDialogue();
+			return;
+		}
+		if(Dialogues.areOptionsAvailable())
+		{
+			if(Dialogues.chooseFirstOptionContaining("Set value threshold")) return;
+			MethodProvider.log("Options are available but not the set value threshold one we want in HA varbit function...");
+			Map.interact(p.l.getTile());
+			Sleep.sleep(420, 696);
+			return;
+		}
+		if(Widgets.getWidgetChild(162, 41) != null && 
+    			Widgets.getWidgetChild(162, 41).isVisible() && 
+    			Widgets.getWidgetChild(162, 41).getText().contains("Set value threshold for alchemy warnings:"))
+    	{
+			if(Widgets.getWidgetChild(162, 42).getText().length() > 1)
+			{
+				Keyboard.typeSpecialKey(8);
+				return;
+			}
+			else
+			{
+				Keyboard.type(Integer.toString(API.roundToMultiple((int) Calculations.nextGaussianRandom(75000,20000),500)), true);
+				Sleep.sleep(1111, 4444);
+				return;
+			}
+		}
+		if(!Tabs.isOpen(Tab.MAGIC))
+		{
+			Tabz.open(Tab.MAGIC);
+			return;
+		}
+		if(Magic.interact(Normal.HIGH_LEVEL_ALCHEMY, "Warnings"))
+		{
+			MethodProvider.sleepUntil(Dialogues::inDialogue,Sleep.calculate(2222, 2222));
+			return;
+		}
+	}
 	public static void highAlch()
 	{
 		//decide whether to alch longbows in quiet spot or profit alchs at GE
@@ -176,13 +451,12 @@ public class TrainMagic extends Leaf {
 			if(chance > 60) 
 				{
 				xpAlch = true;
-				MethodProvider.log("Chose to High Alch Magic/Yew longbows~");
+				MethodProvider.log("[MAGIC] -> Chose to High Alch Magic/Yew longbows~");
 				}
-			else MethodProvider.log("Chose to High Alch profitable items~");
+			else MethodProvider.log("[MAGIC] -> Chose to High Alch profitable items~");
 			chancedXPAlch = true;
 		}
 		if(!InvEquip.checkedBank()) return;
-		API.randomAFK(10);
 		if(Equipment.contains(id.staffOfFire) && Inventory.count(id.natureRune) > 0)
 		{
 			List<Integer> profitKeys = new ArrayList(id.approvedAlchs.keySet());
@@ -216,14 +490,14 @@ public class TrainMagic extends Leaf {
 			if(bankedAlchs)
 			{
 				MethodProvider.log("Found banked alchs");
-				if(Locations.HASpot1.contains(Players.localPlayer()))
+				if(Locations.HASpot1.contains(p.l))
 				{
 					if(!Walkz.useJewelry(InvEquip.wealth, "Grand Exchange"))
 					{
 						if(GameObjects.closest("Ladder").interact("Climb-down"))
 						{
-							MethodProvider.sleepUntil(() -> !Locations.HASpot1.contains(Players.localPlayer()),
-									() -> Players.localPlayer().isMoving(),
+							MethodProvider.sleepUntil(() -> !Locations.HASpot1.contains(p.l),
+									() -> p.l.isMoving(),
 									Sleep.calculate(2222, 2222),50);
 						}
 					}
@@ -262,66 +536,16 @@ public class TrainMagic extends Leaf {
 					return;
 				}
 				if(Dialogues.isProcessing()) return;
-				if((Widgets.getWidgetChild(193,2) != null && 
-						Widgets.getWidgetChild(193,2).isVisible() && 
-						Widgets.getWidgetChild(193,2).getText().contains("That item is considered <col=6f0000>valuable") ||
-						(Dialogues.areOptionsAvailable() && Dialogues.chooseFirstOptionContaining("Proceed to cast High Alchemy on it."))))
+				if(shouldChangeHAThreshold())
 				{
-					changeVarbit = true;
+					changeHAThreshold();
 					return;
-				}
-				if(changeVarbit)
-				{
-					if(PlayerSettings.getBitValue(HAWarningThresholdVarbit) >= 50000)
-					{
-						MethodProvider.log("Succesfully changed HA Warnings to greater than 50k!");
-						changeVarbit = false;
-						return;
-					}
-					if(Dialogues.canContinue()) 
-					{
-						Dialogues.continueDialogue();
-						return;
-					}
-					if(Dialogues.areOptionsAvailable())
-					{
-						if(Dialogues.chooseFirstOptionContaining("Set value threshold")) return;
-						MethodProvider.log("Options are available but not the set value threshold one we want in HA varbit function...");
-						Map.interact(Players.localPlayer().getTile());
-						Sleep.sleep(420, 696);
-						return;
-					}
-					if(Widgets.getWidgetChild(162, 41) != null && 
-		        			Widgets.getWidgetChild(162, 41).isVisible() && 
-		        			Widgets.getWidgetChild(162, 41).getText().contains("Set value threshold for alchemy warnings:"))
-		        	{
-						if(Widgets.getWidgetChild(162, 42).getText().length() > 1)
-	    				{
-	    					Keyboard.typeSpecialKey(8);
-	    					return;
-	    				}
-	    				else
-	    				{
-	    					Keyboard.type(Integer.toString(API.roundToMultiple((int) Calculations.nextGaussianRandom(75000,20000),500)), true);
-	    					Sleep.sleep(1111, 4444);
-	    					return;
-	    				}
-		    		}
-					if(!Tabs.isOpen(Tab.MAGIC))
-					{
-						Tabz.open(Tab.MAGIC);
-						return;
-					}
-					if(Magic.interact(Normal.HIGH_LEVEL_ALCHEMY, "Warnings"))
-					{
-						MethodProvider.sleepUntil(Dialogues::inDialogue,Sleep.calculate(2222, 2222));
-						return;
-					}
 				}
 				if(xpAlch)
 				{
-					if(Locations.HASpot1.contains(Players.localPlayer()))
+					if(Locations.HASpot1.contains(p.l))
 					{
+						API.randomAFK(5);
 						if(keys.contains(new Item(Inventory.getIdForSlot(11),1).getUnnotedItemID()))
 						{
 							//can HA now :-)
@@ -422,8 +646,8 @@ public class TrainMagic extends Leaf {
 						}
 						if(ladder.interact("Climb-up"))
 						{
-							MethodProvider.sleepUntil(() -> Locations.HASpot1.contains(Players.localPlayer()), 
-									() -> Players.localPlayer().isMoving(),Sleep.calculate(2222, 2222),69);
+							MethodProvider.sleepUntil(() -> Locations.HASpot1.contains(p.l), 
+									() -> p.l.isMoving(),Sleep.calculate(2222, 2222),69);
 						}
 						return;
 					}
@@ -446,7 +670,8 @@ public class TrainMagic extends Leaf {
 					}
 					return;
 				}
-				
+
+				API.randomAFK(5);
 				if(keys.contains(new Item(Inventory.getIdForSlot(11),1).getUnnotedItemID()))
 				{
 					//can HA now :-)
@@ -548,24 +773,21 @@ public class TrainMagic extends Leaf {
 		}
 	}
 	public static Timer quickHATimer = null;
-	public static final Rectangle perfectHAClickSpot = new Rectangle(709,302,13,14);
+	public static final Rectangle perfectHAClickSpot = new Rectangle(709,302,13,14); //only for FIXED MODE!!
 	/**
 	 * returns true if have HA items in inventory.
 	 * returns false otherwise and tries to withdraw/buy more
 	 * @return
 	 */
-	public static boolean haveHAItems()
+	public static boolean getHAItems()
 	{
 		if(!InvEquip.checkedBank() ||
 				(quickHATimer != null && !quickHATimer.finished())) return false;
 		if(Equipment.contains(id.staffOfFire) && Inventory.count(id.natureRune) > 0)
 		{
 			//combine profit and longbow alch lists
-			List<Integer> profitKeys = new ArrayList(id.approvedAlchs.keySet());
-			List<Integer> longbowKeys = new ArrayList(id.xpAlchs.keySet());
-			List<Integer> keys = new ArrayList<Integer>();
-			keys.addAll(profitKeys);
-			keys.addAll(longbowKeys);
+			List<Integer> keys = new ArrayList(id.approvedAlchs.keySet());
+			keys.addAll(id.xpAlchs.keySet());
 			Collections.shuffle(keys);
 			boolean foundAlch = false;
 			boolean bankedAlchs = false;
@@ -581,14 +803,14 @@ public class TrainMagic extends Leaf {
 			if(bankedAlchs)
 			{
 				MethodProvider.log("Found banked alchs");
-				if(Locations.HASpot1.contains(Players.localPlayer()))
+				if(Locations.HASpot1.contains(p.l))
 				{
 					if(!Walkz.useJewelry(InvEquip.wealth, "Grand Exchange"))
 					{
 						if(GameObjects.closest("Ladder").interact("Climb-down"))
 						{
-							MethodProvider.sleepUntil(() -> !Locations.HASpot1.contains(Players.localPlayer()),
-									() -> Players.localPlayer().isMoving(),
+							MethodProvider.sleepUntil(() -> !Locations.HASpot1.contains(p.l),
+									() -> p.l.isMoving(),
 									Sleep.calculate(2222, 2222),50);
 						}
 					}
@@ -642,61 +864,9 @@ public class TrainMagic extends Leaf {
 			return;
 		}
 		if(Dialogues.isProcessing()) return;
-		if((Widgets.getWidgetChild(193,2) != null && 
-				Widgets.getWidgetChild(193,2).isVisible() && 
-				Widgets.getWidgetChild(193,2).getText().contains("That item is considered <col=6f0000>valuable") ||
-				(Dialogues.areOptionsAvailable() && Dialogues.chooseFirstOptionContaining("Proceed to cast High Alchemy on it."))))
+		if(shouldChangeHAThreshold())
 		{
-			changeVarbit = true;
-			return;
-		}
-		if(changeVarbit)
-		{
-			if(PlayerSettings.getBitValue(HAWarningThresholdVarbit) >= 50000)
-			{
-				MethodProvider.log("Succesfully changed HA Warnings to greater than 50k!");
-				changeVarbit = false;
-				return;
-			}
-			if(Dialogues.canContinue()) 
-			{
-				Dialogues.continueDialogue();
-				return;
-			}
-			if(Dialogues.areOptionsAvailable())
-			{
-				if(Dialogues.chooseFirstOptionContaining("Set value threshold")) return;
-				MethodProvider.log("Options are available but not the set value threshold one we want in HA varbit function...");
-				Map.interact(Players.localPlayer().getTile());
-				Sleep.sleep(420, 696);
-				return;
-			}
-			if(Widgets.getWidgetChild(162, 41) != null && 
-        			Widgets.getWidgetChild(162, 41).isVisible() && 
-        			Widgets.getWidgetChild(162, 41).getText().contains("Set value threshold for alchemy warnings:"))
-        	{
-				if(Widgets.getWidgetChild(162, 42).getText().length() > 1)
-				{
-					Keyboard.typeSpecialKey(8);
-					return;
-				}
-				else
-				{
-					Keyboard.type(Integer.toString(API.roundToMultiple((int) Calculations.nextGaussianRandom(75000,20000),500)), true);
-					Sleep.sleep(1111, 4444);
-					return;
-				}
-    		}
-			if(!Tabs.isOpen(Tab.MAGIC))
-			{
-				Tabz.open(Tab.MAGIC);
-				return;
-			}
-			if(Magic.interact(Normal.HIGH_LEVEL_ALCHEMY, "Warnings"))
-			{
-				MethodProvider.sleepUntil(Dialogues::inDialogue,Sleep.calculate(2222, 2222));
-				return;
-			}
+			changeHAThreshold();
 			return;
 		}
 		if(id.allAlchs.contains(new Item(Inventory.getIdForSlot(11),1).getUnnotedItemID()))
@@ -839,10 +1009,10 @@ public class TrainMagic extends Leaf {
 		}
 		if(Tabs.isOpen(Tab.MAGIC))
 		{
-			API.randomAFK(10);
+			API.randomAFK(5);
 			Magic.castSpell(Normal.CAMELOT_TELEPORT);
 			Sleep.sleep(696, 696);
-			MethodProvider.sleepUntil(() -> !Players.localPlayer().isAnimating(), Sleep.calculate(2222, 2222));
+			MethodProvider.sleepUntil(() -> !p.l.isAnimating(), Sleep.calculate(2222, 2222));
 			return;
 		} 
 		Tabz.open(Tab.MAGIC);
@@ -859,7 +1029,7 @@ public class TrainMagic extends Leaf {
 			fulfillLesserDemonCasting();
 			return;
 		}
-		if(Locations.lesserDemonWizardsTower.contains(Players.localPlayer()))
+		if(Locations.lesserDemonWizardsTower.contains(p.l))
 		{
 			if(Dialogues.canContinue())
 			{
@@ -912,7 +1082,7 @@ public class TrainMagic extends Leaf {
 				}
 			}
 			
-			API.randomAFK(3);
+			API.randomAFK(5);
 			if(!Casting.isAutocastingHighest())
 			{
 				Main.customPaintText2 = "Setting Autocast: " + Casting.getSpellName(Casting.getHighestSpellConfig());
@@ -921,7 +1091,7 @@ public class TrainMagic extends Leaf {
 			}
 			Main.customPaintText2 = "Autocasting: "+Casting.getSpellName(Casting.getHighestSpellConfig());
 			
-			org.dreambot.api.wrappers.interactive.Character interacting = Players.localPlayer().getInteractingCharacter();
+			org.dreambot.api.wrappers.interactive.Character interacting = p.l.getInteractingCharacter();
 			if(interacting == null || 
 					!interacting.getName().equals("Lesser demon"))
 			{
@@ -939,12 +1109,12 @@ public class TrainMagic extends Leaf {
 			}
 			return;
 		}
-		if(Locations.wizardsTower2.contains(Players.localPlayer()))
+		if(Locations.wizardsTower2.contains(p.l))
 		{
 			if(Walking.walk(Locations.lesserDemonWizardsTower.getCenter())) Sleep.sleep(420, 696);
 			return;
 		}
-		if(Locations.wizardsTower1.contains(Players.localPlayer()))
+		if(Locations.wizardsTower1.contains(p.l))
 		{
 			if(Locations.wizardsTowerStairTile1.canReach())
 			{
@@ -957,15 +1127,15 @@ public class TrainMagic extends Leaf {
 				}
 				if(stairs.interact("Climb-up"))
 				{
-					MethodProvider.sleepUntil(() -> Locations.wizardsTower2.contains(Players.localPlayer()),
-							() -> Players.localPlayer().isMoving(),Sleep.calculate(2222, 2222),50);
+					MethodProvider.sleepUntil(() -> Locations.wizardsTower2.contains(p.l),
+							() -> p.l.isMoving(),Sleep.calculate(2222, 2222),50);
 					return;
 				}
 			}
 			if(Walking.walk(Locations.wizardsTowerStairTile1)) Sleep.sleep(420, 696);
 			return;
 		}
-		if(Locations.wizardsTower0.contains(Players.localPlayer()))
+		if(Locations.wizardsTower0.contains(p.l))
 		{
 			if(Locations.wizardsTowerStairTile0.canReach())
 			{
@@ -978,8 +1148,8 @@ public class TrainMagic extends Leaf {
 				}
 				if(stairs.interact("Climb-up"))
 				{
-					MethodProvider.sleepUntil(() -> Locations.wizardsTower1.contains(Players.localPlayer()),
-							() -> Players.localPlayer().isMoving(),Sleep.calculate(2222, 2222),50);
+					MethodProvider.sleepUntil(() -> Locations.wizardsTower1.contains(p.l),
+							() -> p.l.isMoving(),Sleep.calculate(2222, 2222),50);
 					return;
 				}
 			}
@@ -1054,10 +1224,32 @@ public class TrainMagic extends Leaf {
 		}
     	
     }
+	public static boolean fulfillTeleHA()
+    {
+    	InvEquip.clearAll();
+    	InvEquip.setEquipItem(EquipmentSlot.WEAPON, id.staffOfFire);
+    	final int lawQty = (int) Calculations.nextGaussianRandom(1200,200);
+    	final int refillQty = (int) Calculations.nextGaussianRandom(1500, 200);
+
+    	final int airQty = (int) Calculations.nextGaussianRandom(6000,1000);
+    	final int refillAirQty = (int) Calculations.nextGaussianRandom(8000, 1000);
+    	InvEquip.addInvyItem(id.natureRune,100,(int) Calculations.nextGaussianRandom(1200,200),false,(int) Calculations.nextGaussianRandom(1500,100));
+    	InvEquip.addInvyItem(id.lawRune,100,lawQty,false,refillQty);
+    	InvEquip.addInvyItem(id.airRune,500,airQty,false,refillAirQty);
+    	InvEquip.shuffleFulfillOrder();
+		if(InvEquip.fulfillSetup(false, 180000))
+		{
+			MethodProvider.log("[TRAIN MAGIC] -> Fulfilled equipment correctly for Tele-HA!"); 
+			return true;
+		} else 
+		{
+			MethodProvider.log("[TRAIN MAGIC] -> NOT fulfilled equipment correctly for Tele-HA!");
+			return false;
+		}
+    }
 	public static boolean fulfillHA()
     {
     	InvEquip.clearAll();
-
     	InvEquip.setEquipItem(EquipmentSlot.WEAPON, id.staffOfFire);
     	InvEquip.addInvyItem(id.natureRune,100,(int) Calculations.nextGaussianRandom(1200,200),false,(int) Calculations.nextGaussianRandom(1500,100));
     	InvEquip.shuffleFulfillOrder();
@@ -1070,7 +1262,6 @@ public class TrainMagic extends Leaf {
 			MethodProvider.log("[TRAIN MAGIC] -> NOT fulfilled equipment correctly for quick HA!");
 			return false;
 		}
-    	
     }
 	public static void setBestMageArmour()
     {

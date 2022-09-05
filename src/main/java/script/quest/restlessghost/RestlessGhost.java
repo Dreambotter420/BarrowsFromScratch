@@ -18,6 +18,7 @@ import org.dreambot.api.utilities.impl.Condition;
 import org.dreambot.api.wrappers.interactive.NPC;
 
 import script.Main;
+import script.p;
 import script.actionz.UniqueActions;
 import script.actionz.UniqueActions.Actionz;
 import script.behaviour.DecisionLeaf;
@@ -122,7 +123,7 @@ public class RestlessGhost extends Leaf {
          	}
         	if(Equipment.contains(ghostspeakAmulet))
         	{
-        		if(Locations.restlessGhostUrhneyHut.contains(Players.localPlayer()) ||
+        		if(Locations.restlessGhostUrhneyHut.contains(p.l) ||
         				Locations.restlessGhostSkeletonCoffin.getCenter().distance() > 125)
         		{
         			Walkz.teleportLumbridge(30000);
@@ -145,7 +146,7 @@ public class RestlessGhost extends Leaf {
         		if(ghost.interact("Talk-to"))
         		{
         			MethodProvider.sleepUntil(Dialogues::inDialogue,
-        					() -> Players.localPlayer().isMoving(),Sleep.calculate(3333, 2222),66);
+        					() -> p.l.isMoving(),Sleep.calculate(3333, 2222),66);
         		}
         		return Timing.sleepLogNormalSleep();
         	}
@@ -252,7 +253,7 @@ public class RestlessGhost extends Leaf {
     }
     public static void walkSearchCoffin()
     {
-    	if(Locations.wizardTowerBasement.contains(Players.localPlayer()))
+    	if(Locations.wizardTowerBasement.contains(p.l))
     	{
 			Walkz.teleportLumbridge(180000);
 			return;
@@ -277,7 +278,7 @@ public class RestlessGhost extends Leaf {
      		fulfillStart();
      		return;
      	}
-    	if(Locations.wizardTowerBasement.contains(Players.localPlayer()))
+    	if(Locations.wizardTowerBasement.contains(p.l))
     	{
     		API.walkInteractWithGameObject("Altar", "Search", Locations.wizardTowerBasementAltar,
     				() -> haveSkull());
@@ -289,7 +290,7 @@ public class RestlessGhost extends Leaf {
     		return;
     	}
     	API.walkInteractWithGameObject("Ladder", "Climb-down", Locations.wizardTowerGroundFloorLadder,
-    			() -> Locations.wizardTowerBasement.contains(Players.localPlayer()));
+    			() -> Locations.wizardTowerBasement.contains(p.l));
     }
     public static int getProgressValue()
     {

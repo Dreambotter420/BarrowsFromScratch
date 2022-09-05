@@ -12,6 +12,7 @@ import org.dreambot.api.methods.skills.Skills;
 import org.dreambot.api.methods.widget.helpers.ItemProcessing;
 import org.dreambot.api.wrappers.items.Item;
 
+import script.p;
 import script.behaviour.DecisionLeaf;
 import script.framework.Leaf;
 import script.quest.varrockmuseum.Timing;
@@ -91,15 +92,15 @@ public class TrainCrafting extends Leaf {
         		if(ItemProcessing.makeAll(name))
         		{
         			MethodProvider.log("Starting to make all: " + name);
-        			MethodProvider.sleepUntil(() -> Inventory.count(leather) <= 0 || Dialogues.canContinue(),() -> Players.localPlayer().isAnimating(), Sleep.calculate(2222, 2222),50);   
+        			MethodProvider.sleepUntil(() -> Inventory.count(leather) <= 0 || Dialogues.canContinue(),() -> p.l.isAnimating(), Sleep.calculate(2222, 2222),50);   
         		}
         		return true;
         	}
         	else
         	{
-        		if(Players.localPlayer().isAnimating())
+        		if(p.l.isAnimating())
         		{
-        			MethodProvider.sleepUntil(() -> Inventory.count(leather) <= 0 || Dialogues.canContinue(), () -> Players.localPlayer().isAnimating(), Sleep.calculate(2222, 2222),50);    		
+        			MethodProvider.sleepUntil(() -> Inventory.count(leather) <= 0 || Dialogues.canContinue(), () -> p.l.isAnimating(), Sleep.calculate(2222, 2222),50);    		
         			return true;
         		}
         		Item leatherItem = Inventory.get(leather);

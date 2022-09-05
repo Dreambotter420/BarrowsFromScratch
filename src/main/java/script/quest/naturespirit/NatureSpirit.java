@@ -20,6 +20,7 @@ import org.dreambot.api.wrappers.interactive.Player;
 import org.dreambot.api.wrappers.items.Item;
 import org.dreambot.api.wrappers.widgets.WidgetChild;
 
+import script.p;
 import script.behaviour.DecisionLeaf;
 import script.framework.Leaf;
 import script.framework.Tree;
@@ -59,7 +60,7 @@ public class NatureSpirit extends Leaf {
 		if(getProgressValue() == 110)
 		{
 			Questz.closeQuestCompletion();
-			if(Locations.natureSpirit_insideGrottoFinished.contains(Players.localPlayer()))
+			if(Locations.natureSpirit_insideGrottoFinished.contains(p.l))
 			{
 				if(!Walkz.useJewelry(InvEquip.wealth, "Grand Exchange"))
 				{
@@ -84,7 +85,7 @@ public class NatureSpirit extends Leaf {
 	}
     @Override
     public int onLoop() {
-    	Player loc = Players.localPlayer();
+    	Player loc = p.l;
         if (DecisionLeaf.taskTimer.finished()) {
             MethodProvider.log("[TIMEOUT] -> Nature Spirit");
             API.mode = null;
@@ -211,22 +212,22 @@ public class NatureSpirit extends Leaf {
     }
     public static void walkTalkGrotto()
     {
-    	Player loc = Players.localPlayer();
+    	Player loc = p.l;
     	if(Locations.natureSpirit_insideGrotto.contains(loc))
     	{
-    		API.walkTalkWithGameObject("Grotto", "Search");
+    		API.interactWithGameObject("Grotto", "Search");
     		return;
     	}
     	walkToNatureSpirit();
     }
     public static void walkTalkNatureSpirit()
     {
-    	Player loc = Players.localPlayer();
+    	Player loc = p.l;
     	if(Locations.natureSpirit_insideGrotto.contains(loc))
     	{
     		NPC spirit = NPCs.closest("Nature Spirit");
     		if(spirit != null)	API.talkToNPC("Nature Spirit");
-    		else API.walkTalkWithGameObject("Grotto", "Search");
+    		else API.interactWithGameObject("Grotto", "Search");
     		return;
     	}
     	if(!Equipment.contains(RestlessGhost.ghostspeakAmulet))
@@ -242,7 +243,7 @@ public class NatureSpirit extends Leaf {
     }
     public static void walkToNatureSpirit()
     {
-    	Player loc = Players.localPlayer();
+    	Player loc = p.l;
 		if(Locations.natureSpiritGrotto.contains(loc))
 		{
 			API.interactWithGameObject("Grotto", "Enter", () -> Locations.natureSpirit_insideGrotto.contains(loc));
@@ -253,19 +254,19 @@ public class NatureSpirit extends Leaf {
     }
     public static boolean leaveUndergroundPass()
     {
-    	if(Locations.PiP_undergroundPass.contains(Players.localPlayer()))
+    	if(Locations.PiP_undergroundPass.contains(p.l))
     	{
     		if(Inventory.contains(id.salveGraveyardTab))
     		{
     			Walkz.teleport(id.salveGraveyardTab, Locations.salveGraveyard, 30000);
     		}
-    		else API.interactWithGameObject("Holy barrier", "Pass-through", () -> !Locations.PiP_undergroundPass.contains(Players.localPlayer()));
+    		else API.interactWithGameObject("Holy barrier", "Pass-through", () -> !Locations.PiP_undergroundPass.contains(p.l));
     	}
-    	return !Locations.PiP_undergroundPass.contains(Players.localPlayer());
+    	return !Locations.PiP_undergroundPass.contains(p.l);
     }
     public static void walkToGrotto()
     {
-    	Player loc = Players.localPlayer();
+    	Player loc = p.l;
     	if(!leaveUndergroundPass()) return;
     	if(Locations.entireMorytania.contains(loc))
     	{
@@ -303,7 +304,7 @@ public class NatureSpirit extends Leaf {
     }
     public static void walkTalkToDrezel()
     {
-    	Player loc = Players.localPlayer();
+    	Player loc = p.l;
     	if(Locations.PiP_undergroundPass.contains(loc)) //whole underground area
     	{
     		if(Locations.PiP_undergroundPassDrezel.contains(loc))
@@ -333,7 +334,7 @@ public class NatureSpirit extends Leaf {
     }
     public static void fillimansDiary()
     {
-    	Player loc = Players.localPlayer();
+    	Player loc = p.l;
     	if(!Locations.natureSpiritGrotto.contains(loc)) 
     	{
     		goTalkToFilliman();
@@ -349,19 +350,19 @@ public class NatureSpirit extends Leaf {
 				if(Inventory.get(id.natureSpirit_fillimansDiary).useOn(filliman))
 				{
 					MethodProvider.sleepUntil(() -> Dialogues.inDialogue(),
-							() -> Players.localPlayer().isMoving(),
+							() -> p.l.isMoving(),
 							Sleep.calculate(3333,3333),69);
 				}
 				return;
 			}
-			API.walkTalkWithGameObject("Grotto", "Enter");
+			API.interactWithGameObject("Grotto", "Enter");
     		return;
     	}
     	API.interactWithGameObject("Grotto tree", "Search", () -> Inventory.contains(id.natureSpirit_fillimansDiary));
     }
     public static void solvePuzzle()
     {
-    	Player loc = Players.localPlayer();
+    	Player loc = p.l;
     	if(Locations.natureSpiritGrotto.contains(loc))
 		{
 			//solve puzzle part
@@ -393,12 +394,12 @@ public class NatureSpirit extends Leaf {
 	    				if(Walking.shouldWalk(6) && Walking.walk(Locations.natureSpirit_finalPuzzleTile.getCenter())) Sleep.sleep(696, 666);
 	    				return;
 	    			}
-	    			API.walkTalkWithGameObject("Grotto", "Enter");
+	    			API.interactWithGameObject("Grotto", "Enter");
 	    			return;
 				}
 				if(Inventory.get(id.natureSpirit_usedSpell).useOn(GameObjects.closest(g->g!=null && 
 						g.getName().equals("Stone") && 
-						g.getID() == eastStone))) MethodProvider.sleepUntil(() -> placedFungus,Sleep.calculate(4444,4444));
+						g.getID() == eastStone))) MethodProvider.sleepUntil(() -> placedScroll,Sleep.calculate(4444,4444));
 				return;
 			}
 			if(Inventory.get(id.mortFungus).useOn(GameObjects.closest(g->g!=null && 
@@ -411,7 +412,7 @@ public class NatureSpirit extends Leaf {
     
     public static void takeBowlMirror()
     {
-    	Player loc = Players.localPlayer();
+    	Player loc = p.l;
     	if(!Locations.natureSpiritGrotto.contains(loc)) 
     	{
     		goTalkToFilliman();
@@ -428,12 +429,12 @@ public class NatureSpirit extends Leaf {
 				if(Inventory.get(id.natureSpirit_mirror).useOn(filliman))
 				{
 					MethodProvider.sleepUntil(() -> Dialogues.inDialogue(),
-							() -> Players.localPlayer().isMoving(),
+							() -> p.l.isMoving(),
 							Sleep.calculate(3333,3333),69);
 				}
 				return;
 			}
-			API.walkTalkWithGameObject("Grotto", "Enter");
+			API.interactWithGameObject("Grotto", "Enter");
     		return;
     	}
     	GameObject mirror = GameObjects.closest(g -> g!=null && 
@@ -457,7 +458,7 @@ public class NatureSpirit extends Leaf {
     }
     public static void killGhasts()
     {
-    	Player loc = Players.localPlayer();
+    	Player loc = p.l;
     	
     	if(Locations.entireMorytania.contains(loc))
     	{
@@ -525,16 +526,16 @@ public class NatureSpirit extends Leaf {
 			}
 			
     		//6. check for location of log casting and prayer, if so, cast spell
-			if(Locations.natureSpirit_logSpellTile.contains(Players.localPlayer()))
+			if(Locations.natureSpirit_logSpellTile.contains(p.l))
     		{
     			if(Tabz.open(Tab.INVENTORY))
     			{
     				if(Combatz.shouldDrinkPrayPot()) Combatz.drinkPrayPot();
     				if(Inventory.interact(id.blessedSickle, "Cast bloom"))
     				{
-    					MethodProvider.sleepUntil(() -> Players.localPlayer().isAnimating(), Sleep.calculate(3333,3333));
-    					MethodProvider.sleepUntil(() -> !Players.localPlayer().isAnimating(),
-    							() -> Players.localPlayer().isAnimating(),
+    					MethodProvider.sleepUntil(() -> p.l.isAnimating(), Sleep.calculate(3333,3333));
+    					MethodProvider.sleepUntil(() -> !p.l.isAnimating(),
+    							() -> p.l.isAnimating(),
     							Sleep.calculate(3333,3333),69);
     					return;
     				}
@@ -547,7 +548,7 @@ public class NatureSpirit extends Leaf {
     }
     public static void walkToFungusSpot()
     {
-    	Player loc = Players.localPlayer();
+    	Player loc = p.l;
     	if(Locations.natureSpiritGrotto.contains(loc))
 		{
 			API.interactWithGameObject("Bridge", "Jump", () -> Locations.natureSpiritGrottoBridgeSouth.contains(loc));
@@ -602,8 +603,8 @@ public class NatureSpirit extends Leaf {
     }
     public static void harvestFirstFungus()
     {
-    	Player loc = Players.localPlayer();
-    	if(Locations.natureSpirit_logSpellTile.contains(Players.localPlayer()))
+    	Player loc = p.l;
+    	if(Locations.natureSpirit_logSpellTile.contains(p.l))
 		{
 			GameObject fungiLog = GameObjects.closest(g -> g!=null && 
 					g.getName().equals("Fungi on log") && 
@@ -621,9 +622,9 @@ public class NatureSpirit extends Leaf {
 			{
 				if(Inventory.interact(id.natureSpirit_spell, "Cast"))
 				{
-					MethodProvider.sleepUntil(() -> Players.localPlayer().isAnimating(), Sleep.calculate(3333,3333));
-					MethodProvider.sleepUntil(() -> !Players.localPlayer().isAnimating(),
-							() -> Players.localPlayer().isAnimating(),
+					MethodProvider.sleepUntil(() -> p.l.isAnimating(), Sleep.calculate(3333,3333));
+					MethodProvider.sleepUntil(() -> !p.l.isAnimating(),
+							() -> p.l.isAnimating(),
 							Sleep.calculate(3333,3333),69);
 					return;
 				}
@@ -635,7 +636,7 @@ public class NatureSpirit extends Leaf {
     
     public static void goTalkToFilliman()
     {
-    	Player loc = Players.localPlayer();
+    	Player loc = p.l;
     	if(Locations.natureSpiritGrotto.contains(loc))
 		{
 			if(!Equipment.contains(RestlessGhost.ghostspeakAmulet))
@@ -654,12 +655,12 @@ public class NatureSpirit extends Leaf {
 				if(filliman.interact("Talk-to"))
 				{
 					MethodProvider.sleepUntil(() -> Dialogues.inDialogue(),
-							() -> Players.localPlayer().isMoving(),
+							() -> p.l.isMoving(),
 							Sleep.calculate(3333,3333),69);
 				}
 				return;
 			}
-			API.walkTalkWithGameObject("Grotto", "Enter");
+			API.interactWithGameObject("Grotto", "Enter");
 			return;
 		}
     	walkToGrotto();

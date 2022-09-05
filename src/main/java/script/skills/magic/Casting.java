@@ -35,6 +35,11 @@ public class Casting {
 	{
 		return setAutocast(getHighestSpellConfig());
 	}
+	public static boolean voidAutocast()
+	{
+		if(!isAutocasting()) return true;
+		return setAutocast(0);
+	}
 	public static boolean setAutocast(int spellConfigID)
 	{
 		if(getAutocastConfig() == spellConfigID) return true;
@@ -59,9 +64,11 @@ public class Casting {
 			if(Widgets.getWidgetChild(201,1,1) != null && 
 					Widgets.getWidgetChild(201,1,1).isVisible())
 			{
+				String action = getSpellName(spellConfigID);
+				if(spellConfigID == 0) action = "Cancel";
 				if(Widgets.getWidgetChild(201,1,spellConfigID).interact(getSpellName(spellConfigID)))
 				{
-					MethodProvider.sleepUntil(() -> getAutocastConfig() == spellConfigID,Sleep.calculate(2222, 2222));
+					MethodProvider.sleepUntil(() -> getAutocastConfig() == spellConfigID,Sleep.calculate(3333, 3333));
 				}
 				if(getAutocastConfig() == spellConfigID) return true;
 			}

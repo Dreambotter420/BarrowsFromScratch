@@ -11,15 +11,19 @@ import org.dreambot.api.methods.interactive.Players;
 import org.dreambot.api.methods.walking.impl.Walking;
 import org.dreambot.api.methods.widget.Widgets;
 import org.dreambot.api.utilities.impl.Condition;
+import org.dreambot.api.wrappers.widgets.WidgetChild;
 
 import script.Main;
 import script.Test;
+import script.p;
 import script.actionz.UniqueActions;
 import script.actionz.UniqueActions.Actionz;
+import script.quest.alfredgrimhand.AlfredGrimhandsBarcrawl;
 import script.quest.animalmagnetism.AnimalMagnetism;
 import script.quest.animalmagnetism.AnimalMagnetism.Lover;
 import script.quest.ernestthechicken.ErnestTheChicken;
 import script.quest.fremenniktrials.FremennikTrials;
+import script.quest.horrorfromthedeep.HorrorFromTheDeep;
 import script.quest.naturespirit.NatureSpirit;
 import script.utilities.API.modes;
 
@@ -27,6 +31,7 @@ public class Dialoguez {
 	public static String dialog = "";
 	public static boolean foundDialogue = false;
 	public static boolean foundWait = false;
+	public static boolean foundLongWait = false;
 	public static void updateLastNPCDialog()
 	{
 		if(Widgets.getWidgetChild(193, 2) != null && 
@@ -49,6 +54,7 @@ public class Dialoguez {
 	 public static boolean handleDialogues()
 		{
 		 	foundWait = false;
+		 	foundLongWait = false;
 		 	updateLastNPCDialog();
 		 	observeQuestDialogue(dialog);
 		 	if(Dialogues.canContinue())
@@ -67,12 +73,14 @@ public class Dialoguez {
 					Keyboard.holdSpace(condition,timeout);
 					MethodProvider.sleepUntil(condition, timeout);
 					if(foundWait) Sleep.sleep(5555, 4444);
+					if(foundLongWait) Sleep.sleep(8888, 6666);
 					return true;
 				}
 				if(continueDialogue()) 
 				{
 					Sleep.sleep(420,696);
 					if(foundWait) Sleep.sleep(5555, 4444);
+					if(foundLongWait) Sleep.sleep(8888, 6666);
 				}
 				return true;
 			}
@@ -118,12 +126,12 @@ public class Dialoguez {
 					(NatureSpirit.placedFungus || !Inventory.contains(id.mortFungus)) && 
 					(NatureSpirit.placedScroll || !Inventory.contains(id.natureSpirit_usedSpell)))
 			{
-				if(Locations.natureSpirit_finalPuzzleTile.contains(Players.localPlayer())) return false;
+				if(Locations.natureSpirit_finalPuzzleTile.contains(p.l)) return false;
 				if(Walking.walk(Locations.natureSpirit_finalPuzzleTile.getCenter())) Sleep.sleep(696,666);
 				return true;
 			}
 			if(NatureSpirit.getProgressValue() == 25 && 
-					Locations.natureSpiritGrotto.contains(Players.localPlayer()) && 
+					Locations.natureSpiritGrotto.contains(p.l) && 
 					Inventory.contains(id.natureSpirit_fillimansDiary))
 			{
 				NatureSpirit.fillimansDiary();
@@ -257,7 +265,7 @@ public class Dialoguez {
 	}
 	public static boolean chooseQuestOptions()
 	{
-		if(Locations.strongholdLvl1.contains(Players.localPlayer()))
+		if(Locations.strongholdLvl1.contains(p.l))
 		{
 			return chooseOption("Politely tell them no and then use the \'Report Abuse\' button.") || 
 					chooseOption("No way! You\'ll just take my gold for your own! Reported!") || 
@@ -300,6 +308,21 @@ public class Dialoguez {
 			return chooseOption("What\'s a slayer?") || 
 					chooseOption("Wow, can you teach me?");
 		case WATERFALL_QUEST: return chooseOption("Yes.");
+		case ALFRED_GRIMHANDS_BARCRAWL: 
+			return chooseOption("I want to come through this gate.") || 
+					chooseOption("Looks can be deceiving, I am in fact a barbarian.") || 
+					chooseOption("I\'m doing Alfred Grimhand\'s barcrawl.") || 
+					chooseOption("I\'m doing Alfred Grimhands Barcrawl.") || 
+					chooseOption("I want to come through this gate.") || 
+					chooseOption("Sorry, I\'m a bit busy.") || 
+					chooseOption("Yes please, I want to smash my vials.") || 
+					chooseOption("I want to come through this gate.");
+		case TRAIN_HERBLORE: 
+			return chooseOption("I\'m in search of a quest.") || 
+					chooseOption("Okay, I will try and help.") ||
+					chooseOption("Yes.") || 
+					chooseOption("I\'ve been sent to help purify the Varrock stone circle.") || 
+					chooseOption("Ok, I\'ll do that then.");
 		case NATURE_SPIRIT: 
 		{
 			for(String option : Dialogues.getOptions())
@@ -329,7 +352,7 @@ public class Dialoguez {
 				{
 					if(chooseOption("Okay")) 
 					{
-						MethodProvider.sleepUntil(() -> Locations.portPhasmatysCharterShip.contains(Players.localPlayer()), Sleep.calculate(5555,5555));
+						MethodProvider.sleepUntil(() -> Locations.portPhasmatysCharterShip.contains(p.l), Sleep.calculate(5555,5555));
 					}
 					Sleep.sleep(420,2222);
 					return true;
@@ -348,7 +371,17 @@ public class Dialoguez {
 					chooseOption("I\'d love one, thanks.") || 
 					chooseOption("I\'m here about a quest.");
 		}
-			
+		case HORROR_FROM_THE_DEEP:
+		{
+			return chooseOption("With what?") || 
+					chooseOption("Okay, I\'ll help!") ||
+					chooseOption("But how can I help?") ||
+					chooseOption("Yes.") ||
+					chooseOption("Yes") ||
+					chooseOption("Zamorak") ||
+					chooseOption("I\'ll see what I can do");
+					
+		}
 		case RESTLESS_GHOST:
 			return chooseOption("Yes.") || 
 					chooseOption("I\'m looking for a quest!") || 
@@ -418,6 +451,30 @@ public class Dialoguez {
 	 */
 	public static boolean observeQuestDialogue(String npcDialogue)
 	{
+		if(API.mode == modes.HORROR_FROM_THE_DEEP && Widgets.getWidgetChild(229,1) != null && 
+				Widgets.getWidgetChild(229,1).isVisible())
+		{
+			String txt = Widgets.getWidgetChild(229,1).getText();
+			if(txt.contains("The first page"))
+			{
+				if(!txt.contains("The first page has been placed."))
+				{
+					HorrorFromTheDeep.needPage1 = true;
+				}
+				if(!txt.contains("The second page has been placed."))
+				{
+					HorrorFromTheDeep.needPage2 = true;
+				}
+				if(!txt.contains("The third page has been placed."))
+				{
+					HorrorFromTheDeep.needPage3 = true;
+				}
+				if(!txt.contains("The fourth page has been placed."))
+				{
+					HorrorFromTheDeep.needPage4 = true;
+				}
+			}
+		}
 		if(API.mode == modes.FREMENNIK_TRIALS && Widgets.getWidgetChild(229, 1) != null && 
 	 			Widgets.getWidgetChild(229,1).isVisible())
 	 	{
@@ -466,6 +523,35 @@ public class Dialoguez {
 			}
 			break;
 		}
+		case HORROR_FROM_THE_DEEP:
+		{
+			if(npcDialogue.contains("NO! No, you can\'t leave me now!") || 
+					npcDialogue.contains("That was not the creature that attacked me...") || 
+					npcDialogue.contains("That was one of its babies...")) foundWait = true;
+			break;
+		}
+		case ALFRED_GRIMHANDS_BARCRAWL:
+		{
+
+			if(npcDialogue.contains("of expensive parts to the cocktail, though, so it will cost") ||
+					npcDialogue.contains("Ah, you\'ll be wanting some Ape Bite Liqueur then. It\'s") || 
+					npcDialogue.contains("Haha time to be breaking out the old Supergrog") || 
+					npcDialogue.contains("My supply of Olde Suspiciouse is starting") || 
+					npcDialogue.contains("Fancy a bit of Heart Stopper then do you? It\'ll only be") || 
+					npcDialogue.contains("contained the Liverbane Ale? That") || 
+					npcDialogue.contains("sure the human boys will like it as well.") || 
+					npcDialogue.contains("I suppose you\'ll be wanting some Fire Brandy. That\'ll") || 
+					npcDialogue.contains("You\'re going to have to pay 50 gold for the Uncle"))
+			{
+				foundLongWait = true;
+			}
+			if(npcDialogue.contains("Ah, you\'ve come to the best stop on your list! I\'ll give") || 
+					npcDialogue.contains("Ok one Black Skull Ale coming up, 8 coins please."))
+			{
+				foundWait = true;
+			}
+			break;
+		}
 		case ANIMAL_MAGNETISM:
 		{
 			if(npcDialogue.contains("Talk to my wife and I\'ll think about it.") || 
@@ -506,7 +592,7 @@ public class Dialoguez {
 			
 			if(npcDialogue.contains("As you wish outerlander; I will drink first, then you will"))
 	 		{
-				foundWait = true;
+				foundLongWait = true;
 	 		}
 	 		if(npcDialogue.contains("A maze? Is that all? Sure, it sounds simple") || 
 	 				npcDialogue.contains("Hahahaha it is the most complex route I have ever") || 

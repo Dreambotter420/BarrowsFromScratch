@@ -7,6 +7,7 @@ import org.dreambot.api.methods.map.Tile;
 import org.dreambot.api.methods.walking.impl.Walking;
 import org.dreambot.api.utilities.Timer;
 
+import script.p;
 import script.actionz.UniqueActions.Actionz;
 import script.framework.Leaf;
 import script.quest.varrockmuseum.Timing;
@@ -52,9 +53,9 @@ public class WalkDrunkenly extends Leaf
 	}
 	public static void drunkWalk()
 	{
-		final Tile translatedToDrunk = new Tile(Players.localPlayer().getX() + Calculations.random(-10, 11),
-				Players.localPlayer().getY() + Calculations.random(-10, 11),
-				Players.localPlayer().getZ());
+		final Tile translatedToDrunk = new Tile(p.l.getX() + Calculations.random(-10, 11),
+				p.l.getY() + Calculations.random(-10, 11),
+				p.l.getZ());
 		if(Walking.walk(translatedToDrunk))
 		{
 			if(drunkWalksLeft > 0) drunkWalksLeft--;

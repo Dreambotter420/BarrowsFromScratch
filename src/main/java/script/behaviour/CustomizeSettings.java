@@ -19,6 +19,7 @@ import org.dreambot.api.methods.walking.impl.Walking;
 import org.dreambot.api.methods.widget.Widgets;
 import org.dreambot.api.wrappers.widgets.WidgetChild;
 
+import script.p;
 import script.actionz.UniqueActions;
 import script.actionz.UniqueActions.Actionz;
 import script.framework.Leaf;
@@ -60,7 +61,7 @@ public class CustomizeSettings extends Leaf {
 		}
 		if(Dialogues.areOptionsAvailable())
 		{
-			Walking.clickTileOnMinimap(Players.localPlayer().getTile());
+			Walking.clickTileOnMinimap(p.l.getTile());
 			return Sleep.calculate(420, 696);
 		}
 		if(ClientSettings.isAcceptAidEnabled()) ClientSettings.toggleAcceptAid(false);

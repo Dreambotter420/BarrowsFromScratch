@@ -25,6 +25,7 @@ import org.dreambot.api.wrappers.interactive.NPC;
 import org.dreambot.api.wrappers.items.Item;
 
 import script.Main;
+import script.p;
 import script.behaviour.DecisionLeaf;
 import script.framework.Leaf;
 import script.quest.varrockmuseum.Timing;
@@ -162,7 +163,7 @@ public class WaterfallQuest extends Leaf {
         		}
         		break;
         	}
-        	if(Locations.hadley2.contains(Players.localPlayer()))
+        	if(Locations.hadley2.contains(p.l))
         	{
         		Filter<GameObject> bookcaseFilter = g -> 
 					g != null && 
@@ -181,7 +182,7 @@ public class WaterfallQuest extends Leaf {
         		break;
         	}
 
-        	if(Locations.hadleyStairs.contains(Players.localPlayer()))
+        	if(Locations.hadleyStairs.contains(p.l))
         	{
         		Filter<GameObject> stairsFilter = g -> 
 					g != null && 
@@ -194,16 +195,16 @@ public class WaterfallQuest extends Leaf {
 				}
 				if(stairs.interact("Climb-up"))
 				{
-					MethodProvider.sleepUntil(() -> Locations.hadley2.contains(Players.localPlayer()), Sleep.calculate(8888,3333));
+					MethodProvider.sleepUntil(() -> Locations.hadley2.contains(p.l), Sleep.calculate(8888,3333));
 				}
         		break;
         	}
-        	if(Locations.hadleySurrounding.contains(Players.localPlayer()))
+        	if(Locations.hadleySurrounding.contains(p.l))
         	{
         		if(Walking.shouldWalk(6) && Walking.walk(Locations.hadleyStairs.getCenter())) Sleep.sleep(420,696);
         		break;
         	}
-        	if(Locations.waterfallLedge.equals(Players.localPlayer().getTile()))
+        	if(Locations.waterfallLedge.equals(p.l.getTile()))
         	{
         		Filter<GameObject> barrelFilter = g -> 
 					g != null && 
@@ -216,11 +217,11 @@ public class WaterfallQuest extends Leaf {
 				}
 				if(barrel.interact("Get in"))
 				{
-					MethodProvider.sleepUntil(() -> Locations.barrelDestination.contains(Players.localPlayer()), Sleep.calculate(8888,3333));
+					MethodProvider.sleepUntil(() -> Locations.barrelDestination.contains(p.l), Sleep.calculate(8888,3333));
 				}
         		break;
         	}
-        	if(Locations.waterfallIsland2.contains(Players.localPlayer()))
+        	if(Locations.waterfallIsland2.contains(p.l))
         	{
         		Filter<GameObject> treeFilter = g -> 
 					g != null && 
@@ -234,13 +235,13 @@ public class WaterfallQuest extends Leaf {
 				}
 				if(Inventory.get(id.rope).useOn(tree))
 				{
-					MethodProvider.sleepUntil(() -> Locations.waterfallLedge.equals(Players.localPlayer().getTile()), Sleep.calculate(8888,3333));
+					MethodProvider.sleepUntil(() -> Locations.waterfallLedge.equals(p.l.getTile()), Sleep.calculate(8888,3333));
 				}
         		break;
         	}
-        	if(Locations.waterfallIsland1.contains(Players.localPlayer()))
+        	if(Locations.waterfallIsland1.contains(p.l))
         	{
-        		if(Locations.waterfallIsland1SouthTile.equals(Players.localPlayer().getTile()))
+        		if(Locations.waterfallIsland1SouthTile.equals(p.l.getTile()))
         		{
         			Filter<GameObject> rockFilter = g -> 
         				g!= null && 
@@ -253,11 +254,11 @@ public class WaterfallQuest extends Leaf {
         			}
         			if(Inventory.get(id.rope).useOn(rock))
         			{
-        				MethodProvider.sleepUntil(() -> Locations.waterfallIsland2.contains(Players.localPlayer()), Sleep.calculate(8888,3333));
+        				MethodProvider.sleepUntil(() -> Locations.waterfallIsland2.contains(p.l), Sleep.calculate(8888,3333));
         			}
         			break;
         		}
-        		if(!Players.localPlayer().isMoving() && Walking.walk(Locations.waterfallIsland1SouthTile)) Sleep.sleep(420, 696);
+        		if(!p.l.isMoving() && Walking.walk(Locations.waterfallIsland1SouthTile)) Sleep.sleep(420, 696);
         	}
         	break;
         }
@@ -277,7 +278,7 @@ public class WaterfallQuest extends Leaf {
         		Sleep.sleep(420,696);
         		break;
         	}
-    		if(Locations.waterfallIsland1.contains(Players.localPlayer()))
+    		if(Locations.waterfallIsland1.contains(p.l))
     		{
     			NPC hudon = NPCs.closest("Hudon");
         		if(hudon == null)
@@ -288,7 +289,7 @@ public class WaterfallQuest extends Leaf {
         		}
         		if(hudon.interact("Talk-to"))
         		{
-        			MethodProvider.sleepUntil(Dialogues::inDialogue,() -> Players.localPlayer().isMoving(),Sleep.calculate(2222,2222),50);
+        			MethodProvider.sleepUntil(Dialogues::inDialogue,() -> p.l.isMoving(),Sleep.calculate(2222,2222),50);
         		}
     		}
     		teleWalkBoardRaft();
@@ -304,7 +305,7 @@ public class WaterfallQuest extends Leaf {
             		Sleep.sleep(420,696);
             		break;
             	}
-            	if(Locations.almera.contains(Players.localPlayer()))
+            	if(Locations.almera.contains(p.l))
             	{
             		NPC almera = NPCs.closest("Almera");
             		if(almera == null)
@@ -315,7 +316,7 @@ public class WaterfallQuest extends Leaf {
             		}
             		if(almera.interact("Talk-to"))
             		{
-            			MethodProvider.sleepUntil(Dialogues::inDialogue,() -> Players.localPlayer().isMoving(),Sleep.calculate(2222,2222),50);
+            			MethodProvider.sleepUntil(Dialogues::inDialogue,() -> p.l.isMoving(),Sleep.calculate(2222,2222),50);
             		}
             	}
             	walkAlmera();
@@ -343,7 +344,7 @@ public class WaterfallQuest extends Leaf {
 		{
 			fulfillGlarialsPebble();
 		}
-		if(Locations.waterfallGlarialsGravestone.contains(Players.localPlayer()))
+		if(Locations.waterfallGlarialsGravestone.contains(p.l))
 		{
 			Filter<GameObject> doorF = g -> 
 				g != null && 
@@ -356,7 +357,7 @@ public class WaterfallQuest extends Leaf {
 			}
 			if(Inventory.get(glarialsPebble).useOn(door))
 			{
-				MethodProvider.sleepUntil(() -> Locations.waterfallDungeon2.contains(Players.localPlayer()), Sleep.calculate(8888,3333));
+				MethodProvider.sleepUntil(() -> Locations.waterfallDungeon2.contains(p.l), Sleep.calculate(8888,3333));
 			} 
 			else if(Walking.walk(door)) Sleep.sleep(420, 696);
 			return;
@@ -380,9 +381,9 @@ public class WaterfallQuest extends Leaf {
 			Sleep.sleep(111, 420);
 			return;
 		}
-    	if(Locations.waterfallDungeon1.contains(Players.localPlayer()))
+    	if(Locations.waterfallDungeon1.contains(p.l))
     	{
-    		if(Locations.waterfallDungeonGolrieRoom.contains(Players.localPlayer()))
+    		if(Locations.waterfallDungeonGolrieRoom.contains(p.l))
     		{
     			if(Dialoguez.handleDialogues()) return;
     			if(Inventory.isItemSelected()) Inventory.deselect();
@@ -399,7 +400,7 @@ public class WaterfallQuest extends Leaf {
     		}
     		if(Inventory.count(key1) >= 1)
     		{
-    			if(Locations.waterfallDungeonBeforeGolrieRoom.contains(Players.localPlayer()))
+    			if(Locations.waterfallDungeonBeforeGolrieRoom.contains(p.l))
     			{
     				Filter<GameObject> doorF = g -> 
 						g != null && 
@@ -412,7 +413,7 @@ public class WaterfallQuest extends Leaf {
 					}
 					if(Inventory.get(key1).useOn(door))
 					{
-						MethodProvider.sleepUntil(() -> Locations.waterfallDungeonGolrieRoom.contains(Players.localPlayer()), Sleep.calculate(8888,3333));
+						MethodProvider.sleepUntil(() -> Locations.waterfallDungeonGolrieRoom.contains(p.l), Sleep.calculate(8888,3333));
 					} else if(Walking.walk(door)) Sleep.sleep(420, 696);
 					return;
     			}
@@ -426,7 +427,7 @@ public class WaterfallQuest extends Leaf {
     		}
     		
     		//dont have key, need key to speak to golrie
-    		if(Locations.waterfallDungeonKeyRoom.contains(Players.localPlayer()))
+    		if(Locations.waterfallDungeonKeyRoom.contains(p.l))
     		{
     			Filter<GameObject> boxF = g -> 
 					g != null && 
@@ -453,7 +454,7 @@ public class WaterfallQuest extends Leaf {
     		return;
     	}
     	
-    	if(Locations.gnomeStrongholdDungeonEntrance.contains(Players.localPlayer()))
+    	if(Locations.gnomeStrongholdDungeonEntrance.contains(p.l))
     	{
         	Filter<GameObject> ladderf = g -> 
 				g != null && 
@@ -466,11 +467,11 @@ public class WaterfallQuest extends Leaf {
 			}
 			if(ladder.interact("Climb-down"))
 			{
-				MethodProvider.sleepUntil(() -> Locations.waterfallDungeon1.contains(Players.localPlayer()), Sleep.calculate(8888,3333));
+				MethodProvider.sleepUntil(() -> Locations.waterfallDungeon1.contains(p.l), Sleep.calculate(8888,3333));
 			}
 			return;
     	}
-    	if(Locations.hadley2.contains(Players.localPlayer()))
+    	if(Locations.hadley2.contains(p.l))
     	{
     		Filter<GameObject> stairsFilter = g -> 
 				g != null && 
@@ -483,7 +484,7 @@ public class WaterfallQuest extends Leaf {
 			}
 			if(stairs.interact("Climb-down"))
 			{
-				MethodProvider.sleepUntil(() -> Locations.hadleyStairs.contains(Players.localPlayer()), Sleep.calculate(8888,3333));
+				MethodProvider.sleepUntil(() -> Locations.hadleyStairs.contains(p.l), Sleep.calculate(8888,3333));
 			}
     		return;
     	}
@@ -520,12 +521,12 @@ public class WaterfallQuest extends Leaf {
 			}
 			return false;
 		}
-		if(Locations.waterfallDungeonLastAreaChanged.contains(Players.localPlayer()) || 
-				Locations.waterfallDungeon1.contains(Players.localPlayer()) || 
-				Locations.waterfallDungeon2.contains(Players.localPlayer()) || 
-				Locations.waterfallIsland1.contains(Players.localPlayer()) || 
-				Locations.waterfallIsland2.contains(Players.localPlayer()) || 
-				Locations.waterfallLedge.equals(Players.localPlayer().getTile()))
+		if(Locations.waterfallDungeonLastAreaChanged.contains(p.l) || 
+				Locations.waterfallDungeon1.contains(p.l) || 
+				Locations.waterfallDungeon2.contains(p.l) || 
+				Locations.waterfallIsland1.contains(p.l) || 
+				Locations.waterfallIsland2.contains(p.l) || 
+				Locations.waterfallLedge.equals(p.l.getTile()))
 		{
 			if(!Walkz.useJewelry(InvEquip.wealth, "Grand Exchange") && 
 					!Walkz.useJewelry(InvEquip.games, "Barbarian Outpost") && 
@@ -549,7 +550,7 @@ public class WaterfallQuest extends Leaf {
     		}
     	}
     	if(Combatz.shouldEatFood(11)) Combatz.eatFood();
-    	if(Locations.waterfallDungeonLastAreaChanged.contains(Players.localPlayer()))
+    	if(Locations.waterfallDungeonLastAreaChanged.contains(p.l))
     	{
     		if(InvEquip.freeInvySpaces(5))
     		{
@@ -588,15 +589,15 @@ public class WaterfallQuest extends Leaf {
 			{
 				fulfillLastStep();
 			}
-			if(Locations.waterfallDungeon.contains(Players.localPlayer()))
+			if(Locations.waterfallDungeon.contains(p.l))
 			{
-				if(Locations.waterfallDungeonLastArea.contains(Players.localPlayer()))
+				if(Locations.waterfallDungeonLastArea.contains(p.l))
 				{
 					if(Camera.getPitch() >= 250) placeRunesOnPillars();
 					else Camera.rotateToPitch((int) Calculations.nextGaussianRandom(308, 50));
 					return;
 				}
-				if(Locations.waterfallDungeonLastRoomAirlock.contains(Players.localPlayer()))
+				if(Locations.waterfallDungeonLastRoomAirlock.contains(p.l))
 				{
 					if(Walking.shouldWalk(6) && Walking.walk(Locations.waterfallDungeonLastArea))
 					{
@@ -623,7 +624,7 @@ public class WaterfallQuest extends Leaf {
 					}
 					if(spiderHitTimer == null || spiderHitTimer.finished())
 					{
-						if(Locations.waterfallDungeonFoyer.contains(Players.localPlayer()))
+						if(Locations.waterfallDungeonFoyer.contains(p.l))
 						{
 							NPC spider = NPCs.closest("Shadow spider");
 							if(spider == null)
@@ -633,8 +634,8 @@ public class WaterfallQuest extends Leaf {
 							}
 							if(spider.interact("Attack"))
 							{
-								MethodProvider.sleepUntil(() -> Players.localPlayer().getInteractingCharacter() != null && 
-										Players.localPlayer().getInteractingCharacter().getName().contains("Shadow spider"), Sleep.calculate(4444,2222));
+								MethodProvider.sleepUntil(() -> p.l.getInteractingCharacter() != null && 
+										p.l.getInteractingCharacter().getName().contains("Shadow spider"), Sleep.calculate(4444,2222));
 								
 								Sleep.sleep(1111, 1111);
 								spiderHitTimer = new Timer(10000);
@@ -647,7 +648,7 @@ public class WaterfallQuest extends Leaf {
 					Walking.walk(Locations.waterfallDungeonLastArea.getCenter());
 					return;
 				}
-				if(Locations.waterfallLastCrateArea.contains(Players.localPlayer()))
+				if(Locations.waterfallLastCrateArea.contains(p.l))
 				{
 					if(!InvEquip.free1InvySpace()) return;
 					GameObject crate = GameObjects.closest(g -> 
@@ -663,7 +664,7 @@ public class WaterfallQuest extends Leaf {
 					if(crate.interact("Search"))
 					{
 						MethodProvider.sleepUntil(() -> Inventory.count(key2) > 0, 
-								() -> Players.localPlayer().isMoving(),
+								() -> p.l.isMoving(),
 								Sleep.calculate(2222, 2222),50);
 					}
 					return;
@@ -671,7 +672,7 @@ public class WaterfallQuest extends Leaf {
 				if(Walking.walk(Locations.waterfallLastCrateArea.getCenter())) Sleep.sleep(666, 666);
 				return;
 			}
-			if(Locations.waterfallLedge.equals(Players.localPlayer().getTile()))
+			if(Locations.waterfallLedge.equals(p.l.getTile()))
         	{
         		Filter<GameObject> barrelFilter = g -> 
 					g != null && 
@@ -684,11 +685,11 @@ public class WaterfallQuest extends Leaf {
 				}
 				if(Door.interact("Open"))
 				{
-					MethodProvider.sleepUntil(() -> Locations.barrelDestination.contains(Players.localPlayer()), Sleep.calculate(8888,3333));
+					MethodProvider.sleepUntil(() -> Locations.barrelDestination.contains(p.l), Sleep.calculate(8888,3333));
 				}
         		return;
         	}
-        	if(Locations.waterfallIsland2.contains(Players.localPlayer()))
+        	if(Locations.waterfallIsland2.contains(p.l))
         	{
         		Filter<GameObject> treeFilter = g -> 
 					g != null && 
@@ -702,13 +703,13 @@ public class WaterfallQuest extends Leaf {
 				}
 				if(Inventory.get(id.rope).useOn(tree))
 				{
-					MethodProvider.sleepUntil(() -> Locations.waterfallLedge.equals(Players.localPlayer().getTile()), Sleep.calculate(8888,3333));
+					MethodProvider.sleepUntil(() -> Locations.waterfallLedge.equals(p.l.getTile()), Sleep.calculate(8888,3333));
 				}
         		return;
         	}
-			if(Locations.waterfallIsland1.contains(Players.localPlayer()))
+			if(Locations.waterfallIsland1.contains(p.l))
         	{
-        		if(Locations.waterfallIsland1SouthTile.equals(Players.localPlayer().getTile()))
+        		if(Locations.waterfallIsland1SouthTile.equals(p.l.getTile()))
         		{
         			Filter<GameObject> rockFilter = g -> 
         				g!= null && 
@@ -721,11 +722,11 @@ public class WaterfallQuest extends Leaf {
         			}
         			if(Inventory.get(id.rope).useOn(rock))
         			{
-        				MethodProvider.sleepUntil(() -> Locations.waterfallIsland2.contains(Players.localPlayer()), Sleep.calculate(8888,3333));
+        				MethodProvider.sleepUntil(() -> Locations.waterfallIsland2.contains(p.l), Sleep.calculate(8888,3333));
         			}
         			return;
         		}
-        		if(!Players.localPlayer().isMoving() && Walking.walk(Locations.waterfallIsland1SouthTile)) Sleep.sleep(420, 696);
+        		if(!p.l.isMoving() && Walking.walk(Locations.waterfallIsland1SouthTile)) Sleep.sleep(420, 696);
         		return;
         	}
 			teleWalkBoardRaft();
@@ -733,7 +734,7 @@ public class WaterfallQuest extends Leaf {
 		}
 		
 		//we do not have urn or amulet - go get them - check first to see if in the dungeon to get them
-    	if(Locations.waterfallDungeon2.contains(Players.localPlayer()))
+    	if(Locations.waterfallDungeon2.contains(p.l))
     	{
     		if(Combat.isAutoRetaliateOn())
     		{
@@ -750,7 +751,7 @@ public class WaterfallQuest extends Leaf {
     		if(Inventory.count(glarialsUrn) <= 0)
     		{
     			if(!InvEquip.free1InvySpace()) return;
-    			if(Locations.glarialsTomb.contains(Players.localPlayer()))
+    			if(Locations.glarialsTomb.contains(p.l))
         		{
         			Filter<GameObject> doorF = g -> 
 						g != null && 
@@ -773,7 +774,7 @@ public class WaterfallQuest extends Leaf {
     		if(Inventory.count(glarialsAmulet) <= 0)
     		{
     			if(!InvEquip.free1InvySpace()) return;
-    			if(Locations.glarialsChest.contains(Players.localPlayer()))
+    			if(Locations.glarialsChest.contains(p.l))
         		{
         			Filter<GameObject> doorF = g -> 
 						g != null && 
@@ -822,7 +823,7 @@ public class WaterfallQuest extends Leaf {
     		if(raft.interact("Board"))
     		{
     			
-    			MethodProvider.sleepUntil(() -> Locations.waterfallIsland1.contains(Players.localPlayer()),() -> Players.localPlayer().isMoving(),Sleep.calculate(2222,2222),50);
+    			MethodProvider.sleepUntil(() -> Locations.waterfallIsland1.contains(p.l),() -> p.l.isMoving(),Sleep.calculate(2222,2222),50);
     		}
     		else if(Walking.shouldWalk(6) && Walking.walk(Locations.waterfallRaftTile1)) Sleep.sleep(696,420);
 			return;
@@ -939,9 +940,9 @@ public class WaterfallQuest extends Leaf {
 				MethodProvider.log("Used glarials amulet on glarial's statue");
 				MethodProvider.sleepUntil(() -> glarialsStatue.distance() <= 1, Sleep.calculate(2222, 2222));
 				Sleep.sleep(696, 1111);
-				MethodProvider.sleepUntil(() -> Locations.waterfallDungeonLastAreaChanged.contains(Players.localPlayer()), Sleep.calculate(3333, 2222));
+				MethodProvider.sleepUntil(() -> Locations.waterfallDungeonLastAreaChanged.contains(p.l), Sleep.calculate(3333, 2222));
 				Sleep.sleep(69, 696);
-				if(Locations.waterfallDungeonLastAreaChanged.contains(Players.localPlayer()))
+				if(Locations.waterfallDungeonLastAreaChanged.contains(p.l))
 				{
 					MethodProvider.log("Entered changed area of last room of Waterfall Quest!!");
 				}

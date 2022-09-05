@@ -7,6 +7,7 @@ import org.dreambot.api.wrappers.widgets.message.MessageType;
 
 import script.actionz.ReportSpammer;
 import script.behaviour.CustomizeSettings;
+import script.quest.alfredgrimhand.AlfredGrimhandsBarcrawl;
 import script.quest.animalmagnetism.AnimalMagnetism;
 import script.quest.ernestthechicken.ErnestTheChicken;
 import script.quest.fremenniktrials.FremennikTrials;
@@ -76,6 +77,21 @@ public class ReadMessage {
 			if(txt.contains("The stone seems to absorb the fungus.") || 
 					txt.contains("This stone seems to be complete already.")) NatureSpirit.placedFungus = true;
 			if(txt.contains("The stone seems to absorb the used spell scroll.")) NatureSpirit.placedScroll = true;
+		}
+		if(API.mode == API.modes.ALFRED_GRIMHANDS_BARCRAWL)
+		{
+			if(txt.contains("The barmaid signs your card.") || 
+					txt.contains("The bartender signs your card.") || 
+					txt.contains("Zambo signs your card.") || 
+					txt.contains("Blurberry signs your card.") || 
+					txt.contains("You think you see 2 bartenders signing 2 barcrawl cards.") || 
+					txt.contains("signing your barcrawl card") || 
+					txt.contains("The bartender scrawls his signature on your card.") || 
+					txt.contains("You can just about make out the bartender")) AlfredGrimhandsBarcrawl.checkedCard = false;
+			if(txt.contains("You are too drunk to be able to read the barcrawl card."))
+			{
+				AlfredGrimhandsBarcrawl.finishedCard = true;
+			}
 		}
 		
 		if(API.mode == API.modes.FREMENNIK_TRIALS)

@@ -27,6 +27,7 @@ import org.dreambot.api.wrappers.items.Item;
 import org.dreambot.api.wrappers.widgets.WidgetChild;
 
 import script.Main;
+import script.p;
 import script.actionz.UniqueActions;
 import script.actionz.UniqueActions.Actionz;
 import script.behaviour.DecisionLeaf;
@@ -185,7 +186,7 @@ public class AnimalMagnetism extends Leaf {
         		walkTalkToAva();
         		break;
         	}
-        	if(!Locations.draynorUndeadTree.contains(Players.localPlayer()))
+        	if(!Locations.draynorUndeadTree.contains(p.l))
     		{
     			Walkz.teleport(id.draynorTab, Locations.draynorUndeadTree, 30000);
     			break;
@@ -210,7 +211,7 @@ public class AnimalMagnetism extends Leaf {
     	}
         case(150):
         {
-        	if(!Locations.draynorUndeadTree.contains(Players.localPlayer()))
+        	if(!Locations.draynorUndeadTree.contains(p.l))
     		{
     			Walkz.teleport(id.draynorTab, Locations.draynorUndeadTree, 30000);
     			break;
@@ -227,10 +228,10 @@ public class AnimalMagnetism extends Leaf {
         	}
         	if(standTile.distance() < 75)
         	{
-        		Tile loc = Players.localPlayer().getTile();
+        		Tile loc = p.l.getTile();
         		if(standTile.equals(loc))
         		{
-        			if(Players.localPlayer().getOrientation() == 1024)
+        			if(p.l.getOrientation() == 1024)
         			{
         				if(Inventory.get(id.hammer).useOn(id.selectedIron))
         				{
@@ -240,7 +241,7 @@ public class AnimalMagnetism extends Leaf {
         			}
         			if(Walking.walkExact(standTileSouth))
         			{
-        				MethodProvider.sleepUntil(() -> standTileSouth.equals(Players.localPlayer().getTile()), Sleep.calculate(3333, 2222));
+        				MethodProvider.sleepUntil(() -> standTileSouth.equals(p.l.getTile()), Sleep.calculate(3333, 2222));
         			}
         			break;
         		}
@@ -248,7 +249,7 @@ public class AnimalMagnetism extends Leaf {
         		{
         			if(Walking.walkExact(standTile))
         			{
-        				MethodProvider.sleepUntil(() -> standTile.equals(Players.localPlayer().getTile()), Sleep.calculate(3333, 2222));
+        				MethodProvider.sleepUntil(() -> standTile.equals(p.l.getTile()), Sleep.calculate(3333, 2222));
         			}
         			break;
         		}
@@ -260,9 +261,9 @@ public class AnimalMagnetism extends Leaf {
         }
         case(120):case(130):
         {
-        	if(Locations.ernest_westWing.contains(Players.localPlayer()))
+        	if(Locations.ernest_westWing.contains(p.l))
     		{
-    			API.walkInteractWithGameObject("Lever","Pull",Locations.ernest_westWing,() -> !Locations.ernest_westWing.contains(Players.localPlayer()));
+    			API.walkInteractWithGameObject("Lever","Pull",Locations.ernest_westWing,() -> !Locations.ernest_westWing.contains(p.l));
     			break;
     		}
         	API.walkTalkToNPC("Witch", "Talk-to", Locations.draynorMaynorWitch);
@@ -288,7 +289,7 @@ public class AnimalMagnetism extends Leaf {
         					{
         						if(Inventory.get(new Item(id.ironBar,1).getNotedItemID()).useOn(Bank.getClosestBank(BankType.CHEST)))
         						{
-        							MethodProvider.sleepUntil(() -> Inventory.contains(id.ironBar), () -> Players.localPlayer().isMoving(),Sleep.calculate(2222, 2222),69);
+        							MethodProvider.sleepUntil(() -> Inventory.contains(id.ironBar), () -> p.l.isMoving(),Sleep.calculate(2222, 2222),69);
         						}
         					}
         					break;
@@ -305,7 +306,7 @@ public class AnimalMagnetism extends Leaf {
         		}
         		break;
         	}
-        	if(Locations.entireMorytania.contains(Players.localPlayer()) && 
+        	if(Locations.entireMorytania.contains(p.l) && 
         			Locations.animalMagnetism_alice.getCenter().distance() < 115)
         	{
         		API.walkTalkToNPC("Alice\'s husband", "Talk-to", Locations.animalMagnetism_alicesHusband);
@@ -321,7 +322,7 @@ public class AnimalMagnetism extends Leaf {
         }
         case(76):case(80):
         {
-        	if(Locations.entireMorytania.contains(Players.localPlayer()) && 
+        	if(Locations.entireMorytania.contains(p.l) && 
         			Locations.animalMagnetism_alice.getCenter().distance() < 115)
         	{
         		API.walkTalkToNPC("Alice\'s husband", "Talk-to", Locations.animalMagnetism_alicesHusband);
@@ -332,7 +333,7 @@ public class AnimalMagnetism extends Leaf {
         }
         case(70):case(73):
         {
-        	if(Locations.entireMorytania.contains(Players.localPlayer()) && 
+        	if(Locations.entireMorytania.contains(p.l) && 
         			Locations.crowsHouse.getCenter().distance() < 125)
         	{
         		API.walkTalkToNPC("Old crone", "Talk-to", Locations.crowsHouse);
@@ -345,7 +346,7 @@ public class AnimalMagnetism extends Leaf {
         {
         	if(get20Ectotokens())
         	{
-        		if(!Locations.entireMorytania.contains(Players.localPlayer()))
+        		if(!Locations.entireMorytania.contains(p.l))
         		{
         			if(Inventory.contains(id.fenkensteinTab))
         			{
@@ -417,7 +418,7 @@ public class AnimalMagnetism extends Leaf {
 			{
 				if(turael.interact("Talk-to")) 
 				{
-					MethodProvider.sleepUntil(Dialogues::inDialogue, () -> Players.localPlayer().isMoving(), Sleep.calculate(2222, 2222),50);
+					MethodProvider.sleepUntil(Dialogues::inDialogue, () -> p.l.isMoving(), Sleep.calculate(2222, 2222),50);
 					return true;
 				}
 			}
@@ -425,7 +426,7 @@ public class AnimalMagnetism extends Leaf {
 		}
 		else 
 		{
-			if(Locations.burthorpeTeleSpot.distance(Players.localPlayer().getTile()) > 50)
+			if(Locations.burthorpeTeleSpot.distance(p.l.getTile()) > 50)
 			{
 				if(Walkz.useJewelry(InvEquip.games, "Burthorpe"))
 				{
@@ -451,7 +452,7 @@ public class AnimalMagnetism extends Leaf {
 	}
     public static void walkTalkToAva()
     {
-    	if(Locations.ernest_westWing.contains(Players.localPlayer()))
+    	if(Locations.ernest_westWing.contains(p.l))
     	{
     		API.talkToNPC("Ava");
     		return;
@@ -461,7 +462,7 @@ public class AnimalMagnetism extends Leaf {
     		Walkz.teleport(id.draynorTab, Locations.draynorMaynorTeleSpot, 180000);
     		return;
     	}
-		API.walkInteractWithGameObject("Bookcase", "Search", Locations.ernest_westWingAnd, () -> Locations.ernest_westWing.contains(Players.localPlayer()));
+		API.walkInteractWithGameObject("Bookcase", "Search", Locations.ernest_westWingAnd, () -> Locations.ernest_westWing.contains(p.l));
     	
     }
     public static boolean worshipped = false;
@@ -479,29 +480,29 @@ public class AnimalMagnetism extends Leaf {
     		return true;
     	}
     		
-    	if(Locations.ectofunctus_2ndFloor.contains(Players.localPlayer()))
+    	if(Locations.ectofunctus_2ndFloor.contains(p.l))
     	{
     		if(Inventory.contains(id.dBones) && Inventory.contains(id.pot))
     		{
     			if(Inventory.get(id.dBones).useOn(GameObjects.closest("Loader")))
     			{
     				MethodProvider.sleepUntil(() -> Inventory.count(id.potOfDBones) >= 4, 
-    					() -> Players.localPlayer().isAnimating() || Players.localPlayer().isMoving(),
+    					() -> p.l.isAnimating() || p.l.isMoving(),
     					Sleep.calculate(5555, 5555),69);
     			}
     			return false;
     		}
-    		API.interactWithGameObject("Staircase", "Climb-down", () -> Locations.ectofunctus_ground.contains(Players.localPlayer()));
+    		API.interactWithGameObject("Staircase", "Climb-down", () -> Locations.ectofunctus_ground.contains(p.l));
     		return false;
     	}
-    	if(Locations.ectofunctus_ground.contains(Players.localPlayer()))
+    	if(Locations.ectofunctus_ground.contains(p.l))
     	{
     		if(Inventory.contains(id.potOfDBones))
     		{
     			final int prayXP = Skills.getExperience(Skill.PRAYER);
     			API.interactWithGameObject("Ectofuntus", "Worship");
     			MethodProvider.sleepUntil(() -> Skills.getExperience(Skill.PRAYER) > prayXP,
-    					() -> Players.localPlayer().isMoving(),
+    					() -> p.l.isMoving(),
     					Sleep.calculate(3333, 3333),69);
     			worshipped = true;
     			return false;
@@ -518,19 +519,19 @@ public class AnimalMagnetism extends Leaf {
     			return false;
     		}
     		
-    		API.interactWithGameObject("Staircase", "Climb-up", () -> Locations.ectofunctus_2ndFloor.contains(Players.localPlayer()));
+    		API.interactWithGameObject("Staircase", "Climb-up", () -> Locations.ectofunctus_2ndFloor.contains(p.l));
     		return false;
     	}
-    	if(Locations.phasmatys_southOfNorthGateArea.contains(Players.localPlayer()))
+    	if(Locations.phasmatys_southOfNorthGateArea.contains(p.l))
     	{
     		if(Inventory.count(id.pot) == 4 && 
     				Inventory.count(id.bucketOfSlime) == 4)
     		{
-    			API.walkInteractWithGameObject("Energy Barrier", "Pass", Locations.phasmatysNorthGates, () -> Locations.ectofunctus_ground.contains(Players.localPlayer()));
+    			API.walkInteractWithGameObject("Energy Barrier", "Pass", Locations.phasmatysNorthGates, () -> Locations.ectofunctus_ground.contains(p.l));
     		}
     		return false;
     	}
-    	if(Locations.portPhasmatysRough.contains(Players.localPlayer()))
+    	if(Locations.portPhasmatysRough.contains(p.l))
     	{
     		if(pots < 4 || slimes < 4)
     		{
@@ -559,16 +560,16 @@ public class AnimalMagnetism extends Leaf {
     		if(Inventory.count(id.pot) == 4 && 
     				Inventory.count(id.bucketOfSlime) == 4)
     		{
-    			API.walkInteractWithGameObject("Energy Barrier", "Pass", Locations.phasmatysNorthGates, () -> Locations.ectofunctus_ground.contains(Players.localPlayer()));
+    			API.walkInteractWithGameObject("Energy Barrier", "Pass", Locations.phasmatysNorthGates, () -> Locations.ectofunctus_ground.contains(p.l));
     		}
     		return false;
     	}
-    	if(Locations.portPhasmatysCharterShip.contains(Players.localPlayer()))
+    	if(Locations.portPhasmatysCharterShip.contains(p.l))
     	{
-    		API.interactWithGameObject("Gangplank", "Cross", () -> Locations.portPhasmatysRough.contains(Players.localPlayer()));
+    		API.interactWithGameObject("Gangplank", "Cross", () -> Locations.portPhasmatysRough.contains(p.l));
     		return false;
     	}
-    	if(Locations.karamjaF2P.contains(Players.localPlayer()))
+    	if(Locations.karamjaF2P.contains(p.l))
     	{
     		WidgetChild charterMapPhasmatysButton =  Widgets.getWidgetChild(72, 7);
     		if(charterMapPhasmatysButton != null && charterMapPhasmatysButton.isVisible())

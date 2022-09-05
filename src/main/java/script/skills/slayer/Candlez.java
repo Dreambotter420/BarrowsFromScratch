@@ -18,6 +18,7 @@ import org.dreambot.api.script.ScriptManager;
 import org.dreambot.api.utilities.Timer;
 import org.dreambot.api.wrappers.interactive.GameObject;
 
+import script.p;
 import script.quest.varrockmuseum.Timing;
 import script.skills.crafting.TrainCrafting;
 import script.skills.woodcutting.TrainWoodcutting;
@@ -206,20 +207,20 @@ public class Candlez {
 		if(Inventory.count(id.logs) > 0 && 
 				Inventory.count(id.tinderbox) > 0)
 		{
-			if(lightableArea.contains(Players.localPlayer()))
+			if(lightableArea.contains(p.l))
 			{
-				if(Players.localPlayer().isMoving() || Players.localPlayer().isAnimating()) {
+				if(p.l.isMoving() || p.l.isAnimating()) {
 					MethodProvider.sleep(Timing.sleepLogNormalSleep());
 					return false;
 				}
 				GameObject fireUnderMe = GameObjects.closest(g -> g!=null && 
 						g.getName().equals("Fire") && 
-						g.getTile().equals(Players.localPlayer().getTile()));
+						g.getTile().equals(p.l.getTile()));
 				if(fireUnderMe == null)
 				{
 					if(Inventory.get(id.logs).useOn(Inventory.get(id.tinderbox)))
 					{
-						MethodProvider.sleepUntil(() -> Players.localPlayer().isAnimating(), Sleep.calculate(2222, 2222));
+						MethodProvider.sleepUntil(() -> p.l.isAnimating(), Sleep.calculate(2222, 2222));
 					}
 					return false;
 				}

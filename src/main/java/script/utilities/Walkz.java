@@ -37,6 +37,8 @@ import org.dreambot.api.utilities.Timer;
 import org.dreambot.api.wrappers.interactive.GameObject;
 import org.dreambot.api.wrappers.interactive.NPC;
 import org.dreambot.api.wrappers.items.GroundItem;
+
+import script.p;
 import script.actionz.UniqueActions;
 import script.actionz.UniqueActions.Actionz;
 import script.quest.varrockmuseum.Timing;
@@ -77,9 +79,9 @@ public class Walkz {
 		{
 			Sleep.sleep(69,69);
 			//check if already in good GE area
-			if(Locations.clickableGEArea.contains(Players.localPlayer())) return true;
+			if(Locations.clickableGEArea.contains(p.l)) return true;
 			//check if within walkable area to GE
-			if(Locations.dontTeleToGEAreaJustWalk.contains(Players.localPlayer()))
+			if(Locations.dontTeleToGEAreaJustWalk.contains(p.l))
 			{
 				if(Walking.shouldWalk(6) && Walking.walk(BankLocation.GRAND_EXCHANGE.getTile()))
 				{
@@ -94,7 +96,7 @@ public class Walkz {
 				{
 					if(Equipment.interact(EquipmentSlot.RING, "Grand Exchange"))
 					{
-						MethodProvider.sleepUntil(() -> Locations.teleGE.contains(Players.localPlayer()), () -> Players.localPlayer().isAnimating(),Sleep.calculate(3333,2222),50);
+						MethodProvider.sleepUntil(() -> Locations.teleGE.contains(p.l), () -> p.l.isAnimating(),Sleep.calculate(3333,2222),50);
 					}
 				}
 				else
@@ -157,8 +159,8 @@ public class Walkz {
 	
 	public static boolean walkToForgottenSouls()
 	{
-		if(Locations.forgottenSoulsLvl3.contains(Players.localPlayer())) return true;
-		if(Locations.forgottenSoulsLvl1.contains(Players.localPlayer()))
+		if(Locations.forgottenSoulsLvl3.contains(p.l)) return true;
+		if(Locations.forgottenSoulsLvl1.contains(p.l))
 		{
 			GameObject stairs = GameObjects.closest("Staircase");
 			if(stairs == null)
@@ -168,14 +170,14 @@ public class Walkz {
 			}
 			if(stairs.interact("Climb-up"))
 			{
-				MethodProvider.sleepUntil(() -> Locations.forgottenSoulsLvl2.contains(Players.localPlayer()),
-						() -> Players.localPlayer().isMoving(),
+				MethodProvider.sleepUntil(() -> Locations.forgottenSoulsLvl2.contains(p.l),
+						() -> p.l.isMoving(),
 						Sleep.calculate(2222,2222), 50);
 				Sleep.sleep(420,696);
 			}
 			return false;
 		}
-		if(Locations.forgottenSoulsLvl2.contains(Players.localPlayer()))
+		if(Locations.forgottenSoulsLvl2.contains(p.l))
 		{
 			GameObject stairs = GameObjects.closest("Staircase");
 			if(stairs == null)
@@ -185,8 +187,8 @@ public class Walkz {
 			}
 			if(stairs.interact("Climb-up"))
 			{
-				MethodProvider.sleepUntil(() -> Locations.forgottenSoulsLvl2.contains(Players.localPlayer()),
-						() -> Players.localPlayer().isMoving(),
+				MethodProvider.sleepUntil(() -> Locations.forgottenSoulsLvl2.contains(p.l),
+						() -> p.l.isMoving(),
 						Sleep.calculate(2222,2222), 50);
 				Sleep.sleep(420,696);
 			}
@@ -260,7 +262,7 @@ public class Walkz {
 		if(Locations.haSpot == Locations.HASpot1)
 		{
 			//this is the one in f2p walking from duel arena to that one spot south of it at altar 2nd floor
-			if(Locations.HASpot1.contains(Players.localPlayer()))
+			if(Locations.HASpot1.contains(p.l))
 			{
 				
 			}
@@ -269,10 +271,10 @@ public class Walkz {
 	}
 	public static boolean exitLumbyCave()
 	{
-		if(!Locations.entireLumbyCave.contains(Players.localPlayer())) return true;
+		if(!Locations.entireLumbyCave.contains(p.l)) return true;
 		if(!Bankz.openClosest(50))
 		{
-			if(Locations.lumbyCaveFoyer.contains(Players.localPlayer()))
+			if(Locations.lumbyCaveFoyer.contains(p.l))
 			{
 				GameObject climbingRope = GameObjects.closest(g -> g!=null && 
 						g.getName().equals("Climbing rope") && 
@@ -288,7 +290,7 @@ public class Walkz {
 				}
 				return false;
 			}
-			if(Locations.caveHandSkipTile2.equals(Players.localPlayer().getTile()))
+			if(Locations.caveHandSkipTile2.equals(p.l.getTile()))
 			{
 				if(!Walking.isRunEnabled())
 				{
@@ -315,12 +317,12 @@ public class Walkz {
 			
 				
 			Sleep.sleep(69,420);
-			if(Locations.shantayPassSouthSide.contains(Players.localPlayer())) 
+			if(Locations.shantayPassSouthSide.contains(p.l)) 
 			{
 				MethodProvider.log("Exiting enter desert loop - in south side of shantay pass!");
 				return true;
 			}
-			if(Locations.shantayPassArea.contains(Players.localPlayer()))
+			if(Locations.shantayPassArea.contains(p.l))
 			{
 				//drop all useless junk
 				if(Inventory.dropAll(i -> 
@@ -344,7 +346,7 @@ public class Walkz {
 					{
 						if(Widgets.getWidgetChild(565,17).interact("Yes"))
 						{
-							MethodProvider.sleepUntil(() -> Locations.shantayPassSouthSide.contains(Players.localPlayer()), Sleep.calculate(2222,2222));
+							MethodProvider.sleepUntil(() -> Locations.shantayPassSouthSide.contains(p.l), Sleep.calculate(2222,2222));
 						}
 						continue;
 					}
@@ -358,11 +360,11 @@ public class Walkz {
 					}
 					if(shantayPass.interact("Go-through"))
 					{
-						MethodProvider.sleepUntil(() -> Locations.shantayPassSouthSide.contains(Players.localPlayer()) || 
+						MethodProvider.sleepUntil(() -> Locations.shantayPassSouthSide.contains(p.l) || 
 								(Widgets.getWidgetChild(565,17) != null && 
 										Widgets.getWidgetChild(565,17).isVisible() && 
 										Widgets.getWidgetChild(565,17).getText().contains("Proceed regardless")),
-								() -> Players.localPlayer().isMoving(),
+								() -> p.l.isMoving(),
 								Sleep.calculate(2222, 2222),50);
 					}
 					MethodProvider.sleep(Timing.sleepLogNormalInteraction());
@@ -481,7 +483,7 @@ public class Walkz {
 					if(shantay.interact("Trade"))
 					{
 						MethodProvider.log("Interacted -trade- to -shantay-");
-						MethodProvider.sleepUntil(Shop::isOpen, () -> Players.localPlayer().isMoving(),
+						MethodProvider.sleepUntil(Shop::isOpen, () -> p.l.isMoving(),
 								Sleep.calculate(2222, 2222),50);
 						continue;
 					}
@@ -543,7 +545,7 @@ public class Walkz {
 					if(Walkz.useJewelry(InvEquip.glory, "Al Kharid")) continue;
 					if(Walkz.useJewelry(InvEquip.duel, "PvP Arena")) continue;
 					
-					if(Locations.carpetAreaShantay.contains(Players.localPlayer()))
+					if(Locations.carpetAreaShantay.contains(p.l))
 					{
 						GameObject shantayPass = GameObjects.closest(f -> f!=null && f.getName().contains("Shantay pass") && f.hasAction("Go-through"));
 						if(shantayPass == null)
@@ -554,8 +556,8 @@ public class Walkz {
 						}
 						if(shantayPass.interact("Go-through"))
 						{
-							MethodProvider.sleepUntil(() -> Locations.shantayPassArea.contains(Players.localPlayer()),
-									() -> Players.localPlayer().isMoving(),
+							MethodProvider.sleepUntil(() -> Locations.shantayPassArea.contains(p.l),
+									() -> p.l.isMoving(),
 									Sleep.calculate(2222, 2222),50);
 						}
 						MethodProvider.sleep(Timing.sleepLogNormalInteraction());
@@ -595,7 +597,7 @@ public class Walkz {
 				if(useJewelry(InvEquip.duel,"Castle Wars")) continue;
 				if(useJewelry(InvEquip.passage,"Wizards\' Tower")) continue;
 				if(useJewelry(InvEquip.games,"Barbarian Outpost")) continue;
-				if(Locations.kourendGiantsCaveArea.contains(Players.localPlayer()))
+				if(Locations.kourendGiantsCaveArea.contains(p.l))
 				{
 					exitGiantsCave();
 					continue;
@@ -605,8 +607,8 @@ public class Walkz {
 				{
 					if(closestVeos.interact("Port Sarim"))
 					{
-						MethodProvider.sleepUntil(() -> Locations.shipSarimVeos.contains(Players.localPlayer()),
-								() -> Players.localPlayer().isMoving(), 
+						MethodProvider.sleepUntil(() -> Locations.shipSarimVeos.contains(p.l),
+								() -> p.l.isMoving(), 
 								Sleep.calculate(8888, 5555),50);
 					} else if(Walking.shouldWalk(5) && Walking.walk(closestVeos)) Sleep.sleep(69, 420);
 					continue;
@@ -628,7 +630,7 @@ public class Walkz {
 				&& ScriptManager.getScriptManager().isRunning() && !ScriptManager.getScriptManager().isPaused())
 		{
 			Sleep.sleep(69,69);
-			if(Locations.isleOfSouls.contains(Players.localPlayer()))
+			if(Locations.isleOfSouls.contains(p.l))
 			{
 				if(useJewelry(InvEquip.wealth,"Grand Exchange")) continue;
 				if(useJewelry(InvEquip.glory,"Edgeville")) continue;
@@ -643,8 +645,8 @@ public class Walkz {
 				{
 					if(portal.distance() < 10 && portal.interact("Edgeville"))
 					{
-						MethodProvider.sleepUntil(() -> Locations.edgevilleSoulsPortal.contains(Players.localPlayer()),
-								() -> Players.localPlayer().isMoving(), 
+						MethodProvider.sleepUntil(() -> Locations.edgevilleSoulsPortal.contains(p.l),
+								() -> p.l.isMoving(), 
 								Sleep.calculate(5555, 3333),50);
 						continue;
 					}
@@ -654,7 +656,7 @@ public class Walkz {
 							!Walkz.walkBackwardsPath(Paths.path_otherSideOfIsleOfSoulsToForgottenSouls))
 				{
 					MethodProvider.log("Appear to be stuck on isle of souls, teleporting home??");
-					if(Players.localPlayer().isAnimating()) 
+					if(p.l.isAnimating()) 
 					{
 						Sleep.sleep(2222, 2222);
 						return false;
@@ -669,7 +671,7 @@ public class Walkz {
 	}
 	public static boolean exitGiantsCave()
 	{
-		if(Locations.kourendGiantsCaveArea.contains(Players.localPlayer()))
+		if(Locations.kourendGiantsCaveArea.contains(p.l))
 		{
 			Filter<GameObject> caveFilter = c -> 
 			c != null && 
@@ -681,8 +683,8 @@ public class Walkz {
 			{
 				if(cave.interact("Exit"))
 				{
-					MethodProvider.sleepUntil(() -> Locations.kourendGiantsCaveEntrance.contains(Players.localPlayer()),
-							() -> Players.localPlayer().isMoving(),Sleep.calculate(2222,2222), 50);
+					MethodProvider.sleepUntil(() -> Locations.kourendGiantsCaveEntrance.contains(p.l),
+							() -> p.l.isMoving(),Sleep.calculate(2222,2222), 50);
 				} else if(Walking.shouldWalk(6) && Walking.walk(cave))
 				MethodProvider.sleep(Timing.sleepLogNormalSleep());
 			}
@@ -756,9 +758,9 @@ public class Walkz {
 				if(Equipment.interact(equipSlot, teleName))
 				{
 					MethodProvider.log("Just used Jewelry teleport: " + teleName +" in slot: " + equipSlot);
-					MethodProvider.sleepUntil(() -> Players.localPlayer().isAnimating(),Sleep.calculate(4444,4444));
-					MethodProvider.sleepUntil(() -> !Players.localPlayer().isAnimating(), 
-							() -> Players.localPlayer().isAnimating(), Sleep.calculate(3333,2222),69);
+					MethodProvider.sleepUntil(() -> p.l.isAnimating(),Sleep.calculate(4444,4444));
+					MethodProvider.sleepUntil(() -> !p.l.isAnimating(), 
+							() -> p.l.isAnimating(), Sleep.calculate(3333,2222),69);
 					Sleep.sleep(111,1111);
 				}
 			}
@@ -775,9 +777,9 @@ public class Walkz {
 		{
 			Sleep.sleep(69,69);
 			//check if already in good castle wars area
-			if(Locations.castleWars.contains(Players.localPlayer())) return true;
+			if(Locations.castleWars.contains(p.l)) return true;
 			//check if within reasonable walking distance
-			double dist = Locations.castleWars.distance(Players.localPlayer().getTile());
+			double dist = Locations.castleWars.distance(p.l.getTile());
 			//if have ring of dueling already equipped, use it
 			boolean ringFound = false;
 			if(dist > 100)
@@ -895,7 +897,7 @@ public class Walkz {
 			}
 			MethodProvider.log("In teleportWoodcuttingGuild loop");
 			//check if already in good draynor teleport area
-			double dist = Locations.woodcuttingGuildTeleSpot.distance(Players.localPlayer().getTile());
+			double dist = Locations.woodcuttingGuildTeleSpot.distance(p.l.getTile());
 			if(dist <= 10) return true;
 			//check if within reasonable walking distance
 			if(useJewelry(InvEquip.skills,"Woodcutting Guild")) continue;
@@ -927,9 +929,9 @@ public class Walkz {
 		{
 			Sleep.sleep(69,69);
 			//check if already in good area
-			if(Locations.camelotTrees.contains(Players.localPlayer())) return true;
+			if(Locations.camelotTrees.contains(p.l)) return true;
 			//check if within reasonable walking distance
-			double dist = Locations.camelotTrees.distance(Players.localPlayer().getTile());
+			double dist = Locations.camelotTrees.distance(p.l.getTile());
 			
 			if(dist <= 150)
 			{
@@ -946,7 +948,7 @@ public class Walkz {
 				if(Bank.isOpen()) Bankz.close();
 				else if(Inventory.interact(id.cammyTele, "Break"))
 				{
-					MethodProvider.sleepUntil(() -> Locations.camelotTrees.contains(Players.localPlayer()), () -> Players.localPlayer().isAnimating(), Sleep.calculate(4444,2222),50);
+					MethodProvider.sleepUntil(() -> Locations.camelotTrees.contains(p.l), () -> p.l.isAnimating(), Sleep.calculate(4444,2222),50);
 				}
 				continue;
 			}
@@ -984,7 +986,7 @@ public class Walkz {
 		while(!timer.finished() && Client.getGameState() == GameState.LOGGED_IN
 				&& ScriptManager.getScriptManager().isRunning() && !ScriptManager.getScriptManager().isPaused())
 		{
-			if(teleSpot.contains(Players.localPlayer())) return true;
+			if(teleSpot.contains(p.l)) return true;
 			
 			Sleep.sleep(69,69);
 			
@@ -996,7 +998,7 @@ public class Walkz {
 				{
 					if(Inventory.interact(tabID, "Break"))
 					{
-						MethodProvider.sleepUntil(() -> teleSpot.contains(Players.localPlayer()), () -> Players.localPlayer().isAnimating(), Sleep.calculate(4444,2222),50);
+						MethodProvider.sleepUntil(() -> teleSpot.contains(p.l), () -> p.l.isAnimating(), Sleep.calculate(4444,2222),50);
 					}
 				}
 				continue;
@@ -1026,14 +1028,14 @@ public class Walkz {
 		while(!timer.finished() && Client.getGameState() == GameState.LOGGED_IN
 				&& ScriptManager.getScriptManager().isRunning() && !ScriptManager.getScriptManager().isPaused())
 		{
-			if(Locations.isInstanced() || Locations.houseTeleSpot.contains(Players.localPlayer())) return true;
+			if(Locations.isInstanced() || Locations.houseTeleSpot.contains(p.l)) return true;
 			if(!Locations.unlockedHouse)
 			{
 				TrainPrayer.unlockHouse();
 				return false;
 			}
 			Sleep.sleep(69,69);
-			final double dist = Locations.houseTeleSpot.distance(Players.localPlayer().getTile());
+			final double dist = Locations.houseTeleSpot.distance(p.l.getTile());
 			if(dist <= 30)
 			{
 				if(Walking.shouldWalk(6) && Walking.walk(Locations.houseTeleSpot.getCenter()))
@@ -1049,7 +1051,7 @@ public class Walkz {
 				if(Bank.isOpen()) Bankz.close();
 				else if(Inventory.interact(id.houseTele, "Outside"))
 				{
-					MethodProvider.sleepUntil(() -> Locations.isInstanced() || Locations.houseTeleSpot.contains(Players.localPlayer()), () -> Players.localPlayer().isAnimating(), Sleep.calculate(4444,2222),50);
+					MethodProvider.sleepUntil(() -> Locations.isInstanced() || Locations.houseTeleSpot.contains(p.l), () -> p.l.isAnimating(), Sleep.calculate(4444,2222),50);
 				}
 				continue;
 			}
@@ -1082,29 +1084,29 @@ public class Walkz {
 	}
 	public static boolean walkToArea(Area area,Tile walkableTile)
 	{
-		if(area.contains(Players.localPlayer())) return true;
+		if(area.contains(p.l)) return true;
 		
 		if(Walking.shouldWalk(6))
 		{
 			if(Walking.walk(walkableTile)) Sleep.sleep(420,696);
 		}
-		return area.contains(Players.localPlayer());
+		return area.contains(p.l);
 	}
 	public static boolean walkToArea(Area area)
 	{
-		if(area.contains(Players.localPlayer())) return true;
+		if(area.contains(p.l)) return true;
 		
 		if(Walking.shouldWalk(6))
 		{
 			if(Walking.walk(area.getCenter())) Sleep.sleep(420,696);
 		}
-		return area.contains(Players.localPlayer());
+		return area.contains(p.l);
 	}
 	public static boolean walkToTileInRadius(Tile walkableTile,int radius)
 	{
 		Area area = walkableTile.getArea(radius);
 		
-		if(area.contains(Players.localPlayer())) return true;
+		if(area.contains(p.l)) return true;
 		if(!Walking.isRunEnabled() &&
 				Walking.getRunEnergy() > Sleep.calculate(15, 20)) 
 		{
@@ -1114,7 +1116,7 @@ public class Walkz {
 		{
 			if(Walking.walk(walkableTile)) Sleep.sleep(666, 1111);
 		}
-		return area.contains(Players.localPlayer());
+		return area.contains(p.l);
 	}
 	public static boolean turnOnRun()
 	{
@@ -1131,7 +1133,7 @@ public class Walkz {
 	
 	public static boolean walkToEntityInArea(String thingName,Area area)
 	{
-		if(area.contains(Players.localPlayer()))
+		if(area.contains(p.l))
 		{
 			//first check NPCs
 			NPC npc = NPCs.closest(thingName);

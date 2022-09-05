@@ -14,6 +14,7 @@ import org.dreambot.api.methods.skills.Skills;
 import org.dreambot.api.utilities.Timer;
 import org.dreambot.api.wrappers.items.Item;
 
+import script.p;
 import script.actionz.UniqueActions.Actionz;
 import script.framework.Leaf;
 import script.quest.varrockmuseum.Timing;
@@ -28,7 +29,7 @@ public class RuneliteChatPluginPretending extends Leaf {
 	 public boolean isValid() 
 	 {
 	    return UniqueActions.isActionEnabled(Actionz.PRETEND_TO_HAVE_RUNELITE_CHATCOMMAND_PLUGIN_AT_GE) &&
-	    		GE.contains(Players.localPlayer()) &&
+	    		GE.contains(p.l) &&
 	    		(calloutTimer == null || calloutTimer.finished());
 	 }
    public static Timer calloutTimer = null;
@@ -36,32 +37,10 @@ public class RuneliteChatPluginPretending extends Leaf {
     public int onLoop() {
     	if(API.clearChatWithBackspace())
 		{
-			String sayTxt = "";
-			if(Calculations.nextGaussianRandom(50,20) >= 50)
-			{
-				List<Skill> skills = new ArrayList<Skill>();
-				for(Skill skill : Skill.values())
-				{
-					if(Skills.getRealLevel(skill) > 1)
-					{
-						skills.add(skill);
-					}
-				}
-				if(!skills.isEmpty())
-				{
-					Collections.shuffle(skills);
-					sayTxt = "!lvl "+ skills.get(0).toString();
-					Keyboard.type(sayTxt,true);
-					int timer = (int) Calculations.nextGaussianRandom(6000000, 3000000) + Calculations.random(1000,1200000);
-		    		MethodProvider.log("Setting timer until next Runelite plugin chat thing: " + Timer.formatTime(timer));
-					calloutTimer = new Timer(timer);
-					return Sleep.calculate(1111,1111);
-				}
-			}
 			if(!ItemsOnGround.allSlayerLoot.isEmpty())
 			{
 				Collections.shuffle(ItemsOnGround.allSlayerLoot);
-				sayTxt = "!Price "+ new Item(ItemsOnGround.allSlayerLoot.get(0),1).getName();
+				String sayTxt = "!Price " + new Item(ItemsOnGround.allSlayerLoot.get(0),1).getName();
 				Keyboard.type(sayTxt,true);
 				int timer = (int) Calculations.nextGaussianRandom(6000000, 3000000) + Calculations.random(1000,1200000);
 				MethodProvider.log("Setting timer until next Runelite plugin chat thing: " + Timer.formatTime(timer));

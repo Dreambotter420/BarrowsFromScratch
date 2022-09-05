@@ -29,6 +29,7 @@ import org.dreambot.api.script.ScriptManager;
 import org.dreambot.api.utilities.Timer;
 import org.dreambot.api.wrappers.items.Item;
 
+import script.p;
 import script.quest.varrockmuseum.Timing;
 import script.skills.ranged.TrainRanged;
 import script.skills.woodcutting.TrainWoodcutting;
@@ -643,7 +644,7 @@ public class InvEquip {
 					Sleep.sleep(696, 420);
 					continue;
 				}
-				if(BankLocation.GRAND_EXCHANGE.distance(Players.localPlayer().getTile()) < 50 && 
+				if(BankLocation.GRAND_EXCHANGE.distance(p.l.getTile()) < 50 && 
 						Bank.open(BankLocation.GRAND_EXCHANGE) )
 				{
 					MethodProvider.sleepUntil(() -> Bank.isOpen(), Sleep.calculate(2222, 2222));
@@ -706,13 +707,18 @@ public class InvEquip {
 					Sleep.sleep(420, 1111);
 					continue;
 				}
-				int purchaseTimeout = Sleep.calculate(5555, 5555); //amt of time to wait after purchase for sale to go through
+				//amt of time to wait after purchase for sale to go through
+				//default is max timeout limit minus 10s for fixed price items
+				int purchaseTimeout = (int) timer.remaining() - 10000;
+				if(purchaseTimeout < 5000) purchaseTimeout = 5000;
 				int pricePer = pricePerItem;
+				
+				//see increasing-price function, price per item passed as -1
 				if(pricePer <= 0) 
 				{
 					pricePer = (int)(priceIncrease * ((LivePrices.getHigh(itemID) * 1.25) + (LivePrices.getHigh(itemID) * (Calculations.random(25.0, 50.0) / 100))));
-					purchaseTimeout = (int) timer.remaining() - 10000;
-					if(purchaseTimeout < 5000) purchaseTimeout = 5000;
+					purchaseTimeout = Sleep.calculate(4444, 2222);
+					MethodProvider.log("See increasing price function for GE! Putting price per item: "+pricePer+" / " + new Item(itemID,1).getName());
 				}
 				//have coins for this purchase?
 				int totalPrice = qty * pricePer;
@@ -725,14 +731,13 @@ public class InvEquip {
 				if(GrandExchange.buyItem(itemID, qty, pricePer))
 				{
 					MethodProvider.sleepUntil(() -> GrandExchange.isReadyToCollect(), purchaseTimeout);
-					double tmp = priceIncrease + 0.2;
+					double tmp = priceIncrease + 0.32;
 					priceIncrease = tmp;
 					Sleep.sleep(111, 111);
 					continue;
 				}
 			}
 		}
-		
 	}
 	/**
 	 * Buys a thing at the GE for ever increasing price until we have total qty in bank + invy
@@ -1671,7 +1676,7 @@ public class InvEquip {
 						continue;
 					}
 					int bankCount = Bank.count(unnotedID);
-					MethodProvider.log("requested / unnoted / noted IDs: " + requestedID + " / " + unnotedID+ " / " + notedID +"~~~ noted: "+ noted);
+					MethodProvider.log("requested / unnoted / noted IDs: " + requestedID + " / " + unnotedID+ " / " + notedID +"~~~ noted: "+ noted+" ~~ qty: " + minQty+" - " +maxQty);
 					int tooMuch = invCount - maxQty;
 					//check bank for item
 					if(bankCount > 0 || tooMuch > 0) 
@@ -1795,15 +1800,15 @@ public class InvEquip {
 	
 	public static boolean equipItem(int ID)
 	{
-
+		Item i = new Item(ID,1);
 		if(GrandExchange.isOpen()) 
 		{
 			GrandExchangg.close();
 			return false;
 		}
-		if(Equipment.contains(ID)) return true;
+		if(Equipment.contains(ID) && Inventory.contains(ID) && !i.isStackable()) return true;
 		if(!Inventory.contains(ID)) return false;
-		MethodProvider.log("Equipping item: " + new Item(ID,1).getName());
+		MethodProvider.log("Equipping item: " + i.getName());
 		if(Tabs.isOpen(Tab.INVENTORY) || Bank.isOpen() ||
 				(Widgets.getWidgetChild(12, 76) != null && Widgets.getWidgetChild(12, 76).isVisible()))
 		{
@@ -1840,51 +1845,7 @@ public class InvEquip {
 		}
 		return false;
 	}
-	public static boolean equipItem(String itemName)
-	{
-		if(Equipment.contains(itemName)) return true;
-		if(Tabs.isOpen(Tab.INVENTORY) || Bank.isOpen() ||
-				(Widgets.getWidgetChild(12, 76) != null && Widgets.getWidgetChild(12, 76).isVisible()))
-		{
-			Item wearItem = Inventory.get(itemName);
-			if(wearItem == null) return false;
-			String action = null;
-			for(String act : wearItem.getActions())
-			{
-				if(act == null) continue;
-				if(act.equals("Wield")) 
-				{
-					action = "Wield";
-					break;
-				}
-				else if(act.equals("Wear")) 
-				{
-					action = "Wear";
-					break;
-				}
-			}
-			final String tmp = itemName;
-			if(Inventory.interact(itemName, action))
-			{
-				MethodProvider.sleepUntil(() -> {
-					if(Combatz.shouldEatFood(8)) Combatz.eatFood();
-					return Equipment.contains(tmp);
-				}, Sleep.calculate(2222, 2222));
-			}
-			if(Equipment.contains(itemName)) return true;
-			return false;
-		}
-		else
-		{
-			if(Widgets.isOpen())
-			{
-				Widgets.closeAll();
-				Sleep.sleep(111, 111);
-			}
-			else Tabz.open(Tab.INVENTORY);
-		}
-		return false;
-	}
+	
 	/**
 	 * returns false if Equipment can be closed, true if equipment bank tab closed already
 	 * @return
@@ -1943,14 +1904,17 @@ public class InvEquip {
 	{
 		if(Inventory.isFull())
 		{
-			if(!Inventory.dropAll(i -> i!=null && 
-					i.getID() != -1 && 
-					(i.getID() == id.jug || 
-					i.getID() == id.vial)))
+			if(!Inventory.contains(id.jug,id.vial) && 
+					!InvEquip.invyContains(Combatz.foods)) return false;
+			if(Inventory.contains(id.jug,id.vial))
 			{
-				Combatz.eatFood();
+				Inventory.dropAll(i -> i!=null && 
+						i.getID() != -1 && 
+						(i.getID() == id.jug || 
+						i.getID() == id.vial));
+				return true;
 			}
-			return false;
+			Combatz.eatFood();
 		}
 		return true;
 	}
@@ -1958,14 +1922,17 @@ public class InvEquip {
 	{
 		if(Inventory.emptySlotCount() < emptySpaces)
 		{
-			if(!Inventory.dropAll(i -> i!=null && 
-					i.getID() != -1 && 
-					(i.getID() == id.jug || 
-					i.getID() == id.vial)))
+			if(!Inventory.contains(id.jug,id.vial) && 
+					!InvEquip.invyContains(Combatz.foods)) return false;
+			if(Inventory.contains(id.jug,id.vial))
 			{
-				Combatz.eatFood();
+				Inventory.dropAll(i -> i!=null && 
+						i.getID() != -1 && 
+						(i.getID() == id.jug || 
+						i.getID() == id.vial));
+				return true;
 			}
-			return false;
+			Combatz.eatFood();
 		}
 		return true;
 	}

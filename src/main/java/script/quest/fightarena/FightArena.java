@@ -22,6 +22,7 @@ import org.dreambot.api.wrappers.interactive.GameObject;
 import org.dreambot.api.wrappers.interactive.NPC;
 
 import script.Main;
+import script.p;
 import script.behaviour.DecisionLeaf;
 import script.framework.Leaf;
 import script.quest.varrockmuseum.Timing;
@@ -140,7 +141,7 @@ public class FightArena extends Leaf {
         }
         case(11):
         {
-        	if(Locations.fightArenaFightArena.contains(Players.localPlayer()))
+        	if(Locations.fightArenaFightArena.contains(p.l))
         	{
         		GameObject door = GameObjects.closest(g ->  
         				g != null && 
@@ -154,8 +155,8 @@ public class FightArena extends Leaf {
         		}
         		if(door.interact("Open"))
         		{
-        			MethodProvider.sleepUntil(() -> !Locations.fightArenaFightArena.contains(Players.localPlayer()), 
-        					() -> Players.localPlayer().isMoving(),
+        			MethodProvider.sleepUntil(() -> !Locations.fightArenaFightArena.contains(p.l), 
+        					() -> p.l.isMoving(),
         					Sleep.calculate(2222, 2222),50);
         		}
         	}
@@ -163,7 +164,7 @@ public class FightArena extends Leaf {
         }
         case(10):
         {
-        	if(Locations.fightArenaFightArena.contains(Players.localPlayer()))
+        	if(Locations.fightArenaFightArena.contains(p.l))
         	{
         		NPC bouncer = NPCs.closest("Bouncer");
             	if(bouncer == null)
@@ -198,11 +199,11 @@ public class FightArena extends Leaf {
             				return Timing.sleepLogNormalInteraction();
             			}
             		}
-            		if(Players.localPlayer().isInteracting(bouncer)) return Timing.sleepLogNormalSleep();
+            		if(p.l.isInteracting(bouncer)) return Timing.sleepLogNormalSleep();
             		if(bouncer.interact("Attack"))
             		{
-            			MethodProvider.sleepUntil(() -> bouncer.isInteracting(Players.localPlayer()), 
-            					() -> Players.localPlayer().isMoving(),
+            			MethodProvider.sleepUntil(() -> bouncer.isInteracting(p.l), 
+            					() -> p.l.isMoving(),
             					Sleep.calculate(2222, 2222),69);
             			Sleep.sleep(696, 666);
             		}
@@ -213,7 +214,7 @@ public class FightArena extends Leaf {
         }
         case(9):
         {
-        	if(Locations.fightArenaFightArena.contains(Players.localPlayer()))
+        	if(Locations.fightArenaFightArena.contains(p.l))
         	{
         		NPC scorpion = NPCs.closest("Khazard Scorpion");
             	if(scorpion == null)
@@ -247,11 +248,11 @@ public class FightArena extends Leaf {
             				return Timing.sleepLogNormalInteraction();
             			}
             		}
-            		if(Players.localPlayer().isInteracting(scorpion)) return Timing.sleepLogNormalSleep();
+            		if(p.l.isInteracting(scorpion)) return Timing.sleepLogNormalSleep();
             		if(scorpion.interact("Attack"))
             		{
-            			MethodProvider.sleepUntil(() -> scorpion.isInteracting(Players.localPlayer()), 
-            					() -> Players.localPlayer().isMoving(),
+            			MethodProvider.sleepUntil(() -> scorpion.isInteracting(p.l), 
+            					() -> p.l.isMoving(),
             					Sleep.calculate(2222, 2222),69);
             			Sleep.sleep(696, 666);
             		}
@@ -271,18 +272,18 @@ public class FightArena extends Leaf {
 				if(closestMotherfucker.interact("Talk-to"))
 				{
 					MethodProvider.sleepUntil(Dialogues::inDialogue,
-							() -> Players.localPlayer().isMoving(),Sleep.calculate(2222, 2222),66);
+							() -> p.l.isMoving(),Sleep.calculate(2222, 2222),66);
 				}
 				return Timing.sleepLogNormalSleep();
         	}
-        	if(Locations.fightArenaHengradWaitingCell.contains(Players.localPlayer()))
+        	if(Locations.fightArenaHengradWaitingCell.contains(p.l))
         	{
         		if(Prayers.isQuickPrayerActive() && Prayers.toggleQuickPrayer(false))
             	{
             		Sleep.sleep(1111,420);
             	}
         		Sleep.sleep(6666, 3333);
-        		if(!Players.localPlayer().isMoving())
+        		if(!p.l.isMoving())
         		{
         			if(Dialogues.isProcessing()) return Timing.sleepLogNormalInteraction();
         			if(Dialogues.canContinue())
@@ -299,7 +300,7 @@ public class FightArena extends Leaf {
             		if(hengrad.interact("Talk-to"))
             		{
             			MethodProvider.sleepUntil(Dialogues::inDialogue,
-        						() -> Players.localPlayer().isMoving(),Sleep.calculate(2222, 2222),66);
+        						() -> p.l.isMoving(),Sleep.calculate(2222, 2222),66);
         			}
         		}
         		return Timing.sleepLogNormalSleep();
@@ -308,7 +309,7 @@ public class FightArena extends Leaf {
         }
         case(8):
         {
-        	if(Locations.fightArenaFightArena.contains(Players.localPlayer()))
+        	if(Locations.fightArenaFightArena.contains(p.l))
         	{
         		NPC closestMotherfucker = NPCs.closest(n -> 
         				n != null && 
@@ -324,7 +325,7 @@ public class FightArena extends Leaf {
         		if(closestMotherfucker.interact("Talk-to"))
         		{
         			MethodProvider.sleepUntil(Dialogues::inDialogue,
-    						() -> Players.localPlayer().isMoving(),Sleep.calculate(2222, 2222),66);
+    						() -> p.l.isMoving(),Sleep.calculate(2222, 2222),66);
     			}
         		return Timing.sleepLogNormalSleep();
         	}
@@ -338,11 +339,11 @@ public class FightArena extends Leaf {
         		return Timing.sleepLogNormalSleep();
         	}
         	if(Locations.fightArenaOgreCage.contains(ogre) && !ogre.isMoving() && 
-        			!Players.localPlayer().isMoving())
+        			!p.l.isMoving())
         	{
         		Sleep.sleep(2222, 2222);
         		if(Locations.fightArenaOgreCage.contains(ogre) && !ogre.isMoving() && 
-            			!Players.localPlayer().isMoving())
+            			!p.l.isMoving())
             	{
             		NPC justin = NPCs.closest("Justin Servil");
             		if(justin == null)
@@ -353,7 +354,7 @@ public class FightArena extends Leaf {
             		if(justin.interact("Talk-to"))
             		{
             			MethodProvider.sleepUntil(Dialogues::inDialogue,
-        						() -> Players.localPlayer().isMoving(),Sleep.calculate(2222, 2222),66);
+        						() -> p.l.isMoving(),Sleep.calculate(2222, 2222),66);
         			}
             		return Timing.sleepLogNormalSleep();
             	}
@@ -384,11 +385,11 @@ public class FightArena extends Leaf {
         				return Timing.sleepLogNormalInteraction();
         			}
         		}
-        		if(Players.localPlayer().isInteracting(ogre)) return Timing.sleepLogNormalSleep();
+        		if(p.l.isInteracting(ogre)) return Timing.sleepLogNormalSleep();
         		if(ogre.interact("Attack"))
         		{
-        			MethodProvider.sleepUntil(() -> ogre.isInteracting(Players.localPlayer()), 
-        					() -> Players.localPlayer().isMoving(),
+        			MethodProvider.sleepUntil(() -> ogre.isInteracting(p.l), 
+        					() -> p.l.isMoving(),
         					Sleep.calculate(2222, 2222),69);
         			Sleep.sleep(696, 666);
         		}
@@ -459,7 +460,7 @@ public class FightArena extends Leaf {
     public static final int khazardPlatebody = 75;
     public static void talkToLadyServil()
     {
-    	if(Locations.fightArenaStartArea.contains(Players.localPlayer()))
+    	if(Locations.fightArenaStartArea.contains(p.l))
         {
     		NPC ladyServil = NPCs.closest("Lady servil");
          	if(ladyServil == null || !ladyServil.exists())
@@ -469,7 +470,7 @@ public class FightArena extends Leaf {
          	}
          	if(ladyServil.interact("Talk-to"))
          	{
-         		MethodProvider.sleepUntil(() -> Dialogues.inDialogue(), () -> Players.localPlayer().isMoving(), Sleep.calculate(2222, 2222),50);
+         		MethodProvider.sleepUntil(() -> Dialogues.inDialogue(), () -> p.l.isMoving(), Sleep.calculate(2222, 2222),50);
          	}
          	return;
         }
@@ -495,7 +496,7 @@ public class FightArena extends Leaf {
     		return false;
     	}
     	
-    	if(Locations.fightArenaChestHouse.contains(Players.localPlayer()))
+    	if(Locations.fightArenaChestHouse.contains(p.l))
     	{
     		if(InvEquip.freeInvySpaces(2))
     		{
@@ -513,7 +514,7 @@ public class FightArena extends Leaf {
 	    			if(chest.interact("Open"))
 	    			{
 	    				MethodProvider.sleepUntil(() -> chest.distance() <= 1, 
-	    					() -> Players.localPlayer().isMoving(),
+	    					() -> p.l.isMoving(),
 	    					Sleep.calculate(2222, 2222),50);
 	    			}
 	    			return false;
@@ -523,7 +524,7 @@ public class FightArena extends Leaf {
 	    			if(chest.interact("Search"))
 	    			{
 	    				MethodProvider.sleepUntil(() -> chest.distance() <= 1, 
-	    					() -> Players.localPlayer().isMoving(),
+	    					() -> p.l.isMoving(),
 	    					Sleep.calculate(2222, 2222),50);
 	    				Sleep.sleep(696, 666);
 	    			}
@@ -536,7 +537,7 @@ public class FightArena extends Leaf {
     }
     public static void talkToSammy()
     {
-    	if(Locations.fightArenaSammySpace.contains(Players.localPlayer()))
+    	if(Locations.fightArenaSammySpace.contains(p.l))
     	{
     		GameObject jailDoor = GameObjects.closest(g -> 
     			g != null && 
@@ -550,7 +551,7 @@ public class FightArena extends Leaf {
     		if(Inventory.get(khazardCellKeys).useOn(jailDoor))
     		{
     			MethodProvider.sleepUntil(Dialogues::inDialogue,
-						() -> Players.localPlayer().isMoving(),Sleep.calculate(2222, 2222),66);
+						() -> p.l.isMoving(),Sleep.calculate(2222, 2222),66);
 			}
     	}
 		if(enterPrison())
@@ -560,7 +561,7 @@ public class FightArena extends Leaf {
     }
     public static void talkToPrisonGuard()
     {
-    	if(Locations.fightArenaDrunkGuardArea.contains(Players.localPlayer()))
+    	if(Locations.fightArenaDrunkGuardArea.contains(p.l))
 		{
 			NPC drunkGuard = NPCs.closest(n -> 
 				n != null && 
@@ -574,7 +575,7 @@ public class FightArena extends Leaf {
 			if(drunkGuard.interact("Talk-to"))
 			{
 				MethodProvider.sleepUntil(Dialogues::inDialogue,
-						() -> Players.localPlayer().isMoving(),Sleep.calculate(2222, 2222),66);
+						() -> p.l.isMoving(),Sleep.calculate(2222, 2222),66);
 			}
 			return;
 		}
@@ -588,8 +589,8 @@ public class FightArena extends Leaf {
     public static boolean enterPrison()
     {
     	if(inPrisonWalkable()) return true;
-    	if(Locations.fightArenaOutsideLeftJailDoor.contains(Players.localPlayer()) || 
-    			Locations.fightArenaOutsideNorthJailDoor.contains(Players.localPlayer()))
+    	if(Locations.fightArenaOutsideLeftJailDoor.contains(p.l) || 
+    			Locations.fightArenaOutsideNorthJailDoor.contains(p.l))
     	{
     		GameObject door = GameObjects.closest(g -> 
     				g!= null && 
@@ -604,7 +605,7 @@ public class FightArena extends Leaf {
     		if(door.interact("Open"))
     		{
     			MethodProvider.sleepUntil(Dialogues::inDialogue,
-						() -> Players.localPlayer().isMoving(),Sleep.calculate(3333, 2222),66);
+						() -> p.l.isMoving(),Sleep.calculate(3333, 2222),66);
     		}
     	}
     	if(Locations.fightArenaStartArea.getCenter().distance() > 250)
@@ -622,15 +623,15 @@ public class FightArena extends Leaf {
     }
     public static boolean inPrisonWalkable()
     {
-    	return Locations.fightArenaLeftWing1.contains(Players.localPlayer()) || 
-    			Locations.fightArenaLeftWing2.contains(Players.localPlayer()) || 
-    			Locations.fightArenaUpperWing1.contains(Players.localPlayer()) || 
-    			Locations.fightArenaUpperWing2.contains(Players.localPlayer()) || 
-    			Locations.fightArenaDrunkGuardArea.contains(Players.localPlayer());
+    	return Locations.fightArenaLeftWing1.contains(p.l) || 
+    			Locations.fightArenaLeftWing2.contains(p.l) || 
+    			Locations.fightArenaUpperWing1.contains(p.l) || 
+    			Locations.fightArenaUpperWing2.contains(p.l) || 
+    			Locations.fightArenaDrunkGuardArea.contains(p.l);
     }
     public static void talkToBarman()
     {
-    	if(Locations.fightArenaAlcoholicsArea.contains(Players.localPlayer()))
+    	if(Locations.fightArenaAlcoholicsArea.contains(p.l))
 		{
     		if(!InvEquip.free1InvySpace()) return;
 			NPC barman = NPCs.closest("Khazard barman");
@@ -642,7 +643,7 @@ public class FightArena extends Leaf {
 			if(barman.interact("Talk-to"))
 			{
 				MethodProvider.sleepUntil(Dialogues::inDialogue,
-						() -> Players.localPlayer().isMoving(),Sleep.calculate(2222, 2222),66);
+						() -> p.l.isMoving(),Sleep.calculate(2222, 2222),66);
 			}
 			return;
 		}

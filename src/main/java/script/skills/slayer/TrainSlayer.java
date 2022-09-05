@@ -21,6 +21,7 @@ import org.dreambot.api.wrappers.interactive.NPC;
 import org.dreambot.api.wrappers.items.Item;
 
 import script.Main;
+import script.p;
 import script.behaviour.DecisionLeaf;
 import script.framework.Branch;
 import script.framework.Leaf;
@@ -130,7 +131,7 @@ public class TrainSlayer extends Leaf{
 			{
 				if(turael.interact("Assignment")) 
 				{
-					MethodProvider.sleepUntil(Dialogues::inDialogue, () -> Players.localPlayer().isMoving(), Sleep.calculate(2222, 2222),50);
+					MethodProvider.sleepUntil(Dialogues::inDialogue, () -> p.l.isMoving(), Sleep.calculate(2222, 2222),50);
 					return true;
 				}
 			}
@@ -138,7 +139,7 @@ public class TrainSlayer extends Leaf{
 		}
 		else 
 		{
-			if(Locations.burthorpeTeleSpot.distance(Players.localPlayer().getTile()) > 50)
+			if(Locations.burthorpeTeleSpot.distance(p.l.getTile()) > 50)
 			{
 				if(Walkz.useJewelry(InvEquip.games, "Burthorpe"))
 				{
@@ -266,7 +267,7 @@ public class TrainSlayer extends Leaf{
 						{
 
 							MethodProvider.log("Turael Traded");
-							MethodProvider.sleepUntil(Shop::isOpen,() -> Players.localPlayer().isMoving(), Sleep.calculate(2222, 2222),50);
+							MethodProvider.sleepUntil(Shop::isOpen,() -> p.l.isMoving(), Sleep.calculate(2222, 2222),50);
 							Sleep.sleep(69, 696);
 							continue;
 						}
@@ -275,7 +276,7 @@ public class TrainSlayer extends Leaf{
 				}
 				else 
 				{
-					if(Locations.burthorpeTeleSpot.distance(Players.localPlayer().getTile()) > 50)
+					if(Locations.burthorpeTeleSpot.distance(p.l.getTile()) > 50)
 					{
 						if(Walkz.useJewelry(InvEquip.games, "Burthorpe"))
 						{

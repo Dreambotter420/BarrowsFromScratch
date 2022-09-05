@@ -28,6 +28,7 @@ import org.dreambot.api.wrappers.interactive.Player;
 import org.dreambot.api.wrappers.items.Item;
 import org.dreambot.api.wrappers.widgets.WidgetChild;
 
+import script.p;
 import script.quest.varrockmuseum.Timing;
 
 public class MissingAPI {
@@ -35,12 +36,12 @@ public class MissingAPI {
 	public static boolean scrollHopWorld(int world)
 	{
 		if(Worlds.getCurrentWorld() == world) return true;
-		if(Players.localPlayer().isInCombat()) return false;
+		if(p.l.isInCombat()) return false;
 		Timer timeout = new Timer(Sleep.calculate(18000, 5555));
 		while(Worlds.getCurrentWorld() != world && 
 				!timeout.finished() && 
 				Client.isLoggedIn() && 
-				!Players.localPlayer().isInCombat() && 
+				!p.l.isInCombat() && 
 				Skills.getRealLevel(Skill.HITPOINTS) > 0)
 		{	
 			Sleep.sleep(69, 69);
@@ -203,7 +204,7 @@ public class MissingAPI {
 	}
 	public static boolean isInteractedByNPC()
 	{
-		List<NPC> targetedBy = getAllNPCsInteractingWith(Players.localPlayer());
+		List<NPC> targetedBy = getAllNPCsInteractingWith(p.l);
 		for(NPC npc : targetedBy)
 		{
 			if(npc != null)
@@ -215,7 +216,7 @@ public class MissingAPI {
 	}
 	public static boolean isInteracting()
 	{
-		return Players.localPlayer().getInteractingCharacter() != null;
+		return p.l.getInteractingCharacter() != null;
 	}
 	public static boolean isInCombat()
 	{
@@ -250,7 +251,7 @@ public class MissingAPI {
 	}
 	public static boolean isInteractedByAnotherPlayer()
 	{
-		List<Player> targetedBy = getAllPlayersInteractingWith(Players.localPlayer());
+		List<Player> targetedBy = getAllPlayersInteractingWith(p.l);
 		for(Player player : targetedBy)
 		{
 			if(player != null)
@@ -271,7 +272,7 @@ public class MissingAPI {
 		List<Player> targetedBy = getAllPlayersInteractingWith(playerToCheck); 
 		for(Player player : targetedBy)
 		{
-			if(player != null && !player.equals(Players.localPlayer()))
+			if(player != null && !player.equals(p.l))
 			{
 				return true;
 			}
@@ -283,7 +284,7 @@ public class MissingAPI {
 		List<Player> targetedBy = getAllPlayersInteractingWith(npcToCheck);
 		for(Player player : targetedBy)
 		{
-			if(player != null && !player.equals(Players.localPlayer()))
+			if(player != null && !player.equals(p.l))
 			{
 				return true;
 			}
@@ -360,7 +361,7 @@ public class MissingAPI {
 	}
 	public static boolean isInteractedWith() //no argument assumes from local player
 	{
-		return isInteractedByAnotherPlayer(Players.localPlayer()) || isInteractedByAnotherNPC(Players.localPlayer());
+		return isInteractedByAnotherPlayer(p.l) || isInteractedByAnotherNPC(p.l);
 	}
 	public static boolean isInteractedWith(NPC toCheck)
 	{

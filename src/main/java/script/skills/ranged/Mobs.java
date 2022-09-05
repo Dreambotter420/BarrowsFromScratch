@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.dreambot.api.input.Mouse;
+import org.dreambot.api.input.event.impl.mouse.impl.click.ClickMode;
 import org.dreambot.api.methods.Calculations;
 import org.dreambot.api.methods.MethodProvider;
 import org.dreambot.api.methods.combat.Combat;
@@ -37,6 +39,8 @@ import org.dreambot.api.wrappers.items.GroundItem;
 import org.dreambot.api.wrappers.items.Item;
 
 import script.Main;
+import script.p;
+import script.actionz.UniqueActions;
 import script.quest.varrockmuseum.Timing;
 import script.skills.melee.TrainMelee;
 import script.skills.ranged.Mobs.Mob;
@@ -135,6 +139,7 @@ public class Mobs {
 	 */
 	public static int trainMob(boolean melee)
 	{
+		if(!Combat.isAutoRetaliateOn()) Combat.toggleAutoRetaliate(true);
 		if(Mobs.mob == Mob.BOAR) return trainBoars(melee);
 		else if(Mobs.mob == Mob.HILL_GIANT) return trainHillGiants(melee);
 		else if(Mobs.mob == Mob.SANDCRAB) return trainSandCrabs(melee);
@@ -217,7 +222,7 @@ public class Mobs {
 		{
 			if(Combatz.shouldDrinkMeleeBoost())
 			{
-				if(Locations.boarZone.contains(Players.localPlayer()))
+				if(Locations.boarZone.contains(p.l))
 				{
 					Combatz.drinkMeleeBoost();
 				}
@@ -227,7 +232,7 @@ public class Mobs {
 		{
 			if(Combatz.shouldDrinkRangedBoost())
 			{
-				if(Locations.boarZone.contains(Players.localPlayer()))
+				if(Locations.boarZone.contains(p.l))
 				{
 					if(!Combatz.drinkRangeBoost()) MethodProvider.log("Not drank ranged Potion");
 				}
@@ -235,7 +240,7 @@ public class Mobs {
 		}
 		
 		//in location to kill mobs
-		if(Locations.boarZone.contains(Players.localPlayer()))
+		if(Locations.boarZone.contains(p.l))
 		{
 			if(!melee) Mobs.fightMobRanged("Boar",Locations.boarZone);
 			else Mobs.fightMobMelee("Boar",Locations.boarZone);
@@ -244,23 +249,23 @@ public class Mobs {
 		else if(Locations.isInKourend())
 		{
 			if(Bank.isOpen()) Bankz.close();
-			if(Locations.kourendGiantsCaveArea.contains(Players.localPlayer()))
+			if(Locations.kourendGiantsCaveArea.contains(p.l))
 			{
 				if(!Walkz.exitGiantsCave()) Sleep.sleep(420,696);
 				return Timing.sleepLogNormalSleep();
 			}
-			if(Locations.dreambotFuckedShayzien3.contains(Players.localPlayer()))
+			if(Locations.dreambotFuckedShayzien3.contains(p.l))
 			{
 				if(Walking.shouldWalk(6) && Walking.walk(Locations.dreambotFuckedShayzienDest3)) Sleep.sleep(69, 420);
 				return Timing.sleepLogNormalSleep();
 			}
-			if(Locations.dreambotFuckedShayzien2.contains(Players.localPlayer()))
+			if(Locations.dreambotFuckedShayzien2.contains(p.l))
 			{
 				
 				if(Walking.shouldWalk(6) && Walking.walk(Locations.dreambotFuckedShayzienDest2)) Sleep.sleep(69, 420);
 				return Timing.sleepLogNormalSleep();
 			}
-			if(Locations.dreambotFuckedShayzien.contains(Players.localPlayer()))
+			if(Locations.dreambotFuckedShayzien.contains(p.l))
 			{
 				
 				if(Walking.shouldWalk(6) && Walking.walk(Locations.dreambotFuckedShayzienDest)) Sleep.sleep(69, 420);
@@ -341,7 +346,7 @@ public class Mobs {
 				//if have any ranged pots while needing a drink, wait until in killingzone to sip up
 				if(InvEquip.invyContains(id.rangedPots))
 				{
-					if(killingZone.contains(Players.localPlayer()))
+					if(killingZone.contains(p.l))
 					{
 						if(!Combatz.drinkRangeBoost()) MethodProvider.log("Not drank ranged Potion");
 					}
@@ -357,7 +362,17 @@ public class Mobs {
 				}
 			}
 			
-			
+			if(Inventory.isFull())
+			{
+				if(!InvEquip.free1InvySpace())
+				{
+					if(mobName.contains("Cave bug")) TrainSlayer.fulfillRangedCaveBugsTask();
+					else if(mobName.contains("Cave slime")) TrainSlayer.fulfillRangedCaveSlimesTask();
+					else if(mobName.contains("Lizard")) TrainSlayer.fulfillRangedLizardsTask();
+					else TrainRanged.fulfillRangedDartsStaminaAntidote();
+					return Timing.sleepLogNormalSleep();
+				}
+			}
 			if(groundItemLoot != null && !groundItemLoot.isEmpty())
 			{
 				GroundItem gi = ItemsOnGround.getNearbyGroundItem(groundItemLoot,killingZone);
@@ -370,7 +385,7 @@ public class Mobs {
 			
 			
 			//in location to kill mobs
-			if(killingZone.contains(Players.localPlayer()))
+			if(killingZone.contains(p.l))
 			{
 				MethodProvider.log("[SLAYER] -> in killingzone!");
 				if(Dialoguez.handleDialogues()) return Timing.sleepLogNormalSleep();
@@ -442,13 +457,13 @@ public class Mobs {
 					return Timing.sleepLogNormalSleep();
 				}
 				
-				if(Locations.edgevilleDungeon.contains(Players.localPlayer()))
+				if(Locations.edgevilleDungeon.contains(p.l))
 				{
 					if(Walking.shouldWalk(6) && Walking.walk(Locations.zombiesEdgeville.getCenter())) Sleep.sleep(420,696);
 				}
 				else
 				{
-					if(Locations.edgevilleTeleSpot.distance(Players.localPlayer().getTile()) >= 50)
+					if(Locations.edgevilleTeleSpot.distance(p.l.getTile()) >= 50)
 					{
 						if(Walkz.useJewelry(InvEquip.glory, "Edgeville"))
 						{
@@ -468,13 +483,13 @@ public class Mobs {
 					return Timing.sleepLogNormalSleep();
 				}
 				
-				if(Locations.edgevilleDungeon.contains(Players.localPlayer()))
+				if(Locations.edgevilleDungeon.contains(p.l))
 				{
 					if(Walking.shouldWalk(6) && Walking.walk(Locations.skeletonsEdgeville.getCenter())) Sleep.sleep(420,696);
 				}
 				else
 				{
-					if(Locations.edgevilleTeleSpot.distance(Players.localPlayer().getTile()) >= 50)
+					if(Locations.edgevilleTeleSpot.distance(p.l.getTile()) >= 50)
 					{
 						if(Walkz.useJewelry(InvEquip.glory, "Edgeville"))
 						{
@@ -504,12 +519,12 @@ public class Mobs {
 					Walkz.exitKourend(180000);
 					return Timing.sleepLogNormalSleep();
 				}
-				if(Locations.entireFremmyDungeon.contains(Players.localPlayer()))
+				if(Locations.entireFremmyDungeon.contains(p.l))
 				{
 					if(Walking.shouldWalk(6) && Walking.walk(Locations.caveCrawlersFremmyCave.getCenter())) Sleep.sleep(696, 420);
 					return Timing.sleepLogNormalSleep();
 				}
-				if(Locations.fremmyCaveEntrance.contains(Players.localPlayer()))
+				if(Locations.fremmyCaveEntrance.contains(p.l))
 				{
 					GameObject caveEntrance = GameObjects.closest("Cave Entrance");
 					if(caveEntrance == null) {
@@ -518,13 +533,13 @@ public class Mobs {
 					}
 					if(caveEntrance.interact("Enter"))
 					{
-						MethodProvider.sleepUntil(() -> Locations.entireFremmyDungeon.contains(Players.localPlayer()),
-								() -> Players.localPlayer().isMoving(), 
+						MethodProvider.sleepUntil(() -> Locations.entireFremmyDungeon.contains(p.l),
+								() -> p.l.isMoving(), 
 								Sleep.calculate(2222, 2222),50);
 					}
 					return Timing.sleepLogNormalSleep();
 				}
-				if(Locations.fremmyCaveEntrance.getCenter().distance() > 175 || Locations.burthrope.contains(Players.localPlayer()))
+				if(Locations.fremmyCaveEntrance.getCenter().distance() > 175 || Locations.burthrope.contains(p.l))
 				{
 					if(TrainRanged.fulfillRangedDartsStaminaAntidote())
 					{
@@ -543,12 +558,12 @@ public class Mobs {
 					Walkz.exitKourend(180000);
 					return Timing.sleepLogNormalSleep();
 				}
-				if(Locations.kalphiteCave.contains(Players.localPlayer()))
+				if(Locations.kalphiteCave.contains(p.l))
 				{
 					if(Walking.shouldWalk(6) && Walking.walk(Locations.kalphiteWorkersArea.getCenter())) Sleep.sleep(696, 420);
 					return Timing.sleepLogNormalSleep();
 				}
-				if(Locations.kalphiteCaveEntrance.contains(Players.localPlayer()))
+				if(Locations.kalphiteCaveEntrance.contains(p.l))
 				{
 					GameObject caveEntrance = GameObjects.closest("Cave");
 					if(caveEntrance == null) {
@@ -557,8 +572,8 @@ public class Mobs {
 					}
 					if(caveEntrance.interact("Enter"))
 					{
-						MethodProvider.sleepUntil(() -> Locations.kalphiteCave.contains(Players.localPlayer()),
-								() -> Players.localPlayer().isMoving(), 
+						MethodProvider.sleepUntil(() -> Locations.kalphiteCave.contains(p.l),
+								() -> p.l.isMoving(), 
 								Sleep.calculate(2222, 2222),50);
 					}
 					return Timing.sleepLogNormalSleep();
@@ -684,7 +699,7 @@ public class Mobs {
 					TrainSlayer.fulfillRangedLizardsTask();
 					return Timing.sleepLogNormalSleep();
 				}
-				if(Locations.shantayPassArea.contains(Players.localPlayer()))
+				if(Locations.shantayPassArea.contains(p.l))
 				{
 					Walkz.enterDesert();
 					return Timing.sleepLogNormalInteraction();
@@ -714,7 +729,7 @@ public class Mobs {
 							TrainSlayer.fulfillRangedCaveBugsTask();
 							return Timing.sleepLogNormalInteraction();
 						}
-						if(Locations.lumbridgeCaveEntrance.contains(Players.localPlayer()))
+						if(Locations.lumbridgeCaveEntrance.contains(p.l))
 						{
 							GameObject caveEntrance = GameObjects.closest(g -> g!=null && 
 									g.getName().equals("Dark hole") && 
@@ -727,7 +742,7 @@ public class Mobs {
 							if(Inventory.get(id.rope).useOn(caveEntrance))
 							{
 								MethodProvider.sleepUntil(() -> SlayerSettings.unlockedLumbyCave(), 
-										() -> Players.localPlayer().isMoving(),
+										() -> p.l.isMoving(),
 										Sleep.calculate(2222, 2222),50);
 								return Timing.sleepLogNormalInteraction();
 							}
@@ -742,9 +757,9 @@ public class Mobs {
 					}
 					
 					//here can now enter tha cave ... 
-					if(Locations.entireLumbyCave.contains(Players.localPlayer()))
+					if(Locations.entireLumbyCave.contains(p.l))
 					{
-						if(Locations.caveHandSkipTile.equals(Players.localPlayer().getTile()))
+						if(Locations.caveHandSkipTile.equals(p.l.getTile()))
 						{
 							if(!Walking.isRunEnabled())
 							{
@@ -757,16 +772,16 @@ public class Mobs {
 							}
 							return Timing.sleepLogNormalInteraction();
 						}
-						if(Locations.lumbyCaveFoyer.contains(Players.localPlayer()))
+						if(Locations.lumbyCaveFoyer.contains(p.l))
 						{
-							if(!Players.localPlayer().isMoving() && Walking.walkExact(Locations.caveHandSkipTile)) Sleep.sleep(420, 696);
+							if(!p.l.isMoving() && Walking.walkExact(Locations.caveHandSkipTile)) Sleep.sleep(420, 696);
 							return Timing.sleepLogNormalInteraction();
 						}
 						if(Walking.shouldWalk(6) && Walking.walk(Locations.caveBugs.getCenter())) Sleep.sleep(420, 696);
 						return Timing.sleepLogNormalInteraction();
 					}
 					
-					if(Locations.lumbridgeCaveEntrance.contains(Players.localPlayer()))
+					if(Locations.lumbridgeCaveEntrance.contains(p.l))
 					{
 						GameObject caveEntrance = GameObjects.closest(g -> g!=null && 
 								g.getName().equals("Dark hole") && 
@@ -778,15 +793,15 @@ public class Mobs {
 						}
 						if(caveEntrance.interact("Climb-down"))
 						{
-							MethodProvider.sleepUntil(() -> Locations.lumbyCaveFoyer.contains(Players.localPlayer()), 
-									() -> Players.localPlayer().isMoving(),
+							MethodProvider.sleepUntil(() -> Locations.lumbyCaveFoyer.contains(p.l), 
+									() -> p.l.isMoving(),
 									Sleep.calculate(2222, 2222),50);
 							return Timing.sleepLogNormalInteraction();
 						}
 					}
 					if(Locations.lumbridgeCaveEntrance.getCenter().distance() > 150)
 					{
-						if(Locations.burthrope.contains(Players.localPlayer()))
+						if(Locations.burthrope.contains(p.l))
 						{
 							
 						}
@@ -808,7 +823,7 @@ public class Mobs {
 							TrainSlayer.fulfillRangedCaveBugsTask();
 							return Timing.sleepLogNormalInteraction();
 						}
-						if(Locations.lumbridgeCaveEntrance.contains(Players.localPlayer()))
+						if(Locations.lumbridgeCaveEntrance.contains(p.l))
 						{
 							GameObject caveEntrance = GameObjects.closest(g -> g!=null && 
 									g.getName().equals("Dark hole") && 
@@ -821,7 +836,7 @@ public class Mobs {
 							if(Inventory.get(id.rope).useOn(caveEntrance))
 							{
 								MethodProvider.sleepUntil(() -> SlayerSettings.unlockedLumbyCave(), 
-										() -> Players.localPlayer().isMoving(),
+										() -> p.l.isMoving(),
 										Sleep.calculate(2222, 2222),50);
 								return Timing.sleepLogNormalInteraction();
 							}
@@ -836,9 +851,9 @@ public class Mobs {
 					}
 					
 					//here can now enter tha cave ... 
-					if(Locations.entireLumbyCave.contains(Players.localPlayer()))
+					if(Locations.entireLumbyCave.contains(p.l))
 					{
-						if(Locations.caveHandSkipTile.equals(Players.localPlayer().getTile()))
+						if(Locations.caveHandSkipTile.equals(p.l.getTile()))
 						{
 							if(!Walking.isRunEnabled())
 							{
@@ -851,16 +866,16 @@ public class Mobs {
 							}
 							return Timing.sleepLogNormalInteraction();
 						}
-						if(Locations.lumbyCaveFoyer.contains(Players.localPlayer()))
+						if(Locations.lumbyCaveFoyer.contains(p.l))
 						{
-							if(!Players.localPlayer().isMoving() && Walking.walkExact(Locations.caveHandSkipTile)) Sleep.sleep(420, 696);
+							if(!p.l.isMoving() && Walking.walkExact(Locations.caveHandSkipTile)) Sleep.sleep(420, 696);
 							return Timing.sleepLogNormalInteraction();
 						}
 						if(Walking.shouldWalk(6) && Walking.walk(Locations.caveSlimeArea.getCenter())) Sleep.sleep(420, 696);
 						return Timing.sleepLogNormalInteraction();
 					}
 					
-					if(Locations.lumbridgeCaveEntrance.contains(Players.localPlayer()))
+					if(Locations.lumbridgeCaveEntrance.contains(p.l))
 					{
 						GameObject caveEntrance = GameObjects.closest(g -> g!=null && 
 								g.getName().equals("Dark hole") && 
@@ -872,8 +887,8 @@ public class Mobs {
 						}
 						if(caveEntrance.interact("Climb-down"))
 						{
-							MethodProvider.sleepUntil(() -> Locations.lumbyCaveFoyer.contains(Players.localPlayer()), 
-									() -> Players.localPlayer().isMoving(),
+							MethodProvider.sleepUntil(() -> Locations.lumbyCaveFoyer.contains(p.l), 
+									() -> p.l.isMoving(),
 									Sleep.calculate(2222, 2222),50);
 							return Timing.sleepLogNormalInteraction();
 						}
@@ -894,7 +909,7 @@ public class Mobs {
 					Walkz.exitKourend(180000);
 					return Timing.sleepLogNormalSleep();
 				}
-				if(Locations.lumbyCastle2.contains(Players.localPlayer()))
+				if(Locations.lumbyCastle2.contains(p.l))
 				{
 					GameObject door = GameObjects.closest(f -> f != null && f.getName().equals("Staircase"));
 					if(door == null)
@@ -909,13 +924,13 @@ public class Mobs {
 					}
 					if(door.interact("Climb-down"))
 					{
-						MethodProvider.sleepUntil(() -> !Locations.lumbyCastle2.contains(Players.localPlayer()),
-								() -> Players.localPlayer().isMoving(), 
+						MethodProvider.sleepUntil(() -> !Locations.lumbyCastle2.contains(p.l),
+								() -> p.l.isMoving(), 
 								Sleep.calculate(2222, 2222),50);
 					}
 					return Timing.sleepLogNormalInteraction();
 				}
-				if(Locations.lumbyCastle1.contains(Players.localPlayer()))
+				if(Locations.lumbyCastle1.contains(p.l))
 				{
 					GameObject door = GameObjects.closest(f -> f != null && f.getName().equals("Staircase"));
 					if(door == null)
@@ -930,8 +945,8 @@ public class Mobs {
 					}
 					if(door.interact("Climb-down"))
 					{
-						MethodProvider.sleepUntil(() -> !Locations.lumbyCastle1.contains(Players.localPlayer()),
-								() -> Players.localPlayer().isMoving(), 
+						MethodProvider.sleepUntil(() -> !Locations.lumbyCastle1.contains(p.l),
+								() -> p.l.isMoving(), 
 								Sleep.calculate(2222, 2222),50);
 					}
 					return Timing.sleepLogNormalInteraction();
@@ -1041,7 +1056,7 @@ public class Mobs {
 					Walkz.exitKourend(180000);
 					return Timing.sleepLogNormalSleep();
 				}
-				if(Locations.strongholdLvl1.contains(Players.localPlayer()))
+				if(Locations.strongholdLvl1.contains(p.l))
 				{
 					if(Camera.getPitch() < 334) 
 					{
@@ -1052,7 +1067,7 @@ public class Mobs {
 						return Timing.sleepLogNormalInteraction();
 					}
 					if(Dialoguez.handleDialogues()) return Timing.sleepLogNormalSleep();
-					if(Locations.strongholdLvl1Foyer.contains(Players.localPlayer()))
+					if(Locations.strongholdLvl1Foyer.contains(p.l))
 					{
 						GameObject door = GameObjects.closest(f -> f != null && f.getID() == 19207 && f.getTile().equals(new Tile(1859,5238,0)));
 						if(door == null)
@@ -1063,12 +1078,12 @@ public class Mobs {
 						if(door.interact("Open"))
 						{
 							MethodProvider.sleepUntil(Dialogues::inDialogue,
-									() -> Players.localPlayer().isMoving(), 
+									() -> p.l.isMoving(), 
 									Sleep.calculate(2222, 2222),50);
 						}
 						return Timing.sleepLogNormalInteraction();
 					}
-					if(Locations.strongholdDoor1.contains(Players.localPlayer()))
+					if(Locations.strongholdDoor1.contains(p.l))
 					{
 						GameObject door = GameObjects.closest(f -> f != null && f.getID() == 19207 && f.getTile().equals(new Tile(1859, 5235, 0)));
 						if(door == null)
@@ -1079,11 +1094,11 @@ public class Mobs {
 						if(door.interact("Open"))
 						{
 							MethodProvider.sleepUntil(Dialogues::inDialogue,
-									() -> Players.localPlayer().isMoving(), 
+									() -> p.l.isMoving(), 
 									Sleep.calculate(2222, 2222),50);
 						}
 						return Timing.sleepLogNormalInteraction();
-					}if(Locations.strongholdGoblins.contains(Players.localPlayer()))
+					}if(Locations.strongholdGoblins.contains(p.l))
 					{
 						GameObject door = GameObjects.closest(f -> f != null && f.getID() == 19207 && f.getTile().equals(new Tile(1865, 5227, 0)));
 						if(door == null)
@@ -1094,12 +1109,12 @@ public class Mobs {
 						if(door.interact("Open"))
 						{
 							MethodProvider.sleepUntil(Dialogues::inDialogue,
-									() -> Players.localPlayer().isMoving(), 
+									() -> p.l.isMoving(), 
 									Sleep.calculate(2222, 2222),50);
 						}
 						return Timing.sleepLogNormalInteraction();
 					}
-					if(Locations.strongholdDoor2.contains(Players.localPlayer()))
+					if(Locations.strongholdDoor2.contains(p.l))
 					{
 						GameObject door = GameObjects.closest(f -> f != null && f.getID() == 19207 && f.getTile().equals(new Tile(1868, 5227, 0)));
 						if(door == null)
@@ -1110,14 +1125,14 @@ public class Mobs {
 						if(door.interact("Open"))
 						{
 							MethodProvider.sleepUntil(Dialogues::inDialogue,
-									() -> Players.localPlayer().isMoving(), 
+									() -> p.l.isMoving(), 
 									Sleep.calculate(2222, 2222),50);
 						}
 						return Timing.sleepLogNormalInteraction();
 					}
 					return Timing.sleepLogNormalInteraction();
 				}
-				if(Locations.strongholdEntrance.contains(Players.localPlayer()))
+				if(Locations.strongholdEntrance.contains(p.l))
 				{
 					GameObject entrance = GameObjects.closest(f -> f != null && f.getName().contains("Entrance") && f.hasAction("Climb-down"));
 					if(entrance == null)
@@ -1127,8 +1142,8 @@ public class Mobs {
 					}
 					if(entrance.interact("Climb-down"))
 					{
-						MethodProvider.sleepUntil(() -> Locations.strongholdLvl1Foyer.contains(Players.localPlayer()),
-								() -> Players.localPlayer().isMoving(), 
+						MethodProvider.sleepUntil(() -> Locations.strongholdLvl1Foyer.contains(p.l),
+								() -> p.l.isMoving(), 
 								Sleep.calculate(2222, 2222),50);
 					}
 					return Timing.sleepLogNormalInteraction();
@@ -1161,7 +1176,7 @@ public class Mobs {
 				}
 				if(InvEquip.invyContains(id.staminas))
 				{
-					if(Locations.edgevilleSoulsPortal.contains(Players.localPlayer()))
+					if(Locations.edgevilleSoulsPortal.contains(p.l))
 					{
 						Filter<GameObject> portalFilter = p -> 
 							p != null && 
@@ -1175,7 +1190,7 @@ public class Mobs {
 						}
 						if(portal.interact("Enter"))
 						{
-							MethodProvider.sleepUntil(() -> Locations.isleOfSouls.contains(Players.localPlayer()), Sleep.calculate(4444, 2222));
+							MethodProvider.sleepUntil(() -> Locations.isleOfSouls.contains(p.l), Sleep.calculate(4444, 2222));
 							Sleep.sleep(420, 696);
 						}
 						return Timing.sleepLogNormalSleep();
@@ -1216,7 +1231,7 @@ public class Mobs {
 			if(Combatz.drinkRangeBoost()) Sleep.sleep(69, 420);
 		}
 		TrainRanged.updateAttStyle();
-		org.dreambot.api.wrappers.interactive.Character lizard = Players.localPlayer().getInteractingCharacter();
+		org.dreambot.api.wrappers.interactive.Character lizard = p.l.getInteractingCharacter();
 		if(lizard != null && 
 				(lizard.getName().equals("Small Lizard") || lizard.getName().equals("Desert Lizard")))
 		{
@@ -1237,7 +1252,7 @@ public class Mobs {
 		Filter<NPC> onMeMobsFilter = mob -> 
 				mob != null &&
 				(mob.getName().equals("Small Lizard") || mob.getName().equals("Desert Lizard")) &&
-				mob.isInteracting(Players.localPlayer());
+				mob.isInteracting(p.l);
 		List<NPC> mobsOnMe = NPCs.all(onMeMobsFilter);
 		if(!mobsOnMe.isEmpty())
 		{
@@ -1249,7 +1264,7 @@ public class Mobs {
 	    	Main.customPaintText3 = "~~Have mobs on me: " + mobsOnMeString+"~~";
 	    	for(NPC mobOnMe : mobsOnMe)
 	    	{
-	    		if(Players.localPlayer().isInteracting(mobOnMe)) 
+	    		if(p.l.isInteracting(mobOnMe)) 
 		    	{
 	    			if(mobOnMe.getHealthPercent() <= 20)
 	    			{
@@ -1281,8 +1296,8 @@ public class Mobs {
 			Main.customPaintText3 = "~~Attacking mob: " + mob.getName()+"~~";
 			if(mob.interact("Attack"))
 			{
-				MethodProvider.sleepUntil(() -> Players.localPlayer().isInteracting(mob) && mob.isInteracting(Players.localPlayer()), Sleep.calculate(2222, 2222));
-				if(Players.localPlayer().isInteracting(mob)) MethodProvider.sleep(Timing.sleepLogNormalSleep());
+				MethodProvider.sleepUntil(() -> p.l.isInteracting(mob) && mob.isInteracting(p.l), Sleep.calculate(2222, 2222));
+				if(p.l.isInteracting(mob)) MethodProvider.sleep(Timing.sleepLogNormalSleep());
 	        	return;
 			}
 		}
@@ -1355,7 +1370,7 @@ public class Mobs {
 				ItemsOnGround.grabNearbyGroundItem(gi);
 				return Timing.sleepLogNormalSleep();
 			}
-			if(Locations.sandcrabSouls1.equals(Players.localPlayer().getTile()) || Locations.sandcrabSouls2.equals(Players.localPlayer().getTile()))
+			if(Locations.sandcrabSouls1.equals(p.l.getTile()) || Locations.sandcrabSouls2.equals(p.l.getTile()))
 			{
 				if(Combat.isAutoRetaliateOn())
 		    	{
@@ -1372,21 +1387,45 @@ public class Mobs {
 				}
 				if(sandcrabIdleResetTimer == null || sandcrabIdleResetTimer.finished())
 				{
-					if(Tabs.isOpen(Tab.SKILLS))
+					int selector = Calculations.random(0, 100);
+					if(selector <= 1)
 					{
-						List<Skill> skills = new ArrayList<Skill>();
-						for(Skill s : Skill.values())
-						{
-							skills.add(s);
-						}
-						Collections.shuffle(skills);
-						if(Skills.hoverSkill(skills.get(0)))
-						{
-							sandcrabIdleResetTimer = null;
-						}
-						return Timing.sleepLogNormalSleep();
+						UniqueActions.examineRandomObect();
 					}
-					Tabz.open(Tab.SKILLS);
+					else if(selector <= 45)
+					{
+						Mouse.move(p.l);
+						Sleep.sleep(11, 696);
+						Mouse.click(ClickMode.RIGHT_CLICK);
+						Mouse.moveMouseOutsideScreen();
+					}
+					else //55% chance to open another tab - prioritize opening skills tab and hovering, but if skills open, open invy
+					{
+						if(!Tabs.isOpen(Tab.SKILLS))
+						{
+							if(Tabz.open(Tab.SKILLS))
+							{
+								List<Skill> skills = new ArrayList<Skill>();
+								for(Skill s : Skill.values())
+								{
+									skills.add(s);
+								}
+								Collections.shuffle(skills);
+								if(Skills.hoverSkill(skills.get(0)))
+								{
+									sandcrabIdleResetTimer = null;
+								}
+								return Timing.sleepLogNormalSleep();
+							}
+						}
+						else if(!Tabs.isOpen(Tab.INVENTORY))
+						{
+							if(Tabz.open(Tab.INVENTORY))
+							{
+								Sleep.sleep(111, 696);
+							}
+						}
+					}
 					return Timing.sleepLogNormalSleep();
 				}
 				if(melee && Combatz.shouldDrinkMeleeBoost()) Combatz.drinkMeleeBoost();
@@ -1394,14 +1433,19 @@ public class Mobs {
 				checkFightSandcrabs();
 				return Timing.sleepLogNormalSleep();
 			}
-			if(Locations.sandcrabsArea1.contains(Players.localPlayer()))
+			if(Locations.sandcrabsArea1.contains(p.l))
 			{
 				if(Walking.shouldWalk(6) && Walking.walkExact(Locations.sandcrabSouls1)) Sleep.sleep(666,696);
 				return Timing.sleepLogNormalSleep();
 			}
-			if(Locations.sandcrabsArea2.contains(Players.localPlayer()))
+			if(Locations.sandcrabsArea2.contains(p.l))
 			{
 				if(Walking.shouldWalk(6) && Walking.walkExact(Locations.sandcrabSouls2)) Sleep.sleep(666,696);
+				return Timing.sleepLogNormalSleep();
+			}
+			if(Locations.sandcrabsArea2.getCenter().distance() <= 25)
+			{
+				if(Walking.shouldWalk(6) && Walking.walk(Locations.sandcrabSouls2)) Sleep.sleep(666,696);
 				return Timing.sleepLogNormalSleep();
 			}
 			if(!Walkz.walkPath(Paths.soulWarsLobbyToSandcrabs))
@@ -1410,7 +1454,7 @@ public class Mobs {
 			}
 			return Timing.sleepLogNormalSleep();
 		}
-		if(Locations.edgevilleSoulsPortal.contains(Players.localPlayer()))
+		if(Locations.edgevilleSoulsPortal.contains(p.l))
 		{
 			Filter<GameObject> portalFilter = p -> 
 				p != null && 
@@ -1424,7 +1468,7 @@ public class Mobs {
 			}
 			if(portal.interact("Enter"))
 			{
-				MethodProvider.sleepUntil(() -> Locations.isleOfSouls.contains(Players.localPlayer()), Sleep.calculate(4444, 2222));
+				MethodProvider.sleepUntil(() -> Locations.isleOfSouls.contains(p.l), Sleep.calculate(4444, 2222));
 				Sleep.sleep(420, 696);
 			}
 			return Timing.sleepLogNormalSleep();
@@ -1450,10 +1494,10 @@ public class Mobs {
 				n.getName().equals("Sand Crab") && 
 				n.hasAction("Attack") && 
 				n.getInteractingCharacter() != null && 
-				n.getInteractingCharacter().getName().equals(Players.localPlayer().getName()));
+				n.getInteractingCharacter().getName().equals(p.l.getName()));
 		if(rockCrabOnMe != null || 
-				(Players.localPlayer().getInteractingCharacter() != null && 
-				Players.localPlayer().getInteractingCharacter().getName().equals("Sand Crab")))
+				(p.l.getInteractingCharacter() != null && 
+				p.l.getInteractingCharacter().getName().equals("Sand Crab")))
 		{
 			sandcrabIdleCheckTimer = null;
 			Sleep.sleep(69,1111);
@@ -1512,8 +1556,15 @@ public class Mobs {
 		if((int) Calculations.nextGaussianRandom(50, 10) > 50) resetArea = resetWest;
 		else resetArea = resetNorth;
 		
-		final Tile resetTile = resetArea.getRandomTile();
-		final Tile comeBackTile = Players.localPlayer().getTile();
+		Tile resetTile = resetArea.getRandomTile();
+		while(resetTile == null)
+		{
+			MethodProvider.log("Reset area random tile grabbed is null! Getting new one..");
+			resetTile = resetArea.getRandomTile();
+			MethodProvider.sleep(10,50);
+		}
+		MethodProvider.log("Random area reset tile is: " + resetTile.toString());
+		final Tile comeBackTile = p.l.getTile();
 		if(Locations.sandcrabsArea1.contains(comeBackTile))
 		{
 			MethodProvider.log("Entering reset function from sandcrabs 2-spot NORTH to reset area: " + (resetArea.equals(resetWest) ? "WEST" : "NORTH"));
@@ -1538,7 +1589,7 @@ public class Mobs {
 					Sleep.sleep(69, 696);
 				}
 			}
-			if(resetArea.contains(Players.localPlayer())) 
+			if(resetArea.contains(p.l)) 
 			{
 				MethodProvider.log("Entered reset location! Running back...");
 				enteredResetLocation = true;
@@ -1546,17 +1597,17 @@ public class Mobs {
 				
 			if(enteredResetLocation)
 			{
-				if(Locations.sandcrabsArea1.contains(Players.localPlayer()))
+				if(Locations.sandcrabsArea1.contains(p.l))
 				{
 					needReset = false;
 					return;
 				}
-				if(Locations.sandcrabsArea2.contains(Players.localPlayer()))
+				if(Locations.sandcrabsArea2.contains(p.l))
 				{
 					needReset = false;
 					return;
 				}
-				if(Players.localPlayer().getTile().equals(comeBackTile)) 
+				if(p.l.getTile().equals(comeBackTile)) 
 				{
 					needReset = false;
 					return;
@@ -1569,7 +1620,22 @@ public class Mobs {
 				if(Walking.shouldWalk(6) && Walking.walk(comeBackTile)) Sleep.sleep(696, 420);
 				continue;
 			}
-			if(Walking.shouldWalk(6) && Walking.walk(resetTile)) Sleep.sleep(696, 420);
+			if(Walking.shouldWalk(6))
+			{
+				if(Walking.walk(resetTile)) Sleep.sleep(696, 420);
+				else
+				{
+					MethodProvider.log("Reset regular walk failed, attempting to pathz walk");
+					if(resetArea.equals(resetWest))
+					{
+						Walkz.walkPath(Paths.sandcrabsToResetWest);
+					}
+					else if(resetArea.equals(resetWest))
+					{
+						Walkz.walkPath(Paths.sandcrabsToResetNorth);
+					}
+				}
+			}
 		}
 	}
 	/**
@@ -1643,27 +1709,16 @@ public class Mobs {
 				}
 				
 				//in location to kill mobs
-				if(Locations.kourendGiantsCaveArea.contains(Players.localPlayer()))
+				if(Locations.kourendGiantsCaveArea.contains(p.l))
 				{
 					if(Dialoguez.handleDialogues()) return Sleep.calculate(222,696);
 					if(Inventory.isFull())
 					{
-						if(!Tabs.isOpen(Tab.INVENTORY))
+						if(!InvEquip.free1InvySpace())
 						{
-							Tabz.open(Tab.INVENTORY);
-						}
-						if(Inventory.count(id.jug) > 0)
-						{
-							Inventory.dropAll(id.jug);
-						}
-						if(Inventory.count(id.bigBones) > 0)
-						{
-							Inventory.interact(id.bigBones, "Bury");
-							Sleep.sleep(69,420);
-						}
-						if(Combatz.eatFood())
-						{
-							return Timing.sleepLogNormalSleep();
+							if(melee) TrainMelee.fulfillMelee_Pots_Stam_Bass();
+							else TrainRanged.fulfillRangedDartsStamina();
+							return Timing.sleepLogNormalInteraction();
 						}
 					}
 					if(Combatz.shouldEatFood(6))
@@ -1702,22 +1757,22 @@ public class Mobs {
 					//safespot
 					if(!melee && Skills.getRealLevel(Skill.DEFENCE) < 40 && selectedHillGiantsArea == Locations.kourendGiantsKillingArea_Hill)
 					{
-						if(!Locations.kourendGiantsSafeSpot_Hill.contains(Players.localPlayer()))
+						if(!Locations.kourendGiantsSafeSpot_Hill.contains(p.l))
 						{
-							final Tile closestSafespot = Locations.kourendGiantsSafeSpot_Hill.getNearestTile(Players.localPlayer());
+							final Tile closestSafespot = Locations.kourendGiantsSafeSpot_Hill.getNearestTile(p.l);
 							if(Map.isTileOnScreen(closestSafespot))
 							{
 								if(Walking.walkExact(closestSafespot)) Sleep.sleep(420,696);
 							}
 							
-							else if(!Players.localPlayer().isMoving() && Walking.walk(closestSafespot))
+							else if(!p.l.isMoving() && Walking.walk(closestSafespot))
 							{
 								Sleep.sleep(420,696);
 							}
 							return Timing.sleepLogNormalSleep();
 						}
 					}
-					else if(!Locations.kourendGiantsKillingArea_Hill.contains(Players.localPlayer()))
+					else if(!Locations.kourendGiantsKillingArea_Hill.contains(p.l))
 					{
 						if(Walking.shouldWalk(6) && Walking.walk(Locations.kourendGiantsKillingArea_Hill.getCenter())) Sleep.sleep(696,420);
 						return Timing.sleepLogNormalSleep();
@@ -1737,12 +1792,12 @@ public class Mobs {
 						Walkz.drinkStamina();
 						return Timing.sleepLogNormalSleep();
 					}
-					if(!Locations.kourendGiantsCaveEntrance.contains(Players.localPlayer()))
+					if(!Locations.kourendGiantsCaveEntrance.contains(p.l))
 					{
 						if(!Walkz.walkPath(Paths.woodcuttingGuildToHillGiantsCave))
 						{
 							//backup paths to hill giants cave stuff :-(
-							if(Locations.dreambotFuckedWCGuildSouth.contains(Players.localPlayer()))
+							if(Locations.dreambotFuckedWCGuildSouth.contains(p.l))
 							{
 								if(Walking.shouldWalk(6) && Walking.walk(Locations.dreambotFuckedWCGuildDestSouth))
 								{
@@ -1771,8 +1826,8 @@ public class Mobs {
 						{
 							if(cave.interact("Enter"))
 							{
-								MethodProvider.sleepUntil(() -> Locations.kourendGiantsCaveArea.contains(Players.localPlayer()),
-										() -> Players.localPlayer().isMoving(),Sleep.calculate(2222,2222), 50);
+								MethodProvider.sleepUntil(() -> Locations.kourendGiantsCaveArea.contains(p.l),
+										() -> p.l.isMoving(),Sleep.calculate(2222,2222), 50);
 							}
 							return Timing.sleepLogNormalSleep();
 						}
@@ -1826,7 +1881,7 @@ public class Mobs {
 		}
 		
 		//in location to kill mobs
-		if(selectedHillGiantsArea.contains(Players.localPlayer()))
+		if(selectedHillGiantsArea.contains(p.l))
 		{
 			if(Dialoguez.handleDialogues()) return Sleep.calculate(222,696);
 			//check for glory in invy + not equipped -> equip it
@@ -1846,22 +1901,11 @@ public class Mobs {
 			}
 			if(Inventory.isFull())
 			{
-				if(!Tabs.isOpen(Tab.INVENTORY))
+				if(!InvEquip.free1InvySpace())
 				{
-					Tabz.open(Tab.INVENTORY);
-				}
-				if(Inventory.count(id.jug) > 0)
-				{
-					Inventory.dropAll(id.jug);
-				}
-				if(Inventory.count(id.bigBones) > 0)
-				{
-					Inventory.interact(id.bigBones, "Bury");
-					Sleep.sleep(69,420);
-				}
-				if(Combatz.eatFood())
-				{
-					return Timing.sleepLogNormalSleep();
+					if(melee) TrainMelee.fulfillMelee_Pots_Stam_Bass();
+					else TrainRanged.fulfillRangedDartsStamina();
+					return Timing.sleepLogNormalInteraction();
 				}
 			}
 			if(Combatz.shouldEatFood(6))
@@ -1979,7 +2023,7 @@ public class Mobs {
 		}
 		
 		//in location to kill mobs
-		if(Locations.lumbyGiantFrogs.contains(Players.localPlayer()))
+		if(Locations.lumbyGiantFrogs.contains(p.l))
 		{
 			if(Dialoguez.handleDialogues()) return Sleep.calculate(222,696);
 			if(Combatz.shouldEatFood(6))
@@ -2127,8 +2171,8 @@ public class Mobs {
 			if(!randmob.interact("Attack"))
 			{
 				Walking.walk(randmob);
-			} else MethodProvider.sleepUntil(() -> Players.localPlayer().isInteracting(randmob) && randmob.isInteracting(Players.localPlayer()),
-					() -> Players.localPlayer().isMoving(),
+			} else MethodProvider.sleepUntil(() -> p.l.isInteracting(randmob) && randmob.isInteracting(p.l),
+					() -> p.l.isMoving(),
 					Sleep.calculate(2222, 2222),50);
 			Sleep.sleep(420, 696);
 			cantReachThat = false;
@@ -2138,7 +2182,7 @@ public class Mobs {
 				mob != null &&
 				mob.exists() && 
     			mob.getHealthPercent() >= 0 && 
-				mob.isInteracting(Players.localPlayer());
+				mob.isInteracting(p.l);
     	List<NPC> mobsOnMe = NPCs.all(onMeMobsFilter);
     	if(!mobsOnMe.isEmpty())
     	{
@@ -2150,15 +2194,15 @@ public class Mobs {
         	Main.customPaintText3 = "~~Have mobs on me: " + mobsOnMeString+"~~";
         	for(NPC mobOnMe : mobsOnMe)
         	{
-        		if(Players.localPlayer().isInteracting(mobOnMe))
+        		if(p.l.isInteracting(mobOnMe))
         		{
         			MethodProvider.sleep(Timing.sleepLogNormalSleep());
                 	return;
         		}
         	}
     	}
-    	if(Players.localPlayer().getInteractingCharacter() != null && 
-    			Players.localPlayer().getInteractingCharacter().getName().contains(name))
+    	if(p.l.getInteractingCharacter() != null && 
+    			p.l.getInteractingCharacter().getName().contains(name))
     	{
     		//we are already in interaction with something
     		MethodProvider.sleep(Timing.sleepLogNormalSleep());
@@ -2181,10 +2225,10 @@ public class Mobs {
 			Main.customPaintText3 = "~~Attacking mob: " + name+"~~";
 			if(mob.interact("Attack"))
 			{
-				MethodProvider.sleepUntil(() -> Players.localPlayer().isInteracting(mob) && mob.isInteracting(Players.localPlayer()),
-							() -> Players.localPlayer().isMoving(),
+				MethodProvider.sleepUntil(() -> p.l.isInteracting(mob) && mob.isInteracting(p.l),
+							() -> p.l.isMoving(),
 							Sleep.calculate(2222, 2222),50);
-				if(Players.localPlayer().isInteracting(mob)) MethodProvider.sleep(Timing.sleepLogNormalSleep());
+				if(p.l.isInteracting(mob)) MethodProvider.sleep(Timing.sleepLogNormalSleep());
 	        	return;
 			}
 		}
@@ -2212,8 +2256,8 @@ public class Mobs {
 			{
 				Walking.walk(randmob);
 			}
-			else MethodProvider.sleepUntil(() -> Players.localPlayer().isInteracting(randmob) && randmob.isInteracting(Players.localPlayer()),
-					() -> Players.localPlayer().isMoving(),
+			else MethodProvider.sleepUntil(() -> p.l.isInteracting(randmob) && randmob.isInteracting(p.l),
+					() -> p.l.isMoving(),
 					Sleep.calculate(3333, 2222),50);
 			Sleep.sleep(420, 696);
 			cantReachThat = false;
@@ -2223,7 +2267,7 @@ public class Mobs {
 				mob != null &&
 				mob.exists() && 
     			mob.getHealthPercent() >= 0 && 
-				mob.isInteracting(Players.localPlayer());
+				mob.isInteracting(p.l);
     	List<NPC> mobsOnMe = NPCs.all(onMeMobsFilter);
     	if(!mobsOnMe.isEmpty())
     	{
@@ -2235,15 +2279,15 @@ public class Mobs {
         	Main.customPaintText3 = "~~Have mobs on me: " + mobsOnMeString+"~~";
         	for(NPC mobOnMe : mobsOnMe)
         	{
-        		if(Players.localPlayer().isInteracting(mobOnMe))
+        		if(p.l.isInteracting(mobOnMe))
         		{
         			MethodProvider.sleep(Timing.sleepLogNormalSleep());
                 	return;
         		}
         	}
     	}
-    	if(Players.localPlayer().getInteractingCharacter() != null && 
-    			Players.localPlayer().getInteractingCharacter().getName().contains(name))
+    	if(p.l.getInteractingCharacter() != null && 
+    			p.l.getInteractingCharacter().getName().contains(name))
     	{
     		//we are already in interaction with something
     		MethodProvider.sleep(Timing.sleepLogNormalSleep());
@@ -2268,10 +2312,10 @@ public class Mobs {
 			Main.customPaintText3 = "~~Attacking mob: " + name+"~~";
 			if(mob.interact("Attack"))
 			{
-				MethodProvider.sleepUntil(() -> Players.localPlayer().isInteracting(mob) && mob.isInteracting(Players.localPlayer()),
-							() -> Players.localPlayer().isMoving(),
+				MethodProvider.sleepUntil(() -> p.l.isInteracting(mob) && mob.isInteracting(p.l),
+							() -> p.l.isMoving(),
 							Sleep.calculate(2222, 2222),50);
-				if(Players.localPlayer().isInteracting(mob)) MethodProvider.sleep(Timing.sleepLogNormalSleep());
+				if(p.l.isInteracting(mob)) MethodProvider.sleep(Timing.sleepLogNormalSleep());
 	        	return;
 			}
 		}

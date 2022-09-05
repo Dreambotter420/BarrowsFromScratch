@@ -23,6 +23,7 @@ import org.dreambot.api.wrappers.interactive.Player;
 import org.dreambot.api.wrappers.items.GroundItem;
 
 import script.Main;
+import script.p;
 import script.behaviour.DecisionLeaf;
 import script.framework.Leaf;
 import script.framework.Tree;
@@ -100,12 +101,12 @@ public class TrainWoodcutting extends Leaf {
     		{
     			if(Inventory.contains(id.logs))
     			{
-    				if(Inventory.drop(id.logs)) MethodProvider.sleepUntil(() -> Inventory.fullSlotCount() > count, () -> Players.localPlayer().isMoving(),Sleep.calculate(2222, 2222), 50);
+    				if(Inventory.drop(id.logs)) MethodProvider.sleepUntil(() -> Inventory.fullSlotCount() > count, () -> p.l.isMoving(),Sleep.calculate(2222, 2222), 50);
     				return Timing.sleepLogNormalSleep();
     			}
     			if(Inventory.contains(id.oakLogs))
     			{
-    				if(Inventory.drop(id.oakLogs)) MethodProvider.sleepUntil(() -> Inventory.fullSlotCount() > count, () -> Players.localPlayer().isMoving(),Sleep.calculate(2222, 2222), 50);
+    				if(Inventory.drop(id.oakLogs)) MethodProvider.sleepUntil(() -> Inventory.fullSlotCount() > count, () -> p.l.isMoving(),Sleep.calculate(2222, 2222), 50);
     				return Timing.sleepLogNormalSleep();
     			}
     			else 
@@ -118,7 +119,7 @@ public class TrainWoodcutting extends Leaf {
     		{
     			if(birdNest.distance() < 8 && birdNest.interact("Take"))
         		{
-        			MethodProvider.sleepUntil(() -> Inventory.fullSlotCount() > count, () -> Players.localPlayer().isMoving(),Sleep.calculate(2222, 2222), 50);
+        			MethodProvider.sleepUntil(() -> Inventory.fullSlotCount() > count, () -> p.l.isMoving(),Sleep.calculate(2222, 2222), 50);
         		}
         		if(Inventory.fullSlotCount() > count)
         		{
@@ -195,7 +196,7 @@ public class TrainWoodcutting extends Leaf {
 
 	    	Main.customPaintText3 = "Training location: Castle Wars";
 			//if not in in chopping area, walk to it - give it 10 minutes timer
-			if(Locations.castleWarsTrees.contains(Players.localPlayer()) || Walkz.goToCastleWars(600000))
+			if(Locations.castleWarsTrees.contains(p.l) || Walkz.goToCastleWars(600000))
 			{
 				return chopTree(careAboutOaks);
 			}
@@ -205,7 +206,7 @@ public class TrainWoodcutting extends Leaf {
 
 	    	Main.customPaintText3 = "Training location: Camelot";
 			//if not in in chopping area, walk to it - give it 10 minutes timer
-			if(Locations.camelotTrees.contains(Players.localPlayer()) || Walkz.goToCamelotTrees(600000))
+			if(Locations.camelotTrees.contains(p.l) || Walkz.goToCamelotTrees(600000))
 			{
 				//inventory not full and have care about axe - go chop
 				return chopTree(careAboutOaks);
@@ -260,15 +261,15 @@ public class TrainWoodcutting extends Leaf {
 		}
 		else
 		{
-			if(Players.localPlayer().isAnimating())
+			if(p.l.isAnimating())
 			{
 				final int invCount = Inventory.fullSlotCount();
 				MethodProvider.sleepUntil(() -> Inventory.fullSlotCount() > invCount, Sleep.calculate(3333, 3333));
 				return Timing.sleepLogNormalSleep();
 			}
-			if(Players.localPlayer().isMoving())
+			if(p.l.isMoving())
 			{
-				MethodProvider.sleepUntil(() -> !Players.localPlayer().isMoving(), Sleep.calculate(3333, 3333));
+				MethodProvider.sleepUntil(() -> !p.l.isMoving(), Sleep.calculate(3333, 3333));
 				return Timing.sleepLogNormalSleep();
 				
 			}
@@ -282,7 +283,7 @@ public class TrainWoodcutting extends Leaf {
 				}
 			}
 			
-			if(Players.localPlayer().isAnimating() || Players.localPlayer().isMoving()) return Timing.sleepLogNormalSleep();
+			if(p.l.isAnimating() || p.l.isMoving()) return Timing.sleepLogNormalSleep();
 			if(closestAvailableTree.exists() || closestAvailableTree.distance() <= 8)
 			{
 				if(closestAvailableTree.interact("Chop down")) return Timing.sleepLogNormalInteraction();

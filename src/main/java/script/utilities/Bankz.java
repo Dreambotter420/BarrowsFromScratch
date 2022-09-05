@@ -17,6 +17,7 @@ import org.dreambot.api.methods.widget.Widgets;
 import org.dreambot.api.wrappers.interactive.GameObject;
 import org.dreambot.api.wrappers.items.Item;
 
+import script.p;
 import script.actionz.UniqueActions;
 import script.actionz.UniqueActions.Actionz;
 import script.quest.varrockmuseum.Timing;
@@ -26,7 +27,7 @@ public class Bankz {
 	{
 		if(Bank.isOpen()) return true;
 		MethodProvider.log("Entering Bankz.openClosest(int) function");
-		if(Locations.mageArenaBank.contains(Players.localPlayer()))
+		if(Locations.mageArenaBank.contains(p.l))
 		{
 			GameObject bank = GameObjects.closest(g -> 
 					g!=null && 
@@ -38,13 +39,13 @@ public class Bankz {
 			}
 			if(bank.interact("Use"))
 			{
-				MethodProvider.sleepUntil(Bank::isOpen,() ->Players.localPlayer().isMoving(), Sleep.calculate(2222, 2222),69);
+				MethodProvider.sleepUntil(Bank::isOpen,() ->p.l.isMoving(), Sleep.calculate(2222, 2222),69);
 			}
 			return false;
 		}
 		final double dist = Bank.getClosestBankLocation().getTile().distance();
 		MethodProvider.log("Distance to closest bank: " + dist);
-		if(dist >= distToTryTeleport || Players.localPlayer().getZ() > 0)
+		if(dist >= distToTryTeleport || p.l.getZ() > 0)
 		{
 			if(Walkz.useJewelry(InvEquip.wealth,"Grand Exchange") || 
 					Walkz.useJewelry(InvEquip.glory,"Edgeville") ||
@@ -67,7 +68,7 @@ public class Bankz {
 			return false;
 		}
 		
-		if(Walking.shouldWalk(6) && Walking.walk(BankLocation.getNearest(Players.localPlayer())))
+		if(Walking.shouldWalk(6) && Walking.walk(BankLocation.getNearest(p.l)))
 		{
 			MethodProvider.log("Walked towards banklocation closest!");
 			MethodProvider.sleep(Timing.sleepLogNormalSleep());
@@ -87,7 +88,7 @@ public class Bankz {
 			return false;
 		}
 		
-		if(Walking.shouldWalk(6) && Walking.walk(BankLocation.getNearest(Players.localPlayer())))
+		if(Walking.shouldWalk(6) && Walking.walk(BankLocation.getNearest(p.l)))
 		{
 			MethodProvider.sleep(Timing.sleepLogNormalSleep());
 		}

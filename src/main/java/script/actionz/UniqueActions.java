@@ -24,6 +24,7 @@ import org.dreambot.api.methods.interactive.GameObjects;
 import org.dreambot.api.methods.interactive.NPCs;
 import org.dreambot.api.methods.interactive.Players;
 import org.dreambot.api.methods.item.GroundItems;
+import org.dreambot.api.methods.magic.Magic;
 import org.dreambot.api.methods.map.Tile;
 import org.dreambot.api.methods.quest.book.PaidQuest;
 import org.dreambot.api.methods.quest.book.Quest;
@@ -44,6 +45,7 @@ import org.dreambot.api.wrappers.items.GroundItem;
 import org.dreambot.api.wrappers.items.Item;
 import org.dreambot.api.wrappers.widgets.WidgetChild;
 
+import script.p;
 import script.actionz.UniqueActions.Actionz;
 import script.utilities.API;
 import script.utilities.Bankz;
@@ -95,7 +97,7 @@ public class UniqueActions {
 	public static LinkedHashMap<Actionz,Boolean> uniqueActions = new LinkedHashMap<Actionz,Boolean>();
 	public static void initialize()
 	{
-		String username = Players.localPlayer().getName();
+		String username = p.l.getName();
 		String hash = getHash(username);
 		for(int i = 0; i <= 32; i++)
 		{
@@ -208,13 +210,17 @@ public class UniqueActions {
 	
 	public static void printHashForUsername()
 	{
-		String username = Players.localPlayer().getName();
+		String username = p.l.getName();
 		String hash = getHash(username);
 		MethodProvider.log("Hash for username: " + username+" is: " + hash);
 	}
 	
 	public static void examineRandomObect()
 	{
+ 		if(Inventory.isItemSelected() || Magic.isSpellSelected())
+ 		{
+ 			
+ 		}
 		if(Tabs.isOpen(Tab.INVENTORY))
 		{
 			if(Calculations.random(1, 10) > 5 && !Inventory.isEmpty())

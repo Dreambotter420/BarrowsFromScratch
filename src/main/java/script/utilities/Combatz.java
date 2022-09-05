@@ -45,6 +45,8 @@ public class Combatz {
 		foods.add(id.swordfish);
 		foods.add(id.monkfish);
 		foods.add(id.pineapplePizza2);
+		foods.add(id.summerPie1_2);
+		foods.add(id.summerPie);
 		foods.add(id.seaTurtle);
 	}
 	public static Item getFood()
@@ -219,7 +221,7 @@ public class Combatz {
     				MethodProvider.log("Drank "+(id.superStrs == superPots ? "Strength" : "Attack")+" pot!");
     				int delay = (int) Calculations.nextGaussianRandom(2000,400);
     				if(delay<1400) delay = 1500;
-    				drinkDelayTimer = new Timer();
+    				drinkDelayTimer = new Timer(delay);
     				nextRandMeleeBoostLvl = 0;
 					Main.customPaintText3 = "";
 					Main.customPaintText4 = "";

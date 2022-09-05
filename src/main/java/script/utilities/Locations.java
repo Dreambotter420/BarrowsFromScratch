@@ -18,6 +18,7 @@ import org.dreambot.api.methods.walking.web.node.impl.BasicWebNode;
 import org.dreambot.api.wrappers.interactive.GameObject;
 import org.dreambot.api.wrappers.interactive.NPC;
 
+import script.p;
 import script.quest.varrockmuseum.Timing;
 
 public class Locations {
@@ -35,7 +36,7 @@ public class Locations {
 		//handle dialogue for Veos traveling to Kourend
 		if(Dialoguez.handleDialogues()) return;
 		
-		if(Locations.veosSarim.getCenter().distance(Players.localPlayer().getTile()) > 75) 
+		if(Locations.veosSarim.getCenter().distance(p.l.getTile()) > 75) 
 		{
 			Walkz.teleportDraynor(180000);
 			Sleep.sleep(420,1111);
@@ -109,13 +110,6 @@ public class Locations {
 		    }
 		);
 	public static final Area strangeAltar = new Area(2624, 3604, 2628, 3596, 0);
-	public static final Area seersPub = new Area(
-			new Tile(2689, 3488, 0),
-			new Tile(2697, 3488, 0),
-			new Tile(2697, 3494, 0),
-			new Tile(2700, 3495, 0),
-			new Tile(2700, 3498, 0),
-			new Tile(2689, 3498, 0));
 	public static final Area salveGraveyard = new Area(
 			new Tile(3422, 3467, 0),
 			new Tile(3423, 3459, 0),
@@ -156,6 +150,101 @@ public class Locations {
 		        new Tile(3730, 3529, 0)
 		    }
 		);
+	public static final Area allBurthropeTaverly = new Area(
+		    new Tile[] {
+		        new Tile(2876, 3559, 0),
+		        new Tile(2882, 3578, 0),
+		        new Tile(2898, 3586, 0),
+		        new Tile(2941, 3577, 0),
+		        new Tile(2943, 3535, 0),
+		        new Tile(2926, 3520, 0),
+		        new Tile(2929, 3510, 0),
+		        new Tile(2938, 3508, 0),
+		        new Tile(2938, 3505, 0),
+		        new Tile(2935, 3501, 0),
+		        new Tile(2935, 3495, 0),
+		        new Tile(2937, 3492, 0),
+		        new Tile(2938, 3474, 0),
+		        new Tile(2941, 3471, 0),
+		        new Tile(2940, 3454, 0),
+		        new Tile(2944, 3443, 0),
+		        new Tile(2944, 3411, 0),
+		        new Tile(2937, 3395, 0),
+		        new Tile(2940, 3391, 0),
+		        new Tile(2936, 3386, 0),
+		        new Tile(2936, 3328, 0),
+		        new Tile(2881, 3328, 0),
+		        new Tile(2866, 3416, 0),
+		        new Tile(2869, 3428, 0),
+		        new Tile(2878, 3450, 0),
+		        new Tile(2878, 3461, 0),
+		        new Tile(2871, 3479, 0),
+		        new Tile(2880, 3501, 0),
+		        new Tile(2881, 3520, 0)
+		    }
+		);
+	public static final Area druidicRitual_sanfewbelow = new Area(2893, 3433, 2903, 3423, 0);
+	public static final Area druidicRitual_abovegroundLadder = new Area(2880, 3402, 2889, 3393, 0);
+	public static final Area druidicRitual_undergroundLadder = new Area(2888, 9802, 2881, 9794, 0);
+	public static final Area druidicRitual_cauldron = new Area(2889, 9826, 2897, 9837, 0);
+	public static final Area druidicRitual_skeletonsHallway = new Area(
+			new Tile(2880, 9812, 0),
+			new Tile(2881, 9810, 0),
+			new Tile(2882, 9808, 0),
+			new Tile(2883, 9804, 0),
+			new Tile(2881, 9801, 0),
+			new Tile(2881, 9792, 0),
+			new Tile(2888, 9790, 0),
+			new Tile(2888, 9838, 0),
+			new Tile(2879, 9837, 0),
+			new Tile(2880, 9828, 0));
+	public static final Area stuckInFerox = new Area(3123, 3629, 3125, 3628, 0);
+	public static final Area stuckInFerox2 = new Area(3134, 3619, 3135, 3617, 0);
+    
+	public static final Area druidicRitual_sanfewAbove = new Area(2893, 3433, 2903, 3423, 1);
+	public static final Area kaqemeex = new Area(2919, 3490, 2932, 3477, 0);
+	public static final Area yanilleBar = new Area(2557, 3077, 2548, 3082, 0);
+	public static final Area seersPub = new Area(2689, 3488, 2700, 3498, 0);
+	public static final Area lumberyardBar = new Area(3282, 3489, 3272, 3486, 0);
+	public static final Area varrockBar = new Area(3222, 3402, 3227, 3394, 0);
+	public static final Area grandTreeBase = new Area(2463, 3493, 2468, 3498, 0);
+	public static final Area gnomeStrongholdBar = new Area(2480, 3490, 2484, 3486, 1);
+	public static final Area gnomeStrongholdGate_South = new Area(2457, 3383, 2465, 3375, 0);
+	public static final Area ardougneBar = new Area(
+			new Tile(2575, 3319, 0),
+			new Tile(2572, 3320, 0),
+			new Tile(2572, 3326, 0),
+			new Tile(2577, 3326, 0));
+	public static final Area brimhavenBar = new Area(
+			new Tile(2799, 3154, 0),
+			new Tile(2793, 3154, 0),
+			new Tile(2791, 3157, 0),
+			new Tile(2791, 3169, 0),
+			new Tile(2799, 3169, 0));
+	public static final Area karamjaBar = new Area(2918, 3147, 2930, 3142, 0);
+	public static final Area rustyAnchor = new Area(3044, 3259, 3055, 3255, 0);
+	public static final Area faladorBar = new Area(
+			new Tile(2957, 3378, 0),
+			new Tile(2955, 3378, 0),
+			new Tile(2955, 3375, 0),
+			new Tile(2953, 3374, 0),
+			new Tile(2953, 3366, 0),
+			new Tile(2961, 3365, 0),
+			new Tile(2960, 3369, 0),
+			new Tile(2962, 3369, 0),
+			new Tile(2960, 3375, 0),
+			new Tile(2958, 3376, 0));
+	public static final Area barbarianAgilityOutside = new Area(
+			new Tile(2549, 3574, 0),
+			new Tile(2549, 3579, 0),
+			new Tile(2539, 3579, 0),
+			new Tile(2538, 3572, 0),
+			new Tile(2540, 3571, 0),
+			new Tile(2540, 3569, 0),
+			new Tile(2539, 3570, 0),
+			new Tile(2539, 3563, 0),
+			new Tile(2545, 3562, 0),
+			new Tile(2546, 3574, 0));
 	public static final Area phasmatys_southOfNorthGateArea = new Area(
 			new Tile(3653, 3500, 0),
 			new Tile(3653, 3505, 0),
@@ -654,9 +743,9 @@ public class Locations {
 	public static final Area entireLumbyCave = new Area(3137, 9602, 3262, 9536,0);
 	public static final boolean isInDesert()
 	{
-		if(Locations.shantayPassSouthSide.contains(Players.localPlayer()) || 
-				Locations.wholeDesert.contains(Players.localPlayer()) || 
-				Locations.carpetAreaShantay.contains(Players.localPlayer())) return true;
+		if(Locations.shantayPassSouthSide.contains(p.l) || 
+				Locations.wholeDesert.contains(p.l) || 
+				Locations.carpetAreaShantay.contains(p.l)) return true;
 		return false;
 	}
 	public static final Area strongholdWolves = new Area(
@@ -690,10 +779,10 @@ public class Locations {
 			new Tile(3137, 3474, 0),
 			new Tile(3128, 3474, 0));
 	public static boolean isInIsleOfSouls() {
-		if(forgottenSoulsLvl1.contains(Players.localPlayer()) || 
-				forgottenSoulsLvl2.contains(Players.localPlayer()) || 
-				forgottenSoulsLvl3.contains(Players.localPlayer()) || 
-				isleOfSouls.contains(Players.localPlayer())) return true;
+		if(forgottenSoulsLvl1.contains(p.l) || 
+				forgottenSoulsLvl2.contains(p.l) || 
+				forgottenSoulsLvl3.contains(p.l) || 
+				isleOfSouls.contains(p.l)) return true;
 		return false;
 	}
 	public static final Tile sandcrabSouls1 = new Tile(2283,2804,0);
@@ -780,22 +869,22 @@ public class Locations {
 			if(gangplank.interact("Cross"))
 			{
 				MethodProvider.sleepUntil(() -> !isInDestinationShip(), 
-					() -> Players.localPlayer().isMoving(),
+					() -> p.l.isMoving(),
 					Sleep.calculate(2222,2222), 50);
 			}
 		}
 	}
 	public static boolean isInDestinationShip() {
-		if(shipLandsEnd.contains(Players.localPlayer())) return true;
-		if(shipSarimVeos.contains(Players.localPlayer())) return true;
-		if(shipPiscVeos.contains(Players.localPlayer())) return true;
+		if(shipLandsEnd.contains(p.l)) return true;
+		if(shipSarimVeos.contains(p.l)) return true;
+		if(shipPiscVeos.contains(p.l)) return true;
 		return false;
 	}
 	public static boolean isInKourend() {
-		if(kourendGiantsCaveArea.contains(Players.localPlayer()) || 
-				entireKourend.contains(Players.localPlayer()) || 
-				kourendCastle2ndFloor.contains(Players.localPlayer()) || 
-				kourendCastle3rdFloor.contains(Players.localPlayer())) 
+		if(kourendGiantsCaveArea.contains(p.l) || 
+				entireKourend.contains(p.l) || 
+				kourendCastle2ndFloor.contains(p.l) || 
+				kourendCastle3rdFloor.contains(p.l)) 
 		{
 			unlockedKourend = true;
 			return true;
@@ -812,7 +901,7 @@ public class Locations {
 			new Tile(1563, 3678, 0));
 	public static final int edgeOfTheWorldX = 3904;
 	public static boolean isInstanced() {
-		if(Players.localPlayer().getX() >= edgeOfTheWorldX) return true;
+		if(p.l.getX() >= edgeOfTheWorldX) return true;
 		return false;
 	}
 	public static final Area castleWarsTrees = new Area(
@@ -825,6 +914,108 @@ public class Locations {
 			new Tile(2452, 3080, 0),
 			new Tile(2469, 3080, 0),
 			new Tile(2476, 3089, 0));
+	public static final Area horror_larrissaLighthouse = new Area(
+			new Tile(2503, 3641, 0),
+			new Tile(2501, 3641, 0),
+			new Tile(2502, 3630, 0),
+			new Tile(2512, 3631, 0),
+			new Tile(2511, 3635, 0),
+			new Tile(2507, 3636, 0),
+			new Tile(2504, 3638, 0),
+			new Tile(2504, 3638, 0));
+	public static final Area barbAgilityCourseGroundLvl = new Area(
+			new Tile(2550, 3559, 0),
+			new Tile(2550, 3556, 0),
+			new Tile(2545, 3555, 0),
+			new Tile(2545, 3556, 0),
+			new Tile(2527, 3557, 0),
+			new Tile(2529, 3541, 0),
+			new Tile(2553, 3542, 0),
+			new Tile(2553, 3559, 0),
+			new Tile(2552, 3558, 0),
+			new Tile(2551, 3559, 0));
+	public static final Area horror_realLighthouseLvl2 = new Area(2505, 3637, 2513, 3644, 1);
+	public static final Area horror_realLighthouseLvl1 = new Area(
+			new Tile(2506, 3636, 0),
+			new Tile(2511, 3636, 0),
+			new Tile(2513, 3638, 0),
+			new Tile(2513, 3642, 0),
+			new Tile(2510, 3645, 0),
+			new Tile(2507, 3645, 0),
+			new Tile(2504, 3643, 0),
+			new Tile(2504, 3639, 0));
+	public static final Area horror_caveV2 = new Area(2507, 10002, 2522, 9987, 0);
+	public static final Tile horror_1stDaggannothSafespot = new Tile(2510,4633,0);
+	public static final Area horror_fakeInstanceBossFightArea = new Area(
+			new Tile(2521, 4632, 0),
+			new Tile(2501, 4632, 0),
+			new Tile(2499, 4657, 0),
+			new Tile(2523, 4667, 0),
+			new Tile(2544, 4661, 0),
+			new Tile(2542, 4640, 0));
+	public static final Area horror_barbAgilityCoursePipeEntrance = new Area(
+			new Tile(2551, 3559, 0),
+			new Tile(2550, 3560, 0),
+			new Tile(2550, 3565, 0),
+			new Tile(2555, 3565, 0),
+			new Tile(2555, 3560, 0),
+			new Tile(2553, 3560, 0),
+			new Tile(2552, 3561, 0));
+	public static final Tile horror_bridgeEastTile = new Tile(2598, 3608, 0);
+	public static final Tile horror_bridgeWestTile = new Tile(2596, 3608, 0);
+	public static final Area horror_bridgeEast = new Area(
+			new Tile(2602, 3613, 0),
+			new Tile(2595, 3612, 0),
+			new Tile(2600, 3604, 0),
+			new Tile(2605, 3608, 0));
+	public static final Area horror_bridgeWest = new Area(
+			new Tile(2596, 3610, 0),
+			new Tile(2591, 3610, 0),
+			new Tile(2591, 3603, 0),
+			new Tile(2598, 3605, 0),
+			new Tile(2597, 3607, 0));
+	public static final Area horror_lighthouseAndBridgeArea = new Area(
+		    new Tile[] {
+		        new Tile(2612, 3604, 0),
+		        new Tile(2612, 3618, 0),
+		        new Tile(2480, 3686, 0),
+		        new Tile(2459, 3624, 0),
+		        new Tile(2510, 3618, 0),
+		        new Tile(2532, 3618, 0),
+		        new Tile(2584, 3576, 0)
+		    }
+		);
+	public static final Tile horror_strangeDoorEntrance = new Tile(2516,4627,0);
+	public static final Area horror_caveDoorSouth = new Area(2512, 4626, 2517, 4622, 0);
+	public static final Area horror_caveAirlock = new Area(2517, 4629, 2512, 4627, 0);
+	public static final Area horror_caveLobby = new Area(2524, 4610, 2504, 4626, 0);
+	public static final Area horror_lighthouseFakeInstanceLvl3V2 = new Area(2504, 3636, 2513, 3645, 2);
+	public static final Area horror_lighthouseFakeInstanceLvl3 = new Area(2440, 4605, 2449, 4596, 2);
+	public static final Area horror_lighthouseFakeInstanceLvl2 = new Area(2441, 4604, 2448, 4597, 1);
+	public static final Area horror_lighthouseFakeInstanceLvl1 = new Area(2440, 4595, 2449, 4608, 0);
+	public static final Area horror_totalStonesArea = new Area(2510, 3618, 2527, 3597, 0);
+	public static final Area horror_stonesNorth = new Area(2517, 3619, 2510, 3624, 0);
+	public static final Area horror_stones4 = new Area(2514, 3617, 2514, 3615, 0);
+	public static final Area horror_stones3 = new Area(2516, 3611, 2514, 3613, 0);
+	public static final Area horror_stones2 = new Area(2518, 3611, 2522, 3602, 0);
+	public static final Tile horror_stone5 = new Tile(2514, 3617, 0);
+	public static final Tile horror_stone4 = new Tile(2514, 3613, 0);
+	public static final Tile horror_stone3 = new Tile(2518, 3611, 0);
+	public static final Tile horror_stone2 = new Tile(2522, 3600, 0);
+	public static final Tile horror_stone1 = new Tile(2522, 3597, 0);
+	public static final Area horror_stonesSouth = new Area(2519, 3596, 2527, 3591, 0);
+	public static final Area horror_stones1 = new Area(2522, 3600, 2522, 3597, 0);
+	public static final Area horror_entireLightHouseBarbarian = new Area(
+		    new Tile[] {
+		        new Tile(2459, 3673, 0),
+		        new Tile(2496, 3546, 0),
+		        new Tile(2506, 3509, 0),
+		        new Tile(2576, 3508, 0),
+		        new Tile(2615, 3604, 0),
+		        new Tile(2611, 3620, 0),
+		        new Tile(2484, 3686, 0)
+		    }
+		);
 	public static final Area dontTeleToGEAreaJustWalk = new Area(
 		    new Tile[] {
 		        new Tile(3138, 3513, 0),

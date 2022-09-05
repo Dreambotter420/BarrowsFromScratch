@@ -37,6 +37,7 @@ import org.dreambot.api.wrappers.items.GroundItem;
 import org.dreambot.api.wrappers.items.Item;
 
 import script.Main;
+import script.p;
 import script.actionz.UniqueActions;
 import script.actionz.UniqueActions.Actionz;
 import script.quest.varrockmuseum.Timing;
@@ -70,6 +71,8 @@ public class API {
 		FIGHT_ARENA,
 		FREMENNIK_TRIALS,
 		X_MARKS_THE_SPOT,
+		ALFRED_GRIMHANDS_BARCRAWL,
+		TRAIN_HERBLORE,
 		BREAK,
 		TEST
     }
@@ -93,6 +96,11 @@ public class API {
 	 */
 	public static boolean clearChatWithBackspace()
 	{
+		if(Dialogues.canContinue())
+		{
+			Dialoguez.continueDialogue();
+			return true;
+		}
 		String[] x = Widgets.getWidgetChild(162,55).getText().split(":", 2);
     	String[] y = x[1].split("</col>",0);
     	String[] zeChatInputBox = y[0].split("<col=0000ff>",0);
@@ -363,6 +371,11 @@ public class API {
 		Filter<NPC> filter = n -> n != null && n.getName().contains(npcName) && n.hasAction(action) && npcArea.contains(n);
 		interactNPC(filter, action, true, false,npcArea,null);
 	}
+	public static void walkTalkToNPC(String npcName, String action, boolean reachable, Area npcArea)
+	{
+		Filter<NPC> filter = n -> n != null && n.getName().contains(npcName) && n.hasAction(action) && npcArea.contains(n);
+		interactNPC(filter, action, true, true,npcArea,null);
+	}
 	public static void walkInteractNPC(String npcName, String action, Area npcArea, Condition condition)
 	{
 		Filter<NPC> filter = n -> n != null && n.getName().contains(npcName) && n.hasAction(action) && npcArea.contains(n);
@@ -384,7 +397,7 @@ public class API {
 	}
 	public static void interactNPC(Filter<NPC> filter,String action,boolean walk,boolean reachable,Area area, Condition condition)
 	{
-		if(walk && !area.contains(Players.localPlayer()))
+		if(walk && !area.contains(p.l))
 		{
 			if(!Walkz.isStaminated()) Walkz.drinkStamina();
 			if(Walkz.isStaminated() && Walking.getRunEnergy() > 5 && !Walking.isRunEnabled()) Walking.toggleRun();
@@ -402,7 +415,7 @@ public class API {
 			if(Walking.walk(npc)) Sleep.sleep(420, 696);
 			return;
 		}
-		
+		if(npc.distance() > 10) Walking.walk(npc);
 		boolean interacted = false;
 		if(action == null)
 		{
@@ -414,12 +427,12 @@ public class API {
 			if(condition == null) condition = Dialogues::inDialogue;
 			final Condition finalCondition = condition;
 			MethodProvider.sleepUntil(() -> finalCondition.verify(),
-					() -> Players.localPlayer().isMoving(),Sleep.calculate(6666, 4444),69);
+					() -> p.l.isMoving(),Sleep.calculate(6666, 4444),69);
 		}
 	}
 	private static void interactGameObject(Filter<GameObject> filter,String action,boolean walkToArea,boolean reachable,Area area, Condition condition)
 	{
-		if(walkToArea && !area.contains(Players.localPlayer()))
+		if(walkToArea && !area.contains(p.l))
 		{
 			if(!Walkz.isStaminated()) Walkz.drinkStamina();
 			if(Walkz.isStaminated() && Walking.getRunEnergy() > 5 && !Walking.isRunEnabled()) Walking.toggleRun();
@@ -450,6 +463,7 @@ public class API {
 			}
 			//must be able to reach it now, continue
 		}
+		if(go.distance() > 10) Walking.walk(go);
 		boolean interacted = false;
 		if(action == null)
 		{
@@ -458,28 +472,31 @@ public class API {
 		else if(go.interact(action)) interacted = true;
 		if(interacted)
 		{
-			if(condition == null) condition = () -> go.getSurrounding().contains(Players.localPlayer().getTile());
+			if(condition == null) condition = () -> go.getSurrounding().contains(p.l.getTile());
 			final Condition finalCondition = condition;
 			MethodProvider.sleepUntil(() -> finalCondition.verify(),
-					() -> Players.localPlayer().isMoving(),Sleep.calculate(6666, 4444),69);
+					() -> p.l.isMoving(),Sleep.calculate(6666, 4444),69);
 		}
 	}
 	public static void walkTalkWithGameObject(String objectName, String action) {
 		Filter<GameObject> filter = n -> n != null && n.getName().contains(objectName) && n.hasAction(action);
-		interactGameObject(filter, action, false,true,null,Dialogues::inDialogue);
+		interactGameObject(filter, action, true,false,null,Dialogues::inDialogue);
 	}
 	public static void walkTalkWithGameObject(String objectName) {
 		Filter<GameObject> filter = n -> n != null && n.getName().contains(objectName);
-		interactGameObject(filter, null, false,true,null,Dialogues::inDialogue);
+		interactGameObject(filter, null, true,false,null,Dialogues::inDialogue);
 	}
 	public static void walkTalkWithGameObject(String objectName, Area searchArea) {
 		Filter<GameObject> filter = n -> n != null && n.getName().contains(objectName) && searchArea.contains(n);
-		interactGameObject(filter, null, true,true,searchArea,Dialogues::inDialogue);
+		interactGameObject(filter, null, true,false,searchArea,Dialogues::inDialogue);
 	}
-
+	public static void walkTalkWithGameObject(String objectName, String action, Area searchArea, boolean standableTile) {
+		Filter<GameObject> filter = n -> n != null && n.getName().contains(objectName)  && n.hasAction(action) && searchArea.contains(n);
+		interactGameObject(filter, action, true,true,searchArea,Dialogues::inDialogue);
+	}
 	public static void walkTalkWithGameObject(String objectName, String action, Area searchArea) {
 		Filter<GameObject> filter = n -> n != null && n.getName().contains(objectName)  && n.hasAction(action) && searchArea.contains(n);
-		interactGameObject(filter, action, false,true,searchArea,Dialogues::inDialogue);
+		interactGameObject(filter, action, true,false,searchArea,Dialogues::inDialogue);
 	}
 	public static void interactWithGameObject(String objectName, String action)
 	{
@@ -506,6 +523,11 @@ public class API {
 		Filter<GameObject> filter = n -> n != null && n.getName().contains(objectName) && n.hasAction(action) && gameObjectArea.contains(n);
 		interactGameObject(filter, action, false,true,null,null);
 	}
+	public static void interactWithGameObject(String objectName, String action, Area gameObjectArea,Condition condition)
+	{
+		Filter<GameObject> filter = n -> n != null && n.getName().contains(objectName) && n.hasAction(action) && gameObjectArea.contains(n);
+		interactGameObject(filter, action, false,true,null,condition);
+	}
 	public static void walkInteractWithGameObject(String objectName, String action, Area gameObjectArea)
 	{
 		Filter<GameObject> filter = n -> n != null && n.getName().contains(objectName) && n.hasAction(action) && gameObjectArea.contains(n);
@@ -518,7 +540,7 @@ public class API {
 	}
 	private static void interactGroundItem(Filter<GroundItem> filter,String action,boolean walkToArea,boolean reachable,Area area, Condition condition)
 	{
-		if(walkToArea && !area.contains(Players.localPlayer()))
+		if(walkToArea && !area.contains(p.l))
 		{
 			if(!Walkz.isStaminated()) Walkz.drinkStamina();
 			if(Walkz.isStaminated() && Walking.getRunEnergy() > 5 && !Walking.isRunEnabled()) Walking.toggleRun();
@@ -549,6 +571,7 @@ public class API {
 			}
 			//must be able to reach it now, continue
 		}
+		if(go.distance() > 10) Walking.walk(go);
 		boolean interacted = false;
 		if(action == null)
 		{
@@ -561,7 +584,7 @@ public class API {
 			if(condition == null) condition = () -> Inventory.count(go.getID()) > count;
 			final Condition finalCondition = condition;
 			MethodProvider.sleepUntil(() -> finalCondition.verify(),
-					() -> Players.localPlayer().isMoving(),Sleep.calculate(6666, 4444),69);
+					() -> p.l.isMoving(),Sleep.calculate(6666, 4444),69);
 		}
 	}
 	public static void walkPickupGroundItem(int groundItemID, String action, boolean reachable,Area groundItemArea)

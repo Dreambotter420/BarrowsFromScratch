@@ -18,6 +18,7 @@ import org.dreambot.api.script.ScriptManager;
 import org.dreambot.api.utilities.Timer;
 import org.dreambot.api.wrappers.widgets.WidgetChild;
 
+import script.p;
 import script.actionz.UniqueActions;
 import script.actionz.UniqueActions.Actionz;
 
@@ -56,7 +57,7 @@ public class Skillz {
 		Timer timeout = new Timer(Sleep.calculate(18000, 5555));
 		while(!timeout.finished() && 
 				Client.isLoggedIn() && 
-				!Players.localPlayer().isInCombat() && 
+				!p.l.isInCombat() && 
 				Skills.getRealLevel(Skill.HITPOINTS) > 0 && 
 				!ScriptManager.getScriptManager().isPaused() &&
 				ScriptManager.getScriptManager().isRunning())

@@ -18,6 +18,7 @@ import org.dreambot.api.script.listener.ActionListener;
 import org.dreambot.api.script.listener.ChatListener;
 import org.dreambot.api.utilities.Timer;
 import org.dreambot.api.wrappers.interactive.GameObject;
+import org.dreambot.api.wrappers.interactive.Player;
 import org.dreambot.api.wrappers.widgets.MenuRow;
 import org.dreambot.api.wrappers.widgets.message.Message;
 
@@ -28,10 +29,12 @@ import script.actionz.WalkDrunkenly;
 import script.behaviour.*;
 import script.framework.Tree;
 import script.paint.*;
+import script.quest.alfredgrimhand.AlfredGrimhandsBarcrawl;
 import script.quest.animalmagnetism.AnimalMagnetism;
 import script.quest.ernestthechicken.ErnestTheChicken;
 import script.quest.fightarena.FightArena;
 import script.quest.fremenniktrials.FremennikTrials;
+import script.quest.horrorfromthedeep.HorrorFromTheDeep;
 import script.quest.magearena1.MageArena1;
 import script.quest.magearena2.MageArena2;
 import script.quest.naturespirit.NatureSpirit;
@@ -41,6 +44,7 @@ import script.quest.varrockmuseum.VarrockQuiz;
 import script.quest.waterfallquest.WaterfallQuest;
 import script.skills.agility.TrainAgility;
 import script.skills.crafting.TrainCrafting;
+import script.skills.herblore.TrainHerblore;
 import script.skills.magic.TrainMagic;
 import script.skills.melee.TrainMelee;
 import script.skills.prayer.TrainPrayer;
@@ -74,11 +78,12 @@ public class Main extends AbstractScript implements PaintInfo, ChatListener
         API.started = true;
         instantiateTree();
     }
-
+    public static Player loc = null;
     private final Tree tree = new Tree();
     
     private void instantiateTree() {
         tree.addBranches(new WaitForLogged_N_Loaded(),
+        			new p(),
         			new Initialize(),
         			new OnTutorialIsland(),
         			new LogoutBreak(),
@@ -93,7 +98,9 @@ public class Main extends AbstractScript implements PaintInfo, ChatListener
 					new PriestInPeril(),
 					new NatureSpirit(),
 					new MageArena2(),
+					new AlfredGrimhandsBarcrawl(),
 					new MageArena1(),
+					new HorrorFromTheDeep(),
 					new WaterfallQuest(),
 					new FightArena(),
 					new FremennikTrials(),
@@ -102,6 +109,7 @@ public class Main extends AbstractScript implements PaintInfo, ChatListener
 					new VarrockQuiz(),
 					new TrainWoodcutting(),
 					new TrainCrafting(),
+					new TrainHerblore(),
 					new TrainMagic(),
 					new TrainSlayer(),
 					new TrainRanged(),
@@ -111,43 +119,10 @@ public class Main extends AbstractScript implements PaintInfo, ChatListener
     }
 
     
-    private final Area stuckInFerox = new Area(3123, 3629, 3125, 3628, 0);
-    private final Area stuckInFerox2 = new Area(3134, 3619, 3135, 3617, 0);
     @Override
     public int onLoop()
     {
-        //stuck in ferox enclave
-        if(stuckInFerox.contains(getLocalPlayer()) || 
-        		stuckInFerox2.contains(getLocalPlayer()))
-        {
-            if(Widgets.getWidgetChild(229, 1) != null && 
-            		Widgets.getWidgetChild(229, 1).isVisible() &&
-            		Widgets.getWidgetChild(229, 1).getText().contains("When returning to the Enclave, if you are teleblocked, you will not"))
-            {
-            	Dialogues.continueDialogue();
-            	return Sleep.calculate(694, 111);
-            }
-            else if(Dialogues.areOptionsAvailable())
-            {
-            	Dialogues.chooseOption("Yes, and don\'t ask again.");
-            	return Sleep.calculate(694, 111);
-            }
-        	Sleep.sleep(111, 111);
-        	if(getLocalPlayer().isMoving()) return Sleep.calculate(111, 111);
-        	GameObject barrier = GameObjects.closest("Barrier");
-        	if(barrier == null) MethodProvider.log("Barrier null in Ferox Enclave! :-(");
-        	else barrier.interact("Pass-through");
-        	return Sleep.calculate(1111, 111);
-        }
-        
-        //check wildy ditch cross sign
-        if(Widgets.getWidgetChild(475,11,1) != null && 
-        		Widgets.getWidgetChild(475,11,1).isVisible() &&
-        		Widgets.getWidgetChild(475,11,1).getText().contains("Enter Wilderness"))
-        {
-        	Widgets.getWidgetChild(475,11,1).interact();
-        	Sleep.sleep(3000, 111);
-        }
+       
         return tree.onLoop();
     }
     

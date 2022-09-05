@@ -14,6 +14,7 @@ import org.dreambot.api.utilities.Timer;
 import org.dreambot.api.wrappers.items.GroundItem;
 
 import script.Main;
+import script.p;
 import script.behaviour.DecisionLeaf;
 import script.framework.Branch;
 import script.framework.Leaf;
@@ -74,6 +75,12 @@ public class TrainAgility extends Leaf{
             API.mode = null;
             return Timing.sleepLogNormalSleep();
     	}
+		if(Skills.getRealLevel(Skill.AGILITY) < 10)
+		{
+			MethodProvider.log("[AGILITY] -> Not lvl 10! Gnome agility course unscripted, just wait until script chooses Fremennik trials after training for it");
+			API.mode = null;
+	        return Timing.sleepLogNormalSleep();
+		}
 		checkSetCourse();
 		if(!InvEquip.equipmentContains(InvEquip.wearableWealth) || 
 				(!InvEquip.equipmentContains(InvEquip.wearableGlory) && !InvEquip.invyContains(InvEquip.wearableGlory)))
@@ -98,68 +105,68 @@ public class TrainAgility extends Leaf{
 				Walking.toggleRun();
 				Sleep.sleep(696,666);
 			}
-			if(Players.localPlayer().isAnimating()) 
+			if(p.l.isAnimating()) 
 			{
 				Sleep.sleep(420,696);
 				break;
 			}
-			if(Locations.alkharidAgility1.contains(Players.localPlayer()))
+			if(Locations.alkharidAgility1.contains(p.l))
 			{
 				if(checkTakeMarkOfGrace(Locations.alkharidAgility1)) break;
 				maybeHA();
-				API.interactWithGameObject("Rough wall", "Climb", () -> Locations.alkharidAgility2.contains(Players.localPlayer()));
+				API.interactWithGameObject("Rough wall", "Climb", () -> Locations.alkharidAgility2.contains(p.l));
 				break;
 			}
-			if(Locations.alkharidAgility2.contains(Players.localPlayer()))
+			if(Locations.alkharidAgility2.contains(p.l))
 			{
 				if(checkTakeMarkOfGrace(Locations.alkharidAgility2)) break;
 				maybeHA();
-				API.interactWithGameObject("Tightrope", "Cross", () -> Locations.alkharidAgilityGround.contains(Players.localPlayer()) || Locations.alkharidAgility3.contains(Players.localPlayer()));
+				API.interactWithGameObject("Tightrope", "Cross", () -> Locations.alkharidAgilityGround.contains(p.l) || Locations.alkharidAgility3.contains(p.l));
 				break;
 			}
-			if(Locations.alkharidAgility3.contains(Players.localPlayer()))
+			if(Locations.alkharidAgility3.contains(p.l))
 			{
 				if(checkTakeMarkOfGrace(Locations.alkharidAgility3)) break;
 				maybeHA();
-				API.interactWithGameObject("Cable", "Swing-across", () -> Locations.alkharidAgilityGround.contains(Players.localPlayer()) || Locations.alkharidAgility4.contains(Players.localPlayer()));
+				API.interactWithGameObject("Cable", "Swing-across", () -> Locations.alkharidAgilityGround.contains(p.l) || Locations.alkharidAgility4.contains(p.l));
 				break;
 			}
-			if(Locations.alkharidAgility4.contains(Players.localPlayer()))
+			if(Locations.alkharidAgility4.contains(p.l))
 			{
 				if(checkTakeMarkOfGrace(Locations.alkharidAgility4)) break;
 				maybeHA();
-				API.interactWithGameObject("Zip line", "Teeth-grip", () -> Locations.alkharidAgilityGround.contains(Players.localPlayer()) || Locations.alkharidAgility5.contains(Players.localPlayer()));
+				API.interactWithGameObject("Zip line", "Teeth-grip", () -> Locations.alkharidAgilityGround.contains(p.l) || Locations.alkharidAgility5.contains(p.l));
 				break;
 			}
-			if(Locations.alkharidAgility5.contains(Players.localPlayer()))
+			if(Locations.alkharidAgility5.contains(p.l))
 			{
 				if(checkTakeMarkOfGrace(Locations.alkharidAgility5)) break;
 				maybeHA();
-				API.interactWithGameObject("Tropical tree", "Swing-across", () -> Locations.alkharidAgilityGround.contains(Players.localPlayer()) ||Locations.alkharidAgility6.contains(Players.localPlayer()));
+				API.interactWithGameObject("Tropical tree", "Swing-across", () -> Locations.alkharidAgilityGround.contains(p.l) ||Locations.alkharidAgility6.contains(p.l));
 				break;
 			}
-			if(Locations.alkharidAgility6.contains(Players.localPlayer()))
+			if(Locations.alkharidAgility6.contains(p.l))
 			{
 				if(checkTakeMarkOfGrace(Locations.alkharidAgility6)) break;
 				maybeHA();
-				API.interactWithGameObject("Roof top beams", "Climb", () -> Locations.alkharidAgilityGround.contains(Players.localPlayer()) ||Locations.alkharidAgility7.contains(Players.localPlayer()));
+				API.interactWithGameObject("Roof top beams", "Climb", () -> Locations.alkharidAgilityGround.contains(p.l) ||Locations.alkharidAgility7.contains(p.l));
 				break;
 			}
-			if(Locations.alkharidAgility7.contains(Players.localPlayer()))
+			if(Locations.alkharidAgility7.contains(p.l))
 			{
 				if(checkTakeMarkOfGrace(Locations.alkharidAgility7)) break;
 				maybeHA();
-				API.interactWithGameObject("Tightrope", "Cross", () -> Locations.alkharidAgilityGround.contains(Players.localPlayer()) ||Locations.alkharidAgility8.contains(Players.localPlayer()));
+				API.interactWithGameObject("Tightrope", "Cross", () -> Locations.alkharidAgilityGround.contains(p.l) ||Locations.alkharidAgility8.contains(p.l));
 				break;
 			}
-			if(Locations.alkharidAgility8.contains(Players.localPlayer()))
+			if(Locations.alkharidAgility8.contains(p.l))
 			{
 				if(checkTakeMarkOfGrace(Locations.alkharidAgility8)) break;
 				maybeHA();
-				API.interactWithGameObject("Gap", "Jump", () -> Locations.alkharidAgilityGround.contains(Players.localPlayer()));
+				API.interactWithGameObject("Gap", "Jump", () -> Locations.alkharidAgilityGround.contains(p.l));
 				break;
 			}
-			if(Locations.alkharidAgilityGround.contains(Players.localPlayer()))
+			if(Locations.alkharidAgilityGround.contains(p.l))
 			{
 				maybeHA();
 				if(Walking.shouldWalk(5) && Walking.walk(Locations.alkharidAgility1.getCenter())) Sleep.sleep(69,666);
@@ -176,67 +183,67 @@ public class TrainAgility extends Leaf{
 		}*/
 		case DRAYNOR:
 		{
-			if(ha && !TrainMagic.haveHAItems()) break;
+			if(ha && !TrainMagic.getHAItems()) break;
 			if(!Walking.isRunEnabled() && Walking.getRunEnergy() >= 99 && (int) Calculations.nextGaussianRandom(100,50) > 120)
 			{
 				Walking.toggleRun();
 				Sleep.sleep(696,666);
 			}
-			if(Players.localPlayer().isAnimating()) 
+			if(p.l.isAnimating()) 
 			{
 				Sleep.sleep(420,696);
 				break;
 			}
-			if(Locations.draynorAgility1.contains(Players.localPlayer()))
+			if(Locations.draynorAgility1.contains(p.l))
 			{
 				if(checkTakeMarkOfGrace(Locations.draynorAgility1)) break;
 				maybeHA();
-				API.interactWithGameObject("Rough wall", "Climb", () -> Locations.draynorAgility2.contains(Players.localPlayer()));
+				API.interactWithGameObject("Rough wall", "Climb", () -> Locations.draynorAgility2.contains(p.l));
 				break;
 			}
-			if(Locations.draynorAgility2.contains(Players.localPlayer()))
+			if(Locations.draynorAgility2.contains(p.l))
 			{
 				if(checkTakeMarkOfGrace(Locations.draynorAgility2)) break;
 				maybeHA();
-				API.interactWithGameObject("Tightrope", "Cross", () -> Locations.draynorAgilityGround.contains(Players.localPlayer()) || Locations.draynorAgility3.contains(Players.localPlayer()));
+				API.interactWithGameObject("Tightrope", "Cross", () -> Locations.draynorAgilityGround.contains(p.l) || Locations.draynorAgility3.contains(p.l));
 				break;
 			}
-			if(Locations.draynorAgility3.contains(Players.localPlayer()))
+			if(Locations.draynorAgility3.contains(p.l))
 			{
 				if(checkTakeMarkOfGrace(Locations.draynorAgility3)) break;
 				maybeHA();
-				API.interactWithGameObject("Tightrope", "Cross", () -> Locations.draynorAgilityGround.contains(Players.localPlayer()) || Locations.draynorAgility4.contains(Players.localPlayer()));
+				API.interactWithGameObject("Tightrope", "Cross", () -> Locations.draynorAgilityGround.contains(p.l) || Locations.draynorAgility4.contains(p.l));
 				break;
 			}
-			if(Locations.draynorAgility4.contains(Players.localPlayer()))
+			if(Locations.draynorAgility4.contains(p.l))
 			{
 				if(checkTakeMarkOfGrace(Locations.draynorAgility4)) break;
 				maybeHA();
-				API.interactWithGameObject("Narrow wall", "Balance", () -> Locations.draynorAgilityGround.contains(Players.localPlayer()) || Locations.draynorAgility5.contains(Players.localPlayer()));
+				API.interactWithGameObject("Narrow wall", "Balance", () -> Locations.draynorAgilityGround.contains(p.l) || Locations.draynorAgility5.contains(p.l));
 				break;
 			}
-			if(Locations.draynorAgility5.contains(Players.localPlayer()))
+			if(Locations.draynorAgility5.contains(p.l))
 			{
 				if(checkTakeMarkOfGrace(Locations.draynorAgility5)) break;
 				maybeHA();
-				API.interactWithGameObject("Wall", "Jump-up", () -> Locations.draynorAgility6.contains(Players.localPlayer()));
+				API.interactWithGameObject("Wall", "Jump-up", () -> Locations.draynorAgility6.contains(p.l));
 				break;
 			}
-			if(Locations.draynorAgility6.contains(Players.localPlayer()))
+			if(Locations.draynorAgility6.contains(p.l))
 			{
 				if(checkTakeMarkOfGrace(Locations.draynorAgility6)) break;
 				maybeHA();
-				API.interactWithGameObject("Gap", "Jump", () -> Locations.draynorAgility7.contains(Players.localPlayer()));
+				API.interactWithGameObject("Gap", "Jump", () -> Locations.draynorAgility7.contains(p.l));
 				break;
 			}
-			if(Locations.draynorAgility7.contains(Players.localPlayer()))
+			if(Locations.draynorAgility7.contains(p.l))
 			{
 				if(checkTakeMarkOfGrace(Locations.draynorAgility7)) break;
 				maybeHA();
-				API.interactWithGameObject("Crate", "Climb-down", () -> Locations.draynorAgilityGround.contains(Players.localPlayer()));
+				API.interactWithGameObject("Crate", "Climb-down", () -> Locations.draynorAgilityGround.contains(p.l));
 				break;
 			}
-			if(Locations.draynorAgilityGround.contains(Players.localPlayer()))
+			if(Locations.draynorAgilityGround.contains(p.l))
 			{
 				maybeHA();
 				if(Walking.shouldWalk(5) && Walking.walk(Locations.draynorAgility1.getCenter())) Sleep.sleep(69,666);
@@ -287,7 +294,7 @@ public class TrainAgility extends Leaf{
 			final int count = Inventory.count(id.markOfGrace);
 			if(markOfGrace.interact("Take"))
 			{
-				MethodProvider.sleepUntil(() -> Inventory.count(id.markOfGrace) > count, () -> Players.localPlayer().isMoving(),
+				MethodProvider.sleepUntil(() -> Inventory.count(id.markOfGrace) > count, () -> p.l.isMoving(),
 						Sleep.calculate(2222, 2222),69);
 			}
 			if(Inventory.count(id.markOfGrace) > count)

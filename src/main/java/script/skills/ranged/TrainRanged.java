@@ -24,6 +24,7 @@ import org.dreambot.api.utilities.Timer;
 import org.dreambot.api.wrappers.widgets.WidgetChild;
 
 import script.Main;
+import script.p;
 import script.actionz.UniqueActions;
 import script.actionz.UniqueActions.Actionz;
 import script.behaviour.DecisionLeaf;
@@ -65,7 +66,7 @@ public class TrainRanged extends Leaf {
 			Walkz.exitIsleOfSouls(240000);
 			return false;
 		}
-        if(Locations.kourendGiantsCaveArea.contains(Players.localPlayer()))
+        if(Locations.kourendGiantsCaveArea.contains(p.l))
 		{
 			Walkz.exitGiantsCave();
 			return false;
@@ -131,7 +132,7 @@ public class TrainRanged extends Leaf {
     			{
     				if(Inventory.contains(id.avasAccumulator))
     				{
-    					if(Locations.dontTeleToGEAreaJustWalk.contains(Players.localPlayer()))
+    					if(Locations.dontTeleToGEAreaJustWalk.contains(p.l))
     					{
     						MethodProvider.log("Sucessfully bought more avas!");
     						return;
@@ -166,7 +167,7 @@ public class TrainRanged extends Leaf {
     }
     public static void walkDevicesAva()
     {
-    	if(Locations.ernest_westWing.contains(Players.localPlayer()))
+    	if(Locations.ernest_westWing.contains(p.l))
     	{
     		API.talkToNPC("Ava","Devices");
     		return;
@@ -176,7 +177,7 @@ public class TrainRanged extends Leaf {
     		Walkz.teleport(id.draynorTab, Locations.draynorMaynorTeleSpot, 180000);
     		return;
     	}
-		API.walkInteractWithGameObject("Bookcase", "Search", Locations.ernest_westWingAnd, () -> Locations.ernest_westWing.contains(Players.localPlayer()));
+		API.walkInteractWithGameObject("Bookcase", "Search", Locations.ernest_westWingAnd, () -> Locations.ernest_westWing.contains(p.l));
     	
     }
     public static boolean outOfAvas()
@@ -250,17 +251,24 @@ public class TrainRanged extends Leaf {
     	InvEquip.setEquipItem(EquipmentSlot.AMULET, getBestAmuletSlot());
     	InvEquip.setEquipItem(EquipmentSlot.LEGS, getBestLegSlot());
     	InvEquip.setEquipItem(EquipmentSlot.RING, InvEquip.wealth);
-    	boolean foundCape = false;
-    	for(int capeID : id.randCapes)
+    	if(getBestCapeSlot() == id.avasAccumulator)
     	{
-    		if(Equipment.contains(capeID)) 
-    		{
-    			InvEquip.setEquipItem(EquipmentSlot.CAPE, capeID);
-    			foundCape = true;
-    			break;
-    		}
+    		InvEquip.setEquipItem(EquipmentSlot.CAPE, id.avasAccumulator);
     	}
-    	if(!foundCape) InvEquip.setEquipItem(EquipmentSlot.CAPE, getBestCapeSlot());
+    	else
+    	{
+    		boolean foundCape = false;
+        	for(int capeID : id.randCapes)
+        	{
+        		if(Equipment.contains(capeID)) 
+        		{
+        			InvEquip.setEquipItem(EquipmentSlot.CAPE, capeID);
+        			foundCape = true;
+        			break;
+        		}
+        	}
+        	if(!foundCape) InvEquip.setEquipItem(EquipmentSlot.CAPE, getBestCapeSlot());
+    	}
     	InvEquip.addInvyItem(getBestDart(), 500, 1000, false, 1000);
 		if(getNextBestDart() != getBestDart()) InvEquip.addInvyItem(getNextBestDart(), 500, 1000, false, 1000);
 		if(getNextNextBestDart() != getBestDart() && 
@@ -453,7 +461,7 @@ public class TrainRanged extends Leaf {
 	{
 		final int ranged = Skills.getRealLevel(Skill.RANGED);
     	final int def = Skills.getRealLevel(Skill.DEFENCE);
-		if(HorrorFromTheDeep.completedHorrorFromTheDeep) return id.bookOfLaw;
+		if(HorrorFromTheDeep.completed()) return id.bookOfLaw;
 		if(def >= 40 && ranged >= 70) return id.blackShield;
 		//skipping green, blue, and red dhide shields cuz less than 200 traded per day. ...
 		if(def >= 30 && ranged >= 30) return id.snakeskinShield;

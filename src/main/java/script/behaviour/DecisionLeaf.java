@@ -5,16 +5,11 @@ import java.util.Collections;
 import java.util.List;
 
 import org.dreambot.api.methods.Calculations;
-import org.dreambot.api.methods.MethodProvider;
-import org.dreambot.api.methods.dialogues.Dialogues;
-import org.dreambot.api.methods.interactive.NPCs;
 import org.dreambot.api.methods.skills.Skill;
 import org.dreambot.api.methods.skills.Skills;
-import org.dreambot.api.script.ScriptManager;
+import org.dreambot.api.utilities.Logger;
 import org.dreambot.api.utilities.Timer;
 
-import script.actionz.UniqueActions;
-import script.actionz.UniqueActions.Actionz;
 import script.framework.Leaf;
 import script.quest.alfredgrimhand.AlfredGrimhandsBarcrawl;
 import script.quest.animalmagnetism.AnimalMagnetism;
@@ -27,15 +22,11 @@ import script.quest.magearena2.MageArena2;
 import script.quest.naturespirit.NatureSpirit;
 import script.quest.priestinperil.PriestInPeril;
 import script.quest.restlessghost.RestlessGhost;
-import script.quest.varrockmuseum.Timing;
 import script.quest.varrockmuseum.VarrockQuiz;
 import script.quest.waterfallquest.WaterfallQuest;
 import script.skills.herblore.TrainHerblore;
 import script.utilities.API;
 import script.utilities.API.modes;
-import script.utilities.Dialoguez;
-import script.utilities.Questz;
-import script.utilities.Sleep;
 
 public class DecisionLeaf extends Leaf{
 
@@ -50,74 +41,62 @@ public class DecisionLeaf extends Leaf{
     public static int craftingSetpoint;
     public static int prayerSetpoint;
     public static int agilitySetpoint;
-    public static int slayerSetpoint = 18; //set to 18 upon script completion
+    public static int slayerSetpoint = 18; // setpoint is 18 for this script for quest requirements
     public static Timer taskTimer;
-    public static Timer forceBreakTimer;
-    
-    
-    public static void resetForceBreakTimer()
-    {
-    	if(UniqueActions.isActionEnabled(Actionz.TAKE_MORE_BREAKS))
-    	{
-    		forceBreakTimer = new Timer((int)Calculations.nextGaussianRandom(9000000, 3500000));
-    		return;
-    	}
-    	forceBreakTimer = new Timer((int)Calculations.nextGaussianRandom(12000000, 5000000));
-    }
-    
+
     /**
      * sets a timer for random length.
      * enter 1 for short,
      * 2 for medium,
      * 3 for long,
      * 4 for guaranteed extra long.
-     * Most likely will choose the chosen timer. But a chance to choose others. Except for 4. 4 will choose extra long.
+     * Most likely will choose the chosen timer. But a chance to choose others, except for 4 which forces extra long.
      */
     public static void setTaskTimer (int priorityTime)
     {
     	switch(priorityTime) {
     	case(4):
     	{
-    		int timer = (int)Calculations.nextGaussianRandom(12000000, 1200000);
+    		int timer = (int)Calculations.nextGaussianRandom(12000000, 5200000);
     		taskTimer = new Timer(timer);
-    		MethodProvider.log("Set timer for: " + ((double)timer / 60000) +" minutes");
+    		Logger.log("Set timer for: " + ((double)timer / 60000) +" minutes");
     		break;
     	}
     	case(3):
     	{
-    		int rand = (int) Calculations.nextGaussianRandom(50, 20);
+    		int rand = (int) Calculations.nextGaussianRandom(50, 40);
     		int timer = 0;
-    		if(rand < 30) timer = (int)Calculations.nextGaussianRandom(1200000, 800000);
-    		else if (rand < 38) timer = (int)Calculations.nextGaussianRandom(3000000, 800000);
+    		if(rand < 30) timer = (int)Calculations.nextGaussianRandom(7200000, 3200000);
+    		else if (rand < 38) timer = (int)Calculations.nextGaussianRandom(4500000, 800000);
     		else timer = (int)Calculations.nextGaussianRandom(6000000, 1200000);
     		taskTimer = new Timer(timer);
-    		MethodProvider.log("Set timer for: " + ((double)timer / 60000) +" minutes");
+    		Logger.log("Set timer for: " + ((double)timer / 60000) +" minutes");
     		break;
     	}
     	case(2):
     	{
-    		int rand = (int) Calculations.nextGaussianRandom(50, 20);
+    		int rand = (int) Calculations.nextGaussianRandom(50, 40);
     		int timer = 0;
     		if(rand < 30) timer = (int)Calculations.nextGaussianRandom(6000000, 800000);
     		else if (rand < 38) timer = (int)Calculations.nextGaussianRandom(1200000, 800000);
-    		else timer = (int)Calculations.nextGaussianRandom(3000000, 1200000);
+    		else timer = (int)Calculations.nextGaussianRandom(7200000, 3200000);
     		taskTimer = new Timer(timer);
-    		MethodProvider.log("Set timer for: " + ((double)timer / 60000) +" minutes");
+    		Logger.log("Set timer for: " + ((double)timer / 60000) +" minutes");
     		break;
     	}
     	case(1):
     	{
-    		int rand = (int) Calculations.nextGaussianRandom(50, 20);
+    		int rand = (int) Calculations.nextGaussianRandom(50, 40);
     		int timer = 0;
     		if(rand < 30) timer = (int)Calculations.nextGaussianRandom(6000000, 800000);
-    		else if (rand < 38) timer = (int)Calculations.nextGaussianRandom(3000000, 800000);
+    		else if (rand < 38) timer = (int)Calculations.nextGaussianRandom(7200000, 3200000);
     		else timer = (int)Calculations.nextGaussianRandom(1200000, 1200000);
     		taskTimer = new Timer(timer);
-    		MethodProvider.log("Set timer for: " + ((double)timer / 60000) +" minutes");
+    		Logger.log("Set timer for: " + ((double)timer / 60000) +" minutes");
     		break;
     	}
     	default:{
-    		MethodProvider.log("Whoops - enter 1,2,3 into setTaskTimer function! :-)");
+    		Logger.log("Whoops - enter 1,2,3,4 into setTaskTimer function! :-)");
     		break;
     	}}
     }
@@ -238,26 +217,19 @@ public class DecisionLeaf extends Leaf{
 		if(!ernestDone && !validModes.contains(modes.ERNEST_THE_CHIKKEN)) validModes.add(modes.ERNEST_THE_CHIKKEN);
 		if(!restedGhost && !validModes.contains(modes.RESTLESS_GHOST)) validModes.add(modes.RESTLESS_GHOST);
 		if(ranged < rangeSetpoint && !validModes.contains(modes.TRAIN_RANGE)) validModes.add(modes.TRAIN_RANGE);
-		if(mage < mageSetpoint && !validModes.contains(modes.TRAIN_MAGIC)) validModes.add(modes.TRAIN_MAGIC);
+		if(mage < mageSetpoint && !validModes.contains(modes.TRAIN_MAGIC) && Calculations.random(1, 100) > 5) validModes.add(modes.TRAIN_MAGIC);
 		if(prayer < prayerSetpoint && !validModes.contains(modes.TRAIN_PRAYER)) validModes.add(modes.TRAIN_PRAYER);
 		if(def < 70 && !validModes.contains(modes.TRAIN_MELEE)) validModes.add(modes.TRAIN_MELEE);
-		if(validModes.isEmpty()) MethodProvider.log("Congratulations, you win!");
-		else
-		{
-			int breakChance = Calculations.random(1,100);
-			if(UniqueActions.isActionEnabled(Actionz.TAKE_MORE_BREAKS)) breakChance += 3;
-			if(breakChance > 95 || forceBreakTimer.finished()) API.mode = modes.BREAK;
-			else 
-			{
-				Collections.shuffle(validModes);
-				API.mode = validModes.get(0);
-			}
+		if(validModes.isEmpty()) Logger.log("Congratulations, you win!");
+		else {
+			Collections.shuffle(validModes);
+			API.mode = validModes.get(0);
 			
 			//testing
-			//API.mode = modes.HORROR_FROM_THE_DEEP;
+			//API.mode = modes.ERNEST_THE_CHIKKEN;
 			
 			
-			MethodProvider.log("Switching mode: " + API.mode.toString());
+			Logger.log("Switching mode: " + API.mode.toString());
 			if(API.mode == modes.ANIMAL_MAGNETISM || 
 					API.mode == modes.HORROR_FROM_THE_DEEP || 
 					API.mode == modes.MAGE_ARENA_2 || 
@@ -285,17 +257,12 @@ public class DecisionLeaf extends Leaf{
 				setTaskTimer(2);
 			}
 			else if(API.mode == modes.TRAIN_CRAFTING || 
-					API.mode == modes.TRAIN_AGILITY || 
-					API.mode == modes.TRAIN_WOODCUTTING || 
+					API.mode == modes.TRAIN_AGILITY ||
+					API.mode == modes.TRAIN_WOODCUTTING ||
+					API.mode == modes.OBOR ||
 					API.mode == modes.TRAIN_PRAYER)
 			{
 				setTaskTimer(1);
-			}
-			else if(API.mode == modes.BREAK)
-			{
-				if(UniqueActions.isActionEnabled(Actionz.TAKE_LONGER_BREAKS)) setTaskTimer(3);
-				else setTaskTimer(2);
-				resetForceBreakTimer();
 			}
 			else if(API.mode == modes.TRAIN_HERBLORE)
 			{
@@ -307,8 +274,6 @@ public class DecisionLeaf extends Leaf{
 	}
 	public static void initialize()
 	{
-		resetForceBreakTimer();
-		
 		int tmp =(int) Calculations.nextGaussianRandom(21, 3);
 		if(tmp >= 19 && tmp <= 24) craftingSetpoint = tmp;
 		else craftingSetpoint = 19;
@@ -321,24 +286,20 @@ public class DecisionLeaf extends Leaf{
 		if(tmp >= 75 && tmp <= 78) rangeSetpoint = tmp;
 		else rangeSetpoint = 75;
 		
-		tmp =(int) Calculations.nextGaussianRandom(83, 3);
-		if(tmp >= 83 && tmp <= 85) mageSetpoint = tmp;
-		else mageSetpoint = 83;
+		tmp =(int) Calculations.nextGaussianRandom(76, 3);
+		if(tmp >= 75 && tmp <= 78) mageSetpoint = tmp;
+		else mageSetpoint = 75;
 		
 		if(Skills.getRealLevel(Skill.PRAYER) >= 45) prayerSetpoint = 45;
-		else
-		{
+		else {
 			tmp =(int) Calculations.nextGaussianRandom(49, 3);
 			if(tmp >= 45 && tmp <= 50) prayerSetpoint = tmp;
 			else prayerSetpoint = 45;
 		}
-		
-		
 		tmp =(int) Calculations.nextGaussianRandom(31, 3);
 		if(tmp >= 30 && tmp <= 32) agilitySetpoint = tmp;
 		else agilitySetpoint = 30;
 		setPoints = true;
-		
 	}
 	
 }

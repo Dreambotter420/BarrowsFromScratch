@@ -1,15 +1,12 @@
 package script.quest.magearena2;
 
-import org.dreambot.api.methods.MethodProvider;
-import org.dreambot.api.methods.settings.PlayerSettings;
+import org.dreambot.api.utilities.Logger;
 
 import script.framework.Leaf;
 import script.framework.Tree;
-import script.quest.varrockmuseum.Timing;
+import script.utilities.Sleepz;
 import script.utilities.API;
 
-import java.util.LinkedHashMap;
-import java.util.List;
 /**
  * Completes Mage Arena 2
  * @author Dreambotter420
@@ -31,10 +28,10 @@ public class MageArena2 extends Leaf {
     @Override
     public int onLoop() {
         if (true) {
-            MethodProvider.log("[UNSCRIPTED] -> Mage Arena 2");
+            Logger.log("[UNSCRIPTED] -> Mage Arena 2");
             completedMageArena2 = true;
            	API.mode = null;
-            return Timing.sleepLogNormalSleep();
+            return Sleepz.sleepTiming();
         }
         return tree.onLoop();
     }

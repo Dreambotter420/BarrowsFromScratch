@@ -7,7 +7,6 @@ import java.util.List;
 import org.dreambot.api.Client;
 import org.dreambot.api.data.GameState;
 import org.dreambot.api.methods.Calculations;
-import org.dreambot.api.methods.MethodProvider;
 import org.dreambot.api.methods.combat.Combat;
 import org.dreambot.api.methods.container.impl.Inventory;
 import org.dreambot.api.methods.container.impl.bank.Bank;
@@ -18,14 +17,13 @@ import org.dreambot.api.methods.tabs.Tab;
 import org.dreambot.api.methods.tabs.Tabs;
 import org.dreambot.api.methods.widget.Widgets;
 import org.dreambot.api.script.ScriptManager;
+import org.dreambot.api.utilities.Logger;
+import org.dreambot.api.utilities.Sleep;
 import org.dreambot.api.utilities.Timer;
 import org.dreambot.api.wrappers.items.Item;
 import org.dreambot.api.wrappers.widgets.WidgetChild;
 
 import script.Main;
-import script.actionz.UniqueActions;
-import script.actionz.UniqueActions.Actionz;
-import script.skills.ranged.TrainRanged;
 
 public class Combatz {
 	public static List<Integer> foods = new ArrayList<Integer>();
@@ -37,8 +35,7 @@ public class Combatz {
 	public static int nextRandRangedBoostLvl = 0;
 	public static void initializeFoods()
 	{
-		if(UniqueActions.isActionEnabled(Actionz.BASS_OR_LOBSTER_INSTEAD_OF_JUGSOFWINE)) lowFood = id.bass;
-		else lowFood = id.jugOfWine;
+		lowFood = id.jugOfWine;
 		foods.add(id.pineapplePizza1);
 		foods.add(id.jugOfWine);
 		foods.add(id.bass);
@@ -68,10 +65,10 @@ public class Combatz {
 		if(Combat.isAutoRetaliateOn() == on) return;
 		if(!Tabs.isOpen(Tab.COMBAT))
 		{
-			if(Tabz.open(Tab.COMBAT)) MethodProvider.sleepUntil(() -> Tabs.isOpen(Tab.COMBAT),Sleep.calculate(420, 696));
+			if(Tabz.open(Tab.COMBAT)) Sleep.sleepUntil(() -> Tabs.isOpen(Tab.COMBAT),Sleepz.calculate(420, 696));
 			return;
 		}
-		if(Combat.toggleAutoRetaliate(on)) MethodProvider.sleepUntil(() -> Combat.isAutoRetaliateOn() == on, Sleep.calculate(2222, 2222));
+		if(Combat.toggleAutoRetaliate(on)) Sleep.sleepUntil(() -> Combat.isAutoRetaliateOn() == on, Sleepz.calculate(2222, 2222));
 	}
 	
 	public static boolean drinkAntidote()
@@ -81,8 +78,8 @@ public class Combatz {
 		{
 			if(Inventory.interact(InvEquip.getInvyItem(id.antidotes), "Drink"))
 			{
-				MethodProvider.log("Drank antidote!");
-				antidoteDrinkTimer = new Timer(Sleep.calculate(2222,2222));
+				Logger.log("Drank antidote!");
+				antidoteDrinkTimer = new Timer(Sleepz.calculate(2222,2222));
 				return true;
 			}
 			
@@ -140,9 +137,9 @@ public class Combatz {
     		else if(tmp < ranged) nextRandRangedBoostLvl = ranged;
             else nextRandRangedBoostLvl = tmp;
     	}
-    	Main.customPaintText2 = "Next ranged pot at boostLvl (baseLvL): " + nextRandRangedBoostLvl+" ("+ranged+")";
+    	Main.paint_itemsCount = "Next ranged pot at boostLvl (baseLvL): " + nextRandRangedBoostLvl+" ("+ranged+")";
     	if(drinkDelayTimer != null && !drinkDelayTimer.finished() && !drinkDelayTimer.isPaused()) return false;
-    	if(Skills.getBoostedLevels(Skill.RANGED) <= nextRandRangedBoostLvl) return true;
+    	if(Skills.getBoostedLevel(Skill.RANGED) <= nextRandRangedBoostLvl) return true;
     	return false;
     }
     public static boolean shouldDrinkMeleeBoost()
@@ -171,10 +168,11 @@ public class Combatz {
     		else if(tmp < lowest) nextRandMeleeBoostLvl = lowest;
             else nextRandMeleeBoostLvl = tmp;
     	}
-    	Main.customPaintText2 = "Next "+lowestSkill.getName()+" pot at boostLvl (baseLvl): " + nextRandMeleeBoostLvl +" ("+lowest+")";
+    	Main.paint_itemsCount = "Next "+lowestSkill.getName()+" pot at boostLvl (baseLvl): " + nextRandMeleeBoostLvl +" ("+lowest+")";
     	if(drinkDelayTimer != null && !drinkDelayTimer.finished() && !drinkDelayTimer.isPaused()) return false;
-    	if(Skills.getBoostedLevels(lowestSkill) <= nextRandMeleeBoostLvl) return true;
+    	if(Skills.getBoostedLevel(lowestSkill) <= nextRandMeleeBoostLvl) return true;
     	return false;
+    	
     }
     public static void drinkMeleeBoost()
     {
@@ -191,45 +189,45 @@ public class Combatz {
     				!ScriptManager.getScriptManager().isPaused())
     		{
     			if(!InvEquip.invyContains(superPots)) break;
-    			Sleep.sleep(69, 69);
+    			Sleepz.sleep(69, 69);
     			if(drinkDelayTimer != null && !drinkDelayTimer.finished() && !drinkDelayTimer.isPaused()) 
     			{
     				
-					Main.customPaintText3 = "~~Time until potion delay finish: " + drinkDelayTimer.remaining() +"ms~~";
+					Main.paint_subTask = "~~Time until potion delay finish: " + drinkDelayTimer.remaining() +"ms~~";
 					continue;
     			}
     			if(!Tabs.isOpen(Tab.INVENTORY)) 
     			{
     				Tabz.open(Tab.INVENTORY);
-    				Sleep.sleep(69, 420);
+    				Sleepz.sleep(69, 420);
     				continue;
     			}
     			if(Inventory.get(InvEquip.getInvyItem(superPots)).interact("Drink"))
     			{
     				if(superPots.equals(id.superCombats))
     				{
-    					MethodProvider.log("Drank supercombat pot!");
+    					Logger.log("Drank supercombat pot!");
     					int delay = (int) Calculations.nextGaussianRandom(2000,400);
         				if(delay<1400) delay = 1500;
         				drinkDelayTimer = new Timer();
         				nextRandMeleeBoostLvl = 0;
-    					Main.customPaintText3 = "";
-    					Main.customPaintText4 = "";
-    					Sleep.sleep(666, 696);
+    					Main.paint_subTask = "";
+    					Main.paint_levels = "";
+    					Sleepz.sleep(666, 696);
         				return;
     				}
-    				MethodProvider.log("Drank "+(id.superStrs == superPots ? "Strength" : "Attack")+" pot!");
+    				Logger.log("Drank "+(id.superStrs == superPots ? "Strength" : "Attack")+" pot!");
     				int delay = (int) Calculations.nextGaussianRandom(2000,400);
     				if(delay<1400) delay = 1500;
     				drinkDelayTimer = new Timer(delay);
     				nextRandMeleeBoostLvl = 0;
-					Main.customPaintText3 = "";
-					Main.customPaintText4 = "";
+					Main.paint_subTask = "";
+					Main.paint_levels = "";
     				break;
     			}
     		}
     	}
-    	Sleep.sleep(696, 666);
+    	Sleepz.sleep(696, 666);
     }
     
     public static int calculateMaxMeleeBoost(Skill attOrStr)
@@ -250,8 +248,8 @@ public class Combatz {
     		else if(tmp < 5) nextPrayerPotLvl = 5;
     		else nextPrayerPotLvl = tmp;
     	}
-    	Main.customPaintText2 = "Eating next praypot sip at pray lvl: " + nextPrayerPotLvl;
-    	if(Skills.getBoostedLevels(Skill.PRAYER) <= nextPrayerPotLvl)
+    	Main.paint_itemsCount = "Eating next praypot sip at pray lvl: " + nextPrayerPotLvl;
+    	if(Skills.getBoostedLevel(Skill.PRAYER) <= nextPrayerPotLvl)
     	{
     		return true;
     	}
@@ -259,31 +257,31 @@ public class Combatz {
     }
 	public static boolean drinkPrayPot()
 	{
-		Main.customPaintText4 = "~~sipping Praypot~~";
+		Main.paint_levels = "~~sipping Praypot~~";
 		Timer timer = new Timer(5000);
 		while(!timer.finished() && Client.getGameState() == GameState.LOGGED_IN
 				&& ScriptManager.getScriptManager().isRunning() && !ScriptManager.getScriptManager().isPaused())
 		{
-			Sleep.sleep(69, 69);
+			Sleepz.sleep(69, 69);
 			if(Tabs.isOpen(Tab.INVENTORY))
 			{
 				if(drinkDelayTimer != null && !drinkDelayTimer.finished())
 				{
-					MethodProvider.log("attempted to sip pray pot " +drinkDelayTimer.elapsed()+"ms ago, continuing");
-					Main.customPaintText3 = "~~Time until potion delay finish: " + drinkDelayTimer.remaining() +"ms~~";
+					Logger.log("attempted to sip pray pot " +drinkDelayTimer.elapsed()+"ms ago, continuing");
+					Main.paint_subTask = "~~Time until potion delay finish: " + drinkDelayTimer.remaining() +"ms~~";
 					continue;
 				}
 				Item prayPot = Inventory.get(InvEquip.getInvyItem(id.prayPots));
 				if(prayPot == null) return false;
 				final int prayerPotID = prayPot.getID();
-				Main.customPaintText3 = ("Drinking prayer potion: " + new Item(prayerPotID,1).getName());
+				Main.paint_subTask = ("Drinking prayer potion: " + new Item(prayerPotID,1).getName());
 				if(Inventory.interact(prayerPotID, "Drink"))
 				{
-					MethodProvider.log("Attempted to drink praypot!");
+					Logger.log("Attempted to drink praypot!");
 					nextPrayerPotLvl = 0;
 					drinkDelayTimer = new Timer(1200); 
-					Main.customPaintText3 = "";
-					Main.customPaintText4 = "";
+					Main.paint_subTask = "";
+					Main.paint_levels = "";
 					return true;
 				}
 			}
@@ -292,7 +290,7 @@ public class Combatz {
 				if(Widgets.isOpen())
 				{
 					Widgets.closeAll();
-					Sleep.sleep(111, 111);
+					Sleepz.sleep(111, 111);
 				}
 				else Tabz.open(Tab.INVENTORY);
 			}
@@ -311,8 +309,8 @@ public class Combatz {
     		else if(tmp < maxHit) nextFoodHP = maxHit;
     		else nextFoodHP = tmp;
     	}
-    	Main.customPaintText1 = "Eating next food at HP lvl: " + nextFoodHP;
-    	if(Skills.getBoostedLevels(Skill.HITPOINTS) <= nextFoodHP)
+    	Main.paint_task = "Eating next food at HP lvl: " + nextFoodHP;
+    	if(Skills.getBoostedLevel(Skill.HITPOINTS) <= nextFoodHP)
     	{
     		return true;
     	}
@@ -322,21 +320,21 @@ public class Combatz {
 	{
 		if(foodAttemptTimer != null && !foodAttemptTimer.isPaused() && !foodAttemptTimer.finished())
 		{
-			MethodProvider.log("attempted to eat food: " +foodAttemptTimer.elapsed()+"ms ago, continuing");
+			Logger.log("attempted to eat food: " +foodAttemptTimer.elapsed()+"ms ago, continuing");
 			return false;
 		}
 		Timer timer = new Timer(5000);
 		while(!timer.finished() && Client.getGameState() == GameState.LOGGED_IN
 				&& ScriptManager.getScriptManager().isRunning() && !ScriptManager.getScriptManager().isPaused())
 		{
-			Main.customPaintText4 = "~~Eating food until: "+timer.remaining()+"ms~~";
-			Sleep.sleep(69, 69);
+			Main.paint_levels = "~~Eating food until: "+timer.remaining()+"ms~~";
+			Sleepz.sleep(69, 69);
 			if(Tabs.isOpen(Tab.INVENTORY))
 			{
 				if(foodEatTimer != null && !foodEatTimer.finished())
 				{
-					MethodProvider.log("Called eatFood function, but food after-eat-timer still running! Waiting...");
-					Main.customPaintText3 = "~~Time until eat delay finish: " + foodEatTimer.remaining() +"ms~~";
+					Logger.log("Called eatFood function, but food after-eat-timer still running! Waiting...");
+					Main.paint_subTask = "~~Time until eat delay finish: " + foodEatTimer.remaining() +"ms~~";
 					continue;
 				}
 				Item food = getFood();
@@ -357,19 +355,19 @@ public class Combatz {
 						break;
 					}
 				}
-				Main.customPaintText3 = ("Eating food: " + new Item(foodID,1).getName());
+				Main.paint_subTask = ("Eating food: " + new Item(foodID,1).getName());
 				
 				if(Inventory.interact(foodID, action))
 				{
-					MethodProvider.log("Attempted to eat food!");
+					Logger.log("Attempted to eat food!");
 					nextFoodHP = 0;
 					foodAttemptTimer = new Timer(600);
 					foodEatTimer = new Timer(1200); // when u eat a food, it waits until next tick to actually eat it.
 					//once food is eaten then the game needs to wait 2 more ticks until you can attempt to eat another food
 					//if u attempt to eat another food on the 2nd tick after, you will eat the food on the end of the 2nd tick
 					//after 2nd tick after 1st eat completes, any more food eating is OK but will only register on end of tick
-					Main.customPaintText3 = "";
-					Main.customPaintText4 = "";
+					Main.paint_subTask = "";
+					Main.paint_levels = "";
 					return true;
 				}
 			}
@@ -378,7 +376,7 @@ public class Combatz {
 				if(Widgets.isOpen())
 				{
 					Widgets.closeAll();
-					Sleep.sleep(111, 111);
+					Sleepz.sleep(111, 111);
 				}
 				else Tabz.open(Tab.INVENTORY);
 			}
@@ -391,30 +389,30 @@ public class Combatz {
 	public static final int eagleEye = 4194304;
 	public static boolean setQuickPrayEagleEyeProtectMelee()
 	{
-		final WidgetChild eagleEyeButton = Widgets.getWidgetChild(77,4,22);
-		final WidgetChild protectMeleeButton = Widgets.getWidgetChild(77,4,14);
+		final WidgetChild eagleEyeButton = Widgets.get(77,4,22);
+		final WidgetChild protectMeleeButton = Widgets.get(77,4,14);
 		if(PlayerSettings.getBitValue(4102) == eagleEye_protectMelee) //setting for both Eagle Eye + Protekk Melee
 		{
-			if(Widgets.getWidgetChild(77,5) != null && 
-					Widgets.getWidgetChild(77,5).isVisible())
+			if(Widgets.get(77,5) != null && 
+					Widgets.get(77,5).isVisible())
 			{
-				if(Widgets.getWidgetChild(77,5).interact("Done"))
+				if(Widgets.get(77,5).interact("Done"))
 				{
-					MethodProvider.sleepUntil(() -> Widgets.getWidgetChild(77,5) == null || !Widgets.getWidgetChild(77,5).isVisible(), Sleep.calculate(2222, 2222));
+					Sleep.sleepUntil(() -> Widgets.get(77,5) == null || !Widgets.get(77,5).isVisible(), Sleepz.calculate(2222, 2222));
 				}
 				return false;
 			}
 			return true;
 		}
-		if(Widgets.getWidgetChild(77,5) == null || 
-				!Widgets.getWidgetChild(77,5).isVisible())
+		if(Widgets.get(77,5) == null || 
+				!Widgets.get(77,5).isVisible())
 		{
-			if(Widgets.getWidgetChild(160, 19) != null && 
-					Widgets.getWidgetChild(160, 19).isVisible())
+			if(Widgets.get(160, 19) != null && 
+					Widgets.get(160, 19).isVisible())
 			{
-				if(Widgets.getWidgetChild(160, 19).interact("Setup"))
+				if(Widgets.get(160, 19).interact("Setup"))
 				{
-					MethodProvider.sleepUntil(() -> Widgets.getWidgetChild(77,5) != null && Widgets.getWidgetChild(77,5).isVisible(), Sleep.calculate(2222, 2222));
+					Sleep.sleepUntil(() -> Widgets.get(77,5) != null && Widgets.get(77,5).isVisible(), Sleepz.calculate(2222, 2222));
 				}
 			}
 			return false;
@@ -423,7 +421,7 @@ public class Combatz {
 		{
 			if(protectMeleeButton.interact("Toggle"))
 			{
-				MethodProvider.sleepUntil(() -> PlayerSettings.getBitValue(4102) == eagleEye_protectMelee, Sleep.calculate(2222, 2222));
+				Sleep.sleepUntil(() -> PlayerSettings.getBitValue(4102) == eagleEye_protectMelee, Sleepz.calculate(2222, 2222));
 			}
 			return false;
 		}
@@ -431,7 +429,7 @@ public class Combatz {
 		{
 			if(eagleEyeButton.interact("Toggle"))
 			{
-				MethodProvider.sleepUntil(() -> PlayerSettings.getBitValue(4102) == eagleEye_protectMelee, Sleep.calculate(2222, 2222));
+				Sleep.sleepUntil(() -> PlayerSettings.getBitValue(4102) == eagleEye_protectMelee, Sleepz.calculate(2222, 2222));
 			}
 			return false;
 		}
@@ -441,21 +439,64 @@ public class Combatz {
 			{
 				if(eagleEyeButton.interact("Toggle"))
 				{
-					MethodProvider.sleepUntil(() -> PlayerSettings.getBitValue(4102) == eagleEye, Sleep.calculate(2222, 2222));
+					Sleep.sleepUntil(() -> PlayerSettings.getBitValue(4102) == eagleEye, Sleepz.calculate(2222, 2222));
 				}
 			}
 			else 
 			{
 				if(protectMeleeButton.interact("Toggle"))
 				{
-					MethodProvider.sleepUntil(() -> PlayerSettings.getBitValue(4102) == protectMelee, Sleep.calculate(2222, 2222));
+					Sleep.sleepUntil(() -> PlayerSettings.getBitValue(4102) == protectMelee, Sleepz.calculate(2222, 2222));
 				}
 			}
 			return false;
 		}
-		
-		
 		return false;
 	}
+	/**
+	 * Turns ON pk skull prevention, to make it MORE SAFE! Skull impossible!
+	 * Returns true if prevention is activated, otherwise tries to activate it and returns false.
+	 */
+	public static boolean turnOnPKSkullPrevention()
+	{
+		if(!isPKSkullPrevented()) togglePKSkullPrevention();
+		return isPKSkullPrevented();
+	}
+	public static final int pkSkullPreventionVarbit = 13131;
+	public static final int optionsSubTabVarbit = 9683; //0 = Controls Settings, 1 = Sound Settings, 2 = Display Settings
+	public static boolean isPKSkullPrevented()
+	{
+		return PlayerSettings.getBitValue(pkSkullPreventionVarbit) == 1;
+	}
+	public static boolean isControlsSubtabOpen()
+	{
+		return PlayerSettings.getBitValue(optionsSubTabVarbit) == 0;
+	}
 	
+	public static void togglePKSkullPrevention()
+	{
+		if(Tabz.open(Tab.OPTIONS))
+		{
+			if(!isControlsSubtabOpen())
+			{
+				WidgetChild controlsSubtabButton = Widgets.get(116, 106);
+				if(controlsSubtabButton != null && controlsSubtabButton.isVisible())
+				{
+					if(controlsSubtabButton.interact("Controls"))
+					{
+						Sleep.sleepUntil(() -> isControlsSubtabOpen(), Sleepz.calculate(3333, 3333));
+					}
+				}
+				return;
+			}
+			WidgetChild pkSkullPreventionButton = Widgets.get(116, 5);
+			if(pkSkullPreventionButton != null && pkSkullPreventionButton.isVisible())
+			{
+				if(pkSkullPreventionButton.interact("Toggle skull prevention"))
+				{
+					Sleep.sleepUntil(() -> isPKSkullPrevented(), Sleepz.calculate(3333, 3333));
+				}
+			}
+		}
+	}
 }

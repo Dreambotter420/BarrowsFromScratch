@@ -1,12 +1,8 @@
 package script;
 
-import org.dreambot.api.methods.MethodProvider;
-
-import script.actionz.UniqueActions;
 import script.framework.Leaf;
 import script.utilities.API;
-import script.utilities.Dialoguez;
-import script.utilities.Sleep;
+import script.utilities.Sleepz;
 import script.utilities.API.modes;
 
 public class Test extends Leaf {
@@ -18,8 +14,8 @@ public class Test extends Leaf {
 	public static boolean test = false;
 	@Override
 	public int onLoop() {
-		UniqueActions.examineRandomObect();
-		return Sleep.calculate(2222,2222);
+		//test a thing here
+		return Sleepz.calculate(2222,2222);
 	}
 	
 }

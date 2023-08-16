@@ -3,10 +3,8 @@ package script.skills.woodcutting;
 import java.util.List;
 
 import org.dreambot.api.methods.Calculations;
-import org.dreambot.api.methods.MethodProvider;
 import org.dreambot.api.methods.container.impl.Inventory;
 import org.dreambot.api.methods.container.impl.bank.Bank;
-import org.dreambot.api.methods.dialogues.Dialogues;
 import org.dreambot.api.methods.filter.Filter;
 import org.dreambot.api.methods.interactive.GameObjects;
 import org.dreambot.api.methods.interactive.Players;
@@ -18,22 +16,21 @@ import org.dreambot.api.methods.skills.Skills;
 import org.dreambot.api.methods.tabs.Tab;
 import org.dreambot.api.methods.tabs.Tabs;
 import org.dreambot.api.methods.walking.impl.Walking;
+import org.dreambot.api.utilities.Logger;
+import org.dreambot.api.utilities.Sleep;
 import org.dreambot.api.wrappers.interactive.GameObject;
 import org.dreambot.api.wrappers.interactive.Player;
 import org.dreambot.api.wrappers.items.GroundItem;
 
 import script.Main;
-import script.p;
 import script.behaviour.DecisionLeaf;
 import script.framework.Leaf;
 import script.framework.Tree;
-import script.quest.varrockmuseum.Timing;
 import script.utilities.API;
 import script.utilities.Dialoguez;
 import script.utilities.InvEquip;
 import script.utilities.Locations;
-import script.utilities.Skillz;
-import script.utilities.Sleep;
+import script.utilities.Sleepz;
 import script.utilities.Tabz;
 import script.utilities.Walkz;
 import script.utilities.id;
@@ -65,8 +62,8 @@ public class TrainWoodcutting extends Leaf {
 	};
     public void onStart() {
         instantiateTree();
-        if(wcArea == Locations.camelotTrees) MethodProvider.log("[WOODCUTTING] -> Set area to Camelot!");
-        else MethodProvider.log("[WOODCUTTING] -> Set area to Castle Wars!");
+        if(wcArea == Locations.camelotTrees) Logger.log("[WOODCUTTING] -> Set area to Camelot!");
+        else Logger.log("[WOODCUTTING] -> Set area to Castle Wars!");
         initialized = true;
     }
     
@@ -79,68 +76,63 @@ public class TrainWoodcutting extends Leaf {
     	if(!initialized) onStart();
     	if(DecisionLeaf.taskTimer.finished())
     	{
-    		MethodProvider.log("[TIMEOUT] -> Woodcutting!");
+    		Logger.log("[TIMEOUT] -> Woodcutting!");
             API.mode = null;
-            return Timing.sleepLogNormalSleep();
+            return Sleepz.sleepTiming();
     	}
-    	API.randomAFK(5);
-    	if(Dialoguez.handleDialogues()) return Sleep.calculate(420, 696);
-    	if(Skillz.shouldCheckSkillInterface())
-    	{
-    		Skillz.checkSkillProgress(Skill.WOODCUTTING);
-    	}
+    	if(Dialoguez.handleDialogues()) return Sleepz.calculate(420, 696);
     	GroundItem birdNest = GroundItems.closest(nest -> 
     			nest != null && 
     			nest.getName().contains("Bird nest"));
     	if(birdNest != null)
     	{
-    		MethodProvider.log("See bird nest! Attempting to grab it..");
+    		Logger.log("See bird nest! Attempting to grab it..");
     		boolean bankInstead = false;
     		final int count = Inventory.fullSlotCount();
     		if(count == 28)
     		{
     			if(Inventory.contains(id.logs))
     			{
-    				if(Inventory.drop(id.logs)) MethodProvider.sleepUntil(() -> Inventory.fullSlotCount() > count, () -> p.l.isMoving(),Sleep.calculate(2222, 2222), 50);
-    				return Timing.sleepLogNormalSleep();
+    				if(Inventory.drop(id.logs)) Sleep.sleepUntil(() -> Inventory.fullSlotCount() > count, () -> Players.getLocal().isMoving(),Sleepz.calculate(2222, 2222), 50);
+    				return Sleepz.sleepTiming();
     			}
     			if(Inventory.contains(id.oakLogs))
     			{
-    				if(Inventory.drop(id.oakLogs)) MethodProvider.sleepUntil(() -> Inventory.fullSlotCount() > count, () -> p.l.isMoving(),Sleep.calculate(2222, 2222), 50);
-    				return Timing.sleepLogNormalSleep();
+    				if(Inventory.drop(id.oakLogs)) Sleep.sleepUntil(() -> Inventory.fullSlotCount() > count, () -> Players.getLocal().isMoving(),Sleepz.calculate(2222, 2222), 50);
+    				return Sleepz.sleepTiming();
     			}
     			else 
     			{
     				bankInstead = true;
-    				MethodProvider.log("See birds nest but invy full and no logs to drop! banking...");
+    				Logger.log("See birds nest but invy full and no logs to drop! banking...");
     			}
     		}
     		if(!bankInstead)
     		{
     			if(birdNest.distance() < 8 && birdNest.interact("Take"))
         		{
-        			MethodProvider.sleepUntil(() -> Inventory.fullSlotCount() > count, () -> p.l.isMoving(),Sleep.calculate(2222, 2222), 50);
+        			Sleep.sleepUntil(() -> Inventory.fullSlotCount() > count, () -> Players.getLocal().isMoving(),Sleepz.calculate(2222, 2222), 50);
         		}
         		if(Inventory.fullSlotCount() > count)
         		{
-        			MethodProvider.log("Got birds nest! Total so far (invy + bank): " +(Inventory.count("Bird nest") + Bank.count("Bird nest")));
+        			Logger.log("Got birds nest! Total so far (invy + bank): " +(Inventory.count("Bird nest") + Bank.count("Bird nest")));
         		}
-        		return Timing.sleepLogNormalSleep();
+        		return Sleepz.sleepTiming();
     		}
     	}
     	
     	final int wc = Skills.getRealLevel(Skill.WOODCUTTING);
     	if (wc >= DecisionLeaf.wcSetpoint) {
-            MethodProvider.log("[COMPLETE] -> lvl "+DecisionLeaf.wcSetpoint+" woodcutting!");
+            Logger.log("[COMPLETE] -> lvl "+DecisionLeaf.wcSetpoint+" woodcutting!");
             API.mode = null;
             Main.clearCustomPaintText();
-            return Timing.sleepLogNormalSleep();
+            return Sleepz.sleepTiming();
         }
     	final int birdNestsCount = (Inventory.count("Bird nest") + Bank.count("Bird nest"));	
-    	Main.customPaintText2 = "~~Have bird nests (bank + invy): " + birdNestsCount;
-    	Main.customPaintText1 = "~~~Training Woodcutting~~~";
+    	Main.paint_itemsCount = "~~Have bird nests (bank + invy): " + birdNestsCount;
+    	Main.paint_task = "~~~Training Woodcutting~~~";
 
-    	Main.customPaintText4 = "Current wc lvl: " + wc + " and training to: " +DecisionLeaf.wcSetpoint;
+    	Main.paint_levels = "Current wc lvl: " + wc + " and training to: " +DecisionLeaf.wcSetpoint;
     	InvEquip.clearAll();
     	int careAboutAxe = 0;
     	//add axes to inventory
@@ -189,14 +181,14 @@ public class TrainWoodcutting extends Leaf {
 		if(Inventory.isFull() || !Inventory.contains(careAboutAxe))
 		{
 			InvEquip.fulfillSetup(true,60000);
-			return Timing.sleepLogNormalSleep();
+			return Sleepz.sleepTiming();
 		}
 		if(wcArea == Locations.castleWarsTrees)
 		{
 
-	    	Main.customPaintText3 = "Training location: Castle Wars";
+	    	Main.paint_subTask = "Training location: Castle Wars";
 			//if not in in chopping area, walk to it - give it 10 minutes timer
-			if(Locations.castleWarsTrees.contains(p.l) || Walkz.goToCastleWars(600000))
+			if(Locations.castleWarsTrees.contains(Players.getLocal()) || Walkz.goToCastleWars(600000))
 			{
 				return chopTree(careAboutOaks);
 			}
@@ -204,15 +196,15 @@ public class TrainWoodcutting extends Leaf {
 		if(wcArea == Locations.camelotTrees)
 		{
 
-	    	Main.customPaintText3 = "Training location: Camelot";
+	    	Main.paint_subTask = "Training location: Camelot";
 			//if not in in chopping area, walk to it - give it 10 minutes timer
-			if(Locations.camelotTrees.contains(p.l) || Walkz.goToCamelotTrees(600000))
+			if(Locations.camelotTrees.contains(Players.getLocal()) || Walkz.goToCamelotTrees(600000))
 			{
 				//inventory not full and have care about axe - go chop
 				return chopTree(careAboutOaks);
 			}
 		}
-		return Timing.sleepLogNormalSleep();
+		return Sleepz.sleepTiming();
     }
     
     public static int chopTree(boolean oaks)
@@ -255,41 +247,41 @@ public class TrainWoodcutting extends Leaf {
 		//tree OK to chop, DO IT
 		if(closestAvailableTree == null)
 		{
-			MethodProvider.log("Hmmmm no trees available in area! Walking to center of it");
-			if(Walking.shouldWalk(6) && Walking.walk(wcArea.getCenter())) Sleep.sleep(666, 1111);
-			return Timing.sleepLogNormalSleep();
+			Logger.log("Hmmmm no trees available in area! Walking to center of it");
+			if(Walking.shouldWalk(6) && Walking.walk(wcArea.getCenter())) Sleepz.sleep(666, 1111);
+			return Sleepz.sleepTiming();
 		}
 		else
 		{
-			if(p.l.isAnimating())
+			if(Players.getLocal().isAnimating())
 			{
 				final int invCount = Inventory.fullSlotCount();
-				MethodProvider.sleepUntil(() -> Inventory.fullSlotCount() > invCount, Sleep.calculate(3333, 3333));
-				return Timing.sleepLogNormalSleep();
+				Sleep.sleepUntil(() -> Inventory.fullSlotCount() > invCount, Sleepz.calculate(3333, 3333));
+				return Sleepz.sleepTiming();
 			}
-			if(p.l.isMoving())
+			if(Players.getLocal().isMoving())
 			{
-				MethodProvider.sleepUntil(() -> !p.l.isMoving(), Sleep.calculate(3333, 3333));
-				return Timing.sleepLogNormalSleep();
+				Sleep.sleepUntil(() -> !Players.getLocal().isMoving(), Sleepz.calculate(3333, 3333));
+				return Sleepz.sleepTiming();
 				
 			}
-			Sleep.sleep(222, 1111);
+			Sleepz.sleep(222, 1111);
 			if(!Tabs.isOpen(Tab.INVENTORY))
 			{
 				boolean openInvy = (Calculations.nextGaussianRandom(500,5) > 491 ? false : true);
 				if(openInvy) 
 				{
-					if(Tabz.open(Tab.INVENTORY)) Sleep.sleep(222,1111);
+					if(Tabz.open(Tab.INVENTORY)) Sleepz.sleep(222,1111);
 				}
 			}
 			
-			if(p.l.isAnimating() || p.l.isMoving()) return Timing.sleepLogNormalSleep();
+			if(Players.getLocal().isAnimating() || Players.getLocal().isMoving()) return Sleepz.sleepTiming();
 			if(closestAvailableTree.exists() || closestAvailableTree.distance() <= 8)
 			{
-				if(closestAvailableTree.interact("Chop down")) return Timing.sleepLogNormalInteraction();
+				if(closestAvailableTree.interact("Chop down")) return Sleepz.interactionTiming();
 			}
-			if(Walking.shouldWalk() && Walking.walk(closestAvailableTree.getTile())) Sleep.sleep(666, 1111);
+			if(Walking.shouldWalk() && Walking.walk(closestAvailableTree.getTile())) Sleepz.sleep(666, 1111);
 		}
-		return Timing.sleepLogNormalSleep();
+		return Sleepz.sleepTiming();
     }
 }

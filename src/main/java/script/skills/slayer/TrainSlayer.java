@@ -3,7 +3,6 @@ package script.skills.slayer;
 import org.dreambot.api.Client;
 import org.dreambot.api.data.GameState;
 import org.dreambot.api.methods.Calculations;
-import org.dreambot.api.methods.MethodProvider;
 import org.dreambot.api.methods.container.impl.Inventory;
 import org.dreambot.api.methods.container.impl.Shop;
 import org.dreambot.api.methods.container.impl.bank.Bank;
@@ -16,16 +15,15 @@ import org.dreambot.api.methods.skills.Skill;
 import org.dreambot.api.methods.skills.Skills;
 import org.dreambot.api.methods.walking.impl.Walking;
 import org.dreambot.api.script.ScriptManager;
+import org.dreambot.api.utilities.Logger;
+import org.dreambot.api.utilities.Sleep;
 import org.dreambot.api.utilities.Timer;
 import org.dreambot.api.wrappers.interactive.NPC;
 import org.dreambot.api.wrappers.items.Item;
 
 import script.Main;
-import script.p;
 import script.behaviour.DecisionLeaf;
-import script.framework.Branch;
 import script.framework.Leaf;
-import script.quest.varrockmuseum.Timing;
 import script.skills.ranged.Mobs;
 import script.skills.ranged.TrainRanged;
 import script.utilities.API;
@@ -37,8 +35,7 @@ import script.utilities.GrandExchangg;
 import script.utilities.InvEquip;
 import script.utilities.ItemsOnGround;
 import script.utilities.Locations;
-import script.utilities.Skillz;
-import script.utilities.Sleep;
+import script.utilities.Sleepz;
 import script.utilities.Walkz;
 import script.utilities.id;
 
@@ -61,23 +58,23 @@ public class TrainSlayer extends Leaf{
 	public int onLoop() {
 		if(Skills.getRealLevel(Skill.RANGED) < 30) 
 		{
-    		MethodProvider.log("[SLAYER] -> Not 30 ranged! Switching to ranged training...");
+    		Logger.log("[SLAYER] -> Not 30 ranged! Switching to ranged training...");
             API.mode = modes.TRAIN_RANGE;
-            return Timing.sleepLogNormalSleep();
+            return Sleepz.sleepTiming();
     	}
 		if(!started) onStart();
 		
 		if(DecisionLeaf.taskTimer.finished())
     	{
-    		MethodProvider.log("[TIMEOUT] -> Slayer!");
+    		Logger.log("[TIMEOUT] -> Slayer!");
             API.mode = null;
-            return Timing.sleepLogNormalSleep();
+            return Sleepz.sleepTiming();
     	}
 		SlayerSettings.getConfigs();
-		Main.customPaintText1 = "~~Training Slayer~~";
+		Main.paint_task = "~~Training Slayer~~";
 		if(SlayerSettings.slayerTaskQty > 0)
 		{
-			MethodProvider.log("Think we have slayer task: " + SlayerSettings.getTaskName() + " in qty: " +SlayerSettings.slayerTaskQty);
+			Logger.log("Think we have slayer task: " + SlayerSettings.getTaskName() + " in qty: " +SlayerSettings.slayerTaskQty);
 			if(SlayerSettings.slayerMonsterID == 10) Mobs.trainPlainMainlandSlayerTask(SlayerSettings.getTaskName(), Locations.zombiesEdgeville, 8,null);
 			if(SlayerSettings.slayerMonsterID == 22) Mobs.trainPlainMainlandSlayerTask(SlayerSettings.getTaskName(), Locations.guardDogAreaHosidius, 10,null);
 			if(SlayerSettings.slayerMonsterID == 12) Mobs.trainPlainMainlandSlayerTask(SlayerSettings.getTaskName(), Locations.forgottenSoulsLvl3, 6,ItemsOnGround.forgottenSoulsLoot);
@@ -103,20 +100,20 @@ public class TrainSlayer extends Leaf{
 			
 			
 				
-			Main.customPaintText4 = "Have slayer task! " + SlayerSettings.slayerTaskQty + " " + SlayerSettings.getTaskName()+"s and config value: "+SlayerSettings.slayerMonsterID;
-			return Timing.sleepLogNormalInteraction();
+			Main.paint_levels = "Have slayer task! " + SlayerSettings.slayerTaskQty + " " + SlayerSettings.getTaskName()+"s and config value: "+SlayerSettings.slayerMonsterID;
+			return Sleepz.interactionTiming();
 		}
 		
-		Main.customPaintText4 = "Slayer task done! Getting new one~~";
+		Main.paint_levels = "Slayer task done! Getting new one~~";
 		//have to grab new slayer task
-		if(getAssignmentTurael()) return Timing.sleepLogNormalSleep();
+		if(getAssignmentTurael()) return Sleepz.sleepTiming();
 		
-		return Timing.sleepLogNormalSleep();
+		return Sleepz.sleepTiming();
 	}
 	
 	public static boolean getAssignmentTurael()
 	{
-		Main.customPaintText2 = "Grabbing assigment from Turael";
+		Main.paint_itemsCount = "Grabbing assigment from Turael";
 		
 		Filter<NPC> turaelFilter = p -> 
 			p != null &&
@@ -125,31 +122,30 @@ public class TrainSlayer extends Leaf{
 		NPC turael = NPCs.closest(turaelFilter);
 		if(turael != null)
 		{
-			if(Skillz.shouldCheckSkillInterface()) Skillz.checkSkillProgress(Skill.SLAYER);
 			if(Dialoguez.handleDialogues()) return true;
 			if(turael.canReach())
 			{
 				if(turael.interact("Assignment")) 
 				{
-					MethodProvider.sleepUntil(Dialogues::inDialogue, () -> p.l.isMoving(), Sleep.calculate(2222, 2222),50);
+					Sleep.sleepUntil(Dialogues::inDialogue, () -> Players.getLocal().isMoving(), Sleepz.calculate(2222, 2222),50);
 					return true;
 				}
 			}
-			else if(Walking.shouldWalk(6) && Walking.walk(turael)) Sleep.sleep(420, 696);
+			else if(Walking.shouldWalk(6) && Walking.walk(turael)) Sleepz.sleep(420, 696);
 		}
 		else 
 		{
-			if(Locations.burthorpeTeleSpot.distance(p.l.getTile()) > 50)
+			if(Locations.burthorpeTeleSpot.distance(Players.getLocal().getTile()) > 50)
 			{
 				if(Walkz.useJewelry(InvEquip.games, "Burthorpe"))
 				{
-					Sleep.sleep(420, 696);
+					Sleepz.sleep(420, 696);
 					return true;
 				}
 				
 				if(!InvEquip.checkedBank())
 				{
-					Sleep.sleep(696, 420);
+					Sleepz.sleep(696, 420);
 					return false;
 				}
 				final int games = InvEquip.getBankItem(InvEquip.wearableGames);
@@ -159,7 +155,7 @@ public class TrainSlayer extends Leaf{
 					return false;
 				}
 				InvEquip.buyItem(InvEquip.games8, 2, 180000);
-			} else if(Walking.shouldWalk(6) && Walking.walk(Locations.turaelArea.getCenter())) Sleep.sleep(420, 696);
+			} else if(Walking.shouldWalk(6) && Walking.walk(Locations.turaelArea.getCenter())) Sleepz.sleep(420, 696);
 		}
 		return false;
 	}
@@ -167,17 +163,17 @@ public class TrainSlayer extends Leaf{
 	{
 		if(qty <= 0)
 		{
-			MethodProvider.log("Called BuyItemTurael with item: " + new Item(itemID,1).getName() + " in quantity 0!");
+			Logger.log("Called BuyItemTurael with item: " + new Item(itemID,1).getName() + " in quantity 0!");
 			return false;
 		}
-		MethodProvider.log("Grabbing equipment from Turael: " +qty + " " +new Item(itemID,1).getName());
+		Logger.log("Grabbing equipment from Turael: " +qty + " " +new Item(itemID,1).getName());
 		
-		Main.customPaintText2 = "Grabbing equipment from Turael: " +qty + " "+new Item(itemID,1).getName();
+		Main.paint_itemsCount = "Grabbing equipment from Turael: " +qty + " "+new Item(itemID,1).getName();
 		Timer timeout = new Timer(180000);
 		while(!timeout.finished() && Client.getGameState() == GameState.LOGGED_IN
 				&& ScriptManager.getScriptManager().isRunning() && !ScriptManager.getScriptManager().isPaused())
 		{
-			Sleep.sleep(69, 420);
+			Sleepz.sleep(69, 420);
 			if(!InvEquip.checkedBank()) continue;
 			if((Inventory.count(itemID) + Bank.count(itemID)) >= qty) return true;
 			if(Inventory.count(InvEquip.coins) >= 2000)
@@ -188,18 +184,18 @@ public class TrainSlayer extends Leaf{
 					
 					if(Inventory.count(itemID) <= 0)
 					{
-						MethodProvider.log("Not enough invy space for buying " + new Item(itemID,1).getName()+" from Turael!");
+						Logger.log("Not enough invy space for buying " + new Item(itemID,1).getName()+" from Turael!");
 						
 						if(GrandExchange.isOpen())
 						{
 							GrandExchangg.close();
-							Sleep.sleep(420,696);
+							Sleepz.sleep(420,696);
 							continue;
 						}
 						if(Shop.isOpen())
 						{
 							Shop.close();
-							Sleep.sleep(420,696);
+							Sleepz.sleep(420,696);
 							continue;
 						}
 						if(Bank.isOpen())
@@ -207,27 +203,27 @@ public class TrainSlayer extends Leaf{
 							if(Bank.depositAll(i -> i != null && 
 									ItemsOnGround.allSlayerLoot.contains(i.getID())))
 							{
-								MethodProvider.log("Deposited some allSlayerLoot");
+								Logger.log("Deposited some allSlayerLoot");
 							}
 							else 
 							{
-								MethodProvider.log("Did not deposit any allSlayerLoot");
+								Logger.log("Did not deposit any allSlayerLoot");
 								if(Bank.deposit(i -> i != null && 
 										i.getID() == id.jugOfWine, (1)))
 								{
-									MethodProvider.log("Deposited 1 jug of wine");
+									Logger.log("Deposited 1 jug of wine");
 								}
 								else 
 								{
-									MethodProvider.log("Did not deposit a jug of wine");
+									Logger.log("Did not deposit a jug of wine");
 								}
 							}
-							MethodProvider.sleep(Timing.sleepLogNormalInteraction());
+							Sleepz.sleepInteraction();
 							continue;
 						}
 						if(Inventory.count(id.jugOfWine) > 0) 
 						{
-							if(Inventory.drop(id.jugOfWine)) Sleep.sleep(222, 696);
+							if(Inventory.drop(id.jugOfWine)) Sleepz.sleep(222, 696);
 						}
 						continue;
 					}
@@ -238,18 +234,18 @@ public class TrainSlayer extends Leaf{
 					if(!Shop.contains(itemID))
 					{
 						Shop.close();
-						MethodProvider.sleep(Timing.sleepLogNormalSleep());
+						Sleepz.sleep();
 						continue;
 					}
 
-					MethodProvider.log("Turael shop open");
+					Logger.log("Turael shop open");
 					String tmp = "Buy ";
 					String buyString = tmp;
 					if(qty == 1) buyString = tmp.concat("1");
 					else buyString = tmp.concat("50");
 					if(Shop.interact(i -> i != null && i.getID() == itemID, buyString))
 					{
-						Sleep.sleep(69, 696);
+						Sleepz.sleep(69, 696);
 					}
 
 					continue;
@@ -266,21 +262,21 @@ public class TrainSlayer extends Leaf{
 						if(turael.interact("Trade")) 
 						{
 
-							MethodProvider.log("Turael Traded");
-							MethodProvider.sleepUntil(Shop::isOpen,() -> p.l.isMoving(), Sleep.calculate(2222, 2222),50);
-							Sleep.sleep(69, 696);
+							Logger.log("Turael Traded");
+							Sleep.sleepUntil(Shop::isOpen,() -> Players.getLocal().isMoving(), Sleepz.calculate(2222, 2222),50);
+							Sleepz.sleep(69, 696);
 							continue;
 						}
 					}
-					else if(Walking.shouldWalk(6) && Walking.walk(turael)) Sleep.sleep(420, 696);
+					else if(Walking.shouldWalk(6) && Walking.walk(turael)) Sleepz.sleep(420, 696);
 				}
 				else 
 				{
-					if(Locations.burthorpeTeleSpot.distance(p.l.getTile()) > 50)
+					if(Locations.burthorpeTeleSpot.distance(Players.getLocal().getTile()) > 50)
 					{
 						if(Walkz.useJewelry(InvEquip.games, "Burthorpe"))
 						{
-							Sleep.sleep(420, 696);
+							Sleepz.sleep(420, 696);
 							continue;
 						}
 						
@@ -291,29 +287,29 @@ public class TrainSlayer extends Leaf{
 							continue;
 						}
 						InvEquip.buyItem(InvEquip.games8, 2, 180000);
-					} else if(Walking.shouldWalk(6) && Walking.walk(Locations.turaelArea.getCenter())) Sleep.sleep(420, 696);
+					} else if(Walking.shouldWalk(6) && Walking.walk(Locations.turaelArea.getCenter())) Sleepz.sleep(420, 696);
 				}
 				continue;
 			}
-			MethodProvider.log("Getting 5000 coins for buying item: " + new Item(itemID,1).getName()+" from Turael!");
+			Logger.log("Getting 5000 coins for buying item: " + new Item(itemID,1).getName()+" from Turael!");
 			
 			
 			if(Bank.isOpen())
 			{
 				if(Bank.count(InvEquip.coins) < 5000) 
 				{
-					MethodProvider.log("Not enough coins (5000) for buying " + new Item(itemID,1).getName()+" from Turael!");
+					Logger.log("Not enough coins (5000) for buying " + new Item(itemID,1).getName()+" from Turael!");
 					ScriptManager.getScriptManager().stop();
 					return false;
 				}
 				if(Bank.withdraw(InvEquip.coins, 5000))
 				{
-					MethodProvider.log("Withdrew 5000 coins!");
-					MethodProvider.sleep(Timing.sleepLogNormalInteraction());
+					Logger.log("Withdrew 5000 coins!");
+					Sleepz.sleepInteraction();
 				}
 				continue;
 			}
-			if(Bankz.openClosest(25)) MethodProvider.sleep(Timing.sleepLogNormalSleep());
+			if(Bankz.openClosest(25)) Sleepz.sleep();
 			continue;
 			
 		
@@ -353,11 +349,11 @@ public class TrainSlayer extends Leaf{
     	InvEquip.addInvyItem(InvEquip.coins, 0, 0, false, 0);
 		if(InvEquip.fulfillSetup(true, 180000))
 		{
-			MethodProvider.log("[INVEQUIP] -> Fulfilled equipment correctly! (shantay pass lizards task)");
+			Logger.log("[INVEQUIP] -> Fulfilled equipment correctly! (shantay pass lizards task)");
 			return true;
 		} else 
 		{
-			MethodProvider.log("[INVEQUIP] -> NOT Fulfilled equipment correctly! (shantay pass lizards task)");
+			Logger.log("[INVEQUIP] -> NOT Fulfilled equipment correctly! (shantay pass lizards task)");
 			return false;
 		}
     	
@@ -395,11 +391,11 @@ public class TrainSlayer extends Leaf{
     	InvEquip.addInvyItem(InvEquip.coins, 0, 0, false, 0);
 		if(InvEquip.fulfillSetup(true, 180000))
 		{
-			MethodProvider.log("[INVEQUIP] -> Fulfilled equipment correctly! (cave bugs task)");
+			Logger.log("[INVEQUIP] -> Fulfilled equipment correctly! (cave bugs task)");
 			return true;
 		} else 
 		{
-			MethodProvider.log("[INVEQUIP] -> NOT Fulfilled equipment correctly! (cave bugs task)");
+			Logger.log("[INVEQUIP] -> NOT Fulfilled equipment correctly! (cave bugs task)");
 			return false;
 		}
     	
@@ -438,11 +434,11 @@ public class TrainSlayer extends Leaf{
     	InvEquip.addInvyItem(InvEquip.coins, 0, 0, false, 0);
 		if(InvEquip.fulfillSetup(true, 180000))
 		{
-			MethodProvider.log("[INVEQUIP] -> Fulfilled equipment correctly! (cave bugs task)");
+			Logger.log("[INVEQUIP] -> Fulfilled equipment correctly! (cave bugs task)");
 			return true;
 		} else 
 		{
-			MethodProvider.log("[INVEQUIP] -> NOT Fulfilled equipment correctly! (cave bugs task)");
+			Logger.log("[INVEQUIP] -> NOT Fulfilled equipment correctly! (cave bugs task)");
 			return false;
 		}
     	

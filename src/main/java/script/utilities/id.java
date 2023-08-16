@@ -5,16 +5,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 import org.dreambot.api.methods.Calculations;
-import org.dreambot.api.methods.map.Map;
-import org.dreambot.api.methods.skills.Skill;
-import org.dreambot.api.methods.skills.Skills;
-
-import script.Main;
-import script.actionz.UniqueActions;
-import script.actionz.UniqueActions.Actionz;
-import script.quest.animalmagnetism.AnimalMagnetism;
-import script.quest.horrorfromthedeep.HorrorFromTheDeep;
-import script.skills.ranged.TrainRanged;
+import org.dreambot.api.wrappers.items.Item;
 
 public class id {
 	public static final int cammyTele = 8010;
@@ -98,6 +89,7 @@ public class id {
 	public static final int armaPage2 = 12618;
 	public static final int armaPage3 = 12619;
 	public static final int armaPage4 = 12620;
+	public static final int steelKnife = 865;
 	
 	
 	public static final int torstol = 269;
@@ -381,7 +373,11 @@ public class id {
 	public static final int zamorakMonkBottom = 1033;
 
 	public static final int occultNecklace = 20137;
-	
+	public static final int limpwurtRoot = 225;
+	public static final int hillGiantClub = 20756;
+	public static final int uncutRuby = 1619;
+	public static final int brassKey = 983;
+	public static final int runeLongsword = 1303;
 	public static final int dragonMedHelm = 1149;
 	public static final int runeFullHelm = 1163;
 	public static final int addyFullHelm = 1161;
@@ -415,6 +411,7 @@ public class id {
 	public static final int markOfGrace = 11849;
 	
 	public static LinkedHashMap<Integer, Integer> approvedAlchs = new LinkedHashMap<Integer,Integer>();
+	public static List<Integer> needAtLeast1Alchs = new ArrayList<Integer>();
 	public static LinkedHashMap<Integer, Integer> xpAlchs = new LinkedHashMap<Integer,Integer>();
 	public static List<Integer> allAlchs = new ArrayList<Integer>();
 	public static void initializeIDLists()
@@ -424,8 +421,11 @@ public class id {
 		
 		approvedAlchs.put(redDhideBodyG,8);
 		approvedAlchs.put(redDhideChaps,65);
+		needAtLeast1Alchs.add(redDhideChaps);
 		approvedAlchs.put(blackDhideBody,65);
+		needAtLeast1Alchs.add(blackDhideBody);
 		approvedAlchs.put(redDhidevambs,65);
+		needAtLeast1Alchs.add(redDhidevambs);
 		approvedAlchs.put(mysticEarthStaff,18000);
 		approvedAlchs.put(initiateSallet,125);
 		approvedAlchs.put(proselyteTasset,70);
@@ -437,14 +437,20 @@ public class id {
 		approvedAlchs.put(runeDaggerPP,70);
 		approvedAlchs.put(runeSword,70);
 		approvedAlchs.put(blueDhideBody,120);
+		needAtLeast1Alchs.add(blueDhideBody);
 		approvedAlchs.put(earthBattlestaff,18000);
 		approvedAlchs.put(runeDagger,70);
 		approvedAlchs.put(redDhideBody,65);
+		needAtLeast1Alchs.add(redDhideBody);
 		approvedAlchs.put(adamantPlatebody,120);
+		needAtLeast1Alchs.add(adamantPlatebody);
 		approvedAlchs.put(runeAxe,35);
+		needAtLeast1Alchs.add(runeAxe);
 		approvedAlchs.put(greenDhideBody,120);
+		needAtLeast1Alchs.add(greenDhideBody);
 		approvedAlchs.put(onyxBoltsE,11000);
 		approvedAlchs.put(mithrilPlatebody,120);
+		needAtLeast1Alchs.add(mithrilPlatebody);
 		approvedAlchs.put(rune2h,70);
 		
 		for(Integer i : xpAlchs.keySet())
@@ -497,5 +503,12 @@ public class id {
         rangedPots.add(rangePot2);
         rangedPots.add(rangePot3);
         rangedPots.add(rangePot4);
+	}
+	public static int noted(int id)
+	{
+		if(id < 0) return -1;
+		Item i = new Item(id,1);
+		if(i == null) return -1;
+		return i.getNotedItemID();
 	}
 }

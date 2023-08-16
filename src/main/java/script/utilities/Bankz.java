@@ -1,33 +1,38 @@
 package script.utilities;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-
-import org.dreambot.api.methods.MethodProvider;
+import org.dreambot.api.input.Keyboard;
+import org.dreambot.api.methods.container.impl.Inventory;
 import org.dreambot.api.methods.container.impl.bank.Bank;
 import org.dreambot.api.methods.container.impl.bank.BankLocation;
-import org.dreambot.api.methods.input.Keyboard;
+import org.dreambot.api.methods.grandexchange.GrandExchange;
 import org.dreambot.api.methods.interactive.GameObjects;
 import org.dreambot.api.methods.interactive.Players;
-import org.dreambot.api.methods.map.Tile;
+import org.dreambot.api.methods.magic.Magic;
 import org.dreambot.api.methods.walking.impl.Walking;
 import org.dreambot.api.methods.widget.Widgets;
+import org.dreambot.api.utilities.Logger;
+import org.dreambot.api.utilities.Sleep;
 import org.dreambot.api.wrappers.interactive.GameObject;
-import org.dreambot.api.wrappers.items.Item;
-
-import script.p;
-import script.actionz.UniqueActions;
-import script.actionz.UniqueActions.Actionz;
-import script.quest.varrockmuseum.Timing;
+import org.dreambot.api.wrappers.widgets.WidgetChild;
 
 public class Bankz {
 	public static boolean openClosest(int distToTryTeleport)
 	{
 		if(Bank.isOpen()) return true;
-		MethodProvider.log("Entering Bankz.openClosest(int) function");
-		if(Locations.mageArenaBank.contains(p.l))
+		Logger.log("Entering Bankz.openClosest(int) function");
+		if(Magic.isSpellSelected())
+		{
+			Magic.deselect();
+			Sleep.sleepTick();
+			return false;
+		}
+		if(Inventory.isItemSelected())
+		{
+			Inventory.deselect();
+			Sleep.sleepTick();
+			return false;
+		}
+		if(Locations.mageArenaBank.contains(Players.getLocal()))
 		{
 			GameObject bank = GameObjects.closest(g -> 
 					g!=null && 
@@ -35,17 +40,18 @@ public class Bankz {
 					g.hasAction("Use"));
 			if(bank == null) 
 			{
-				MethodProvider.log("Bank null in Mage Arena Bank!");
+				Logger.log("Bank null in Mage Arena Bank!");
 			}
 			if(bank.interact("Use"))
 			{
-				MethodProvider.sleepUntil(Bank::isOpen,() ->p.l.isMoving(), Sleep.calculate(2222, 2222),69);
+				Sleep.sleepUntil(Bank::isOpen,() ->Players.getLocal().isMoving(), Sleepz.calculate(2222, 2222),69);
 			}
 			return false;
 		}
-		final double dist = Bank.getClosestBankLocation().getTile().distance();
-		MethodProvider.log("Distance to closest bank: " + dist);
-		if(dist >= distToTryTeleport || p.l.getZ() > 0)
+		BankLocation.getSortedValidLocations(Players.getLocal()).stream().forEach((bl) -> Logger.log("Found valid, sorted bank location: " +bl.name() + " - " + bl.getTile().toString()));
+		final double dist = BankLocation.getSortedValidLocations(Players.getLocal()).get(0).distance(Players.getLocal().getTile());
+		Logger.log("Distance to closest bank: " + dist);
+		if(dist >= distToTryTeleport || Players.getLocal().getZ() > 0)
 		{
 			if(Walkz.useJewelry(InvEquip.wealth,"Grand Exchange") || 
 					Walkz.useJewelry(InvEquip.glory,"Edgeville") ||
@@ -55,25 +61,12 @@ public class Bankz {
 					Walkz.useJewelry(InvEquip.skills,"Fishing Guild") || 
 					Walkz.useJewelry(InvEquip.passage,"Wizards\' Tower") ) 
 			{
-				MethodProvider.log("Teleported to another place using jewelry to get close to bank!");
-				MethodProvider.sleep(Timing.sleepLogNormalSleep());
+				Logger.log("Teleported to another place using jewelry to get close to bank!");
+				Sleepz.sleep();
 				return false;
 			}
 		}
-		
-		if(dist <= 8)
-		{
-			if(Bank.open(Bank.getClosestBankLocation())) return true;
-			MethodProvider.sleep(Timing.sleepLogNormalSleep());
-			return false;
-		}
-		
-		if(Walking.shouldWalk(6) && Walking.walk(BankLocation.getNearest(p.l)))
-		{
-			MethodProvider.log("Walked towards banklocation closest!");
-			MethodProvider.sleep(Timing.sleepLogNormalSleep());
-		}
-		return false;
+		return openClosestNoJewelry();
 	}
 	
 	public static boolean openClosestNoJewelry()
@@ -83,22 +76,73 @@ public class Bankz {
 		final double dist = Bank.getClosestBankLocation().getTile().distance();
 		if(dist <= 8)
 		{
-			if(Bank.open(Bank.getClosestBankLocation())) return true;
-			MethodProvider.sleep(Timing.sleepLogNormalSleep());
+			if(Bank.open()) return true;
+			Sleepz.sleep();
 			return false;
 		}
 		
-		if(Walking.shouldWalk(6) && Walking.walk(BankLocation.getNearest(p.l)))
+		if(Walking.shouldWalk(6) && Walking.walk(BankLocation.getNearest(Players.getLocal())))
 		{
-			MethodProvider.sleep(Timing.sleepLogNormalSleep());
+			Logger.log("Walked towards banklocation closest!");
+			Sleepz.sleep();
 		}
 		return false;
 	}
 	
-	public static boolean close()
-	{
-		if(UniqueActions.isActionEnabled(Actionz.ESC_TO_CLOSE)) return Keyboard.closeInterfaceWithESC();
-		return Widgets.getWidgetChild(12, 2 , 11) != null && 
-				Widgets.getWidgetChild(12, 2 , 11).interact("Close");
+	public static boolean close() {
+		if (Bank.isOpen()) {
+			Sleepz.sleepTiming();
+			Keyboard.closeInterfaceWithEsc();
+		}
+		return !Bank.isOpen();
+	}
+
+	/**
+	 * returns false if Equipment can be closed, true if equipment bank tab closed already
+	 * @return
+	 */
+	public static boolean closeBankEquipment() {
+		Logger.log("Close Bank Equipment");
+		WidgetChild hideWornItemsButton = Widgets.get(w -> w.hasAction("Show worn items") && w.getParentID() == 12);
+		if(hideWornItemsButton != null &&
+				hideWornItemsButton.isVisible()) {
+			if(hideWornItemsButton.interact("Hide worn items")) {
+				return Sleep.sleepUntil(Bank::isOpen, Sleepz.calculate(3333, 2222));
+			}
+			if(Bank.isOpen()) {
+				Bank.count(InvEquip.coins); //random API call to update bank cache ...
+				return true;
+			}
+			return false;
+		}
+		return true;
+	}
+
+	/**
+	 * returns false if Equipment can be opened, true if equipment bank tab open already
+	 * @return
+	 */
+	public static boolean openBankEquipment() {
+		Logger.log("Open Bank Equipment");
+		WidgetChild hideWornItemsButton = Widgets.get(w -> w.hasAction("Hide worn items") && w.getParentID() == 12);
+		if(hideWornItemsButton != null &&
+				hideWornItemsButton.isVisible()) {
+			return true;
+		}
+		if(Bank.isOpen()) {
+			Bank.count(InvEquip.coins); //random API call to update bank cache ...
+			WidgetChild showWornItemsButton = Widgets.get(w -> w.hasAction("Show worn items") && w.getParentID() == 12);
+			if (showWornItemsButton == null || !showWornItemsButton.isVisible()) {
+				Logger.log("Error with finding Show worn items button");
+			}
+			Sleepz.sleep();
+			if(showWornItemsButton.interact("Show worn items")) {
+				return Sleep.sleepUntil(() -> !Bank.isOpen(), Sleepz.calculate(3333, 2222));
+			}
+			return false;
+		}
+		else if(GrandExchange.isOpen()) GrandExchangg.close();
+		else openClosest(75);
+		return false;
 	}
 }

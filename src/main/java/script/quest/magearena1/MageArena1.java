@@ -1,7 +1,6 @@
 package script.quest.magearena1;
 
 import org.dreambot.api.methods.Calculations;
-import org.dreambot.api.methods.MethodProvider;
 import org.dreambot.api.methods.combat.Combat;
 import org.dreambot.api.methods.container.impl.Inventory;
 import org.dreambot.api.methods.container.impl.bank.Bank;
@@ -9,7 +8,6 @@ import org.dreambot.api.methods.container.impl.equipment.Equipment;
 import org.dreambot.api.methods.container.impl.equipment.EquipmentSlot;
 import org.dreambot.api.methods.dialogues.Dialogues;
 import org.dreambot.api.methods.interactive.GameObjects;
-import org.dreambot.api.methods.interactive.NPCs;
 import org.dreambot.api.methods.interactive.Players;
 import org.dreambot.api.methods.item.GroundItems;
 import org.dreambot.api.methods.map.Tile;
@@ -20,20 +18,16 @@ import org.dreambot.api.methods.skills.Skill;
 import org.dreambot.api.methods.skills.Skills;
 import org.dreambot.api.methods.tabs.Tab;
 import org.dreambot.api.methods.walking.impl.Walking;
+import org.dreambot.api.utilities.Logger;
+import org.dreambot.api.utilities.Sleep;
 import org.dreambot.api.wrappers.interactive.GameObject;
-import org.dreambot.api.wrappers.interactive.NPC;
 import org.dreambot.api.wrappers.interactive.Player;
 import org.dreambot.api.wrappers.items.GroundItem;
 
 import script.Main;
-import script.p;
 import script.behaviour.DecisionLeaf;
 import script.framework.Leaf;
-import script.framework.Tree;
-import script.quest.varrockmuseum.Timing;
 import script.skills.magic.Casting;
-import script.skills.magic.TrainMagic;
-import script.skills.ranged.TrainRanged;
 import script.utilities.API;
 import script.utilities.Bankz;
 import script.utilities.Combatz;
@@ -41,13 +35,11 @@ import script.utilities.Dialoguez;
 import script.utilities.InvEquip;
 import script.utilities.Locations;
 import script.utilities.Questz;
-import script.utilities.Sleep;
+import script.utilities.Sleepz;
 import script.utilities.Tabz;
 import script.utilities.Walkz;
 import script.utilities.id;
 
-import java.util.LinkedHashMap;
-import java.util.List;
 /**
  * Completes Mage Arena 1
  * @author Dreambotter420
@@ -59,13 +51,13 @@ public class MageArena1 extends Leaf {
         
     }
     public boolean onExit() {
-        if(Locations.mageArenaBank.contains(p.l))
+        if(Locations.mageArenaBank.contains(Players.getLocal()))
         {
         	if(!Walkz.useJewelry(InvEquip.glory, "Edgeville") && !Walkz.useJewelry(InvEquip.combat, "Ranging Guild"))
         	{
         		if(Walkz.teleportVarrock(30000))
         		{
-        			MethodProvider.log("Teleported to varrock!");
+        			Logger.log("Teleported to varrock!");
         		}
         	}
         }
@@ -76,14 +68,13 @@ public class MageArena1 extends Leaf {
     {
     	if(getProgressValue() == 8) //finished value
     	{
-    		if(p.l.isAnimating())
+    		if(Players.getLocal().isAnimating())
         	{
-        		Sleep.sleep(69, 696);
+        		Sleepz.sleep(69, 696);
         		return true;
         	}
-        	if(Locations.mageArenaCave.contains(p.l))
+        	if(Locations.mageArenaCave.contains(Players.getLocal()))
         	{
-            	API.randomAFK(5);
         		if(Inventory.count(id.saradominCape) < 2)
             	{
             		getCape("Saradomin");
@@ -102,9 +93,8 @@ public class MageArena1 extends Leaf {
             	API.walkTalkWithGameObject("Sparkling pool", "Step-into",Locations.mageArenaCaveSouth);
             	return true;
         	}
-        	if(Locations.mageArenaBank.contains(p.l))
+        	if(Locations.mageArenaBank.contains(Players.getLocal()))
         	{
-            	API.randomAFK(5);
         		if(Inventory.contains(id.guthixCape) || 
         				Inventory.contains(id.guthixStaff) || 
         				Inventory.contains(id.zamorakCape) || 
@@ -127,37 +117,36 @@ public class MageArena1 extends Leaf {
     @Override
     public int onLoop() {
     	if (completed()) {
-            MethodProvider.log("[FINISHED] -> Mage Arena 1");
+            Logger.log("[FINISHED] -> Mage Arena 1");
             if(onExit()) 
             {
-            	Main.customPaintText1 = "~~~~~~~~~~~";
-        		Main.customPaintText2 = "~Quest Complete~";
-        		Main.customPaintText3 = "~Mage Arena 1~";
-        		Main.customPaintText4 = "~~~~~~~~~~~";
+            	Main.paint_task = "~~~~~~~~~~~";
+        		Main.paint_itemsCount = "~Quest Complete~";
+        		Main.paint_subTask = "~Mage Arena 1~";
+        		Main.paint_levels = "~~~~~~~~~~~";
             	API.mode = null;
             }
-            return Timing.sleepLogNormalSleep();
+            return Sleepz.sleepTiming();
         }
     	if (DecisionLeaf.taskTimer.finished()) {
-            MethodProvider.log("[TIMEOUT] -> Mage Arena 1");
+            Logger.log("[TIMEOUT] -> Mage Arena 1");
             if(onExit()) API.mode = null;
-            return Timing.sleepLogNormalSleep();
+            return Sleepz.sleepTiming();
         }
 
     	if(Questz.shouldCheckQuestStep()) Questz.checkQuestStep("Mage Arena I");
-        if(Dialoguez.handleDialogues()) return Timing.sleepLogNormalSleep();
+        if(Dialoguez.handleDialogues()) return Sleepz.sleepTiming();
         switch(getProgressValue())
         {
         //just prayed at first statue
         case(7):
         {
-        	API.randomAFK(5);
-        	if(p.l.isAnimating())
+        	if(Players.getLocal().isAnimating())
         	{
-        		Sleep.sleep(696, 696);
+        		Sleepz.sleep(696, 696);
         		break;
         	}
-        	if(Locations.mageArenaCave.contains(p.l))
+        	if(Locations.mageArenaCave.contains(Players.getLocal()))
         	{
         		if(Inventory.count(id.saradominCape) < 2)
             	{
@@ -186,25 +175,24 @@ public class MageArena1 extends Leaf {
         //just defeated kolodion, should teleport back into mage arena bank
         case(6):
         {
-        	if(p.l.isAnimating())
+        	if(Players.getLocal().isAnimating())
         	{
-        		Sleep.sleep(696, 696);
+        		Sleepz.sleep(696, 696);
         		break;
         	}
-        	API.randomAFK(5);
         	if(Prayers.isActive(Prayer.PROTECT_FROM_MAGIC))
         	{
         		Tabz.open(Tab.PRAYER);
         		Prayers.toggle(false, Prayer.PROTECT_FROM_MAGIC);
-        		Sleep.sleep(69, 696);
+        		Sleepz.sleep(69, 696);
         		break;
         	}
-        	if(Locations.mageArenaCave.contains(p.l))
+        	if(Locations.mageArenaCave.contains(Players.getLocal()))
         	{
         		API.walkInteractWithGameObject("Statue of Saradomin", "Pray-at", Locations.mageArenaCaveStatues, Dialogues::inDialogue);
     			break;
         	}
-        	if(Locations.mageArenaBank.contains(p.l))
+        	if(Locations.mageArenaBank.contains(Players.getLocal()))
         	{
         		API.walkInteractWithGameObject("Sparkling pool", "Step-into", Locations.mageArenaBank, Dialogues::inDialogue);
         		break;
@@ -247,7 +235,7 @@ public class MageArena1 extends Leaf {
         default:break;
         }
         
-        return Timing.sleepLogNormalSleep();
+        return Sleepz.sleepTiming();
     }
     public static void getCape(String godName)
     {
@@ -265,7 +253,7 @@ public class MageArena1 extends Leaf {
     	{
     		String capeName = godName.concat(" cape");
     		final int count = Inventory.count(capeName);
-    		MethodProvider.sleepUntil(() -> Inventory.count(capeName) > count, Sleep.calculate(2222, 2222));
+    		Sleep.sleepUntil(() -> Inventory.count(capeName) > count, Sleepz.calculate(2222, 2222));
     	}
     }
     public static void fightKolodion()
@@ -288,7 +276,7 @@ public class MageArena1 extends Leaf {
     		InvEquip.depositAll(InvEquip.coins, 180000);
     		return;
     	}
-    	if(Locations.mageArenaInnerCircle.contains(p.l))
+    	if(Locations.mageArenaInnerCircle.contains(Players.getLocal()))
     	{
     		if(Combatz.shouldDrinkPrayPot()) 
     		{
@@ -308,7 +296,7 @@ public class MageArena1 extends Leaf {
     		}
     		if(PlayerSettings.getConfig(172) == 1)
         	{
-    			MethodProvider.log("Toggling autoretaliate");
+    			Logger.log("Toggling autoretaliate");
         		Combat.toggleAutoRetaliate(true);
         	}
     		if(!Casting.isAutocastingHighest())
@@ -316,16 +304,16 @@ public class MageArena1 extends Leaf {
     			Casting.setHighestAutocast();
     			return;
     		}
-    		if(!p.l.isInCombat())
+    		if(!Players.getLocal().isInCombat())
     		{
-    			API.interactNPC("Kolodion", "Attack", Locations.mageArenaInnerCircle, true, () -> p.l.isInCombat());
+    			API.interactNPC("Kolodion", "Attack", Locations.mageArenaInnerCircle, true, () -> Players.getLocal().isInCombat());
     		}
     		return;
     	}
     	if(goToMageArenaBank())
     	{
-    		Sleep.sleep(2222, 2222);
-    		if(Locations.mageArenaBank.contains(p.l))
+    		Sleepz.sleep(2222, 2222);
+    		if(Locations.mageArenaBank.contains(Players.getLocal()))
     		{
     			API.talkToNPC("Kolodion");
     		}
@@ -335,7 +323,7 @@ public class MageArena1 extends Leaf {
     public static boolean goToMageArenaBank()
     {
     	slashed = false;
-    	if(Locations.mageArenaBank.contains(p.l)) return true;
+    	if(Locations.mageArenaBank.contains(Players.getLocal())) return true;
     	if(Combatz.shouldEatFood(20))
     	{
     		Combatz.eatFood();
@@ -359,7 +347,7 @@ public class MageArena1 extends Leaf {
     		{
     			if(Walking.getRunEnergy() >= 15)
     			{
-    				if(Walking.toggleRun()) Sleep.sleep(696, 666);
+    				if(Walking.toggleRun()) Sleepz.sleep(696, 666);
     			}
     		}
     	}
@@ -367,7 +355,7 @@ public class MageArena1 extends Leaf {
     	{
     		Combat.toggleAutoRetaliate(false);
     	}
-    	if(Locations.mageArenaBankOutside.contains(p.l))
+    	if(Locations.mageArenaBankOutside.contains(Players.getLocal()))
     	{
     		GameObject lever = GameObjects.closest(g -> 
 			g!=null && 
@@ -376,7 +364,7 @@ public class MageArena1 extends Leaf {
 			Locations.mageArenaBankLeverRoom.contains(g));
     		if(lever == null) //lever being pulled!! Go to lever tile and wait..
     		{
-    			if(Locations.mageArenaBankOutsideLeverTile.equals(p.l.getTile())) return false;
+    			if(Locations.mageArenaBankOutsideLeverTile.equals(Players.getLocal().getTile())) return false;
     		}
     		
     		if(!Locations.mageArenaBankOutsideLeverTile.canReach())
@@ -389,28 +377,28 @@ public class MageArena1 extends Leaf {
 					g.getName().equals("Web") && 
 					g.hasAction("Slash") && 
 					g.getTile().equals(new Tile(3092,3957,0)));
-    			if(Locations.mageArenaBankLeverAirlock.contains(p.l))
+    			if(Locations.mageArenaBankLeverAirlock.contains(Players.getLocal()))
     			{
     				if(web2 != null)
     				{
     					if(web2.interact("Slash"))
     					{
     						if(shouldPanic()) return false;
-        					MethodProvider.sleepUntil(() -> slashed, Sleep.calculate(2222, 2222));
-        					Sleep.sleep(420, 696);
+        					Sleep.sleepUntil(() -> slashed, Sleepz.calculate(2222, 2222));
+        					Sleepz.sleep(420, 696);
     					}
     				}
     				return false;
     			}
-    			if(Locations.mageArenaBankOutside.contains(p.l))
+    			if(Locations.mageArenaBankOutside.contains(Players.getLocal()))
     			{
     				if(web1 != null)
     				{
     					if(web1.interact("Slash"))
     					{
     						if(shouldPanic()) return false;
-        					MethodProvider.sleepUntil(() -> slashed, Sleep.calculate(2222, 2222));
-        					Sleep.sleep(420, 696);
+        					Sleep.sleepUntil(() -> slashed, Sleepz.calculate(2222, 2222));
+        					Sleepz.sleep(420, 696);
     					}
     				}
     				if(web2 != null && web1 == null)
@@ -418,8 +406,8 @@ public class MageArena1 extends Leaf {
     					if(web2.interact("Slash"))
     					{
     						if(shouldPanic()) return false;
-        					MethodProvider.sleepUntil(() -> slashed, Sleep.calculate(2222, 2222));
-        					Sleep.sleep(420, 696);
+        					Sleep.sleepUntil(() -> slashed, Sleepz.calculate(2222, 2222));
+        					Sleepz.sleep(420, 696);
     					}
     				}
     				
@@ -430,20 +418,20 @@ public class MageArena1 extends Leaf {
     		if(lever == null)
     		{
     			if(shouldPanic()) Walking.walkExact(Locations.mageArenaBankOutsideLeverTile);
-    			else if(Walking.shouldWalk(6) && Walking.walk(Locations.mageArenaBankOutsideLeverTile)) Sleep.sleep(696, 666);
+    			else if(Walking.shouldWalk(6) && Walking.walk(Locations.mageArenaBankOutsideLeverTile)) Sleepz.sleep(696, 666);
     			return false;
     		}
     		if(lever.interact("Pull"))
     		{
-    			MethodProvider.log("Pulled lever!");
+    			Logger.log("Pulled lever!");
     			if(shouldPanic()) return false;
-    			MethodProvider.sleepUntil(() -> Locations.mageArenaBank.contains(p.l), 
-    					() -> p.l.isMoving(),
-    					Sleep.calculate(2222, 2222),69);
+    			Sleep.sleepUntil(() -> Locations.mageArenaBank.contains(Players.getLocal()), 
+    					() -> Players.getLocal().isMoving(),
+    					Sleepz.calculate(2222, 2222),69);
     		}
     		return false;
     	}
-    	if(Locations.deepWildyEdgevilleLeverPeninsula.contains(p.l))
+    	if(Locations.deepWildyEdgevilleLeverPeninsula.contains(Players.getLocal()))
     	{
     		final Tile slashTile = new Tile(3158,3950,0);
     		GameObject web = GameObjects.closest(g -> 
@@ -454,44 +442,44 @@ public class MageArena1 extends Leaf {
     		{
     			if(web.distance() >= 8)
     			{
-    				MethodProvider.log("Web too far");
+    				Logger.log("Web too far");
     				if(shouldPanic())
     	    		{
-    	    			if(Walking.walk(slashTile)) Sleep.sleep(420, 696);
+    	    			if(Walking.walk(slashTile)) Sleepz.sleep(420, 696);
     	    		}
-    	    		else if(Walking.shouldWalk(6) && Walking.walk(slashTile)) Sleep.sleep(420, 696);
+    	    		else if(Walking.shouldWalk(6) && Walking.walk(slashTile)) Sleepz.sleep(420, 696);
     				
     			}
     			else if(web.interact("Slash"))
     			{
-    				MethodProvider.log("Web slashed!");
+    				Logger.log("Web slashed!");
     				if(shouldPanic()) return false;
-    				MethodProvider.sleepUntil(() -> slashed, 
-    					() -> p.l.isMoving(), Sleep.calculate(2222, 2222),69);
-					Sleep.sleep(420, 696);
+    				Sleep.sleepUntil(() -> slashed, 
+    					() -> Players.getLocal().isMoving(), Sleepz.calculate(2222, 2222),69);
+					Sleepz.sleep(420, 696);
     				return false;
     			} else
     			{
-    				MethodProvider.log("Web walking");
+    				Logger.log("Web walking");
     				Walking.walk(slashTile);
     			}
     			return false;
     		}
-    		MethodProvider.log("mage arena bank walking");
+    		Logger.log("mage arena bank walking");
     		if(shouldPanic())
     		{
-    			if(Walking.walk(Locations.mageArenaBankOutsideLeverTile)) Sleep.sleep(420, 696);
+    			if(Walking.walk(Locations.mageArenaBankOutsideLeverTile)) Sleepz.sleep(420, 696);
     		}
-    		else if(Walking.shouldWalk(6) && Walking.walk(Locations.mageArenaBankOutsideLeverTile)) Sleep.sleep(420, 696);
+    		else if(Walking.shouldWalk(6) && Walking.walk(Locations.mageArenaBankOutsideLeverTile)) Sleepz.sleep(420, 696);
 			return false;
     	}
     	if(Combat.isInWild() && Combat.getWildernessLevel() > 30)
     	{
     		if(shouldPanic()) Walking.walk(Locations.mageArenaBankOutsideLeverTile);
-    		else if(Walking.shouldWalk(6) && Walking.walk(Locations.mageArenaBankOutsideLeverTile)) Sleep.sleep(420, 696);
+    		else if(Walking.shouldWalk(6) && Walking.walk(Locations.mageArenaBankOutsideLeverTile)) Sleepz.sleep(420, 696);
     		return false;
     	}
-    	if(Locations.edgevillePKLever.contains(p.l))
+    	if(Locations.edgevillePKLever.contains(Players.getLocal()))
     	{
     		GameObject lever = GameObjects.closest(g -> 
 			g!=null && 
@@ -500,20 +488,20 @@ public class MageArena1 extends Leaf {
 			Locations.edgevillePKLever.contains(g));
     		if(lever == null)
     		{
-    			Sleep.sleep(696, 666);
+    			Sleepz.sleep(696, 666);
     			return false;
     		}
     		if(lever.interact("Pull"))
     		{
-    			MethodProvider.sleepUntil(() -> Locations.deepWildyEdgevilleLeverPeninsula.contains(p.l),
-    					() -> p.l.isMoving(),
-    					Sleep.calculate(3333, 3333),69);
+    			Sleep.sleepUntil(() -> Locations.deepWildyEdgevilleLeverPeninsula.contains(Players.getLocal()),
+    					() -> Players.getLocal().isMoving(),
+    					Sleepz.calculate(3333, 3333),69);
     		}
     		return false;
     	}
     	if(Locations.edgevillePKLever.getCenter().distance() <= 50)
     	{
-    		if(Walking.shouldWalk(6) && Walking.walk(Locations.edgevillePKLever.getCenter())) Sleep.sleep(696, 666);
+    		if(Walking.shouldWalk(6) && Walking.walk(Locations.edgevillePKLever.getCenter())) Sleepz.sleep(696, 666);
     		return false;
     	}
     	if(!Walkz.useJewelry(InvEquip.glory, "Edgeville"))
@@ -529,16 +517,16 @@ public class MageArena1 extends Leaf {
     public static boolean shouldPanic()
     {
     	if(!Combat.isInWild()) return false;
-		final int maxBracket = p.l.getLevel() + Combat.getWildernessLevel() + 1;
-		final int minBracket = p.l.getLevel() - Combat.getWildernessLevel() - 1;
+		final int maxBracket = Players.getLocal().getLevel() + Combat.getWildernessLevel() + 1;
+		final int minBracket = Players.getLocal().getLevel() - Combat.getWildernessLevel() - 1;
     	for(Player p2 : Players.all())
 		{
-			if(p2 == null || !p2.exists() || p2.getName().equals(p.l.getName()) || p2.getHealthPercent() == 0) continue;
+			if(p2 == null || !p2.exists() || p2.getName().equals(Players.getLocal().getName()) || p2.getHealthPercent() == 0) continue;
 			if(p2.distance() <= 10 && 
 					p2.getLevel() >= minBracket && 
 					p2.getLevel() <= maxBracket) 
 			{
-				MethodProvider.log("PKer Panic!");
+				Logger.log("PKer Panic!");
 				return true;
 			}
 		}
@@ -582,11 +570,11 @@ public class MageArena1 extends Leaf {
     	
     	if(InvEquip.fulfillSetup(true, 180000))
 		{
-			MethodProvider.log("[Mage Arena 1] -> Fulfilled equipment correctly!");
+			Logger.log("[Mage Arena 1] -> Fulfilled equipment correctly!");
 			return true;
 		} else 
 		{
-			MethodProvider.log("[Mage Arena 1] -> NOT fulfilled equipment correctly!");
+			Logger.log("[Mage Arena 1] -> NOT fulfilled equipment correctly!");
 			return false;
 		}
     	

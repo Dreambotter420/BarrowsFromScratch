@@ -3,20 +3,16 @@ package script.behaviour;
 import java.time.LocalTime;
 
 import org.dreambot.api.methods.Calculations;
-import org.dreambot.api.methods.MethodProvider;
-import org.dreambot.api.methods.widget.Widgets;
+import org.dreambot.api.utilities.Logger;
 
-import script.actionz.UniqueActions;
 import script.framework.Leaf;
 import script.quest.fremenniktrials.FremennikTrials;
-import script.quest.varrockmuseum.VarrockQuiz;
-import script.skills.ranged.TrainRanged;
 import script.utilities.API;
 import script.utilities.Combatz;
 import script.utilities.InvEquip;
 import script.utilities.ItemsOnGround;
 import script.utilities.Locations;
-import script.utilities.Sleep;
+import script.utilities.Sleepz;
 import script.utilities.id;
 
 
@@ -31,10 +27,9 @@ public class Initialize extends Leaf {
     @Override
     public int onLoop() {
     	API.rand2.setSeed(LocalTime.now().getNano());
-    	Sleep.initSleepMod = 1.2 + (API.rand2.nextDouble()/1.25);
-    	Sleep.initSleepMod = Sleep.initSleepMod * Sleep.initSleepMod;
+    	Sleepz.initSleepMod = 1.2 + (API.rand2.nextDouble()/1.25);
+    	Sleepz.initSleepMod = Sleepz.initSleepMod * Sleepz.initSleepMod;
     	//all initial randomizations that depend on new random seed go here
-		UniqueActions.initialize();
 		InvEquip.clearEquipmentSlots();
 		InvEquip.initializeIntLists();
 		id.initializeIDLists();
@@ -48,7 +43,7 @@ public class Initialize extends Leaf {
 		else Locations.scorpions = Locations.scorpionsKharidSouth;
 		if((int) Calculations.nextGammaRandom(100,50) >= 120) Locations.kalphiteWorkersArea = Locations.kalphiteWorkers2;
 		else Locations.scorpions = Locations.kalphiteWorkers1;
-		MethodProvider.log("Initialized");
+		Logger.log("Initialized");
 		API.initialized = true;
         return 5;
     }

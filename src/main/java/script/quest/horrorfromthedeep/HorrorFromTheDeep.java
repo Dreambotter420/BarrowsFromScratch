@@ -1,8 +1,6 @@
 package script.quest.horrorfromthedeep;
 
-import org.dreambot.api.Client;
 import org.dreambot.api.methods.Calculations;
-import org.dreambot.api.methods.MethodProvider;
 import org.dreambot.api.methods.combat.Combat;
 import org.dreambot.api.methods.combat.CombatStyle;
 import org.dreambot.api.methods.container.impl.Inventory;
@@ -14,6 +12,8 @@ import org.dreambot.api.methods.dialogues.Dialogues;
 import org.dreambot.api.methods.hint.HintArrow;
 import org.dreambot.api.methods.interactive.GameObjects;
 import org.dreambot.api.methods.interactive.NPCs;
+import org.dreambot.api.methods.interactive.Players;
+import org.dreambot.api.methods.item.GroundItems;
 import org.dreambot.api.methods.magic.Magic;
 import org.dreambot.api.methods.magic.Normal;
 import org.dreambot.api.methods.prayer.Prayer;
@@ -24,18 +24,16 @@ import org.dreambot.api.methods.skills.Skills;
 import org.dreambot.api.methods.tabs.Tab;
 import org.dreambot.api.methods.walking.impl.Walking;
 import org.dreambot.api.methods.widget.Widgets;
-import org.dreambot.api.utilities.Timer;
+import org.dreambot.api.utilities.Logger;
+import org.dreambot.api.utilities.Sleep;
 import org.dreambot.api.wrappers.interactive.GameObject;
 import org.dreambot.api.wrappers.interactive.NPC;
+import org.dreambot.api.wrappers.items.GroundItem;
 import org.dreambot.api.wrappers.items.Item;
 import org.dreambot.api.wrappers.widgets.WidgetChild;
 
-import script.p;
 import script.behaviour.DecisionLeaf;
 import script.framework.Leaf;
-import script.framework.Tree;
-import script.quest.animalmagnetism.AnimalMagnetism;
-import script.quest.varrockmuseum.Timing;
 import script.skills.magic.Casting;
 import script.skills.magic.TrainMagic;
 import script.skills.ranged.TrainRanged;
@@ -45,14 +43,13 @@ import script.utilities.Dialoguez;
 import script.utilities.InvEquip;
 import script.utilities.Locations;
 import script.utilities.Questz;
-import script.utilities.Sleep;
+import script.utilities.Sleepz;
 import script.utilities.Tabz;
 import script.utilities.Walkz;
 import script.utilities.id;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.List;
 /**
  * Completes Horror From The Deep
@@ -86,32 +83,32 @@ public class HorrorFromTheDeep extends Leaf {
     @Override
     public int onLoop() {
         if (DecisionLeaf.taskTimer.finished()) {
-            MethodProvider.log("[TIMEOUT] -> Horror From The Deep");
+            Logger.log("[TIMEOUT] -> Horror From The Deep");
            	API.mode = null;
-            return Timing.sleepLogNormalSleep();
+            return Sleepz.sleepTiming();
         }
         if(completed())
         {
-        	MethodProvider.log("[COMPLETED] -> Horror From The Deep!");
+        	Logger.log("[COMPLETED] -> Horror From The Deep!");
            	API.mode = null;
-            return Timing.sleepLogNormalSleep();
+            return Sleepz.sleepTiming();
         }
         onStart();
-        if(Dialoguez.handleDialogues()) return Sleep.calculate(420, 696);
+        if(Dialoguez.handleDialogues()) return Sleepz.calculate(420, 696);
         switch(getProgressValue())
         {
         case(10):
         {
-        	WidgetChild armadylBookButton = Widgets.getWidgetChild(302, 7);
+        	WidgetChild armadylBookButton = Widgets.get(302, 7);
 		
-        	if(Questz.closeQuestCompletion()) break;
+        	if(Questz.checkCloseQuestCompletion()) break;
         	
         	if(Inventory.contains(id.damagedArmadylBook))
         	{
         		//close rewards shop interface
         		if(armadylBookButton != null && armadylBookButton.isVisible())
         		{
-        			Widgets.getWidgetChild(302,1,11).interact();
+        			Widgets.get(302,1,11).interact();
         			break;
         		}
         		
@@ -132,7 +129,7 @@ public class HorrorFromTheDeep extends Leaf {
 						final int count = Inventory.count(id.armaPage1);
 						if(Inventory.get(id.armaPage1).useOn(id.damagedArmadylBook))
 						{
-							MethodProvider.sleepUntil(() -> Inventory.count(id.armaPage1) <= count, Sleep.calculate(2222, 2222));
+							Sleep.sleepUntil(() -> Inventory.count(id.armaPage1) <= count, Sleepz.calculate(2222, 2222));
 							needPage1 = false;
 						}
 						break;
@@ -153,7 +150,7 @@ public class HorrorFromTheDeep extends Leaf {
 						final int count = Inventory.count(id.armaPage2);
 						if(Inventory.get(id.armaPage2).useOn(id.damagedArmadylBook))
 						{
-							MethodProvider.sleepUntil(() -> Inventory.count(id.armaPage2) <= count, Sleep.calculate(2222, 2222));
+							Sleep.sleepUntil(() -> Inventory.count(id.armaPage2) <= count, Sleepz.calculate(2222, 2222));
 							needPage2 = false;
 						}
 						break;
@@ -174,7 +171,7 @@ public class HorrorFromTheDeep extends Leaf {
 						final int count = Inventory.count(id.armaPage3);
 						if(Inventory.get(id.armaPage3).useOn(id.damagedArmadylBook))
 						{
-							MethodProvider.sleepUntil(() -> Inventory.count(id.armaPage3) <= count, Sleep.calculate(2222, 2222));
+							Sleep.sleepUntil(() -> Inventory.count(id.armaPage3) <= count, Sleepz.calculate(2222, 2222));
 							needPage3 = false;
 						}
 						break;
@@ -195,7 +192,7 @@ public class HorrorFromTheDeep extends Leaf {
 						final int count = Inventory.count(id.armaPage4);
 						if(Inventory.get(id.armaPage4).useOn(id.damagedArmadylBook))
 						{
-							MethodProvider.sleepUntil(() -> Inventory.count(id.armaPage4) <= count, Sleep.calculate(2222, 2222));
+							Sleep.sleepUntil(() -> Inventory.count(id.armaPage4) <= count, Sleepz.calculate(2222, 2222));
 							needPage4 = false;
 						}
 						break;
@@ -208,32 +205,32 @@ public class HorrorFromTheDeep extends Leaf {
         		
         		if(Tabz.open(Tab.INVENTORY))
         		{
-        			if(Inventory.interact(id.damagedArmadylBook, "Check")) Sleep.sleep(696, 1111);
+        			if(Inventory.interact(id.damagedArmadylBook, "Check")) Sleepz.sleep(696, 1111);
         		}
         		break;
         	}
         	if(Inventory.contains(id.rustyCasket))
         	{
-        		if(Locations.horror_realLighthouseLvl2.contains(p.l))
+        		if(Locations.horror_realLighthouseLvl2.contains(Players.getLocal()))
         		{
         			API.talkToNPC("Jossik");
         			break;
         		}
-        		if(Locations.horror_realLighthouseLvl1.contains(p.l))
+        		if(Locations.horror_realLighthouseLvl1.contains(Players.getLocal()))
         		{
-        			API.interactWithGameObject("Staircase", "Climb-up", Locations.horror_realLighthouseLvl1, () -> Locations.horror_realLighthouseLvl2.contains(p.l));
+        			API.interactWithGameObject("Staircase", "Climb-up", Locations.horror_realLighthouseLvl1, () -> Locations.horror_realLighthouseLvl2.contains(Players.getLocal()));
         			break;
         		}
-        		if(Locations.horror_caveV2.contains(p.l))
+        		if(Locations.horror_caveV2.contains(Players.getLocal()))
         		{
-        			API.interactWithGameObject("Iron ladder", "Climb", Locations.horror_caveV2, () -> Locations.horror_realLighthouseLvl1.contains(p.l));
+        			API.interactWithGameObject("Iron ladder", "Climb", Locations.horror_caveV2, () -> Locations.horror_realLighthouseLvl1.contains(Players.getLocal()));
         			break;
         		}
-            	if(Locations.horror_lighthouseAndBridgeArea.contains(p.l))
+            	if(Locations.horror_lighthouseAndBridgeArea.contains(Players.getLocal()))
             	{
             		if(Walkz.walkToArea(Locations.horror_larrissaLighthouse))
             		{
-            			API.interactWithGameObject("Doorway","Walk-through",() -> !Locations.horror_larrissaLighthouse.contains(p.l));
+            			API.interactWithGameObject("Doorway","Walk-through",() -> !Locations.horror_larrissaLighthouse.contains(Players.getLocal()));
             			break;
             		}
             		break;
@@ -247,30 +244,30 @@ public class HorrorFromTheDeep extends Leaf {
         		{
         			if(armadylBookButton.interact("Unlock"))
         			{
-        				MethodProvider.sleepUntil(() -> Inventory.contains(id.damagedArmadylBook), Sleep.calculate(2222, 2222));
+        				Sleep.sleepUntil(() -> Inventory.contains(id.damagedArmadylBook), Sleepz.calculate(2222, 2222));
         				break;
         			}
         		}
-        		if(Locations.horror_realLighthouseLvl2.contains(p.l))
+        		if(Locations.horror_realLighthouseLvl2.contains(Players.getLocal()))
         		{
         			API.talkToNPC("Jossik","Rewards");
         			break;
         		}
-        		if(Locations.horror_realLighthouseLvl1.contains(p.l))
+        		if(Locations.horror_realLighthouseLvl1.contains(Players.getLocal()))
         		{
-        			API.interactWithGameObject("Staircase", "Climb-up", Locations.horror_realLighthouseLvl1, () -> Locations.horror_realLighthouseLvl2.contains(p.l));
+        			API.interactWithGameObject("Staircase", "Climb-up", Locations.horror_realLighthouseLvl1, () -> Locations.horror_realLighthouseLvl2.contains(Players.getLocal()));
         			break;
         		}
-        		if(Locations.horror_caveV2.contains(p.l))
+        		if(Locations.horror_caveV2.contains(Players.getLocal()))
         		{
-        			API.interactWithGameObject("Iron ladder", "Climb", Locations.horror_caveV2, () -> Locations.horror_realLighthouseLvl1.contains(p.l));
+        			API.interactWithGameObject("Iron ladder", "Climb", Locations.horror_caveV2, () -> Locations.horror_realLighthouseLvl1.contains(Players.getLocal()));
         			break;
         		}
-            	if(Locations.horror_lighthouseAndBridgeArea.contains(p.l))
+            	if(Locations.horror_lighthouseAndBridgeArea.contains(Players.getLocal()))
             	{
             		if(Walkz.walkToArea(Locations.horror_larrissaLighthouse))
             		{
-            			API.interactWithGameObject("Doorway","Walk-through",() -> !Locations.horror_larrissaLighthouse.contains(p.l));
+            			API.interactWithGameObject("Doorway","Walk-through",() -> !Locations.horror_larrissaLighthouse.contains(Players.getLocal()));
             			break;
             		}
             		break;
@@ -316,7 +313,7 @@ public class HorrorFromTheDeep extends Leaf {
         }
         default:break;
         }
-        return Sleep.calculate(420, 696);
+        return Sleepz.calculate(420, 696);
     }
     public static boolean repairedBridge1()
     {
@@ -376,12 +373,12 @@ public class HorrorFromTheDeep extends Leaf {
     }
     public static void walkToBossFight()
     {
-    	if(Locations.horror_caveAirlock.contains(p.l))
+    	if(Locations.horror_caveAirlock.contains(Players.getLocal()))
     	{
-    		API.interactWithGameObject("Iron ladder", "Climb", () -> !Locations.horror_caveAirlock.contains(p.l));
+    		API.interactWithGameObject("Iron ladder", "Climb", () -> !Locations.horror_caveAirlock.contains(Players.getLocal()));
     		return;
     	}
-    	if(Locations.horror_caveLobby.contains(p.l))
+    	if(Locations.horror_caveLobby.contains(Players.getLocal()))
     	{
     		if(Walkz.walkToArea(Locations.horror_caveDoorSouth))
     		{
@@ -392,7 +389,7 @@ public class HorrorFromTheDeep extends Leaf {
         				if(usedFireRune()) doorItems.remove(0);
         				else if(Inventory.get(doorItems.get(0)).useOn(GameObjects.closest(g -> g!=null && g.getName().equals("Strange wall") && (g.getID() == 4544 || g.getID() == 4543)))) 
         				{
-        					MethodProvider.sleepUntil(() -> Dialogues.inDialogue(),() -> p.l.isMoving(), Sleep.calculate(3333,2222),69);
+        					Sleep.sleepUntil(() -> Dialogues.inDialogue(),() -> Players.getLocal().isMoving(), Sleepz.calculate(3333,2222),69);
         				}
             			return;
         			}
@@ -401,7 +398,7 @@ public class HorrorFromTheDeep extends Leaf {
         				if(usedAirRune()) doorItems.remove(0);
         				else if(Inventory.get(doorItems.get(0)).useOn(GameObjects.closest(g -> g!=null && g.getName().equals("Strange wall") && (g.getID() == 4544 || g.getID() == 4543)))) 
         				{
-        					MethodProvider.sleepUntil(() -> Dialogues.inDialogue(),() -> p.l.isMoving(), Sleep.calculate(3333,2222),69);
+        					Sleep.sleepUntil(() -> Dialogues.inDialogue(),() -> Players.getLocal().isMoving(), Sleepz.calculate(3333,2222),69);
         				}
             			return;
         			}
@@ -410,7 +407,7 @@ public class HorrorFromTheDeep extends Leaf {
         				if(usedWaterRune()) doorItems.remove(0);
         				else if(Inventory.get(doorItems.get(0)).useOn(GameObjects.closest(g -> g!=null && g.getName().equals("Strange wall") && (g.getID() == 4544 || g.getID() == 4543)))) 
         				{
-        					MethodProvider.sleepUntil(() -> Dialogues.inDialogue(),() -> p.l.isMoving(), Sleep.calculate(3333,2222),69);
+        					Sleep.sleepUntil(() -> Dialogues.inDialogue(),() -> Players.getLocal().isMoving(), Sleepz.calculate(3333,2222),69);
         				}
             			return;
         			}
@@ -419,7 +416,7 @@ public class HorrorFromTheDeep extends Leaf {
         				if(usedEarthRune()) doorItems.remove(0);
         				else if(Inventory.get(doorItems.get(0)).useOn(GameObjects.closest(g -> g!=null && g.getName().equals("Strange wall") && (g.getID() == 4544 || g.getID() == 4543)))) 
         				{
-        					MethodProvider.sleepUntil(() -> Dialogues.inDialogue(),() -> p.l.isMoving(), Sleep.calculate(3333,2222),69);
+        					Sleep.sleepUntil(() -> Dialogues.inDialogue(),() -> Players.getLocal().isMoving(), Sleepz.calculate(3333,2222),69);
         				}
             			return;
         			}
@@ -428,7 +425,7 @@ public class HorrorFromTheDeep extends Leaf {
         				if(usedArrow()) doorItems.remove(0);
         				else if(Inventory.get(doorItems.get(0)).useOn(GameObjects.closest(g -> g!=null && g.getName().equals("Strange wall") && (g.getID() == 4544 || g.getID() == 4543)))) 
         				{
-        					MethodProvider.sleepUntil(() -> Dialogues.inDialogue(),() -> p.l.isMoving(), Sleep.calculate(3333,2222),69);
+        					Sleep.sleepUntil(() -> Dialogues.inDialogue(),() -> Players.getLocal().isMoving(), Sleepz.calculate(3333,2222),69);
         				}
             			return;
         			}
@@ -442,41 +439,55 @@ public class HorrorFromTheDeep extends Leaf {
         				}
         				else if(Inventory.get(doorItems.get(0)).useOn(GameObjects.closest(g -> g!=null && g.getName().equals("Strange wall") && (g.getID() == 4544 || g.getID() == 4543))))
         				{
-        					MethodProvider.sleepUntil(() -> Dialogues.inDialogue(),() -> p.l.isMoving(), Sleep.calculate(3333,2222),69);
+        					Sleep.sleepUntil(() -> Dialogues.inDialogue(),() -> Players.getLocal().isMoving(), Sleepz.calculate(3333,2222),69);
         				}
             			return;
         			}
         			return;
         		}
     			//must have all items used on door now, ok to enter
-    			API.interactWithGameObject("Strange wall", "Open", Locations.horror_strangeDoorEntrance, () -> Locations.horror_caveAirlock.contains(p.l));
+    			API.interactWithGameObject("Strange wall", "Open", Locations.horror_strangeDoorEntrance, () -> Locations.horror_caveAirlock.contains(Players.getLocal()));
     		}
     		return;
     	}
-    	if(Locations.horror_lighthouseFakeInstanceLvl3V2.contains(p.l))
+    	if(Locations.horror_lighthouseFakeInstanceLvl3V2.contains(Players.getLocal()))
     	{
-    		API.interactWithGameObject("Staircase", "Climb-down", () -> Locations.horror_lighthouseFakeInstanceLvl2.contains(p.l));
+    		API.interactWithGameObject("Staircase", "Climb-down", () -> Locations.horror_lighthouseFakeInstanceLvl2.contains(Players.getLocal()));
     		return;
     	}
-    	if(Locations.horror_lighthouseFakeInstanceLvl2.contains(p.l))
+    	if(Locations.horror_lighthouseFakeInstanceLvl2.contains(Players.getLocal()))
     	{
-    		API.interactWithGameObject("Staircase", "Climb-down", () -> Locations.horror_lighthouseFakeInstanceLvl1.contains(p.l));
+    		API.interactWithGameObject("Staircase", "Climb-down", () -> Locations.horror_lighthouseFakeInstanceLvl1.contains(Players.getLocal()));
     		return;
     	}
-    	if(Locations.horror_lighthouseFakeInstanceLvl1.contains(p.l))
+    	if(Locations.horror_lighthouseFakeInstanceLvl1.contains(Players.getLocal()))
     	{
-    		API.interactWithGameObject("Iron ladder", "Climb", () -> !Locations.horror_lighthouseFakeInstanceLvl1.contains(p.l));
+    		API.interactWithGameObject("Iron ladder", "Climb", () -> !Locations.horror_lighthouseFakeInstanceLvl1.contains(Players.getLocal()));
     		return;
     	}
-    	if(Locations.horror_lighthouseAndBridgeArea.contains(p.l))
+    	if(Locations.horror_lighthouseAndBridgeArea.contains(Players.getLocal()))
     	{
     		if(Walkz.walkToArea(Locations.horror_larrissaLighthouse))
     		{
-    			API.interactWithGameObject("Doorway","Walk-through",() -> !Locations.horror_larrissaLighthouse.contains(p.l));
+    			API.interactWithGameObject("Doorway","Walk-through",() -> !Locations.horror_larrissaLighthouse.contains(Players.getLocal()));
     		}
     		return;
     	}
-    	walkToLighthouseIsland();
+    	if(Locations.horror_entireLightHouseBarbarian.contains(Players.getLocal()))
+    	{
+        	walkToLighthouseIsland();
+    		return;
+    	}
+    	if(!Walkz.useJewelry(InvEquip.games, "Barbarian Outpost"))
+    	{
+    		if(InvEquip.bankContains(InvEquip.wearableGames))
+    		{
+    			InvEquip.withdrawOne(InvEquip.getBankItem(InvEquip.wearableGames), 180000);
+    			return;
+    		}
+    		InvEquip.buyItem(InvEquip.games8, 1, 180000);
+    		return;
+    	}
     }
     public static final int dagFire = 985;
     public static final int dagRange = 987;
@@ -484,156 +495,255 @@ public class HorrorFromTheDeep extends Leaf {
     public static final int dagWater = 984;
     public static final int dagMelee = 988;
     public static final int dagEarth = 986;
+    public static void teleportAway()
+    {
+    	if(!Walkz.useJewelry(InvEquip.games, "Barbarian Outpost") && 
+    			!Walkz.useJewelry(InvEquip.wealth, "Grand Exchange") && 
+    			!Walkz.useJewelry(InvEquip.glory, "Edgeville") && 
+    			!Walkz.useJewelry(InvEquip.combat, "Ranging Guild"))
+    	{
+    		Logger.log("Failed to teleport away!!");
+    	}
+    }
+    public static void getMorePPots()
+    {
+    	if(Locations.horror_fakeInstanceBossFightArea.contains(Players.getLocal()))
+    	{
+    		teleportAway();
+    		return;
+    	}
+    	InvEquip.clearAll();
+    	InvEquip.addInvyItem(id.prayPot4, 1, 1, false, 1);
+    	InvEquip.fulfillSetup(false, 180000);
+    }
+    public static void getMoreFood()
+    {
+    	if(Locations.horror_fakeInstanceBossFightArea.contains(Players.getLocal()))
+    	{
+    		teleportAway();
+    		return;
+    	}
+    	InvEquip.clearAll();
+    	InvEquip.addInvyItem(Combatz.lowFood, 2, 10, false, 50);
+    	InvEquip.fulfillSetup(false, 180000);
+    }
     public static void killDaggannothMother()
     {
-    	if(Locations.horror_fakeInstanceBossFightArea.contains(p.l))
+    	if(Combatz.shouldEatFood(15)) 
+		{
+			if(!InvEquip.invyContains(Combatz.foods))
+			{
+				getMoreFood();
+				return;
+			}
+			Combatz.eatFood();
+		}
+		if(Combatz.shouldDrinkPrayPot())
+		{
+			if(!InvEquip.invyContains(id.prayPots))
+			{
+				getMorePPots();
+				return;
+			}
+			Combatz.drinkPrayPot();
+		}
+    	if(Locations.horror_fakeInstanceBossFightArea.contains(Players.getLocal()))
     	{
-    		if(HintArrow.exists())
+    		if(InvEquip.invyContains(InvEquip.wearableGlory) && Tabz.open(Tab.INVENTORY)) InvEquip.equipItem(InvEquip.getInvyItem(InvEquip.wearableGlory));
+    		if(InvEquip.invyContains(InvEquip.wearableCombats) && Tabz.open(Tab.INVENTORY)) InvEquip.equipItem(InvEquip.getInvyItem(InvEquip.wearableCombats));
+    		if(InvEquip.invyContains(InvEquip.wearableWealth) && Tabz.open(Tab.INVENTORY)) InvEquip.equipItem(InvEquip.getInvyItem(InvEquip.wearableWealth));
+    		if(Inventory.contains(TrainRanged.getBestCapeSlot()) && Tabz.open(Tab.INVENTORY)) InvEquip.equipItem(TrainRanged.getBestCapeSlot());
+    		if(Inventory.contains(TrainMagic.getBestLegsSlot()) && Tabz.open(Tab.INVENTORY)) InvEquip.equipItem(TrainMagic.getBestLegsSlot());
+    		if(Inventory.contains(id.diamondBoltsE) && Tabz.open(Tab.INVENTORY)) InvEquip.equipItem(id.diamondBoltsE);
+    		if(Inventory.contains(TrainMagic.getBestBodySlot()) && Tabz.open(Tab.INVENTORY)) InvEquip.equipItem(TrainMagic.getBestBodySlot());
+    		if(Inventory.contains(TrainMagic.getBestHatSlot()) && Tabz.open(Tab.INVENTORY)) InvEquip.equipItem(TrainMagic.getBestHatSlot());
+    		
+    		GroundItem gi = GroundItems.closest(g -> g!= null && 
+    				(g.getID() == TrainRanged.getBestCapeSlot() || 
+        				g.getID() == TrainMagic.getBestBodySlot() || 
+    					g.getID() == TrainMagic.getBestLegsSlot() || 
+    					g.getID() == TrainMagic.getBestHatSlot() || 
+    					InvEquip.wearableCombats.contains(g.getID()) || 
+    					InvEquip.wearableWealth.contains(g.getID()) || 
+    					InvEquip.wearableGlory.contains(g.getID()) || 
+    					Combatz.foods.contains(g.getID()) || 
+    					InvEquip.wearableGames.contains(g.getID()) || 
+    					id.prayPots.contains(g.getID()) || 
+    					id.staminas.contains(g.getID()) || 
+    					g.getID() == id.staffOfFire || 
+    					g.getID() == id.blueBoots || 
+    					g.getID() == id.steelArrow || 
+    					g.getID() == id.tinderbox || 
+    					g.getID() == id.hammer || 
+    					g.getID() == id.summerPie || 
+    					g.getID() == id.summerPie1_2 || 
+    					g.getID() == InvEquip.coins || 
+    					g.getID() == id.adamantCrossbow || 
+    					g.getID() == id.runeCrossbow || 
+    					g.getID() == id.diamondBoltsE || 
+    					g.getID() == id.waterRune || 
+    					g.getID() == id.airRune || 
+    					g.getID() == id.earthRune || 
+    					g.getID() == id.fireRune || 
+    					g.getID() == id.deathRune || 
+    					g.getID() == id.bloodRune));
+    		if(gi != null)
     		{
-    			if(Combatz.shouldEatFood(15)) Combatz.eatFood();
-    			if(Combatz.shouldDrinkPrayPot()) Combatz.drinkPrayPot();
-    			if(!Prayers.isActive(Prayer.PROTECT_FROM_MISSILES))
+    			final int id = gi.getID();
+    			int count = Inventory.count(id);
+    			if(gi.interact("Take"))
     			{
-    				if(Tabz.open(Tab.PRAYER))
-    				{
-    					Prayers.toggle(true, Prayer.PROTECT_FROM_MISSILES);
-    				}
+    				Sleep.sleepUntil(() -> Inventory.count(id) > count, () -> Players.getLocal().isMoving(),Sleepz.calculate(2222, 2222),69);
     			}
-    			if(Combat.isAutoRetaliateOn())
-    			{
-    				if(Tabz.open(Tab.COMBAT)) Combat.toggleAutoRetaliate(false);
-    				return;
-    			}
-    			if(Locations.horror_1stDaggannothSafespot.distance() <= 2)
-    			{
-    				org.dreambot.api.wrappers.interactive.Character dag = HintArrow.getPointed();
-					if(dag == null)
-					{
-						MethodProvider.log("Dagganoth mother is null in boss fight with hint arrow existing!");
-						return;
-					}
-					if(Casting.isAutocasting()) 
-					{
-						Casting.voidAutocast();
-						return;
-					}
-    				int magic = Skills.getRealLevel(Skill.MAGIC);
-    				switch(dag.getID())
-    				{
-    				case(dagFire):
-    				{
-    					if(Inventory.contains(id.staffOfFire))
-    					{
-    						if(Tabz.open(Tab.INVENTORY))
-        					{
-        						 InvEquip.equipItem(id.staffOfFire);
-        					}
-    					}
-    					if(Tabz.open(Tab.MAGIC))
-    					{
-    						if(magic >= 75) Magic.castSpellOn(Normal.FIRE_WAVE, dag);
-    						else Magic.castSpellOn(Normal.FIRE_BLAST, dag);
-    						Sleep.sleep(1111, 2222);
-    					}
-    					break;
-    				}
-    				case(dagAir):
-    				{
-    					if(Inventory.contains(id.staffOfFire))
-    					{
-    						if(Tabz.open(Tab.INVENTORY))
-        					{
-        						 InvEquip.equipItem(id.staffOfFire);
-        					}
-    					}
-    					if(Tabz.open(Tab.MAGIC))
-    					{
-    						if(magic >= 62) Magic.castSpellOn(Normal.WIND_WAVE, dag);
-    						else Magic.castSpellOn(Normal.WIND_BLAST, dag);
-    						Sleep.sleep(1111, 2222);
-    					}
-    					break;
-    				}
-    				case(dagWater):
-    				{
-    					
-    					if(Inventory.contains(id.staffOfFire))
-    					{
-    						if(Tabz.open(Tab.INVENTORY))
-        					{
-        						 InvEquip.equipItem(id.staffOfFire);
-        					}
-    					}if(Tabz.open(Tab.MAGIC))
-    					{
-    						if(magic >= 65) Magic.castSpellOn(Normal.WATER_WAVE, dag);
-    						else Magic.castSpellOn(Normal.WATER_BLAST, dag);
-    						Sleep.sleep(1111, 2222);
-    					}
-    					break;
-    				}
-    				case(dagEarth):
-    				{
-    					if(Inventory.contains(id.staffOfFire))
-    					{
-    						if(Tabz.open(Tab.INVENTORY))
-        					{
-        						 InvEquip.equipItem(id.staffOfFire);
-        					}
-    					}
-    					if(Tabz.open(Tab.MAGIC))
-    					{
-    						if(magic >= 70) Magic.castSpellOn(Normal.EARTH_WAVE, dag);
-    						else Magic.castSpellOn(Normal.EARTH_BLAST, dag);
-    						Sleep.sleep(1111, 2222);
-    					}
-    					break;
-    				}
-
-    				case(dagRange):
-    				{
-    					if(Magic.isSpellSelected()) Magic.deselect();
-    					if(Equipment.count(id.diamondBoltsE) <= 0 && 
-    							Inventory.count(id.diamondBoltsE) <= 0) break;
-    					if(Equipment.contains(id.adamantCrossbow) || 
-    							Equipment.contains(id.runeCrossbow))
-    					{
-    						if(Combat.getCombatStyle() != CombatStyle.RANGED_RAPID)
-    						{
-    							if(Tabz.open(Tab.COMBAT))
-        						{
-        							Combat.setCombatStyle(CombatStyle.RANGED_RAPID);
-        						}
-    							break;
-    						}
-    						if(!p.l.isInteracting(dag))
-    						{
-    							dag.interact("Attack");
-    							Sleep.sleep(1111,2222);
-    						}
-    						break;
-    					}
-    					if(Tabz.open(Tab.INVENTORY))
-    					{
-    						if(Inventory.contains(id.runeCrossbow)) InvEquip.equipItem(id.runeCrossbow);
-    						else InvEquip.equipItem(id.adamantCrossbow);
-    					}
-    					break;
-    				}
-    				default:break;//dont melee lol
-    				}
-    			}
-    			Walking.walk(Locations.horror_1stDaggannothSafespot);
-    			Sleep.sleep(111, 420);
     			return;
     		}
-    		API.talkToNPC("Jossik");
-    		return;
+    		NPC lootGrave = NPCs.closest("Grave");
+    		if(lootGrave != null)
+    		{
+    			API.interactNPC("Grave", "Loot");
+    			return;
+    		}
+    		org.dreambot.api.wrappers.interactive.Character dag = HintArrow.getPointed();
+			if(dag == null)
+			{
+				Logger.log("Dagganoth mother is null in boss fight, talking to Jossik");
+	    		API.talkToNPC("Jossik");
+	    		return;
+			}
+			if(!Prayers.isActive(Prayer.PROTECT_FROM_MISSILES))
+			{
+				if(Tabz.open(Tab.PRAYER))
+				{
+					Prayers.toggle(true, Prayer.PROTECT_FROM_MISSILES);
+				}
+			}
+			if(Combat.isAutoRetaliateOn())
+			{
+				if(Tabz.open(Tab.COMBAT)) Combat.toggleAutoRetaliate(false);
+				return;
+			}
+			if(Locations.horror_1stDaggannothSafespot.distance() <= 2)
+			{
+				
+				if(Casting.isAutocasting()) 
+				{
+					Casting.voidAutocast();
+					return;
+				}
+				int magic = Skills.getRealLevel(Skill.MAGIC);
+				switch(dag.getID())
+				{
+				case(dagFire):
+				{
+					if(Inventory.contains(id.staffOfFire))
+					{
+						if(Tabz.open(Tab.INVENTORY))
+    					{
+    						 InvEquip.equipItem(id.staffOfFire);
+    					}
+					}
+					if(Tabz.open(Tab.MAGIC))
+					{
+						if(magic >= 75) Magic.castSpellOn(Normal.FIRE_WAVE, dag);
+						else Magic.castSpellOn(Normal.FIRE_BLAST, dag);
+						Sleepz.sleep(1111, 2222);
+					}
+					break;
+				}
+				case(dagAir):
+				{
+					if(Inventory.contains(id.staffOfFire))
+					{
+						if(Tabz.open(Tab.INVENTORY))
+    					{
+    						 InvEquip.equipItem(id.staffOfFire);
+    					}
+					}
+					if(Tabz.open(Tab.MAGIC))
+					{
+						if(magic >= 62) Magic.castSpellOn(Normal.WIND_WAVE, dag);
+						else Magic.castSpellOn(Normal.WIND_BLAST, dag);
+						Sleepz.sleep(1111, 2222);
+					}
+					break;
+				}
+				case(dagWater):
+				{
+					
+					if(Inventory.contains(id.staffOfFire))
+					{
+						if(Tabz.open(Tab.INVENTORY))
+    					{
+    						 InvEquip.equipItem(id.staffOfFire);
+    					}
+					}if(Tabz.open(Tab.MAGIC))
+					{
+						if(magic >= 65) Magic.castSpellOn(Normal.WATER_WAVE, dag);
+						else Magic.castSpellOn(Normal.WATER_BLAST, dag);
+						Sleepz.sleep(1111, 2222);
+					}
+					break;
+				}
+				case(dagEarth):
+				{
+					if(Inventory.contains(id.staffOfFire))
+					{
+						if(Tabz.open(Tab.INVENTORY))
+    					{
+    						 InvEquip.equipItem(id.staffOfFire);
+    					}
+					}
+					if(Tabz.open(Tab.MAGIC))
+					{
+						if(magic >= 70) Magic.castSpellOn(Normal.EARTH_WAVE, dag);
+						else Magic.castSpellOn(Normal.EARTH_BLAST, dag);
+						Sleepz.sleep(1111, 2222);
+					}
+					break;
+				}
+
+				case(dagRange):
+				{
+					if(Magic.isSpellSelected()) Magic.deselect();
+					if(Equipment.count(id.diamondBoltsE) <= 0 && 
+							Inventory.count(id.diamondBoltsE) <= 0) break;
+					if(Equipment.contains(id.adamantCrossbow) || 
+							Equipment.contains(id.runeCrossbow))
+					{
+						if(Combat.getCombatStyle() != CombatStyle.RANGED_RAPID)
+						{
+							if(Tabz.open(Tab.COMBAT))
+    						{
+    							Combat.setCombatStyle(CombatStyle.RANGED_RAPID);
+    						}
+							break;
+						}
+						if(!Players.getLocal().isInteracting(dag))
+						{
+							dag.interact("Attack");
+							Sleepz.sleep(1111,2222);
+						}
+						break;
+					}
+					if(Tabz.open(Tab.INVENTORY))
+					{
+						if(Inventory.contains(id.runeCrossbow)) InvEquip.equipItem(id.runeCrossbow);
+						else InvEquip.equipItem(id.adamantCrossbow);
+					}
+					break;
+				}
+				default:break;//dont melee lol
+				}
+			}
+			Walking.walk(Locations.horror_1stDaggannothSafespot);
+			Sleepz.sleep(111, 420);
+			return;
     	}
     	walkToBossFight();
     }
     public static void kill1stDaggannoth()
     {
-    	if(Locations.horror_fakeInstanceBossFightArea.contains(p.l))
+    	if(Locations.horror_fakeInstanceBossFightArea.contains(Players.getLocal()))
     	{
     		if(!InvEquip.equipmentContains(InvEquip.wearableGlory) && InvEquip.invyContains(InvEquip.wearableGlory))
     		{
@@ -653,16 +763,16 @@ public class HorrorFromTheDeep extends Leaf {
     				NPC dag = NPCs.closest(979);
     				if(dag != null) 
     				{
-    					if(!p.l.isInteracting(dag))
+    					if(!Players.getLocal().isInteracting(dag))
     					{
     						dag.interact("Attack");
-    						Sleep.sleep(1111,1111);
+    						Sleepz.sleep(1111,1111);
     	    				return;
     					}
     				}
     			}
     			Walking.walk(Locations.horror_1stDaggannothSafespot);
-    			Sleep.sleep(111, 420);
+    			Sleepz.sleep(111, 420);
     			return;
     		}
     		API.talkToNPC("Jossik");
@@ -672,14 +782,14 @@ public class HorrorFromTheDeep extends Leaf {
     }
     public static void repairLighthouse()
     {
-    	if(Locations.horror_lighthouseFakeInstanceLvl3.contains(p.l))
+    	if(Locations.horror_lighthouseFakeInstanceLvl3.contains(Players.getLocal()))
     	{
     		GameObject lightingMechanism = GameObjects.closest(g->g!=null && 
     				g.getName().equals("Lighting mechanism") && 
     				g.getID() == 4588); //main lighting mechanism ID
     		if(lightingMechanism == null)
     		{
-    			MethodProvider.log("Mechanism null in lighthouse fake instanced 3rd floor!");
+    			Logger.log("Mechanism null in lighthouse fake instanced 3rd floor!");
     			return;
     		}
     		Item i = null;
@@ -691,25 +801,25 @@ public class HorrorFromTheDeep extends Leaf {
     			fulfillStep1AfterPlanks();
     			return;
     		}
-    		if(i.useOn(lightingMechanism)) Sleep.sleep(420,1111);
+    		if(i.useOn(lightingMechanism)) Sleepz.sleep(420,1111);
     		
     		return;
     	}
-    	if(Locations.horror_lighthouseFakeInstanceLvl2.contains(p.l))
+    	if(Locations.horror_lighthouseFakeInstanceLvl2.contains(Players.getLocal()))
     	{
-    		API.interactWithGameObject("Staircase", "Climb-up", () -> Locations.horror_lighthouseFakeInstanceLvl3.contains(p.l));
+    		API.interactWithGameObject("Staircase", "Climb-up", () -> Locations.horror_lighthouseFakeInstanceLvl3.contains(Players.getLocal()));
     		return;
     	}
-    	if(Locations.horror_lighthouseFakeInstanceLvl1.contains(p.l))
+    	if(Locations.horror_lighthouseFakeInstanceLvl1.contains(Players.getLocal()))
     	{
-    		API.interactWithGameObject("Staircase", "Climb-up", () -> Locations.horror_lighthouseFakeInstanceLvl2.contains(p.l));
+    		API.interactWithGameObject("Staircase", "Climb-up", () -> Locations.horror_lighthouseFakeInstanceLvl2.contains(Players.getLocal()));
     		return;
     	}
-    	if(Locations.horror_lighthouseAndBridgeArea.contains(p.l))
+    	if(Locations.horror_lighthouseAndBridgeArea.contains(Players.getLocal()))
     	{
     		if(Walkz.walkToArea(Locations.horror_larrissaLighthouse))
     		{
-    			API.interactWithGameObject("Doorway","Walk-through",() -> !Locations.horror_larrissaLighthouse.contains(p.l));
+    			API.interactWithGameObject("Doorway","Walk-through",() -> !Locations.horror_larrissaLighthouse.contains(Players.getLocal()));
         		return;
     		}
     		return;
@@ -725,7 +835,7 @@ public class HorrorFromTheDeep extends Leaf {
     			fulfillStep0();
     			return;
     		}
-    		if(!Locations.horror_lighthouseAndBridgeArea.contains(p.l))
+    		if(!Locations.horror_lighthouseAndBridgeArea.contains(Players.getLocal()))
     		{
     			walkToLighthouseIsland();
     			return;
@@ -737,14 +847,14 @@ public class HorrorFromTheDeep extends Leaf {
     					g.getTile().equals(Locations.horror_bridgeWestTile));
     			if(bridgeWest == null)
     			{
-    				MethodProvider.log("Broken bridge is null!");
+    				Logger.log("Broken bridge is null!");
     				return;
     			}
     			if(Inventory.get(id.plank).useOn(bridgeWest))
     			{
-    				MethodProvider.sleepUntil(() -> repairedBridge1(),
-    						() -> p.l.isMoving(),
-    						Sleep.calculate(2222, 2222),69);
+    				Sleep.sleepUntil(() -> repairedBridge1(),
+    						() -> Players.getLocal().isMoving(),
+    						Sleepz.calculate(2222, 2222),69);
     			}
     			return;
     		}
@@ -757,26 +867,26 @@ public class HorrorFromTheDeep extends Leaf {
     			fulfillStep0();
     			return;
     		}
-    		if(!Locations.horror_lighthouseAndBridgeArea.contains(p.l))
+    		if(!Locations.horror_lighthouseAndBridgeArea.contains(Players.getLocal()))
     		{
     			walkToLighthouseIsland();
     			return;
     		}
-    		if(Locations.horror_bridgeEast.contains(p.l))
+    		if(Locations.horror_bridgeEast.contains(Players.getLocal()))
     		{
     			GameObject bridgeEast = GameObjects.closest(g -> g!=null && 
     					g.getName().equals("Broken bridge") && 
     					g.getTile().equals(Locations.horror_bridgeEastTile));
     			if(bridgeEast == null)
     			{
-    				MethodProvider.log("Broken bridge is null!");
+    				Logger.log("Broken bridge is null!");
     				return;
     			}
     			if(Inventory.get(id.plank).useOn(bridgeEast))
     			{
-    				MethodProvider.sleepUntil(() -> Locations.horror_bridgeEast.contains(p.l),
-    						() -> p.l.isMoving(),
-    						Sleep.calculate(3333, 2222),69);
+    				Sleep.sleepUntil(() -> Locations.horror_bridgeEast.contains(Players.getLocal()),
+    						() -> Players.getLocal().isMoving(),
+    						Sleepz.calculate(3333, 2222),69);
     			}
     			return;
     		}
@@ -787,14 +897,14 @@ public class HorrorFromTheDeep extends Leaf {
     					g.getTile().equals(Locations.horror_bridgeWestTile));
     			if(bridgeWest == null)
     			{
-    				MethodProvider.log("Broken bridge is null!");
+    				Logger.log("Broken bridge is null!");
     				return;
     			}
     			if(bridgeWest.interact("Cross"))
     			{
-    				MethodProvider.sleepUntil(() -> Locations.horror_bridgeEast.contains(p.l),
-    						() -> p.l.isMoving(),
-    						Sleep.calculate(3333, 2222),69);
+    				Sleep.sleepUntil(() -> Locations.horror_bridgeEast.contains(Players.getLocal()),
+    						() -> Players.getLocal().isMoving(),
+    						Sleepz.calculate(3333, 2222),69);
     			}
     			return;
     		}
@@ -802,22 +912,22 @@ public class HorrorFromTheDeep extends Leaf {
     	}
     	if(!gotKey())
     	{
-    		if(Locations.barbAgilityCourseGroundLvl.contains(p.l))
+    		if(Locations.barbAgilityCourseGroundLvl.contains(Players.getLocal()))
     		{
     			API.walkTalkToNPC("Gunnjorn", "Talk-to", Locations.barbAgilityCourseGroundLvl);
     			return;
     		}
-    		if(Locations.horror_lighthouseAndBridgeArea.contains(p.l))
+    		if(Locations.horror_lighthouseAndBridgeArea.contains(Players.getLocal()))
     		{
-    			if(Walkz.useJewelry(InvEquip.games, "Barbarian Outpost")) Sleep.sleep(420, 696);
+    			if(Walkz.useJewelry(InvEquip.games, "Barbarian Outpost")) Sleepz.sleep(420, 696);
     			return;
     		}
     		//deductively, have to be located somewhere outside agility course, in barb outpost - walk
-    		if(Locations.horror_entireLightHouseBarbarian.contains(p.l))
+    		if(Locations.horror_entireLightHouseBarbarian.contains(Players.getLocal()))
     		{
     			if(Walkz.walkToArea(Locations.horror_barbAgilityCoursePipeEntrance))
     			{
-    				if(Skills.getBoostedLevels(Skill.AGILITY) < 35)
+    				if(Skills.getBoostedLevel(Skill.AGILITY) < 35)
     				{
     					if(Tabz.open(Tab.INVENTORY))
     					{
@@ -825,7 +935,7 @@ public class HorrorFromTheDeep extends Leaf {
     						{
     							if(Inventory.interact(id.summerPie1_2, "Eat"))
     							{
-    								MethodProvider.sleepUntil(() -> Skills.getBoostedLevels(Skill.AGILITY) >= 35, Sleep.calculate(2222,2222));
+    								Sleep.sleepUntil(() -> Skills.getBoostedLevel(Skill.AGILITY) >= 35, Sleepz.calculate(2222,2222));
     							}
     							return;
     						}
@@ -833,7 +943,7 @@ public class HorrorFromTheDeep extends Leaf {
     						{
     							if(Inventory.interact(id.summerPie, "Eat"))
     							{
-    								MethodProvider.sleepUntil(() -> Skills.getBoostedLevels(Skill.AGILITY) >= 35, Sleep.calculate(2222,2222));
+    								Sleep.sleepUntil(() -> Skills.getBoostedLevel(Skill.AGILITY) >= 35, Sleepz.calculate(2222,2222));
     							}
     							return;
     						}
@@ -847,7 +957,7 @@ public class HorrorFromTheDeep extends Leaf {
     			return;
     		}
     	}
-    	if(Locations.horror_lighthouseAndBridgeArea.contains(p.l))
+    	if(Locations.horror_lighthouseAndBridgeArea.contains(Players.getLocal()))
     	{
     		if(Walkz.walkToArea(Locations.horror_larrissaLighthouse))
     		{
@@ -860,7 +970,7 @@ public class HorrorFromTheDeep extends Leaf {
     }
     public static void talkToLarrissa()
     {
-    	if(Locations.horror_lighthouseAndBridgeArea.contains(p.l))
+    	if(Locations.horror_lighthouseAndBridgeArea.contains(Players.getLocal()))
     	{
     		API.walkTalkToNPC("Larrissa", "Talk-to", Locations.horror_larrissaLighthouse);
     		return;
@@ -869,7 +979,7 @@ public class HorrorFromTheDeep extends Leaf {
     }
     public static void walkToLighthouseIsland()
     {
-    	if(Locations.barbAgilityCourseGroundLvl.contains(p.l))
+    	if(Locations.barbAgilityCourseGroundLvl.contains(Players.getLocal()))
     	{
     		if(!Walkz.useJewelry(InvEquip.games, "Barbarian Outpost"))
     		{
@@ -878,41 +988,41 @@ public class HorrorFromTheDeep extends Leaf {
     		return;
     	}
     	//handle agility stones
-    	if(Locations.horror_totalStonesArea.contains(p.l))
+    	if(Locations.horror_totalStonesArea.contains(Players.getLocal()))
     	{
-    		if(Locations.horror_stones1.contains(p.l))
+    		if(Locations.horror_stones1.contains(Players.getLocal()))
     		{
-    			API.interactWithGameObject("Basalt rock", "Jump-across", Locations.horror_stone2, () -> Locations.horror_stones2.contains(p.l) || Locations.horror_stonesSouth.contains(p.l));
+    			API.interactWithGameObject("Basalt rock", "Jump-across", Locations.horror_stone2, () -> Locations.horror_stones2.contains(Players.getLocal()) || Locations.horror_stonesSouth.contains(Players.getLocal()));
     			return;
     		}
-    		if(Locations.horror_stones2.contains(p.l))
+    		if(Locations.horror_stones2.contains(Players.getLocal()))
     		{
-    			API.interactWithGameObject("Basalt rock", "Jump-across", Locations.horror_stone3, () -> Locations.horror_stones3.contains(p.l));
+    			API.interactWithGameObject("Basalt rock", "Jump-across", Locations.horror_stone3, () -> Locations.horror_stones3.contains(Players.getLocal()));
     			return;
     		}
-    		if(Locations.horror_stones3.contains(p.l))
+    		if(Locations.horror_stones3.contains(Players.getLocal()))
     		{
-    			API.interactWithGameObject("Basalt rock", "Jump-across", Locations.horror_stone4, () -> Locations.horror_stones4.contains(p.l));
+    			API.interactWithGameObject("Basalt rock", "Jump-across", Locations.horror_stone4, () -> Locations.horror_stones4.contains(Players.getLocal()));
     			return;
     		}
-    		if(Locations.horror_stones4.contains(p.l))
+    		if(Locations.horror_stones4.contains(Players.getLocal()))
     		{
-    			API.interactWithGameObject("Basalt rock", "Jump-across", Locations.horror_stone5, () -> Locations.horror_stonesNorth.contains(p.l));
+    			API.interactWithGameObject("Basalt rock", "Jump-across", Locations.horror_stone5, () -> Locations.horror_stonesNorth.contains(Players.getLocal()));
     			return;
     		}
     	}
     	//ready to click "Jump-to" "Beach" or "Jump-across" "Basalt rock"
-    	if(Locations.horror_stonesSouth.contains(p.l))
+    	if(Locations.horror_stonesSouth.contains(Players.getLocal()))
     	{
     		if(Calculations.nextGaussianRandom(50, 25) >= 35)
     		{
-    			API.interactWithGameObject("Basalt rock", "Jump-across", Locations.horror_stone1, () -> Locations.horror_stones1.contains(p.l));
+    			API.interactWithGameObject("Basalt rock", "Jump-across", Locations.horror_stone1, () -> Locations.horror_stones1.contains(Players.getLocal()));
     			return;
     		}
-    		API.interactWithGameObject("Beach", "Jump-to", Locations.horror_stonesSouth, () -> Locations.horror_stones1.contains(p.l));
+    		API.interactWithGameObject("Beach", "Jump-to", Locations.horror_stonesSouth, () -> Locations.horror_stones1.contains(Players.getLocal()));
 			return;
     	}
-    	if(Locations.horror_entireLightHouseBarbarian.contains(p.l))
+    	if(Locations.horror_entireLightHouseBarbarian.contains(Players.getLocal()))
     	{
     		Walkz.walkToArea(Locations.horror_stonesSouth);
     		return;
@@ -934,14 +1044,14 @@ public class HorrorFromTheDeep extends Leaf {
     
     public static void fulfillStep0()
     {
-    	if(Locations.horror_lighthouseAndBridgeArea.contains(p.l) || 
-				Locations.horror_totalStonesArea.contains(p.l))
+    	if(Locations.horror_lighthouseAndBridgeArea.contains(Players.getLocal()) || 
+				Locations.horror_totalStonesArea.contains(Players.getLocal()))
 		{
 			if(!Walkz.useJewelry(InvEquip.wealth, "Grand Exchange") && 
 					!Walkz.useJewelry(InvEquip.games, "Barbarian Outpost") && 
 					!Walkz.useJewelry(InvEquip.glory, "Edgeville"))
 			{
-				MethodProvider.log("Shit, out of teleports in Horror from the deep lighthouse area!");
+				Logger.log("Shit, out of teleports in Horror from the deep lighthouse area!");
 			}
 			return;
 		}
@@ -979,32 +1089,31 @@ public class HorrorFromTheDeep extends Leaf {
     	int boltsQty = (int) Calculations.nextGaussianRandom(90, 20);
     	if(TrainRanged.getBestCapeSlot() == id.avasAccumulator) boltsQty = (int) Calculations.nextGaussianRandom(40, 15);
     	InvEquip.addInvyItem(id.diamondBoltsE, 15, boltsQty, false, (int) Calculations.nextGaussianRandom(130, 20));
-    	InvEquip.addInvyItem(id.prayPot4, 1, 1, false, 1);
     	InvEquip.addInvyItem(id.summerPie, 4, 4, false, 4);
     	InvEquip.addInvyItem(id.waterRune, 500, (int) Calculations.nextGaussianRandom(700, 50), false, (int) Calculations.nextGaussianRandom(2000, 100));
     	InvEquip.addInvyItem(id.earthRune, 500, (int) Calculations.nextGaussianRandom(700, 50), false, (int) Calculations.nextGaussianRandom(2000, 100));
     	InvEquip.addInvyItem(id.fireRune, 500, (int) Calculations.nextGaussianRandom(700, 50), false, (int) Calculations.nextGaussianRandom(2000, 100));
     	InvEquip.addInvyItem(id.airRune, 500, (int) Calculations.nextGaussianRandom(700, 50), false, (int) Calculations.nextGaussianRandom(2000, 100));
-    	if(Skills.getRealLevel(Skill.MAGIC) < 62) InvEquip.addInvyItem(id.deathRune, 200, (int) Calculations.nextGaussianRandom(250, 25), false, (int) Calculations.nextGaussianRandom(350, 25));
-    	else InvEquip.addInvyItem(id.bloodRune, 150, (int) Calculations.nextGaussianRandom(185, 15), false, (int) Calculations.nextGaussianRandom(350, 25));
+    	if(Skills.getRealLevel(Skill.MAGIC) >= 62) InvEquip.addInvyItem(id.bloodRune, 150, (int) Calculations.nextGaussianRandom(185, 15), false, (int) Calculations.nextGaussianRandom(350, 25));
+    	InvEquip.addInvyItem(id.deathRune, 100, (int) Calculations.nextGaussianRandom(250, 25), false, (int) Calculations.nextGaussianRandom(350, 25));
     	InvEquip.shuffleFulfillOrder();
     	InvEquip.addInvyItem(Combatz.lowFood, 1, 15, false, (int) Calculations.nextGaussianRandom(50, 20));
     	if(InvEquip.fulfillSetup(true, 240000))
     	{
-    		MethodProvider.log("[HORROR FROM THE DEEP] -> Fulfilled step0 correctly!");
+    		Logger.log("[HORROR FROM THE DEEP] -> Fulfilled step0 correctly!");
     	}
-    	else MethodProvider.log("[HORROR FROM THE DEEP] -> NOT fulfilled step0 correctly!");
+    	else Logger.log("[HORROR FROM THE DEEP] -> NOT fulfilled step0 correctly!");
     }
     public static void fulfillStep1AfterPlanks()
     {
-    	if(Locations.horror_lighthouseAndBridgeArea.contains(p.l) || 
-				Locations.horror_totalStonesArea.contains(p.l))
+    	if(Locations.horror_lighthouseAndBridgeArea.contains(Players.getLocal()) || 
+				Locations.horror_totalStonesArea.contains(Players.getLocal()))
 		{
 			if(!Walkz.useJewelry(InvEquip.wealth, "Grand Exchange") && 
 					!Walkz.useJewelry(InvEquip.games, "Barbarian Outpost") && 
 					!Walkz.useJewelry(InvEquip.glory, "Edgeville"))
 			{
-				MethodProvider.log("Shit, out of teleports in Horror from the deep lighthouse area!");
+				Logger.log("Shit, out of teleports in Horror from the deep lighthouse area!");
 			}
 			return;
 		}
@@ -1041,7 +1150,6 @@ public class HorrorFromTheDeep extends Leaf {
     	int boltsQty = (int) Calculations.nextGaussianRandom(90, 20);
     	if(TrainRanged.getBestCapeSlot() == id.avasAccumulator) boltsQty = (int) Calculations.nextGaussianRandom(40, 15);
     	InvEquip.addInvyItem(id.diamondBoltsE, 15, boltsQty, false, (int) Calculations.nextGaussianRandom(130, 20));
-    	InvEquip.addInvyItem(id.prayPot4, 1, 1, false, 1);
     	InvEquip.addInvyItem(id.summerPie, 4, 4, false, 4);
     	InvEquip.addInvyItem(id.waterRune, 500, (int) Calculations.nextGaussianRandom(700, 50), false, (int) Calculations.nextGaussianRandom(2000, 100));
     	InvEquip.addInvyItem(id.earthRune, 500, (int) Calculations.nextGaussianRandom(700, 50), false, (int) Calculations.nextGaussianRandom(2000, 100));
@@ -1053,8 +1161,8 @@ public class HorrorFromTheDeep extends Leaf {
     	InvEquip.addInvyItem(Combatz.lowFood, 1, 15, false, (int) Calculations.nextGaussianRandom(50, 20));
     	if(InvEquip.fulfillSetup(true, 240000))
     	{
-    		MethodProvider.log("[HORROR FROM THE DEEP] -> Fulfilled step0 correctly!");
+    		Logger.log("[HORROR FROM THE DEEP] -> Fulfilled step0 correctly!");
     	}
-    	else MethodProvider.log("[HORROR FROM THE DEEP] -> NOT fulfilled step0 correctly!");
+    	else Logger.log("[HORROR FROM THE DEEP] -> NOT fulfilled step0 correctly!");
     }
 }

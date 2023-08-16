@@ -1,15 +1,11 @@
 package script.quest.priestinperil;
 
 import org.dreambot.api.methods.Calculations;
-import org.dreambot.api.methods.MethodProvider;
 import org.dreambot.api.methods.container.impl.Inventory;
-import org.dreambot.api.methods.container.impl.bank.Bank;
-import org.dreambot.api.methods.container.impl.bank.BankLocation;
 import org.dreambot.api.methods.container.impl.equipment.Equipment;
 import org.dreambot.api.methods.container.impl.equipment.EquipmentSlot;
 import org.dreambot.api.methods.dialogues.Dialogues;
 import org.dreambot.api.methods.interactive.GameObjects;
-import org.dreambot.api.methods.interactive.NPCs;
 import org.dreambot.api.methods.interactive.Players;
 import org.dreambot.api.methods.item.GroundItems;
 import org.dreambot.api.methods.map.Tile;
@@ -22,16 +18,15 @@ import org.dreambot.api.methods.tabs.Tab;
 import org.dreambot.api.methods.walking.impl.Walking;
 import org.dreambot.api.methods.widget.Widgets;
 import org.dreambot.api.script.ScriptManager;
+import org.dreambot.api.utilities.Logger;
+import org.dreambot.api.utilities.Sleep;
 import org.dreambot.api.utilities.Timer;
 import org.dreambot.api.wrappers.interactive.GameObject;
 import org.dreambot.api.wrappers.items.GroundItem;
 
 import script.Main;
-import script.p;
 import script.behaviour.DecisionLeaf;
 import script.framework.Leaf;
-import script.framework.Tree;
-import script.quest.varrockmuseum.Timing;
 import script.skills.ranged.TrainRanged;
 import script.utilities.API;
 import script.utilities.Combatz;
@@ -39,13 +34,12 @@ import script.utilities.Dialoguez;
 import script.utilities.InvEquip;
 import script.utilities.Locations;
 import script.utilities.Questz;
-import script.utilities.Sleep;
+import script.utilities.Sleepz;
 import script.utilities.Walkz;
 import script.utilities.id;
 import script.utilities.Tabz;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 /**
  * Completes Priest in Peril
@@ -72,7 +66,7 @@ public class PriestInPeril extends Leaf {
     {
     	if(getProgressValue() == 61)
         {
-        	if(Locations.PiP_undergroundPass.contains(p.l))
+        	if(Locations.PiP_undergroundPass.contains(Players.getLocal()))
         	{
         		if(!Walkz.useJewelry(InvEquip.wealth, "Grand Exchange") &&
         				!Walkz.useJewelry(InvEquip.glory, "Edgeville"))
@@ -88,107 +82,107 @@ public class PriestInPeril extends Leaf {
     @Override
     public int onLoop() {
     	if (DecisionLeaf.taskTimer.finished()) {
-            MethodProvider.log("[TIMEOUT] -> The Restless Ghost");
+            Logger.log("[TIMEOUT] -> The Restless Ghost");
            	API.mode = null;
-            return Timing.sleepLogNormalSleep();
+            return Sleepz.sleepTiming();
         }
         if (completed()) {
-            MethodProvider.log("[COMPLETED] -> Priest in Peril!");
+            Logger.log("[COMPLETED] -> Priest in Peril!");
            	API.mode = null;
-           	Main.customPaintText1 = "~~~~~~~~~~";
-    		Main.customPaintText2 = "~Quest Complete~";
-    		Main.customPaintText3 = "~Priest in Peril~";
-    		Main.customPaintText4 = "~~~~~~~~~~";
-            return Timing.sleepLogNormalSleep();
+           	Main.paint_task = "~~~~~~~~~~";
+    		Main.paint_itemsCount = "~Quest Complete~";
+    		Main.paint_subTask = "~Priest in Peril~";
+    		Main.paint_levels = "~~~~~~~~~~";
+            return Sleepz.sleepTiming();
         }
 
     	if(Questz.shouldCheckQuestStep()) Questz.checkQuestStep("Priest in Peril");
         if(Dialogues.getNPCDialogue() != null && !Dialogues.getNPCDialogue().isEmpty())
     	{
-    		MethodProvider.log("NPC Dialogue: " + Dialogues.getNPCDialogue());
+    		Logger.log("NPC Dialogue: " + Dialogues.getNPCDialogue());
     	}
-        if(Dialoguez.handleDialogues()) return Timing.sleepLogNormalInteraction();
+        if(Dialoguez.handleDialogues()) return Sleepz.interactionTiming();
         if(Inventory.contains(TrainRanged.getBestDart()))
         {
         	InvEquip.equipItem(TrainRanged.getBestDart());
-        	return Timing.sleepLogNormalSleep();
+        	return Sleepz.sleepTiming();
         }
         
         if(getProgressValue() == 60)
         {
         	//quest done widget - not really have access to morytania until progress value is 61 ... talk to drezel some more...
-        	if(Widgets.getWidgetChild(153,16) != null &&
-        			Widgets.getWidgetChild(153,16).isVisible())
+        	if(Widgets.get(153,16) != null &&
+        			Widgets.get(153,16).isVisible())
         	{
-        		if(Widgets.getWidgetChild(153,16).interact("Close")) Sleep.sleep(696, 666);
-        		return Timing.sleepLogNormalInteraction();
+        		if(Widgets.get(153,16).interact("Close")) Sleepz.sleep(696, 666);
+        		return Sleepz.interactionTiming();
         	}
-        	if(Locations.PiP_undergroundPass.contains(p.l))
+        	if(Locations.PiP_undergroundPass.contains(Players.getLocal()))
         	{
         		API.walkTalkToNPC("Drezel", "Talk-to", Locations.PiP_undergroundPassDrezel);
-        		return Timing.sleepLogNormalSleep();
+        		return Sleepz.sleepTiming();
         	}
-        	if(Locations.PiP_pastramiChurchLvl3.contains(p.l))
+        	if(Locations.PiP_pastramiChurchLvl3.contains(Players.getLocal()))
         	{
-        		API.walkInteractWithGameObject("Ladder", "Climb-down", Locations.PiP_pastramiChurchLvl3, () -> Locations.PiP_pastramiChurchLvl2.contains(p.l));
-        		MethodProvider.sleep(Timing.sleepLogNormalInteraction());
-        		return Timing.sleepLogNormalSleep();
+        		API.walkInteractWithGameObject("Ladder", "Climb-down", Locations.PiP_pastramiChurchLvl3, () -> Locations.PiP_pastramiChurchLvl2.contains(Players.getLocal()));
+        		Sleepz.sleepInteraction();
+        		return Sleepz.sleepTiming();
         	}
-        	if(Locations.PiP_pastramiChurchLvl2.contains(p.l))
+        	if(Locations.PiP_pastramiChurchLvl2.contains(Players.getLocal()))
         	{
-        		API.walkInteractWithGameObject("Staircase", "Climb-down", Locations.PiP_pastramiChurchLvl2, () -> Locations.PiP_pastramiChurchLvl1.contains(p.l));
-        		MethodProvider.sleep(Timing.sleepLogNormalInteraction());
-        		return Timing.sleepLogNormalSleep();
+        		API.walkInteractWithGameObject("Staircase", "Climb-down", Locations.PiP_pastramiChurchLvl2, () -> Locations.PiP_pastramiChurchLvl1.contains(Players.getLocal()));
+        		Sleepz.sleepInteraction();
+        		return Sleepz.sleepTiming();
         	}
-        	if(Locations.PiP_pastramiChurchLvl1.contains(p.l))
+        	if(Locations.PiP_pastramiChurchLvl1.contains(Players.getLocal()))
         	{
-        		MethodProvider.log("Interacting doors! church lvl 1");
-        		API.walkInteractWithGameObject("Large door", "Open", Locations.PiP_largeDoors, () -> !Locations.PiP_pastramiChurchLvl1.contains(p.l));
-        		Sleep.sleep(696, 1111);
-        		return Timing.sleepLogNormalSleep();
+        		Logger.log("Interacting doors! church lvl 1");
+        		API.walkInteractWithGameObject("Large door", "Open", Locations.PiP_largeDoors, () -> !Locations.PiP_pastramiChurchLvl1.contains(Players.getLocal()));
+        		Sleepz.sleep(696, 1111);
+        		return Sleepz.sleepTiming();
         	}
         	if(Locations.PiP_largeDoors.getCenter().distance() > 265)
         	{
         		if(!Walkz.useJewelry(InvEquip.wealth, "Grand Exchange")) Walkz.teleportVarrock(180000);
-        		return Timing.sleepLogNormalSleep();
+        		return Sleepz.sleepTiming();
         	}
         	API.walkInteractWithGameObject("Trapdoor", "Open", Locations.PiP_trapdoor, () -> GameObjects.closest(g -> g!=null && g.getName().contains("Trapdoor") && g.hasAction("Climb-down")) != null);
-        	Sleep.sleep(696, 666);
-        	API.walkInteractWithGameObject("Trapdoor", "Climb-down", Locations.PiP_trapdoor, () -> Locations.PiP_undergroundPass.contains(p.l));
-        	Sleep.sleep(696, 666);
-        	return Timing.sleepLogNormalSleep();
+        	Sleepz.sleep(696, 666);
+        	API.walkInteractWithGameObject("Trapdoor", "Climb-down", Locations.PiP_trapdoor, () -> Locations.PiP_undergroundPass.contains(Players.getLocal()));
+        	Sleepz.sleep(696, 666);
+        	return Sleepz.sleepTiming();
         }
         if(getProgressValue() >= 8)
         {
         	deliverRunes();
-        	return Timing.sleepLogNormalSleep();
+        	return Sleepz.sleepTiming();
         }
         switch(getProgressValue())
         {
         case(7):
         {
-        	if(Locations.PiP_pastramiChurchLvl3.contains(p.l))
+        	if(Locations.PiP_pastramiChurchLvl3.contains(Players.getLocal()))
         	{
         		API.interactNPC("Drezel", "Talk-to",Locations.PiP_pastramiChurchLvl3, false,() -> Dialogues.inDialogue());
-    			MethodProvider.sleep(Timing.sleepLogNormalInteraction());
+    			Sleepz.sleepInteraction();
     			break;
         	}
-        	if(Locations.PiP_pastramiChurchLvl2.contains(p.l))
+        	if(Locations.PiP_pastramiChurchLvl2.contains(Players.getLocal()))
         	{
-        		API.walkInteractWithGameObject("Ladder", "Climb-up", Locations.PiP_pastramiChurchLvl2, () -> Locations.PiP_pastramiChurchLvl3.contains(p.l));
-        		MethodProvider.sleep(Timing.sleepLogNormalInteraction());
+        		API.walkInteractWithGameObject("Ladder", "Climb-up", Locations.PiP_pastramiChurchLvl2, () -> Locations.PiP_pastramiChurchLvl3.contains(Players.getLocal()));
+        		Sleepz.sleepInteraction();
         		break;
         	}
-        	if(Locations.PiP_pastramiChurchLvl1.contains(p.l))
+        	if(Locations.PiP_pastramiChurchLvl1.contains(Players.getLocal()))
         	{
-        		MethodProvider.log("Interacting staircase");
-    			API.walkInteractWithGameObject("Staircase", "Climb-up", Locations.PiP_pastramiChurchLvl1, () -> Locations.PiP_pastramiChurchLvl2.contains(p.l));
-        		MethodProvider.sleep(Timing.sleepLogNormalInteraction());
+        		Logger.log("Interacting staircase");
+    			API.walkInteractWithGameObject("Staircase", "Climb-up", Locations.PiP_pastramiChurchLvl1, () -> Locations.PiP_pastramiChurchLvl2.contains(Players.getLocal()));
+        		Sleepz.sleepInteraction();
         		break;
         	}
-        	if(Locations.PiP_undergroundPass.contains(p.l))
+        	if(Locations.PiP_undergroundPass.contains(Players.getLocal()))
         	{
-        		API.walkInteractWithGameObject("Ladder", "Climb-up", Locations.PiP_undergroundPassLadder, () -> Locations.PiP_trapdoor.contains(p.l));
+        		API.walkInteractWithGameObject("Ladder", "Climb-up", Locations.PiP_undergroundPassLadder, () -> Locations.PiP_trapdoor.contains(Players.getLocal()));
         		break;
         	}
         	if(Locations.PiP_largeDoors.getCenter().distance() > 265)
@@ -196,7 +190,7 @@ public class PriestInPeril extends Leaf {
         		if(!Walkz.useJewelry(InvEquip.wealth, "Grand Exchange")) Walkz.teleportVarrock(180000);
         		break;
         	}
-    		API.walkInteractWithGameObject("Large door", "Open", Locations.PiP_largeDoors, () -> Locations.PiP_pastramiChurchLvl1.contains(p.l));
+    		API.walkInteractWithGameObject("Large door", "Open", Locations.PiP_largeDoors, () -> Locations.PiP_pastramiChurchLvl1.contains(Players.getLocal()));
     		break;
         }
         case(6):
@@ -206,12 +200,12 @@ public class PriestInPeril extends Leaf {
         		fulfillPriestInPerilFight();
         		break;
         	}
-        	if(Locations.PiP_pastramiChurchLvl3.contains(p.l))
+        	if(Locations.PiP_pastramiChurchLvl3.contains(Players.getLocal()))
         	{
         		if(Inventory.contains(unblessedBucket))
         		{
         			API.interactNPC("Drezel", "Talk-to",Locations.PiP_pastramiChurchLvl3, false,() -> Dialogues.inDialogue());
-        			MethodProvider.sleep(Timing.sleepLogNormalInteraction());
+        			Sleepz.sleepInteraction();
         			break;
         		}
         		if(Inventory.contains(blessedBucket))
@@ -221,67 +215,67 @@ public class PriestInPeril extends Leaf {
         			{
         				if(Inventory.get(blessedBucket).useOn(GameObjects.closest("Coffin")))
             			{
-            				MethodProvider.sleepUntil(() -> !Inventory.contains(blessedBucket),
-            						() -> p.l.isMoving(),
-            						Sleep.calculate(2222, 2222),69);
+            				Sleep.sleepUntil(() -> !Inventory.contains(blessedBucket),
+            						() -> Players.getLocal().isMoving(),
+            						Sleepz.calculate(2222, 2222),69);
             			}
-            			MethodProvider.sleep(Timing.sleepLogNormalInteraction());
+            			Sleepz.sleepInteraction();
             			break;
         			}
         			if(GameObjects.closest("Cell door").interact("Open")) 
         			{
-        				MethodProvider.sleepUntil(() -> coffin.canReach(), Sleep.calculate(3333, 3333));
+        				Sleep.sleepUntil(() -> coffin.canReach(), Sleepz.calculate(3333, 3333));
         			}
         			break;
         		}
-        		API.walkInteractWithGameObject("Ladder", "Climb-down", Locations.PiP_pastramiChurchLvl3, () -> Locations.PiP_pastramiChurchLvl2.contains(p.l));
-        		MethodProvider.sleep(Timing.sleepLogNormalInteraction());
+        		API.walkInteractWithGameObject("Ladder", "Climb-down", Locations.PiP_pastramiChurchLvl3, () -> Locations.PiP_pastramiChurchLvl2.contains(Players.getLocal()));
+        		Sleepz.sleepInteraction();
         		break;
         	}
-        	if(Locations.PiP_pastramiChurchLvl2.contains(p.l))
+        	if(Locations.PiP_pastramiChurchLvl2.contains(Players.getLocal()))
         	{
         		if(Inventory.contains(unblessedBucket) || Inventory.contains(blessedBucket))
         		{
-        			API.walkInteractWithGameObject("Ladder", "Climb-up", Locations.PiP_pastramiChurchLvl2, () -> Locations.PiP_pastramiChurchLvl3.contains(p.l));
-            		MethodProvider.sleep(Timing.sleepLogNormalInteraction());
+        			API.walkInteractWithGameObject("Ladder", "Climb-up", Locations.PiP_pastramiChurchLvl2, () -> Locations.PiP_pastramiChurchLvl3.contains(Players.getLocal()));
+            		Sleepz.sleepInteraction();
             		break;
         		}
-        		API.walkInteractWithGameObject("Staircase", "Climb-down", Locations.PiP_pastramiChurchLvl2, () -> Locations.PiP_pastramiChurchLvl1.contains(p.l));
-        		MethodProvider.sleep(Timing.sleepLogNormalInteraction());
+        		API.walkInteractWithGameObject("Staircase", "Climb-down", Locations.PiP_pastramiChurchLvl2, () -> Locations.PiP_pastramiChurchLvl1.contains(Players.getLocal()));
+        		Sleepz.sleepInteraction();
         		break;
         	}
-        	if(Locations.PiP_pastramiChurchLvl1.contains(p.l))
+        	if(Locations.PiP_pastramiChurchLvl1.contains(Players.getLocal()))
         	{
         		if(Inventory.contains(unblessedBucket) || Inventory.contains(blessedBucket))
         		{
-            		MethodProvider.log("Interacting staircase");
-        			API.walkInteractWithGameObject("Staircase", "Climb-up", Locations.PiP_pastramiChurchLvl1, () -> Locations.PiP_pastramiChurchLvl2.contains(p.l));
-            		MethodProvider.sleep(Timing.sleepLogNormalInteraction());
+            		Logger.log("Interacting staircase");
+        			API.walkInteractWithGameObject("Staircase", "Climb-up", Locations.PiP_pastramiChurchLvl1, () -> Locations.PiP_pastramiChurchLvl2.contains(Players.getLocal()));
+            		Sleepz.sleepInteraction();
             		break;
         		}
-        		MethodProvider.log("Interacting doors! church lvl 1");
-        		API.walkInteractWithGameObject("Large door", "Open", Locations.PiP_largeDoors, () -> !Locations.PiP_pastramiChurchLvl1.contains(p.l));
-        		Sleep.sleep(696, 1111);
+        		Logger.log("Interacting doors! church lvl 1");
+        		API.walkInteractWithGameObject("Large door", "Open", Locations.PiP_largeDoors, () -> !Locations.PiP_pastramiChurchLvl1.contains(Players.getLocal()));
+        		Sleepz.sleep(696, 1111);
         		break;
         	}
-        	if(Locations.PiP_undergroundPass.contains(p.l))
+        	if(Locations.PiP_undergroundPass.contains(Players.getLocal()))
         	{
         		if(Inventory.contains(unblessedBucket) || Inventory.contains(blessedBucket))
         		{
-        			API.walkInteractWithGameObject("Ladder", "Climb-up", Locations.PiP_undergroundPassLadder, () -> Locations.PiP_trapdoor.contains(p.l));
+        			API.walkInteractWithGameObject("Ladder", "Climb-up", Locations.PiP_undergroundPassLadder, () -> Locations.PiP_trapdoor.contains(Players.getLocal()));
             		break;
         		}
-        		if(Locations.PiP_undergroundPassMonuments.contains(p.l))
+        		if(Locations.PiP_undergroundPassMonuments.contains(Players.getLocal()))
     			{
     				if(Inventory.get(id.bucket).useOn(GameObjects.closest(g->g!=null&&g.getName().contains("Well")&&g.hasAction("Search"))))
     				{
-    					MethodProvider.sleepUntil(() -> Inventory.contains(unblessedBucket),
-    							() ->p.l.isMoving(),
-    							Sleep.calculate(2222,2222),69);
+    					Sleep.sleepUntil(() -> Inventory.contains(unblessedBucket),
+    							() ->Players.getLocal().isMoving(),
+    							Sleepz.calculate(2222,2222),69);
     				}
     				break;
     			}
-    			if(Walking.shouldWalk(6) && Walking.walk(Locations.PiP_undergroundPassMonuments.getCenter())) Sleep.sleep(696, 666);
+    			if(Walking.shouldWalk(6) && Walking.walk(Locations.PiP_undergroundPassMonuments.getCenter())) Sleepz.sleep(696, 666);
     			break;
         	}
         	if(Locations.PiP_largeDoors.getCenter().distance() > 265)
@@ -291,14 +285,14 @@ public class PriestInPeril extends Leaf {
         	}
         	if(Inventory.contains(unblessedBucket) || Inventory.contains(blessedBucket))
         	{
-        		MethodProvider.log("Interacting doors");
-        		API.walkInteractWithGameObject("Large door", "Open", Locations.PiP_largeDoors, () -> Locations.PiP_pastramiChurchLvl1.contains(p.l));
+        		Logger.log("Interacting doors");
+        		API.walkInteractWithGameObject("Large door", "Open", Locations.PiP_largeDoors, () -> Locations.PiP_pastramiChurchLvl1.contains(Players.getLocal()));
         		break;
         	}
         	API.walkInteractWithGameObject("Trapdoor", "Open", Locations.PiP_trapdoor, () -> GameObjects.closest(g -> g!=null && g.getName().contains("Trapdoor") && g.hasAction("Climb-down")) != null);
-        	Sleep.sleep(696, 666);
-        	API.walkInteractWithGameObject("Trapdoor", "Climb-down", Locations.PiP_trapdoor, () -> Locations.PiP_undergroundPass.contains(p.l));
-        	Sleep.sleep(696, 666);
+        	Sleepz.sleep(696, 666);
+        	API.walkInteractWithGameObject("Trapdoor", "Climb-down", Locations.PiP_trapdoor, () -> Locations.PiP_undergroundPass.contains(Players.getLocal()));
+        	Sleepz.sleep(696, 666);
         	break;
         }
         case(5):
@@ -312,37 +306,37 @@ public class PriestInPeril extends Leaf {
         		fulfillPriestInPerilFight();
         		break;
         	}
-        	if(Locations.PiP_pastramiChurchLvl3.contains(p.l))
+        	if(Locations.PiP_pastramiChurchLvl3.contains(Players.getLocal()))
         	{
         		if(Inventory.contains(ironKey))
         		{
         			API.walkInteractWithGameObject("Cell door", "Open", Locations.PiP_pastramiChurchLvl3, () -> Dialogues.inDialogue());
-        			MethodProvider.sleep(Timing.sleepLogNormalInteraction());
+        			Sleepz.sleepInteraction();
         			break;
         		}
-        		API.walkInteractWithGameObject("Ladder", "Climb-down", Locations.PiP_pastramiChurchLvl3, () -> Locations.PiP_pastramiChurchLvl2.contains(p.l));
-        		MethodProvider.sleep(Timing.sleepLogNormalInteraction());
+        		API.walkInteractWithGameObject("Ladder", "Climb-down", Locations.PiP_pastramiChurchLvl3, () -> Locations.PiP_pastramiChurchLvl2.contains(Players.getLocal()));
+        		Sleepz.sleepInteraction();
         		break;
         	}
-        	if(Locations.PiP_pastramiChurchLvl2.contains(p.l))
+        	if(Locations.PiP_pastramiChurchLvl2.contains(Players.getLocal()))
         	{
         		if(Inventory.contains(ironKey))
         		{
-        			API.walkInteractWithGameObject("Ladder", "Climb-up", Locations.PiP_pastramiChurchLvl2, () -> Locations.PiP_pastramiChurchLvl3.contains(p.l));
-            		MethodProvider.sleep(Timing.sleepLogNormalInteraction());
+        			API.walkInteractWithGameObject("Ladder", "Climb-up", Locations.PiP_pastramiChurchLvl2, () -> Locations.PiP_pastramiChurchLvl3.contains(Players.getLocal()));
+            		Sleepz.sleepInteraction();
             		break;
         		}
-        		API.walkInteractWithGameObject("Staircase", "Climb-down", Locations.PiP_pastramiChurchLvl2, () -> Locations.PiP_pastramiChurchLvl1.contains(p.l));
-        		MethodProvider.sleep(Timing.sleepLogNormalInteraction());
+        		API.walkInteractWithGameObject("Staircase", "Climb-down", Locations.PiP_pastramiChurchLvl2, () -> Locations.PiP_pastramiChurchLvl1.contains(Players.getLocal()));
+        		Sleepz.sleepInteraction();
         		break;
         	}
-        	if(Locations.PiP_pastramiChurchLvl1.contains(p.l))
+        	if(Locations.PiP_pastramiChurchLvl1.contains(Players.getLocal()))
         	{
-        		MethodProvider.log("Inside pastrami church lvl 1");
+        		Logger.log("Inside pastrami church lvl 1");
         		if(Inventory.contains(ironKey))
         		{
-        			API.walkInteractWithGameObject("Staircase", "Climb-up", Locations.PiP_pastramiChurchLvl1, () -> Locations.PiP_pastramiChurchLvl2.contains(p.l));
-            		MethodProvider.sleep(Timing.sleepLogNormalInteraction());
+        			API.walkInteractWithGameObject("Staircase", "Climb-up", Locations.PiP_pastramiChurchLvl1, () -> Locations.PiP_pastramiChurchLvl2.contains(Players.getLocal()));
+            		Sleepz.sleepInteraction();
             		break;
         		}
         		if(!Inventory.contains(goldenKey))
@@ -354,7 +348,7 @@ public class PriestInPeril extends Leaf {
             		{
             			if(goldenKeyG.interact("Take"))
             			{
-            				MethodProvider.sleepUntil(() -> Inventory.contains(goldenKey), Sleep.calculate(2222, 2222));
+            				Sleep.sleepUntil(() -> Inventory.contains(goldenKey), Sleepz.calculate(2222, 2222));
             			}
             			break;
             		}
@@ -393,35 +387,35 @@ public class PriestInPeril extends Leaf {
         					break;
         				}
         			}
-        			if(!p.l.isInCombat())
+        			if(!Players.getLocal().isInCombat())
         			{
-        				Sleep.sleep(1111, 1111);
-        				if(p.l.isInCombat()) break;
-        				MethodProvider.log("Attacking monk of zammy!");
-        				API.interactNPC("Monk of Zamorak","Attack", 30,Locations.PiP_pastramiChurchLvl1,true, () -> p.l.isInCombat());
-            			Sleep.sleep(696, 666);
+        				Sleepz.sleep(1111, 1111);
+        				if(Players.getLocal().isInCombat()) break;
+        				Logger.log("Attacking monk of zammy!");
+        				API.interactNPC("Monk of Zamorak","Attack", 30,Locations.PiP_pastramiChurchLvl1,true, () -> Players.getLocal().isInCombat());
+            			Sleepz.sleep(696, 666);
         			}
         			break;
         		}
 
-        		MethodProvider.log("Interacting doors! church lvl 1");
-        		API.walkInteractWithGameObject("Large door", "Open", Locations.PiP_largeDoors, () -> !Locations.PiP_pastramiChurchLvl1.contains(p.l));
-        		Sleep.sleep(696, 666);
+        		Logger.log("Interacting doors! church lvl 1");
+        		API.walkInteractWithGameObject("Large door", "Open", Locations.PiP_largeDoors, () -> !Locations.PiP_pastramiChurchLvl1.contains(Players.getLocal()));
+        		Sleepz.sleep(696, 666);
     			break;
         	}
-        	if(Locations.PiP_undergroundPass.contains(p.l))
+        	if(Locations.PiP_undergroundPass.contains(Players.getLocal()))
         	{
         		if(Inventory.contains(goldenKey))
         		{
-        			if(Locations.PiP_undergroundPassMonuments.contains(p.l))
+        			if(Locations.PiP_undergroundPassMonuments.contains(Players.getLocal()))
         			{
         				//close item looking interface
-        				if(Widgets.getWidgetChild(272, 1 , 11) != null && 
-        						Widgets.getWidgetChild(272, 1 , 11).isVisible())
+        				if(Widgets.get(272, 1 , 11) != null && 
+        						Widgets.get(272, 1 , 11).isVisible())
         				{
-        					if(Widgets.getWidgetChild(272, 1 , 11).interact("Close"))
+        					if(Widgets.get(272, 1 , 11).interact("Close"))
     						{
-    							Sleep.sleep(111, 696);
+    							Sleepz.sleep(111, 696);
     						}
     						break;
         				}
@@ -433,12 +427,12 @@ public class PriestInPeril extends Leaf {
         							g.getTile().equals(correctMonument));
         					if(correctOne == null)
         					{
-        						MethodProvider.log("Found correct monument but its friggen null!!!!");
+        						Logger.log("Found correct monument but its friggen null!!!!");
         						break;
         					}
         					if(Inventory.get(goldenKey).useOn(correctOne))
         					{
-        						MethodProvider.sleepUntil(() -> Inventory.contains(ironKey),() -> p.l.isMoving(),Sleep.calculate(2222, 2222),69);
+        						Sleep.sleepUntil(() -> Inventory.contains(ironKey),() -> Players.getLocal().isMoving(),Sleepz.calculate(2222, 2222),69);
         					}
         					break;
         				}
@@ -446,25 +440,25 @@ public class PriestInPeril extends Leaf {
         				
         				break;
         			}
-        			if(Walking.shouldWalk(6) && Walking.walk(Locations.PiP_undergroundPassMonuments.getCenter())) Sleep.sleep(696, 666);
+        			if(Walking.shouldWalk(6) && Walking.walk(Locations.PiP_undergroundPassMonuments.getCenter())) Sleepz.sleep(696, 666);
         			break;
         		}
         		if(Inventory.contains(id.bucket))
         		{
-        			if(Locations.PiP_undergroundPassMonuments.contains(p.l))
+        			if(Locations.PiP_undergroundPassMonuments.contains(Players.getLocal()))
         			{
         				if(Inventory.get(id.bucket).useOn(GameObjects.closest(g->g!=null&&g.getName().contains("Well")&&g.hasAction("Search"))))
         				{
-        					MethodProvider.sleepUntil(() -> Inventory.contains(unblessedBucket),
-        							() ->p.l.isMoving(),
-        							Sleep.calculate(2222,2222),69);
+        					Sleep.sleepUntil(() -> Inventory.contains(unblessedBucket),
+        							() ->Players.getLocal().isMoving(),
+        							Sleepz.calculate(2222,2222),69);
         				}
         				break;
         			}
-        			if(Walking.shouldWalk(6) && Walking.walk(Locations.PiP_undergroundPassMonuments.getCenter())) Sleep.sleep(696, 666);
+        			if(Walking.shouldWalk(6) && Walking.walk(Locations.PiP_undergroundPassMonuments.getCenter())) Sleepz.sleep(696, 666);
         			break;
         		}
-        		API.walkInteractWithGameObject("Ladder", "Climb-up", Locations.PiP_undergroundPassLadder, () -> Locations.PiP_trapdoor.contains(p.l));
+        		API.walkInteractWithGameObject("Ladder", "Climb-up", Locations.PiP_undergroundPassLadder, () -> Locations.PiP_trapdoor.contains(Players.getLocal()));
         		break;
         	}
         	if(Locations.PiP_largeDoors.getCenter().distance() > 265)
@@ -475,12 +469,12 @@ public class PriestInPeril extends Leaf {
         	if(Inventory.contains(goldenKey))
         	{
         		API.walkInteractWithGameObject("Trapdoor", "Open", Locations.PiP_trapdoor, () -> GameObjects.closest(g -> g!=null && g.getName().contains("Trapdoor") && g.hasAction("Climb-down")) != null);
-            	Sleep.sleep(696, 666);
-            	API.walkInteractWithGameObject("Trapdoor", "Climb-down", Locations.PiP_trapdoor, () -> Locations.PiP_undergroundPass.contains(p.l));
-            	Sleep.sleep(696, 666);
+            	Sleepz.sleep(696, 666);
+            	API.walkInteractWithGameObject("Trapdoor", "Climb-down", Locations.PiP_trapdoor, () -> Locations.PiP_undergroundPass.contains(Players.getLocal()));
+            	Sleepz.sleep(696, 666);
             	break;
         	}
-        	API.walkInteractWithGameObject("Large door", "Open", Locations.PiP_largeDoors, () -> Locations.PiP_pastramiChurchLvl1.contains(p.l));
+        	API.walkInteractWithGameObject("Large door", "Open", Locations.PiP_largeDoors, () -> Locations.PiP_pastramiChurchLvl1.contains(Players.getLocal()));
     		break;
         }
         case(4):
@@ -494,22 +488,22 @@ public class PriestInPeril extends Leaf {
         		fulfillPriestInPerilFight();
         		break;
         	}
-        	if(Locations.PiP_pastramiChurchLvl3.contains(p.l))
+        	if(Locations.PiP_pastramiChurchLvl3.contains(Players.getLocal()))
         	{
         		API.interactNPC("Drezel", "Talk-to", Locations.PiP_pastramiChurchLvl3, false,() -> Dialogues.inDialogue());
-        		MethodProvider.sleep(Timing.sleepLogNormalInteraction());
+        		Sleepz.sleepInteraction();
         		break;
         	}
-        	if(Locations.PiP_pastramiChurchLvl2.contains(p.l))
+        	if(Locations.PiP_pastramiChurchLvl2.contains(Players.getLocal()))
         	{
-        		API.walkInteractWithGameObject("Ladder", "Climb-up", Locations.PiP_pastramiChurchLvl2, () -> Locations.PiP_pastramiChurchLvl3.contains(p.l));
-        		MethodProvider.sleep(Timing.sleepLogNormalInteraction());
+        		API.walkInteractWithGameObject("Ladder", "Climb-up", Locations.PiP_pastramiChurchLvl2, () -> Locations.PiP_pastramiChurchLvl3.contains(Players.getLocal()));
+        		Sleepz.sleepInteraction();
         		break;
         	}
-        	if(Locations.PiP_pastramiChurchLvl1.contains(p.l))
+        	if(Locations.PiP_pastramiChurchLvl1.contains(Players.getLocal()))
         	{
-        		API.walkInteractWithGameObject("Staircase", "Climb-up", Locations.PiP_pastramiChurchLvl1, () -> Locations.PiP_pastramiChurchLvl2.contains(p.l));
-        		MethodProvider.sleep(Timing.sleepLogNormalInteraction());
+        		API.walkInteractWithGameObject("Staircase", "Climb-up", Locations.PiP_pastramiChurchLvl1, () -> Locations.PiP_pastramiChurchLvl2.contains(Players.getLocal()));
+        		Sleepz.sleepInteraction();
         		break;
         	}
         	
@@ -518,7 +512,7 @@ public class PriestInPeril extends Leaf {
         		if(!Walkz.useJewelry(InvEquip.wealth, "Grand Exchange")) Walkz.teleportVarrock(180000);
         		break;
         	}
-        	API.walkInteractWithGameObject("Large door", "Open", Locations.PiP_largeDoors, () -> Locations.PiP_pastramiChurchLvl1.contains(p.l));
+        	API.walkInteractWithGameObject("Large door", "Open", Locations.PiP_largeDoors, () -> Locations.PiP_pastramiChurchLvl1.contains(Players.getLocal()));
         	break;
         }
         case(3):
@@ -561,9 +555,9 @@ public class PriestInPeril extends Leaf {
         		if(!Walkz.useJewelry(InvEquip.wealth, "Grand Exchange"))
         		{
         			Tile ladderTile = GameObjects.closest("Ladder").getTile();
-            		API.walkInteractWithGameObject("Ladder", "Climb-up", ladderTile.getArea(6), () -> Locations.PiP_trapdoor.contains(p.l));
+            		API.walkInteractWithGameObject("Ladder", "Climb-up", ladderTile.getArea(6), () -> Locations.PiP_trapdoor.contains(Players.getLocal()));
             	}
-        		Sleep.sleep(420, 1111);
+        		Sleepz.sleep(420, 1111);
         		break;
         	}
         	if(Locations.PiP_kingRoald.getCenter().distance() > 100)
@@ -594,7 +588,7 @@ public class PriestInPeril extends Leaf {
         			Combatz.eatFood();
         			break;
         		}
-        		if(safespotFromLadder.equals(p.l.getTile()))
+        		if(safespotFromLadder.equals(Players.getLocal().getTile()))
         		{
         			if(Combatz.shouldDrinkRangedBoost()) Combatz.drinkRangeBoost();
         			final int pray = Skills.getRealLevel(Skill.PRAYER);
@@ -626,17 +620,17 @@ public class PriestInPeril extends Leaf {
         					break;
         				}
         			}
-        			if(!p.l.isInCombat())
+        			if(!Players.getLocal().isInCombat())
         			{
-        				API.interactNPC("Temple guardian","Attack", safespotFromLadder.getArea(15),true, () -> p.l.isInCombat());
-            			Sleep.sleep(696, 666);
+        				API.interactNPC("Temple guardian","Attack", safespotFromLadder.getArea(15),true, () -> Players.getLocal().isInCombat());
+            			Sleepz.sleep(696, 666);
         			}
         			break;
         		}
         		if(Walking.walk(safespotFromLadder))
         		{
-        			MethodProvider.log("Walking towards safespot in dog arena!");
-        			Sleep.sleep(696, 1111);
+        			Logger.log("Walking towards safespot in dog arena!");
+        			Sleepz.sleep(696, 1111);
         		}
         		break;
         	}
@@ -646,9 +640,9 @@ public class PriestInPeril extends Leaf {
         		break;
         	}
         	API.walkInteractWithGameObject("Trapdoor", "Open", Locations.PiP_trapdoor, () -> GameObjects.closest(g -> g!=null && g.getName().contains("Trapdoor") && g.hasAction("Climb-down")) != null);
-        	Sleep.sleep(696, 666);
+        	Sleepz.sleep(696, 666);
         	API.walkInteractWithGameObject("Trapdoor", "Climb-down", Locations.PiP_trapdoor, () -> Dialogues.inDialogue());
-        	Sleep.sleep(696, 666);
+        	Sleepz.sleep(696, 666);
         	break;
         }
         case(1):
@@ -691,7 +685,7 @@ public class PriestInPeril extends Leaf {
         }
         default:break;
         }
-        return Timing.sleepLogNormalSleep();
+        return Sleepz.sleepTiming();
     }
     public static void deliverRunes()
     {
@@ -700,26 +694,26 @@ public class PriestInPeril extends Leaf {
     		fulfillPriestInPerilRunes();
     		return;
     	}
-    	if(Locations.PiP_pastramiChurchLvl3.contains(p.l))
+    	if(Locations.PiP_pastramiChurchLvl3.contains(Players.getLocal()))
     	{
-    		API.walkInteractWithGameObject("Ladder", "Climb-down", Locations.PiP_pastramiChurchLvl3, () -> Locations.PiP_pastramiChurchLvl2.contains(p.l));
-    		MethodProvider.sleep(Timing.sleepLogNormalInteraction());
+    		API.walkInteractWithGameObject("Ladder", "Climb-down", Locations.PiP_pastramiChurchLvl3, () -> Locations.PiP_pastramiChurchLvl2.contains(Players.getLocal()));
+    		Sleepz.sleepInteraction();
     		return;
     	}
-    	if(Locations.PiP_pastramiChurchLvl2.contains(p.l))
+    	if(Locations.PiP_pastramiChurchLvl2.contains(Players.getLocal()))
     	{
-    		API.walkInteractWithGameObject("Staircase", "Climb-down", Locations.PiP_pastramiChurchLvl2, () -> Locations.PiP_pastramiChurchLvl1.contains(p.l));
-    		MethodProvider.sleep(Timing.sleepLogNormalInteraction());
+    		API.walkInteractWithGameObject("Staircase", "Climb-down", Locations.PiP_pastramiChurchLvl2, () -> Locations.PiP_pastramiChurchLvl1.contains(Players.getLocal()));
+    		Sleepz.sleepInteraction();
     		return;
     	}
-    	if(Locations.PiP_pastramiChurchLvl1.contains(p.l))
+    	if(Locations.PiP_pastramiChurchLvl1.contains(Players.getLocal()))
     	{
-    		MethodProvider.log("Interacting doors! church lvl 1");
-    		API.walkInteractWithGameObject("Large door", "Open", Locations.PiP_largeDoors, () -> !Locations.PiP_pastramiChurchLvl1.contains(p.l));
-    		Sleep.sleep(696, 1111);
+    		Logger.log("Interacting doors! church lvl 1");
+    		API.walkInteractWithGameObject("Large door", "Open", Locations.PiP_largeDoors, () -> !Locations.PiP_pastramiChurchLvl1.contains(Players.getLocal()));
+    		Sleepz.sleep(696, 1111);
     		return;
     	}
-    	if(Locations.PiP_undergroundPass.contains(p.l))
+    	if(Locations.PiP_undergroundPass.contains(Players.getLocal()))
     	{
     		API.walkTalkToNPC("Drezel", "Talk-to", Locations.PiP_undergroundPassDrezel);
     		return;
@@ -730,9 +724,9 @@ public class PriestInPeril extends Leaf {
     		return;
     	}
     	API.walkInteractWithGameObject("Trapdoor", "Open", Locations.PiP_trapdoor, () -> GameObjects.closest(g -> g!=null && g.getName().contains("Trapdoor") && g.hasAction("Climb-down")) != null);
-    	Sleep.sleep(696, 666);
-    	API.walkInteractWithGameObject("Trapdoor", "Climb-down", Locations.PiP_trapdoor, () -> Locations.PiP_undergroundPass.contains(p.l));
-    	Sleep.sleep(696, 666);
+    	Sleepz.sleep(696, 666);
+    	API.walkInteractWithGameObject("Trapdoor", "Climb-down", Locations.PiP_trapdoor, () -> Locations.PiP_undergroundPass.contains(Players.getLocal()));
+    	Sleepz.sleep(696, 666);
     }
     private static Tile monument1 = new Tile(3417,9890,0);
     private static Tile monument2 = new Tile(3418,9894,0);
@@ -743,11 +737,11 @@ public class PriestInPeril extends Leaf {
     private static Tile monument7 = new Tile(3423,9884,0);
     public static Tile studyMonumentsForCorrectTile()
     {
-    	MethodProvider.log("Starting study function");
+    	Logger.log("Starting study function");
     	List<Tile> monuments = new ArrayList<Tile>();
     	if((int) Calculations.nextGaussianRandom(100, 50) > 90)
     	{
-    		MethodProvider.log("Searching monuments clockwise!");
+    		Logger.log("Searching monuments clockwise!");
     		monuments.add(monument1);
     		monuments.add(monument2);
     		monuments.add(monument3);
@@ -758,7 +752,7 @@ public class PriestInPeril extends Leaf {
     	} 
     	else
     	{
-    		MethodProvider.log("Searching monuments counter-clockwise!");
+    		Logger.log("Searching monuments counter-clockwise!");
     		monuments.add(monument7);
     		monuments.add(monument6);
     		monuments.add(monument5);
@@ -769,23 +763,23 @@ public class PriestInPeril extends Leaf {
     	}
     	for(Tile t : monuments)
     	{
-    		MethodProvider.log("Studying new monument!");
+    		Logger.log("Studying new monument!");
     		Timer timeout = new Timer(30000);
     		while(!timeout.finished() && !timeout.isPaused() && 
     				ScriptManager.getScriptManager().isRunning() && 
     				!ScriptManager.getScriptManager().isPaused())
     		{
-    			Sleep.sleep(420, 696);
-    			if(Widgets.getWidgetChild(272, 8) != null && 
-    					Widgets.getWidgetChild(272, 8).isVisible())
+    			Sleepz.sleep(420, 696);
+    			if(Widgets.get(272, 8) != null && 
+    					Widgets.get(272, 8).isVisible())
     			{
-    				if(Widgets.getWidgetChild(272, 8).getItemId() == ironKey)
+    				if(Widgets.get(272, 8).getItemId() == ironKey)
     				{
     					return t;
     				}
-    				if(Widgets.getWidgetChild(272, 1 , 11).interact("Close"))
+    				if(Widgets.get(272, 1 , 11).interact("Close"))
     				{
-    					Sleep.sleep(420, 696);
+    					Sleepz.sleep(420, 696);
     					break;
     				}
     				continue;
@@ -796,16 +790,16 @@ public class PriestInPeril extends Leaf {
     					g.getTile().equals(t));
     			if(monument == null)
     			{
-    				MethodProvider.log("Monument is null in iron key checking function!");
+    				Logger.log("Monument is null in iron key checking function!");
     				continue;
     			}
     			if(monument.interact("Study"))
     			{
-    				MethodProvider.log("Studying monument");
-    				MethodProvider.sleepUntil(() -> Widgets.getWidgetChild(272, 8) != null && 
-    					Widgets.getWidgetChild(272, 8).isVisible(), 
-    					() -> p.l.isMoving(),
-    					Sleep.calculate(2222, 2222),69);
+    				Logger.log("Studying monument");
+    				Sleep.sleepUntil(() -> Widgets.get(272, 8) != null && 
+    					Widgets.get(272, 8).isVisible(), 
+    					() -> Players.getLocal().isMoving(),
+    					Sleepz.calculate(2222, 2222),69);
     			}
 				continue;
     		}
@@ -814,7 +808,7 @@ public class PriestInPeril extends Leaf {
     }
     public static boolean isInDogArena()
     {
-    	return !Locations.PiP_undergroundPass.contains(p.l) &&
+    	return !Locations.PiP_undergroundPass.contains(Players.getLocal()) &&
     			GameObjects.closest(g -> g!=null && g.getName().equals("Ladder") && g.hasAction("Climb-up")) != null &&
     			GameObjects.closest(g -> g!=null && g.getName().equals("Monument") && g.hasAction("Study")) != null;
     }
@@ -849,11 +843,11 @@ public class PriestInPeril extends Leaf {
     	InvEquip.addInvyItem(InvEquip.coins, 0, 0, false, 0);
     	if(InvEquip.fulfillSetup(true, 180000))
 		{
-			MethodProvider.log("[INVEQUIP] -> Fulfilled equipment correctly! (Priest in Peril fight)");
+			Logger.log("[INVEQUIP] -> Fulfilled equipment correctly! (Priest in Peril fight)");
 			return true;
 		} else 
 		{
-			MethodProvider.log("[INVEQUIP] -> NOT Fulfilled equipment correctly! (Priest in Peril fight)");
+			Logger.log("[INVEQUIP] -> NOT Fulfilled equipment correctly! (Priest in Peril fight)");
 			return false;
 		}
     	
@@ -869,11 +863,11 @@ public class PriestInPeril extends Leaf {
     	InvEquip.shuffleFulfillOrder();
     	if(InvEquip.fulfillSetup(true, 180000))
 		{
-			MethodProvider.log("[INVEQUIP] -> Fulfilled equipment correctly! (Priest in Peril runes)");
+			Logger.log("[INVEQUIP] -> Fulfilled equipment correctly! (Priest in Peril runes)");
 			return true;
 		} else 
 		{
-			MethodProvider.log("[INVEQUIP] -> NOT Fulfilled equipment correctly! (Priest in Peril runes)");
+			Logger.log("[INVEQUIP] -> NOT Fulfilled equipment correctly! (Priest in Peril runes)");
 			return false;
 		}
     	

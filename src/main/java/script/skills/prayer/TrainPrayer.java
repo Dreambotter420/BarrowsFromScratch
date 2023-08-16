@@ -1,29 +1,22 @@
 package script.skills.prayer;
 
-import java.awt.Rectangle;
-import java.awt.Shape;
 import java.awt.geom.Area;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.dreambot.api.Client;
 import org.dreambot.api.input.Mouse;
-import org.dreambot.api.input.event.impl.mouse.impl.click.ClickMode;
 import org.dreambot.api.methods.Calculations;
-import org.dreambot.api.methods.MethodProvider;
 import org.dreambot.api.methods.container.impl.Inventory;
 import org.dreambot.api.methods.container.impl.bank.Bank;
 import org.dreambot.api.methods.container.impl.equipment.EquipmentSlot;
 import org.dreambot.api.methods.dialogues.Dialogues;
 import org.dreambot.api.methods.filter.Filter;
-import org.dreambot.api.methods.grandexchange.GrandExchange;
 import org.dreambot.api.methods.input.Camera;
 import org.dreambot.api.methods.input.Keyboard;
 import org.dreambot.api.methods.interactive.GameObjects;
 import org.dreambot.api.methods.interactive.NPCs;
 import org.dreambot.api.methods.interactive.Players;
-import org.dreambot.api.methods.map.Map;
 import org.dreambot.api.methods.map.Tile;
 import org.dreambot.api.methods.settings.PlayerSettings;
 import org.dreambot.api.methods.skills.Skill;
@@ -33,6 +26,8 @@ import org.dreambot.api.methods.tabs.Tabs;
 import org.dreambot.api.methods.walking.impl.Walking;
 import org.dreambot.api.methods.widget.Widgets;
 import org.dreambot.api.methods.world.Worlds;
+import org.dreambot.api.utilities.Logger;
+import org.dreambot.api.utilities.Sleep;
 import org.dreambot.api.wrappers.interactive.GameObject;
 import org.dreambot.api.wrappers.interactive.NPC;
 import org.dreambot.api.wrappers.items.Item;
@@ -40,18 +35,14 @@ import org.dreambot.api.wrappers.widgets.Menu;
 import org.dreambot.api.wrappers.widgets.WidgetChild;
 
 import script.Main;
-import script.p;
 import script.behaviour.DecisionLeaf;
 import script.framework.Leaf;
-import script.framework.Tree;
-import script.quest.varrockmuseum.Timing;
 import script.utilities.API;
 import script.utilities.Dialoguez;
 import script.utilities.InvEquip;
 import script.utilities.Locations;
 import script.utilities.MissingAPI;
-import script.utilities.Skillz;
-import script.utilities.Sleep;
+import script.utilities.Sleepz;
 import script.utilities.Tabz;
 import script.utilities.Walkz;
 import script.utilities.id;
@@ -62,6 +53,11 @@ import script.utilities.id;
  * ^_^
  */
 public class TrainPrayer extends Leaf {
+
+	@Override
+	public boolean isValid() {
+		return API.mode == API.modes.TRAIN_PRAYER;
+	}
 	public static final int constructionBook = 8463;
 	public static boolean initialized = false;
 	public static int neededBones = 0;
@@ -79,7 +75,7 @@ public class TrainPrayer extends Leaf {
         if(randomBonesAdder <= 1 || randomBonesAdder >= 20) randomBonesAdder = 1;
         randomCoinsAmount = (int) Calculations.nextGaussianRandom(6000, 1000);
         if(randomCoinsAmount < 2500) randomCoinsAmount = 2500;
-        instantiateTree();
+        
         initialized = true;
     }
     public boolean onExit() {
@@ -90,10 +86,6 @@ public class TrainPrayer extends Leaf {
     	}
     	visitedLast = false;
     	return true;
-    }
-    private final Tree tree = new Tree();
-    private void instantiateTree() {
-    	
     }
     /** returns true if not inside house anymore
      * 
@@ -106,34 +98,34 @@ public class TrainPrayer extends Leaf {
     	{
     		if(portal.interact("Enter"))
     		{
-    			MethodProvider.sleepUntil(() -> !Locations.isInstanced(), () -> p.l.isMoving(), Sleep.calculate(2222, 2222), 50);
+    			Sleep.sleepUntil(() -> !Locations.isInstanced(), () -> Players.getLocal().isMoving(), Sleepz.calculate(2222, 2222), 50);
     		} else {
-    			if(Walking.shouldWalk(6) && Walking.walk(portal)) Sleep.sleep(420, 696);
+    			if(Walking.shouldWalk(6) && Walking.walk(portal)) Sleepz.sleep(420, 696);
     		}
     		return false;
     	}
     	
-    	if(Widgets.getWidgetChild(370, 18) != null && Widgets.getWidgetChild(370, 18).isVisible())
+    	if(Widgets.get(370, 18) != null && Widgets.get(370, 18).isVisible())
     	{
-    		if(Widgets.getWidgetChild(370,18).interact("Leave House"))
+    		if(Widgets.get(370,18).interact("Leave House"))
     		{
-    			MethodProvider.sleepUntil(() -> Locations.rimmington.contains(p.l), Sleep.calculate(2222, 2222));
+    			Sleep.sleepUntil(() -> Locations.rimmington.contains(Players.getLocal()), Sleepz.calculate(2222, 2222));
     			return true;
     		}
     		return false;
     	}
     	if(Tabs.isOpen(Tab.OPTIONS))
     	{
-    		if(Widgets.getWidgetChild(116, 74) != null && Widgets.getWidgetChild(116, 74).isVisible())
+    		if(Widgets.get(116, 74) != null && Widgets.get(116, 74).isVisible())
         	{
-        		if(Widgets.getWidgetChild(116, 74).interact("View House Options"))
+        		if(Widgets.get(116, 74).interact("View House Options"))
         		{
-        			MethodProvider.sleepUntil(() -> Widgets.getWidgetChild(370, 18) != null && Widgets.getWidgetChild(370, 18).isVisible(), Sleep.calculate(2222, 2222));
+        			Sleep.sleepUntil(() -> Widgets.get(370, 18) != null && Widgets.get(370, 18).isVisible(), Sleepz.calculate(2222, 2222));
         		}
         	}
     		if(PlayerSettings.getBitValue(9683) != 0)
     		{
-    			Widgets.getWidgetChild(116, 106).interact("Controls");
+    			Widgets.get(116, 106).interact("Controls");
     		}
     	}
     	else
@@ -158,8 +150,8 @@ public class TrainPrayer extends Leaf {
     		}
     		return;
     	}
-    	if(Widgets.getWidgetChild(52,13) != null && 
-    			Widgets.getWidgetChild(52,13).isVisible())
+    	if(Widgets.get(52,13) != null && 
+    			Widgets.get(52,13).isVisible())
     	{
     		List<WidgetChild> validAltarGC = Widgets.getWidgets(w -> 
     				w != null &&
@@ -171,20 +163,20 @@ public class TrainPrayer extends Leaf {
     				w.getText().equals("Y"));
     		if(validAltarGC.isEmpty())
     		{
-    			MethodProvider.log("Hmmm... no valid altars available on w330... waiting...");
-    			Sleep.sleep(10000, 4200);
-    			Widgets.getWidgetChild(52,30).interact("Refresh Data");
-    			Sleep.sleep(696, 420);
+    			Logger.log("Hmmm... no valid altars available on w330... waiting...");
+    			Sleepz.sleep(10000, 4200);
+    			Widgets.get(52,30).interact("Refresh Data");
+    			Sleepz.sleep(696, 420);
     			return;
     		}
     		Collections.shuffle(validAltarGC);
-    		WidgetChild enterValidHouseButton = Widgets.getWidgetChild(52,19,validAltarGC.get(0).getIndex());
+    		WidgetChild enterValidHouseButton = Widgets.get(52,19,validAltarGC.get(0).getIndex());
     		
     		if(enterValidHouseButton.interact("Enter House"))
     		{
     			visitedLast = true;
-    			MethodProvider.sleepUntil(() -> Locations.isInstanced(), Sleep.calculate(3333, 3333));
-    			Sleep.sleep(696, 4200);
+    			Sleep.sleepUntil(() -> Locations.isInstanced(), Sleepz.calculate(3333, 3333));
+    			Sleepz.sleep(696, 4200);
     		}
     		return;
     	}
@@ -196,24 +188,24 @@ public class TrainPrayer extends Leaf {
     		{
     			if(houseAd.interact("Visit-last"))
         		{
-        			MethodProvider.sleepUntil(() -> Locations.isInstanced(), () -> p.l.isMoving(), Sleep.calculate(2222,2222),50);
-        			Sleep.sleep(420, 696);
+        			Sleep.sleepUntil(() -> Locations.isInstanced(), () -> Players.getLocal().isMoving(), Sleepz.calculate(2222,2222),50);
+        			Sleepz.sleep(420, 696);
         			if(!Locations.isInstanced()) visitedLast = false;
         		}
     			return;
     		}
     		if(houseAd.interact("View"))
     		{
-    			MethodProvider.sleepUntil(() -> Widgets.getWidgetChild(52,13) != null && 
-    	    			Widgets.getWidgetChild(52,13).isVisible(), () -> p.l.isMoving(), Sleep.calculate(2222, 2222),50);
+    			Sleep.sleepUntil(() -> Widgets.get(52,13) != null && 
+    	    			Widgets.get(52,13).isVisible(), () -> Players.getLocal().isMoving(), Sleepz.calculate(2222, 2222),50);
     		}
-    		else if(Walking.shouldWalk(6) && Walking.walk(houseAd))Sleep.sleep(69, 1111);
+    		else if(Walking.shouldWalk(6) && Walking.walk(houseAd))Sleepz.sleep(69, 1111);
     		return;
     	}
     	//check if near rimmington at all
-    	if(Locations.rimmington.contains(p.l) || Locations.rimmington.distance(p.l.getTile()) < 50)
+    	if(Locations.rimmington.contains(Players.getLocal()) || Locations.rimmington.distance(Players.getLocal().getTile()) < 50)
     	{
-    		if(Walking.shouldWalk(6) && Walking.walk(Locations.rimmington.getCenter())) Sleep.sleep(696, 420);
+    		if(Walking.shouldWalk(6) && Walking.walk(Locations.rimmington.getCenter())) Sleepz.sleep(696, 420);
     		return;
     	}
     }
@@ -225,19 +217,19 @@ public class TrainPrayer extends Leaf {
     	{
     		if(onExit())
     		{
-    			MethodProvider.log("[TIMEOUT] -> Prayer!");
+    			Logger.log("[TIMEOUT] -> Prayer!");
                 API.mode = null;
     		}
-            return Timing.sleepLogNormalSleep();
+            return Sleepz.sleepTiming();
     	}
         final int prayer = Skills.getRealLevel(Skill.PRAYER);
     	if (prayer >= DecisionLeaf.prayerSetpoint) {
     		if(onExit())
     		{
-    			MethodProvider.log("[COMPLETE] -> lvl "+DecisionLeaf.prayerSetpoint+" prayer!");
+    			Logger.log("[COMPLETE] -> lvl "+DecisionLeaf.prayerSetpoint+" prayer!");
                 API.mode = null;
     		}
-            return Timing.sleepLogNormalSleep();
+            return Sleepz.sleepTiming();
         }
     	
     	int prayerGoal = DecisionLeaf.prayerSetpoint;
@@ -245,46 +237,15 @@ public class TrainPrayer extends Leaf {
         int currentXP = Skills.getExperience(Skill.PRAYER);
         double neededXP = (xpTotalForGoal - currentXP);
         bonesToGoal = ((int) (neededXP / xpPerBone)) + randomBonesAdder;
-        Main.customPaintText1 = "Prayer lvl goal: " + prayerGoal;
-        Main.customPaintText2 = "Have to offer more bones until reached goal: " +bonesToGoal;
-        
-    	//handle dialogues from Phials/Estate agent
-    	if(Dialogues.isProcessing())
-    	{
-    		return Timing.sleepLogNormalSleep();
-    	}
-    	if(Dialogues.canContinue())
-    	{
-    		Dialoguez.continueDialogue();
-    		return Timing.sleepLogNormalSleep();
-    	}
-    	if(Dialogues.areOptionsAvailable()) 
-    	{ 
-    		//have at least one option to exchange items, check for "all" and if none, choose "1"
-    		for(String option : Dialogues.getOptions())
-    		{
-    			if(option == null || option.isEmpty() || option.equalsIgnoreCase("null")) continue;
-    			if(option.contains("Exchange All:")) {
-    				Dialogues.chooseOption(option);
-    				return Timing.sleepLogNormalSleep();
-    			}
-    		}
-    		Dialoguez.chooseOptionIndex(1);
-    		return Timing.sleepLogNormalSleep();
-    	}
-    	if(Inventory.count(constructionBook) > 0)
-    	{
-    		if(Tabs.isOpen(Tab.INVENTORY)) Inventory.drop(constructionBook);
-    		else Tabz.open(Tab.INVENTORY);
-    		return Timing.sleepLogNormalSleep();
-    	}
-    	if(Skillz.shouldCheckSkillInterface()) Skillz.checkSkillProgress(Skill.PRAYER);
+        Main.paint_task = "Prayer lvl goal: " + prayerGoal;
+        Main.paint_itemsCount = "Have to offer more bones until reached goal: " +bonesToGoal;
+
     	if(Locations.isInstanced())
     	{
     		if(Inventory.count(id.dBones) <= 0 || forceLeaveShitHouse) 
     		{
     			leaveHouse();
-    			return Timing.sleepLogNormalSleep();
+    			return Sleepz.sleepTiming();
     		}
     		
     		//cancel, do not bury the bone
@@ -295,8 +256,8 @@ public class TrainPrayer extends Leaf {
         			if(s == null) continue;
         			if(s.contains("Bury the bone")) 
         			{
-        				if(Dialogues.chooseOption("Cancel")) Sleep.sleep(696,420);
-        				return Timing.sleepLogNormalInteraction();
+        				if(Dialogues.chooseOption("Cancel")) Sleepz.sleep(696,420);
+        				return Sleepz.interactionTiming();
         			}
         		}
     		}
@@ -381,15 +342,15 @@ public class TrainPrayer extends Leaf {
         					forceLeaveShitHouse = true;
         					announcedShitHouse = true;
     					}
-    					return Sleep.calculate(69, 69);
+    					return Sleepz.calculate(69, 69);
     				}
     				leaveHouse();
-    				return Timing.sleepLogNormalSleep();
+    				return Sleepz.sleepTiming();
     			}
     			//find out if item is selected
     			if(Inventory.getSelectedItemName() == null)
     			{
-    				MethodProvider.log("Nothing selected");
+    				Logger.log("Nothing selected");
     				if(Tabs.isOpen(Tab.INVENTORY))
     				{
     					List<Integer> boneSlots = new ArrayList<Integer>();
@@ -418,18 +379,18 @@ public class TrainPrayer extends Leaf {
         				lastBone.interact("Use");
     				} else if(Widgets.isOpen()) Widgets.closeAll();
     				else Tabz.open(Tab.INVENTORY);
-    				Sleep.sleep(69, 69);
+    				Sleepz.sleep(69, 69);
     			}
     			else if(!Inventory.getSelectedItemName().contains(new Item(id.dBones,1).getName()))
     			{
-    				MethodProvider.log("Something NOT dbones selected: "+Inventory.getSelectedItemName());
+    				Logger.log("Something NOT dbones selected: "+Inventory.getSelectedItemName());
     				
     				Inventory.deselect();
-    				Sleep.sleep(69, 69);
+    				Sleepz.sleep(69, 69);
     			}
     			else //dbones are selected
     			{
-    				MethodProvider.log("Dbones selected");
+    				Logger.log("Dbones selected");
     				String useAction = "Use";
 					if(Dialogues.inDialogue()) 
 					{
@@ -437,85 +398,116 @@ public class TrainPrayer extends Leaf {
 						{
 							if(Menu.clickAction(useAction, altar)) 
 							{
-								MethodProvider.sleepUntil(() -> p.l.isMoving() || p.l.isAnimating(), Sleep.calculate(2222, 2222));
-								Sleep.sleep(69,69);
+								Sleep.sleepUntil(() -> Players.getLocal().isMoving() || Players.getLocal().isAnimating(), Sleepz.calculate(2222, 2222));
+								Sleepz.sleep(69,69);
 							}
 						}
 						else 
 						{
-							Area canvas = new Area(Widgets.getWidgetChild(548, 9).getRectangle());
+							Area canvas = new Area(Widgets.get(548, 9).getRectangle());
 		    				Area altarBounds = new Area(altar.getModel().getHullBounds());
 		    				altarBounds.intersect(canvas);
 		    				if(altarBounds.isEmpty())
 		    				{
 		    					Camera.rotateToEntity(altar);
-		    					return Sleep.calculate(69, 69);
+		    					return Sleepz.calculate(69, 69);
 		    				}
 		    				
 		    				if(!altar.getModel().getHullBounds().contains(Mouse.getPosition()))
 		    				{
 		    					Mouse.move(altar);
-		    					return Sleep.calculate(69, 69);
+		    					return Sleepz.calculate(69, 69);
 		    				}
 		    				else Menu.open();
 						}
-						return Sleep.calculate(69, 69);
+						return Sleepz.calculate(69, 69);
 					}
-					if(p.l.isMoving()) MethodProvider.sleepUntil(() -> !p.l.isMoving(), Sleep.calculate(2222, 2222));
-		    		if(p.l.isAnimating())
+					if(Players.getLocal().isMoving()) Sleep.sleepUntil(() -> !Players.getLocal().isMoving(), Sleepz.calculate(2222, 2222));
+		    		if(Players.getLocal().isAnimating())
 		    		{
-		    			MethodProvider.sleepUntil(() -> Inventory.count(id.dBones) <= 0 || 
+		    			Sleep.sleepUntil(() -> Inventory.count(id.dBones) <= 0 || 
 		    					Dialogues.inDialogue() || 
 		    					!Locations.isInstanced() ||
 		    					GameObjects.all(litBurnersFilter).size() <= 1,
-		    					() -> (p.l.isAnimating() || p.l.isMoving()), Sleep.calculate(2222, 2222),50);
+		    					() -> (Players.getLocal().isAnimating() || Players.getLocal().isMoving()), Sleepz.calculate(2222, 2222),50);
 		    		 	if(Inventory.count(id.dBones) <= 0 || 
 		    		 			GameObjects.all(litBurnersFilter).size() <= 1 || 
-		    		 			Locations.isInstanced()) return Timing.sleepLogNormalSleep();
+		    		 			Locations.isInstanced()) return Sleepz.sleepTiming();
 		    		}
 		    		if(Menu.isVisible())
 					{
 						if(Menu.clickAction(useAction, altar)) 
 						{
-							MethodProvider.sleepUntil(() -> p.l.isMoving() || p.l.isAnimating(), Sleep.calculate(2222, 2222));
-							Sleep.sleep(69,69);
+							Sleep.sleepUntil(() -> Players.getLocal().isMoving() || Players.getLocal().isAnimating(), Sleepz.calculate(2222, 2222));
+							Sleepz.sleep(69,69);
 						}
 					}
 					else 
 					{
-						Area canvas = new Area(Widgets.getWidgetChild(548, 9).getRectangle());
+						Area canvas = new Area(Widgets.get(548, 9).getRectangle());
 	    				Area altarBounds = new Area(altar.getModel().getHullBounds());
 	    				altarBounds.intersect(canvas);
 	    				if(altarBounds.isEmpty())
 	    				{
 	    					Camera.rotateToEntity(altar);
-	    					return Sleep.calculate(69, 69);
+	    					return Sleepz.calculate(69, 69);
 	    				}
 	    				
 	    				if(!altar.getModel().getHullBounds().contains(Mouse.getPosition()))
 	    				{
 	    					Mouse.move(altar);
-	    					return Sleep.calculate(69, 69);
+	    					return Sleepz.calculate(69, 69);
 	    				}
 	    				else Menu.open();
 					}
-					return Timing.sleepLogNormalSleep();
+					return Sleepz.sleepTiming();
     			}
     		} else leaveHouse();
     	}
     	else //not in instanced area (house) 
     	{
+    		if(!unlockHouse()) return Sleepz.sleepTiming();
+        	
+    		//handle dialogues from Phials/Estate agent
+        	if(Dialogues.isProcessing())
+        	{
+        		return Sleepz.sleepTiming();
+        	}
+        	if(Dialogues.canContinue())
+        	{
+        		Dialoguez.continueDialogue();
+        		return Sleepz.sleepTiming();
+        	}
+        	if(Dialogues.areOptionsAvailable()) 
+        	{ 
+        		//have at least one option to exchange items, check for "all" and if none, choose "1"
+        		for(String option : Dialogues.getOptions())
+        		{
+        			if(option == null || option.isEmpty() || option.equalsIgnoreCase("null")) continue;
+        			if(option.contains("Exchange All:")) {
+        				Dialogues.chooseOption(option);
+        				return Sleepz.sleepTiming();
+        			}
+        		}
+        		Dialoguez.chooseOptionIndex(1);
+        		return Sleepz.sleepTiming();
+        	}
+        	if(Inventory.count(constructionBook) > 0)
+        	{
+        		if(Tabz.open(Tab.INVENTORY)) Inventory.drop(constructionBook);
+        		return Sleepz.sleepTiming();
+        	}
     		usedSlots.clear();
     		forceLeaveShitHouse = false;
     		announcedShitHouse = false;
     		if(Inventory.count(id.dBones) >= 1)
     		{
-    			if(Locations.rimmington.contains(p.l)) 
+    			if(Locations.rimmington.contains(Players.getLocal())) 
     			{
     				chooseRandomAltarHouse();
     			}
     			else Walkz.teleportOutsideHouse(180000);
-    			return Timing.sleepLogNormalSleep();
+    			return Sleepz.sleepTiming();
     		} 
     		if(Inventory.count(new Item(id.dBones,1).getNotedItemID()) > 0) 
     		{
@@ -523,44 +515,44 @@ public class TrainPrayer extends Leaf {
     	    	NPC phials = NPCs.closest("Phials");
     	    	if(phials != null)
     	    	{
-    	    		if(!p.l.isInteracting(phials))
+    	    		if(!Players.getLocal().isInteracting(phials))
     	    		{
     	        		if(!Tabs.isOpen(Tab.INVENTORY))
     	        		{
     	        			Tabz.open(Tab.INVENTORY);
-    	        			return Timing.sleepLogNormalInteraction();
+    	        			return Sleepz.interactionTiming();
     	        		}
     	    			Item bonesNoted = Inventory.get(new Item(id.dBones,1).getNotedItemID());
     	        		if(bonesNoted.useOn(phials))
 	        			{
-	        				MethodProvider.sleepUntil(Dialogues::inDialogue, () -> p.l.isMoving(), Sleep.calculate(2222,2222), 50);
+	        				Sleep.sleepUntil(Dialogues::inDialogue, () -> Players.getLocal().isMoving(), Sleepz.calculate(2222,2222), 50);
 	        			}
     	    		}
     	    	}
     	    	else
     	    	{
-    	    		if(Locations.rimmington.distance(p.l.getTile()) > 45) Walkz.teleportOutsideHouse(180000);
-        			else if(Walking.shouldWalk(6) && Walking.walk(Locations.rimmington.getCenter())) Sleep.sleep(420,1111);
+    	    		if(Locations.rimmington.distance(Players.getLocal().getTile()) > 45) Walkz.teleportOutsideHouse(180000);
+        			else if(Walking.shouldWalk(6) && Walking.walk(Locations.rimmington.getCenter())) Sleepz.sleep(420,1111);
     	    		
     	    	}
-    	    	return Timing.sleepLogNormalSleep();
+    	    	return Sleepz.sleepTiming();
     		} 
     		//check bank for stuff
-	    	if(!InvEquip.checkedBank()) return Timing.sleepLogNormalSleep();
+	    	if(!InvEquip.checkedBank()) return Sleepz.sleepTiming();
 	    	final int totalBones = Bank.count(id.dBones) + Inventory.count(id.dBones) + Inventory.count(new Item(id.dBones,1).getNotedItemID());
 	    	if(totalBones < bonesToGoal)
 	    	{
 	    		neededBones = bonesToGoal - totalBones;
 	    	}
-	    	Main.customPaintText3 = "total # bones (invy unnoted + noted + bank): " + totalBones;
-	    	Main.customPaintText4 = "total # bones missing to goal: " + neededBones;
+	    	Main.paint_subTask = "total # bones (invy unnoted + noted + bank): " + totalBones;
+	    	Main.paint_levels = "total # bones missing to goal: " + neededBones;
 	    	//withdraw all dBones noted
 	    	if(Bank.contains(id.dBones) || totalBones < bonesToGoal || Inventory.count(id.houseTele) > 1)
 	    	{
 	    		if(Locations.isInstanced())
 	    		{
 	    			leaveHouse();
-	    			return Timing.sleepLogNormalSleep();
+	    			return Sleepz.sleepTiming();
 	    		}
 	    		InvEquip.clearAll();
 	    		InvEquip.addInvyItem(id.dBones, bonesToGoal, bonesToGoal, true, neededBones);
@@ -572,78 +564,34 @@ public class TrainPrayer extends Leaf {
 	    		}
 	    		InvEquip.addInvyItem(InvEquip.coins, 5, randomCoinsAmount, false, 0);
 	    		InvEquip.fulfillSetup(true, 180000);
-	    		return Timing.sleepLogNormalSleep();
+	    		return Sleepz.sleepTiming();
 	    	}
 	    	if(Widgets.isOpen())Widgets.closeAll();
 			
 	    	
-	    	if(!unlockHouse()) return Timing.sleepLogNormalSleep();
 	    	
 	    	if(Inventory.interact(id.houseTele, "Break"))
 			{
-				MethodProvider.sleepUntil(() -> Locations.isInstanced(), () -> p.l.isAnimating(), Sleep.calculate(4444,2222),50);
-				return Timing.sleepLogNormalSleep();
+				Sleep.sleepUntil(() -> Locations.isInstanced(), () -> Players.getLocal().isAnimating(), Sleepz.calculate(4444,2222),50);
+				return Sleepz.sleepTiming();
 			}
     	}
-		return Timing.sleepLogNormalSleep();
+		return Sleepz.sleepTiming();
     }
 
     public static boolean unlockHouse()
     {
-    	if(Locations.unlockedHouse) return true;
-    	//here we unlock teh house
-    	
+    	if(Inventory.count(constructionBook) > 0 || Bank.count(constructionBook) > 0) Locations.unlockedHouse = true;
     	if(Inventory.count(constructionBook) > 0)
     	{
-    		Locations.unlockedHouse = true;
-    		return true;
+    		if(!Tabz.open(Tab.INVENTORY)) return false;
+    		if(Inventory.dropAll(constructionBook)) Sleep.sleepTick();
+    		return false;
     	}
+    	if(Locations.unlockedHouse) return true;
     	
     	//handle dialogues from Phials/Estate agent
-    	if(Dialogues.isProcessing())
-    	{
-    		Sleep.sleep(696,420);
-    		return false;
-    	}
-    	if(Dialogues.canContinue())
-    	{
-    		Dialogues.continueDialogue();
-    		Sleep.sleep(696,420);
-    		return false;
-    	}
-    	if(Widgets.getWidgetChild(219, 1, 1) != null && 
-    			Widgets.getWidgetChild(219, 1, 1).isVisible() && 
-    			Widgets.getWidgetChild(219, 1, 1).getText().contains("Exchange")) 
-    	{ 
-    		//have at least one option to exchange items, check for "all" and if none, choose "1"
-    		if(!Dialogues.chooseFirstOptionContaining("Exchange All:")) Keyboard.type("1",false);
-    		return false;
-    	}
-    	if(Dialogues.areOptionsAvailable())
-    	{
-    		if(Dialogues.getOptionIndexContaining("How can I get a house?") == -1)
-    		{
-    			if(Dialogues.getOptionIndexContaining("Yes please!") == -1)
-    			{
-    				Mouse.click(Map.tileToMiniMap(p.l.getTile()));
-    				Sleep.sleep(696,420);
-    				return false;
-    			} else
-    			{
-    				if(Dialogues.chooseOption("Yes please!"))
-    				{
-    					Locations.unlockedHouse = true;
-    				}
-    				Sleep.sleep(420,1111);
-    			}
-    		}
-    		else
-    		{
-    			Dialogues.chooseOption("How can I get a house?");
-    			Sleep.sleep(420,1111);
-    		}
-    		return false;
-    	}
+    	if(Dialoguez.handleDialogues()) return false;
     	
     	//check for estate agent around us
     	NPC estateAgent = NPCs.closest("Estate agent");
@@ -653,7 +601,7 @@ public class TrainPrayer extends Leaf {
     		{
     			if(estateAgent.interact("Talk-to"))
     			{
-    				MethodProvider.sleepUntil(() -> Dialogues.inDialogue(), Sleep.calculate(2222,2222));
+    				Sleep.sleepUntil(() -> Dialogues.inDialogue(), Sleepz.calculate(2222,2222));
     			}
     		}
     		else
@@ -664,33 +612,30 @@ public class TrainPrayer extends Leaf {
     					d.getTile().equals(new Tile(2982,3370,0)));
     			if(estateAgent.getTile().equals(new Tile(2981,3370,0)) && doorfuckery != null)
     			{
-    				if(doorfuckery.interact("Close")) Sleep.sleep(696, 420);
+    				if(doorfuckery.interact("Close")) Sleepz.sleep(696, 420);
     				{
-    					MethodProvider.sleepWhile(() -> p.l.isMoving(), Sleep.calculate(2222,2222));
+    					Sleep.sleepTicks(2);
+    					Sleep.sleepUntil(() -> !Players.getLocal().isMoving(), Sleepz.calculate(2222,2222));
     				}
     				return false;
     			}
-    			if(Walking.shouldWalk(6) && Walking.walk(Locations.estateRoom.getCenter())) Sleep.sleep(666,1111);
+    			if(Walking.shouldWalk(6) && Walking.walk(Locations.estateRoom.getCenter())) Sleepz.sleep(666,1111);
     		}
-    		MethodProvider.sleep(Timing.sleepLogNormalSleep());
+    		Sleepz.sleep();
     		return false;
     	}
     	//see how close we are to estate room - walk if close
-    	final double dist = Locations.estateRoom.distance(p.l.getTile());
+    	final double dist = Locations.estateRoom.distance(Players.getLocal().getTile());
     	if(dist <= 45)
     	{
-    		if(Walking.shouldWalk(6) && Walking.walk(Locations.estateRoom.getCenter())) Sleep.sleep(666,1111);
-    		MethodProvider.sleep(Timing.sleepLogNormalSleep());
+    		if(Walking.shouldWalk(6) && Walking.walk(Locations.estateRoom.getCenter())) Sleepz.sleep(666,1111);
+    		Sleepz.sleep();
     		return false;
     	}
     	if(!Walkz.teleportFalador(60000)) InvEquip.buyItem(id.fallyTele, 10, 60000);
-    	MethodProvider.sleep(Timing.sleepLogNormalSleep());
+    	Sleepz.sleep();
 		return false;
     }
     
     
-	@Override
-	public boolean isValid() {
-		return API.mode == API.modes.TRAIN_PRAYER;
-	}
 }

@@ -1,25 +1,13 @@
 package script.utilities;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.dreambot.api.methods.MethodProvider;
-import org.dreambot.api.methods.dialogues.Dialogues;
+import org.dreambot.api.Client;
 import org.dreambot.api.methods.filter.Filter;
 import org.dreambot.api.methods.interactive.GameObjects;
-import org.dreambot.api.methods.interactive.NPCs;
 import org.dreambot.api.methods.interactive.Players;
 import org.dreambot.api.methods.map.Area;
 import org.dreambot.api.methods.map.Tile;
-import org.dreambot.api.methods.walking.impl.Walking;
-import org.dreambot.api.methods.walking.pathfinding.impl.web.WebFinder;
-import org.dreambot.api.methods.walking.web.node.AbstractWebNode;
-import org.dreambot.api.methods.walking.web.node.impl.BasicWebNode;
+import org.dreambot.api.utilities.Sleep;
 import org.dreambot.api.wrappers.interactive.GameObject;
-import org.dreambot.api.wrappers.interactive.NPC;
-
-import script.p;
-import script.quest.varrockmuseum.Timing;
 
 public class Locations {
 	public static void initialize()
@@ -36,16 +24,20 @@ public class Locations {
 		//handle dialogue for Veos traveling to Kourend
 		if(Dialoguez.handleDialogues()) return;
 		
-		if(Locations.veosSarim.getCenter().distance(p.l.getTile()) > 75) 
+		if(Locations.veosSarim.getCenter().distance(Players.getLocal().getTile()) > 75) 
 		{
 			Walkz.teleportDraynor(180000);
-			Sleep.sleep(420,1111);
+			Sleepz.sleep(420,1111);
 			return;
 		}
 		
 		API.walkTalkToNPC("Veos", "Talk-to", Locations.veosSarim);
 	}
 	public static boolean unlockedHouse = true;
+	public static final Area hillGiantsShedAbove = new Area(3113, 3450, 3117, 3453, 0);
+	public static final Tile hillGiantsShedDoor = new Tile(3115,3450,0);
+	public static final Area hillGiantsF2PCave = new Area(3093, 9821, 3134, 9865);
+	public static final Area oborGate = new Area(3100, 9838, 3093, 9826, 0);
 	public static final Area camelotTrees = new Area(
 			new Tile(2752, 3452, 0),
 			new Tile(2756, 3451, 0),
@@ -743,9 +735,9 @@ public class Locations {
 	public static final Area entireLumbyCave = new Area(3137, 9602, 3262, 9536,0);
 	public static final boolean isInDesert()
 	{
-		if(Locations.shantayPassSouthSide.contains(p.l) || 
-				Locations.wholeDesert.contains(p.l) || 
-				Locations.carpetAreaShantay.contains(p.l)) return true;
+		if(Locations.shantayPassSouthSide.contains(Players.getLocal()) || 
+				Locations.wholeDesert.contains(Players.getLocal()) || 
+				Locations.carpetAreaShantay.contains(Players.getLocal())) return true;
 		return false;
 	}
 	public static final Area strongholdWolves = new Area(
@@ -779,10 +771,10 @@ public class Locations {
 			new Tile(3137, 3474, 0),
 			new Tile(3128, 3474, 0));
 	public static boolean isInIsleOfSouls() {
-		if(forgottenSoulsLvl1.contains(p.l) || 
-				forgottenSoulsLvl2.contains(p.l) || 
-				forgottenSoulsLvl3.contains(p.l) || 
-				isleOfSouls.contains(p.l)) return true;
+		if(forgottenSoulsLvl1.contains(Players.getLocal()) || 
+				forgottenSoulsLvl2.contains(Players.getLocal()) ||
+				forgottenSoulsLvl3.contains(Players.getLocal()) || 
+				isleOfSouls.contains(Players.getLocal())) return true;
 		return false;
 	}
 	public static final Tile sandcrabSouls1 = new Tile(2283,2804,0);
@@ -868,23 +860,23 @@ public class Locations {
 		{
 			if(gangplank.interact("Cross"))
 			{
-				MethodProvider.sleepUntil(() -> !isInDestinationShip(), 
-					() -> p.l.isMoving(),
-					Sleep.calculate(2222,2222), 50);
+				Sleep.sleepUntil(() -> !isInDestinationShip(), 
+					() -> Players.getLocal().isMoving(),
+					Sleepz.calculate(2222,2222), 50);
 			}
 		}
 	}
 	public static boolean isInDestinationShip() {
-		if(shipLandsEnd.contains(p.l)) return true;
-		if(shipSarimVeos.contains(p.l)) return true;
-		if(shipPiscVeos.contains(p.l)) return true;
+		if(shipLandsEnd.contains(Players.getLocal())) return true;
+		if(shipSarimVeos.contains(Players.getLocal())) return true;
+		if(shipPiscVeos.contains(Players.getLocal())) return true;
 		return false;
 	}
 	public static boolean isInKourend() {
-		if(kourendGiantsCaveArea.contains(p.l) || 
-				entireKourend.contains(p.l) || 
-				kourendCastle2ndFloor.contains(p.l) || 
-				kourendCastle3rdFloor.contains(p.l)) 
+		if(kourendGiantsCaveArea.contains(Players.getLocal()) || 
+				entireKourend.contains(Players.getLocal()) || 
+				kourendCastle2ndFloor.contains(Players.getLocal()) || 
+				kourendCastle3rdFloor.contains(Players.getLocal())) 
 		{
 			unlockedKourend = true;
 			return true;
@@ -901,9 +893,22 @@ public class Locations {
 			new Tile(1563, 3678, 0));
 	public static final int edgeOfTheWorldX = 3904;
 	public static boolean isInstanced() {
-		if(p.l.getX() >= edgeOfTheWorldX) return true;
-		return false;
+		return Client.isDynamicRegion();
 	}
+	public static final Area mageArena2_spot1 = new Area(3014, 3835, 3030, 3820);
+	Area mageArena2_spot2 = new Area(3161, 3803, 3174, 3788);
+	Area mageArena2_spot3 = new Area(3152, 3836, 3161, 3845);
+	Area mageArena2_spot4 = new Area(3154, 3866, 3140, 3882);
+	Area mageArena2_spot5 = new Area(3167, 3903, 3180, 3890);
+	Area mageArena2_spot6 = new Area(3209, 3885, 3221, 3874);
+	Area mageArena2_spot7 = new Area(3237, 3866, 3224, 3878);
+	Area mageArena2_spot8 = new Area(3226, 3913, 3237, 3904);
+	Area mageArena2_spot9 = new Area(3300, 3946, 3307, 3938);
+	Area mageArena2_spot10 = new Area(3267, 3876, 3250, 3894);
+	Area mageArena2_spot11 = new Area(3290, 3882, 3302, 3868);
+	Area mageArena2_spot12 = new Area(3279, 3838, 3269, 3848);
+	Area mageArena2_spot13 = new Area(3241, 3837, 3253, 3826);
+	Area mageArena2_spot14 = new Area(3265, 3807, 3250, 3793);
 	public static final Area castleWarsTrees = new Area(
 			new Tile(2475, 3104, 0),
 			new Tile(2465, 3120, 0),

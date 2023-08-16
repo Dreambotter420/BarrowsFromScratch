@@ -5,44 +5,23 @@ import java.util.Collections;
 import java.util.List;
 
 import org.dreambot.api.methods.Calculations;
-import org.dreambot.api.methods.MethodProvider;
 import org.dreambot.api.methods.combat.Combat;
 import org.dreambot.api.methods.combat.CombatStyle;
 import org.dreambot.api.methods.container.impl.bank.Bank;
 import org.dreambot.api.methods.container.impl.equipment.Equipment;
 import org.dreambot.api.methods.container.impl.equipment.EquipmentSlot;
 import org.dreambot.api.methods.grandexchange.GrandExchange;
-import org.dreambot.api.methods.interactive.NPCs;
 import org.dreambot.api.methods.interactive.Players;
-import org.dreambot.api.methods.magic.Magic;
-import org.dreambot.api.methods.magic.Normal;
 import org.dreambot.api.methods.skills.Skill;
 import org.dreambot.api.methods.skills.Skills;
+import org.dreambot.api.utilities.Logger;
 import org.dreambot.api.utilities.Timer;
-import org.dreambot.api.wrappers.interactive.NPC;
 
 import script.Main;
-import script.p;
-import script.actionz.UniqueActions;
-import script.actionz.UniqueActions.Actionz;
 import script.behaviour.DecisionLeaf;
-import script.framework.Branch;
 import script.framework.Leaf;
-import script.framework.Tree;
-import script.quest.animalmagnetism.AnimalMagnetism;
-import script.quest.horrorfromthedeep.HorrorFromTheDeep;
-import script.quest.varrockmuseum.Timing;
+import script.utilities.*;
 import script.skills.ranged.Mobs;
-import script.skills.ranged.Mobs.Mob;
-import script.skills.ranged.TrainRanged;
-import script.utilities.API;
-import script.utilities.Bankz;
-import script.utilities.GrandExchangg;
-import script.utilities.InvEquip;
-import script.utilities.Locations;
-import script.utilities.Sleep;
-import script.utilities.Walkz;
-import script.utilities.id;
 
 public class TrainMelee extends Leaf{
 	public static boolean started = false; 
@@ -59,7 +38,7 @@ public class TrainMelee extends Leaf{
 			Walkz.exitIsleOfSouls(240000);
 			return false;
 		}
-		if(Locations.kourendGiantsCaveArea.contains(p.l))
+		if(Locations.kourendGiantsCaveArea.contains(Players.getLocal()))
 		{
 			Walkz.exitGiantsCave();
 			return false;
@@ -74,21 +53,18 @@ public class TrainMelee extends Leaf{
 	public static Timer attStyleTimer = null;
 	@Override
 	public int onLoop() {
-		if(DecisionLeaf.taskTimer.finished())
-		{
-			MethodProvider.log("[TIMEOUT] -> Melee training!");
+		if(DecisionLeaf.taskTimer.finished()) {
+			Logger.log("[TIMEOUT] -> Melee training!");
             if(onExit())
             {
             	API.mode = null;
             }
-            return Timing.sleepLogNormalSleep();
+            return Sleepz.sleepTiming();
 		}
-		if(Equipment.contains(getBestWeapon()) && !updateAttStyle()) 
-		{
-			MethodProvider.log("Failed to update attack style with best melee weapon equipped!");
-			return Timing.sleepLogNormalSleep();
+		if(Equipment.contains(getBestWeapon()) && !updateAttStyle()) {
+			Logger.log("Failed to update attack style with best melee weapon equipped!");
+			return Sleepz.sleepTiming();
 		}
-			
 		if(Mobs.mob == null) Mobs.chooseMob(true);
         return Mobs.trainMob(true);
 	}
@@ -111,11 +87,11 @@ public class TrainMelee extends Leaf{
     	InvEquip.addInvyItem(InvEquip.coins, 0, 0, false, 0);
 		if(InvEquip.fulfillSetup(true, 180000))
 		{
-			MethodProvider.log("[TRAIN MELEE] -> Fulfilled equipment correctly!");
+			Logger.log("[TRAIN MELEE] -> Fulfilled equipment correctly!");
 			return true;
 		} else 
 		{
-			MethodProvider.log("[TRAIN MELEE] -> NOT fulfilled equipment correctly!");
+			Logger.log("[TRAIN MELEE] -> NOT fulfilled equipment correctly!");
 			return false;
 		}
     	
@@ -149,7 +125,7 @@ public class TrainMelee extends Leaf{
 	{
 		if(attStyleTimer != null && !attStyleTimer.isPaused() && !attStyleTimer.finished()) 
 		{
-			Main.customPaintText4 = "Time until check att style for switching: " + Timer.formatTime(attStyleTimer.remaining());
+			Main.paint_levels = "Time until check att style for switching: " + Timer.formatTime(attStyleTimer.remaining());
 			return true;
 		}
 		if(attStyleTimer == null || attStyleTimer.isPaused() || attStyleTimer.finished())
@@ -253,9 +229,7 @@ public class TrainMelee extends Leaf{
 	public static int getBestBodySlot()
     {
 		final int def = Skills.getRealLevel(Skill.DEFENCE);
-    	if(def >= 40) 
-    	{
-    		if(UniqueActions.isActionEnabled(Actionz.ADDYPLATEBODY_INSTEAD_OF_RUNECHAINBODY)) return id.addyPlatebody;
+    	if(def >= 40) {
     		return id.runeChainbody;
     	}
     	if(def >= 30) return id.addyPlatebody;

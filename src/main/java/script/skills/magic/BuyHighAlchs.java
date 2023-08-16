@@ -9,33 +9,27 @@ import java.util.Map.Entry;
 import org.dreambot.api.Client;
 import org.dreambot.api.data.GameState;
 import org.dreambot.api.methods.Calculations;
-import org.dreambot.api.methods.MethodProvider;
 import org.dreambot.api.methods.container.impl.Inventory;
 import org.dreambot.api.methods.container.impl.bank.Bank;
 import org.dreambot.api.methods.container.impl.bank.BankLocation;
 import org.dreambot.api.methods.container.impl.bank.BankMode;
-import org.dreambot.api.methods.container.impl.equipment.Equipment;
 import org.dreambot.api.methods.container.impl.equipment.EquipmentSlot;
 import org.dreambot.api.methods.grandexchange.GrandExchange;
 import org.dreambot.api.methods.grandexchange.GrandExchangeItem;
-import org.dreambot.api.methods.grandexchange.LivePrices;
 import org.dreambot.api.methods.grandexchange.Status;
 import org.dreambot.api.methods.interactive.Players;
 import org.dreambot.api.methods.magic.Magic;
-import org.dreambot.api.methods.map.Map;
-import org.dreambot.api.methods.tabs.Tab;
-import org.dreambot.api.methods.tabs.Tabs;
 import org.dreambot.api.methods.widget.Widgets;
 import org.dreambot.api.script.ScriptManager;
+import org.dreambot.api.utilities.Logger;
+import org.dreambot.api.utilities.Sleep;
 import org.dreambot.api.utilities.Timer;
 import org.dreambot.api.wrappers.items.Item;
 
-import script.p;
-import script.quest.varrockmuseum.Timing;
 import script.utilities.Bankz;
 import script.utilities.GrandExchangg;
 import script.utilities.InvEquip;
-import script.utilities.Sleep;
+import script.utilities.Sleepz;
 import script.utilities.Walkz;
 import script.utilities.id;
 
@@ -59,20 +53,20 @@ public class BuyHighAlchs {
 		InvEquip.setEquipItem(EquipmentSlot.RING,InvEquip.wealth);
 		if(!InvEquip.fulfillSetup(true, 180000)) return;
 		final int timeout = 600000;
-		MethodProvider.log("Starting HA buy function with staff of fire equipped");
+		Logger.log("Starting HA buy function with staff of fire equipped");
 		List<Integer> keys = new ArrayList(id.approvedAlchs.keySet());
 		if(longbowsOrNot) keys = new ArrayList(id.xpAlchs.keySet());
 		Collections.shuffle(keys);
 		Timer timer = new Timer(600000);
 		for (Integer o : keys) {
-			MethodProvider.log("Entering fulfill method for HA Item: " + new Item(o, 1).getName());
+			Logger.log("Entering fulfill method for HA Item: " + new Item(o, 1).getName());
 			final int initItemCount = Bank.count(o) + Inventory.count(o) + Inventory.count(new Item(o,1).getNotedItemID());
 			
 			Timer timer2 = new Timer(timer.remaining());
 			while(!timer2.finished() && Client.getGameState() == GameState.LOGGED_IN
 					&& ScriptManager.getScriptManager().isRunning() && !ScriptManager.getScriptManager().isPaused())
 			{
-				Sleep.sleep(69, 69);
+				Sleepz.sleep(69, 69);
 				if(Magic.isSpellSelected())
 		    	{
 		    		Magic.deselect();
@@ -95,7 +89,7 @@ public class BuyHighAlchs {
 				{
 					if(Bank.count(i) > 0) 
 					{
-						MethodProvider.log("Bank contains alch: " + new Item(i,1).getName());
+						Logger.log("Bank contains alch: " + new Item(i,1).getName());
 						containsAlch = true;
 					}
 					alchCount += Inventory.count(i) + Inventory.count(new Item(i,1).getNotedItemID()) + Bank.count(i);
@@ -121,8 +115,8 @@ public class BuyHighAlchs {
 							{
 								if(Bank.depositAll(new Item(i,1).getUnnotedItemID())) 
 								{
-									MethodProvider.log("Deposited some unnoted High Alchs");
-									Sleep.sleep(696, 420);
+									Logger.log("Deposited some unnoted High Alchs");
+									Sleepz.sleep(696, 420);
 								}
 								continue1 = true;
 							}
@@ -133,19 +127,19 @@ public class BuyHighAlchs {
 							if(Inventory.emptySlotCount() <= 0)
 							{
 								InvEquip.depositExtraJunk();
-								MethodProvider.sleep(Timing.sleepLogNormalInteraction());
+								Sleepz.sleepInteraction();
 								continue;
 							}
 							
 							if(Bank.withdrawAll(InvEquip.coins))
 							{
-								MethodProvider.sleepUntil(() -> !Bank.contains(InvEquip.coins), Sleep.calculate(2222, 2222));
+								Sleep.sleepUntil(() -> !Bank.contains(InvEquip.coins), Sleepz.calculate(2222, 2222));
 								continue;
 							}
 
 							if(Bank.withdrawAll(id.natureRune))
 							{
-								MethodProvider.sleepUntil(() -> !Bank.contains(id.natureRune), Sleep.calculate(2222, 2222));
+								Sleep.sleepUntil(() -> !Bank.contains(id.natureRune), Sleepz.calculate(2222, 2222));
 								continue;
 							}
 							boolean withdrewSome = false;
@@ -154,11 +148,11 @@ public class BuyHighAlchs {
 								if(Bank.withdrawAll(i)) 
 								{
 									withdrewSome = true;
-									Sleep.sleep(696, 420);
+									Sleepz.sleep(696, 420);
 								}
 							}
 							if(withdrewSome) continue;
-							MethodProvider.log("Test1");
+							Logger.log("Test1");
 						}
 						else
 						{
@@ -168,13 +162,13 @@ public class BuyHighAlchs {
 					}
 					if(GrandExchange.isOpen() && GrandExchangg.close()) 
 					{
-						Sleep.sleep(696, 420);
+						Sleepz.sleep(696, 420);
 						continue;
 					}
-					if(BankLocation.GRAND_EXCHANGE.distance(p.l.getTile()) < 50 && 
+					if(BankLocation.GRAND_EXCHANGE.distance(Players.getLocal().getTile()) < 50 &&
 							Bank.open(BankLocation.GRAND_EXCHANGE) )
 					{
-						Sleep.sleep(420, 696);
+						Sleepz.sleep(420, 696);
 						continue;
 					}
 					Walkz.goToGE(timer.remaining());
@@ -192,7 +186,7 @@ public class BuyHighAlchs {
 						
 						if(GrandExchange.open())
 						{
-							MethodProvider.sleepUntil(() -> GrandExchange.isOpen(), Sleep.calculate(2222, 2222));
+							Sleep.sleepUntil(() -> GrandExchange.isOpen(), Sleepz.calculate(2222, 2222));
 						}
 					}
 					continue;
@@ -203,32 +197,32 @@ public class BuyHighAlchs {
 					{
 						if(GrandExchange.collect())
 						{
-							MethodProvider.sleepUntil(() -> !GrandExchange.isReadyToCollect(), Sleep.calculate(2222, 2222));
+							Sleep.sleepUntil(() -> !GrandExchange.isReadyToCollect(), Sleepz.calculate(2222, 2222));
 						}
 						continue;
 					}
 					if(GrandExchange.isBuyOpen())
 					{
-						MethodProvider.log("Buy menu open");
+						Logger.log("Buy menu open");
 						
 						if(GrandExchange.goBack())
 						{
-							MethodProvider.log("Went back on GE");
+							Logger.log("Went back on GE");
 						}
 						
 						continue;
 					}
-					MethodProvider.log("|| Printing timers || ");
+					Logger.log("|| Printing timers || ");
 					boolean breakalso = false;
 					for(Entry<Integer,Timer> entry : HABuyTimeouts.entrySet())
 					{
 						if(entry.getValue().finished())
 						{
-							MethodProvider.log("Item: " +new Item(entry.getKey(),1).getName()+ " || Timer: finished");
+							Logger.log("Item: " +new Item(entry.getKey(),1).getName()+ " || Timer: finished");
 						}
 						else
 						{
-							MethodProvider.log("Item: " +new Item(entry.getKey(),1).getName()+ " || Timer: "+Timer.formatTime(entry.getValue().remaining()));
+							Logger.log("Item: " +new Item(entry.getKey(),1).getName()+ " || Timer: "+Timer.formatTime(entry.getValue().remaining()));
 							if(entry.getKey() == itemID) 
 								{
 								breakalso = true;
@@ -248,15 +242,15 @@ public class BuyHighAlchs {
 						{
 							if(HABuyTimeouts.get(geItem.getID()).finished())
 							{
-								if(Widgets.getWidgetChild(465,(geItem.getSlot() + 7),16) != null && 
-										Widgets.getWidgetChild(465,(geItem.getSlot() + 7),16).isVisible())
+								if(Widgets.get(465,(geItem.getSlot() + 7),16) != null && 
+										Widgets.get(465,(geItem.getSlot() + 7),16).isVisible())
 								{
-									if(Widgets.getWidgetChild(465,(geItem.getSlot() + 7),16).interact("Abort offer"))
+									if(Widgets.get(465,(geItem.getSlot() + 7),16).interact("Abort offer"))
 									{
-										MethodProvider.log("Aborted offer via right click");
+										Logger.log("Aborted offer via right click");
 										collect = true;
 										HABuyTimeouts.remove(geItem.getID());
-										Sleep.sleep(696, 696);
+										Sleepz.sleep(696, 696);
 									}
 								}
 							}
@@ -275,14 +269,14 @@ public class BuyHighAlchs {
 					}
 					if(breakWhileLoop) 
 					{
-						MethodProvider.log("Have current alch item in offers already!");
-						Sleep.sleep(420, 696);
+						Logger.log("Have current alch item in offers already!");
+						Sleepz.sleep(420, 696);
 						break;
 					}
 					if(collect) 
 					{
-						MethodProvider.log("Have canceled some old offers!");
-						Sleep.sleep(420, 696);
+						Logger.log("Have canceled some old offers!");
+						Sleepz.sleep(420, 696);
 						continue;
 					}
 					
@@ -293,27 +287,27 @@ public class BuyHighAlchs {
 					{
 						if(wait) 
 						{
-							Sleep.sleep(420, 696);
+							Sleepz.sleep(420, 696);
 							continue;
 						}
-						MethodProvider.log("Account needs more gp (100k) to continue HA function, exiting with no offer timers left");
+						Logger.log("Account needs more gp (100k) to continue HA function, exiting with no offer timers left");
 						return;
 					}
 					if(Inventory.count(InvEquip.coins) < totalPrice)
 					{
-						MethodProvider.log("Account needs more GP to buy item: " + new Item(itemID,1).getName() +" in qty: " + buyLimit+" at total price: " + totalPrice+" gp, adjusting to gp amt...");
+						Logger.log("Account needs more GP to buy item: " + new Item(itemID,1).getName() +" in qty: " + buyLimit+" at total price: " + totalPrice+" gp, adjusting to gp amt...");
 						buyQty =(int) (Inventory.count(InvEquip.coins) / pricePer);
 						totalPrice = buyQty * pricePer;
 						if(Inventory.count(InvEquip.coins) < totalPrice)
 						{
-							MethodProvider.log("Account needs more GP to buy item: " + new Item(itemID,1).getName() +" in qty: " + buyQty+" at total price: " + totalPrice+" gp, stopping HA buying function...");
+							Logger.log("Account needs more GP to buy item: " + new Item(itemID,1).getName() +" in qty: " + buyQty+" at total price: " + totalPrice+" gp, stopping HA buying function...");
 							break;
 						}
 						buyLimit = buyQty;
 					}
 					if(GrandExchange.getFirstOpenSlot() == -1)
 					{
-						MethodProvider.log("Waiting, all offers full...");
+						Logger.log("Waiting, all offers full...");
 						continue;
 					}
 					if(buyLimit > 1000)
@@ -322,14 +316,14 @@ public class BuyHighAlchs {
 					}
 					if(GrandExchange.buyItem(itemID, buyLimit, pricePer))
 					{
-						HABuyTimeouts.put(o, new Timer((int) Calculations.nextGaussianRandom(50000, 25000)));
-						MethodProvider.sleepUntil(() -> GrandExchange.isReadyToCollect(), Sleep.calculate(16666, 5555));
-						Sleep.sleep(111, 111);
+						HABuyTimeouts.put(o, new Timer((int) Calculations.nextGaussianRandom(15000, 1000)));
+						Sleep.sleepUntil(() -> GrandExchange.isReadyToCollect(), Sleepz.calculate(5000, 5555));
+						Sleepz.sleep(111, 111);
 						continue;
 					}
 				}
 			}
 		}
-		MethodProvider.log("Done with HA Buy function!");
+		Logger.log("Done with HA Buy function!");
 	}
 }

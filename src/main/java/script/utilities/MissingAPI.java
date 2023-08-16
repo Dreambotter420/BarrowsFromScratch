@@ -8,9 +8,7 @@ import java.util.List;
 import org.dreambot.api.Client;
 import org.dreambot.api.input.Mouse;
 import org.dreambot.api.methods.Calculations;
-import org.dreambot.api.methods.MethodProvider;
 import org.dreambot.api.methods.combat.Combat;
-import org.dreambot.api.methods.container.impl.Inventory;
 import org.dreambot.api.methods.dialogues.Dialogues;
 import org.dreambot.api.methods.interactive.NPCs;
 import org.dreambot.api.methods.interactive.Players;
@@ -21,132 +19,107 @@ import org.dreambot.api.methods.tabs.Tabs;
 import org.dreambot.api.methods.walking.impl.Walking;
 import org.dreambot.api.methods.widget.Widgets;
 import org.dreambot.api.methods.world.Worlds;
-import org.dreambot.api.methods.worldhopper.WorldHopper;
+import org.dreambot.api.script.ScriptManager;
+import org.dreambot.api.utilities.Logger;
+import org.dreambot.api.utilities.Sleep;
 import org.dreambot.api.utilities.Timer;
 import org.dreambot.api.wrappers.interactive.NPC;
 import org.dreambot.api.wrappers.interactive.Player;
-import org.dreambot.api.wrappers.items.Item;
 import org.dreambot.api.wrappers.widgets.WidgetChild;
-
-import script.p;
-import script.quest.varrockmuseum.Timing;
 
 public class MissingAPI {
 	
 	public static boolean scrollHopWorld(int world)
 	{
 		if(Worlds.getCurrentWorld() == world) return true;
-		if(p.l.isInCombat()) return false;
-		Timer timeout = new Timer(Sleep.calculate(18000, 5555));
+		if(Players.getLocal().isInCombat()) return false;
+		Timer timeout = new Timer(Sleepz.calculate(18000, 7777));
 		while(Worlds.getCurrentWorld() != world && 
 				!timeout.finished() && 
-				Client.isLoggedIn() && 
-				!p.l.isInCombat() && 
-				Skills.getRealLevel(Skill.HITPOINTS) > 0)
-		{	
-			Sleep.sleep(69, 69);
+				Client.isLoggedIn() &&
+				ScriptManager.getScriptManager().isRunning() &&
+				!ScriptManager.getScriptManager().isPaused() &&
+				!Players.getLocal().isInCombat() && 
+				Skills.getRealLevel(Skill.HITPOINTS) > 0) {
+			Sleepz.sleep();
 			if(Dialoguez.handleDialogues()) continue;
-			if(Widgets.getWidgetChild(69,2) != null &&
-					Widgets.getWidgetChild(69,2).isVisible() &&
-					Widgets.getWidgetChild(69,2).getText().contains("Loading..."))
-			{
-				Sleep.sleep(100, 1111);
+			if(Widgets.get(69,2) != null &&
+					Widgets.get(69,2).isVisible() &&
+					Widgets.get(69,2).getText().contains("Loading...")) {
 				continue;
 			}
-			if(Widgets.getWidgetChild(182, 7) != null &&
-					Widgets.getWidgetChild(182, 7).isVisible() &&
-					Widgets.getWidgetChild(182, 7).getText().contains("World Switcher"))
-			{
-				Widgets.getWidgetChild(182, 3).interact("World Switcher");
-				Sleep.sleep(100, 1111);
+			if(Widgets.get(182, 7) != null &&
+					Widgets.get(182, 7).isVisible() &&
+					Widgets.get(182, 7).getText().contains("World Switcher")) {
+				Widgets.get(182, 3).interact("World Switcher");
 				continue;
 			}
-			if(!Tabs.isOpen(Tab.LOGOUT))
-			{
+			if(!Tabs.isOpen(Tab.LOGOUT)) {
 				Tabz.open(Tab.LOGOUT);
-				Sleep.sleep(100, 1111);
 				continue;
 			}
 			//worlds are now loaded
-			if(Widgets.getWidgetChild(69,2) != null &&
-					Widgets.getWidgetChild(69,2).isVisible() &&
-					Widgets.getWidgetChild(69,2).getText().contains("Current world - "))
-			{
+			if(Widgets.get(69,2) != null &&
+					Widgets.get(69,2).isVisible() &&
+					Widgets.get(69,2).getText().contains("Current world - ")) {
 				//establish correct WidgetChild of desired world's clickable bar
 				int gc = -1;
-				for(WidgetChild w : Widgets.getWidgetChildrenContainingText(Integer.toString(world)))
-				{
-					if(w.getX() == 563) // correct x position lineup for world number location **FIXED MODE**
-					{
+				for(WidgetChild w : Widgets.getWidgetChildrenContainingText(Integer.toString(world))) {
+					// hardcoded correct x position lineup for world number location **FIXED MODE**
+					if(w.getX() == 563) {
 						gc = (w.getIndex() - 2);
 						break;
 					}
 				}
 				WidgetChild worldWidget = null;
-				if(gc >= 0) worldWidget = Widgets.getWidgetChild(69,17,gc);
-				if(worldWidget == null) 
-				{
-					Sleep.sleep(100, 111);
+				if(gc >= 0) worldWidget = Widgets.get(69,17,gc);
+				if(worldWidget == null) {
+					Sleepz.sleep(100, 111);
 					continue;
 				}
 				Rectangle worldRectangle = worldWidget.getRectangle();
-				WidgetChild worldListContainer = Widgets.getWidgetChild(69,17);
-				if(worldListContainer == null)
-				{
-					Sleep.sleep(100, 111);
+				WidgetChild worldListContainer = Widgets.get(69,17);
+				if(worldListContainer == null) {
+					Sleepz.sleep(100, 111);
 					continue;
 				}
-				if(worldRectangle.intersects(Widgets.getWidgetChild(69,15).getRectangle()))
-				{
+				if(worldRectangle.intersects(Widgets.get(69,15).getRectangle())) {
 					//World widget is visible - clicking it
-					Rectangle visibleWorldRectangle = worldRectangle.intersection(Widgets.getWidgetChild(69,15).getRectangle());
+					Rectangle visibleWorldRectangle = worldRectangle.intersection(Widgets.get(69,15).getRectangle());
 					Mouse.click(visibleWorldRectangle);
-				}
-				else
-				{
+				} else {
 					//World list needs scrolling
 					double yPos = worldRectangle.getCenterY();
 					double yMin = worldListContainer.getRectangle().getMinY();
 					double yMax = worldListContainer.getRectangle().getMaxY();
 					double offsetRatio = ((yPos - yMin) / (yMax - yMin));
-					WidgetChild scrollContainer = Widgets.getWidgetChild(69,18,0);
-					if(scrollContainer == null)
-					{
-						Sleep.sleep(100, 111);
+					WidgetChild scrollContainer = Widgets.get(69,18,0);
+					if(scrollContainer == null) {
+						Sleepz.sleep(100, 111);
 						continue;
 					}
 					double scrollMinY = scrollContainer.getRectangle().getMinY();
 					int xRand = (int) Calculations.random(scrollContainer.getRectangle().getMinX(), scrollContainer.getRectangle().getMaxX());
 					int yClickPos = (int) ((scrollContainer.getHeight() * offsetRatio) + scrollMinY);
-					if(yPos >= yMax) 
-					{
+					if(yPos >= yMax) {
 						yClickPos =+ (int) Calculations.random(1, 5);
 						if(yClickPos > scrollContainer.getRectangle().getMaxY()) yClickPos = (int) scrollContainer.getRectangle().getMaxY() - 1;
-					}
-					else if(yPos <= yMin) 
-					{
+					} else if(yPos <= yMin) {
 						yClickPos =- (int) Calculations.random(1, 5);
 						if(yClickPos < scrollContainer.getRectangle().getMinY()) yClickPos = (int) scrollContainer.getRectangle().getMinY() + 1;
 					}
 					Mouse.click(new Point(xRand,yClickPos));
 				}
-				Sleep.sleep(111, 1111);
-				continue;
 			}
-			Sleep.sleep(111, 1111);
 		}
 		if(Worlds.getCurrentWorld() == world) return true;
 		return false;
 	}
-	public static List<Player> getAllPlayersInteractingWith(Player player)
-	{
-		if(player != null)
-		{
+	public static List<Player> getAllPlayersInteractingWith(Player player) {
+		if(player != null) {
 			List<Player> targetedBy = new ArrayList<Player>();
-			for(Player p : Players.all())
-			{
-				if(p.isInteracting(player))
-				{
+			for(Player p : Players.all()) {
+				if(p.isInteracting(player)) {
 					targetedBy.add(p);
 				}
 			}
@@ -154,15 +127,11 @@ public class MissingAPI {
 		}
 		return null;
 	}
-	public static List<NPC> getAllNPCsInteractingWith(Player player)
-	{
-		if(player != null)
-		{
+	public static List<NPC> getAllNPCsInteractingWith(Player player) {
+		if(player != null) {
 			List<NPC> targetedBy = new ArrayList<NPC>();
-			for(NPC p : NPCs.all())
-			{
-				if(p.isInteracting(player))
-				{
+			for(NPC p : NPCs.all()) {
+				if(p.isInteracting(player)) {
 					targetedBy.add(p);
 				}
 			}
@@ -204,7 +173,7 @@ public class MissingAPI {
 	}
 	public static boolean isInteractedByNPC()
 	{
-		List<NPC> targetedBy = getAllNPCsInteractingWith(p.l);
+		List<NPC> targetedBy = getAllNPCsInteractingWith(Players.getLocal());
 		for(NPC npc : targetedBy)
 		{
 			if(npc != null)
@@ -216,7 +185,7 @@ public class MissingAPI {
 	}
 	public static boolean isInteracting()
 	{
-		return p.l.getInteractingCharacter() != null;
+		return Players.getLocal().getInteractingCharacter() != null;
 	}
 	public static boolean isInCombat()
 	{
@@ -227,7 +196,7 @@ public class MissingAPI {
 		NPC npc = NPCs.closest(NPC);
 		if(npc == null) 
 		{
-			MethodProvider.log("NPC: \""+NPC+"\" not found in TalkToNPC call");
+			Logger.log("NPC: \""+NPC+"\" not found in TalkToNPC call");
 			return false;
 		}
 		else
@@ -235,11 +204,11 @@ public class MissingAPI {
 			if(npc.getSurroundingArea(1).canReach())
 			{
 				npc.interact("Talk-to");
-				Sleep.sleep(666,111);
-				MethodProvider.sleepUntil(
+				Sleepz.sleep(666,111);
+				Sleep.sleepUntil(
 						() -> Dialogues.inDialogue(),
-						Sleep.calculate(5555,1111));
-				Sleep.sleep(111,1111);
+						Sleepz.calculate(5555,1111));
+				Sleepz.sleep(111,1111);
 			}
 			else 
 			{
@@ -251,7 +220,7 @@ public class MissingAPI {
 	}
 	public static boolean isInteractedByAnotherPlayer()
 	{
-		List<Player> targetedBy = getAllPlayersInteractingWith(p.l);
+		List<Player> targetedBy = getAllPlayersInteractingWith(Players.getLocal());
 		for(Player player : targetedBy)
 		{
 			if(player != null)
@@ -272,7 +241,7 @@ public class MissingAPI {
 		List<Player> targetedBy = getAllPlayersInteractingWith(playerToCheck); 
 		for(Player player : targetedBy)
 		{
-			if(player != null && !player.equals(p.l))
+			if(player != null && !player.equals(Players.getLocal()))
 			{
 				return true;
 			}
@@ -284,7 +253,7 @@ public class MissingAPI {
 		List<Player> targetedBy = getAllPlayersInteractingWith(npcToCheck);
 		for(Player player : targetedBy)
 		{
-			if(player != null && !player.equals(p.l))
+			if(player != null && !player.equals(Players.getLocal()))
 			{
 				return true;
 			}
@@ -361,7 +330,7 @@ public class MissingAPI {
 	}
 	public static boolean isInteractedWith() //no argument assumes from local player
 	{
-		return isInteractedByAnotherPlayer(p.l) || isInteractedByAnotherNPC(p.l);
+		return isInteractedByAnotherPlayer(Players.getLocal()) || isInteractedByAnotherNPC(Players.getLocal());
 	}
 	public static boolean isInteractedWith(NPC toCheck)
 	{

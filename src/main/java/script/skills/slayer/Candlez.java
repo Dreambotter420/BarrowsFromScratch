@@ -3,7 +3,6 @@ package script.skills.slayer;
 import org.dreambot.api.Client;
 import org.dreambot.api.data.GameState;
 import org.dreambot.api.methods.Calculations;
-import org.dreambot.api.methods.MethodProvider;
 import org.dreambot.api.methods.container.impl.Inventory;
 import org.dreambot.api.methods.container.impl.bank.Bank;
 import org.dreambot.api.methods.interactive.GameObjects;
@@ -15,17 +14,16 @@ import org.dreambot.api.methods.skills.Skills;
 import org.dreambot.api.methods.walking.impl.Walking;
 import org.dreambot.api.methods.widget.helpers.ItemProcessing;
 import org.dreambot.api.script.ScriptManager;
+import org.dreambot.api.utilities.Logger;
+import org.dreambot.api.utilities.Sleep;
 import org.dreambot.api.utilities.Timer;
 import org.dreambot.api.wrappers.interactive.GameObject;
 
-import script.p;
-import script.quest.varrockmuseum.Timing;
 import script.skills.crafting.TrainCrafting;
-import script.skills.woodcutting.TrainWoodcutting;
 import script.utilities.Bankz;
 import script.utilities.InvEquip;
 import script.utilities.Paths;
-import script.utilities.Sleep;
+import script.utilities.Sleepz;
 import script.utilities.Walkz;
 import script.utilities.id;
 
@@ -39,8 +37,8 @@ public class Candlez {
 		while(!timer.finished() && Client.getGameState() == GameState.LOGGED_IN
 				&& ScriptManager.getScriptManager().isRunning() && !ScriptManager.getScriptManager().isPaused())
 		{
-			Sleep.sleep(69, 69);
-			MethodProvider.log("In getLantern loop");
+			Sleepz.sleep(69, 69);
+			Logger.log("In getLantern loop");
 			if(trainCrafting() && trainFiremaking())
 			{
 				if(Inventory.count(id.tinderbox) > 0 && Inventory.count(id.litCandleLantern) > 0)
@@ -78,7 +76,7 @@ public class Candlez {
 				//start backwards - finish what we can first ...
 				if(ItemProcessing.isOpen())
 				{
-					if(ItemProcessing.makeAll(id.emptyCandleLantern)) Sleep.sleep(696, 420);
+					if(ItemProcessing.makeAll(id.emptyCandleLantern)) Sleepz.sleep(696, 420);
 					continue;
 				}
 				if(banklitCandleLanterns > 0)
@@ -90,12 +88,12 @@ public class Candlez {
 				{
 					if(Bank.isOpen())
 					{
-						if(Bankz.close()) Sleep.sleep(69, 420);
+						if(Bankz.close()) Sleepz.sleep(69, 420);
 						continue;
 					}
 					if(Inventory.get(id.tinderbox).useOn(Inventory.get(id.unlitCandleLantern)))
 					{
-						MethodProvider.sleepUntil(() -> Inventory.count(id.litCandleLantern) > invlitCandleLanterns, Sleep.calculate(2222, 2222));
+						Sleep.sleepUntil(() -> Inventory.count(id.litCandleLantern) > invlitCandleLanterns, Sleepz.calculate(2222, 2222));
 					}
 					continue;
 				}
@@ -103,7 +101,7 @@ public class Candlez {
 				{
 					if(InvEquip.withdrawOne(id.unlitCandleLantern,180000))
 					{
-						Sleep.sleep(420, 696);
+						Sleepz.sleep(420, 696);
 					}
 					continue;
 				}
@@ -113,12 +111,12 @@ public class Candlez {
 					{
 						if(Bank.isOpen())
 						{
-							if(Bankz.close()) Sleep.sleep(69, 420);
+							if(Bankz.close()) Sleepz.sleep(69, 420);
 							continue;
 						}
 						if(Inventory.get(id.litCandle).useOn(Inventory.get(id.emptyCandleLantern)))
 						{
-							MethodProvider.sleepUntil(() -> Inventory.count(id.litCandleLantern) > invlitCandleLanterns, Sleep.calculate(2222, 2222));
+							Sleep.sleepUntil(() -> Inventory.count(id.litCandleLantern) > invlitCandleLanterns, Sleepz.calculate(2222, 2222));
 						}
 						continue;
 					}
@@ -126,12 +124,12 @@ public class Candlez {
 					{
 						if(Bank.isOpen())
 						{
-							if(Bankz.close()) Sleep.sleep(69, 420);
+							if(Bankz.close()) Sleepz.sleep(69, 420);
 							continue;
 						}
 						if(Inventory.get(id.unlitCandle).useOn(Inventory.get(id.emptyCandleLantern)))
 						{
-							MethodProvider.sleepUntil(() -> Inventory.count(id.unlitCandleLantern) > invunlitCandleLanterns, Sleep.calculate(2222, 2222));
+							Sleep.sleepUntil(() -> Inventory.count(id.unlitCandleLantern) > invunlitCandleLanterns, Sleepz.calculate(2222, 2222));
 						}
 						continue;
 					}
@@ -159,12 +157,12 @@ public class Candlez {
 					{
 						if(Bank.isOpen())
 						{
-							if(Bankz.close()) Sleep.sleep(69, 420);
+							if(Bankz.close()) Sleepz.sleep(69, 420);
 							continue;
 						}
 						if(Inventory.get(id.glassblowingPipe).useOn(Inventory.get(id.moltenGlass)))
 						{
-							MethodProvider.sleepUntil(() -> ItemProcessing.isOpen(), Sleep.calculate(2222, 2222));
+							Sleep.sleepUntil(() -> ItemProcessing.isOpen(), Sleepz.calculate(2222, 2222));
 						}
 						continue;
 					}
@@ -207,20 +205,20 @@ public class Candlez {
 		if(Inventory.count(id.logs) > 0 && 
 				Inventory.count(id.tinderbox) > 0)
 		{
-			if(lightableArea.contains(p.l))
+			if(lightableArea.contains(Players.getLocal()))
 			{
-				if(p.l.isMoving() || p.l.isAnimating()) {
-					MethodProvider.sleep(Timing.sleepLogNormalSleep());
+				if(Players.getLocal().isMoving() || Players.getLocal().isAnimating()) {
+					Sleepz.sleep();
 					return false;
 				}
 				GameObject fireUnderMe = GameObjects.closest(g -> g!=null && 
 						g.getName().equals("Fire") && 
-						g.getTile().equals(p.l.getTile()));
+						g.getTile().equals(Players.getLocal().getTile()));
 				if(fireUnderMe == null)
 				{
 					if(Inventory.get(id.logs).useOn(Inventory.get(id.tinderbox)))
 					{
-						MethodProvider.sleepUntil(() -> p.l.isAnimating(), Sleep.calculate(2222, 2222));
+						Sleep.sleepUntil(() -> Players.getLocal().isAnimating(), Sleepz.calculate(2222, 2222));
 					}
 					return false;
 				}
@@ -231,7 +229,7 @@ public class Candlez {
 							g.getTile().equals(t));
 					if(fireOnTranslatedTile == null)
 					{
-						if(Walking.walkExact(t)) MethodProvider.sleep(Timing.sleepLogNormalInteraction());
+						if(Walking.walkExact(t)) Sleepz.sleepInteraction();
 						return false;
 					}
 				}
@@ -242,7 +240,7 @@ public class Candlez {
 							g.getTile().equals(t));
 					if(fireOnTranslatedTile != null)
 					{
-						if(Walking.walkExact(t)) MethodProvider.sleep(Timing.sleepLogNormalInteraction());
+						if(Walking.walkExact(t)) Sleepz.sleepInteraction();
 						return false;
 					}
 				}
@@ -250,8 +248,8 @@ public class Candlez {
 			}
 			if(Walkz.goToGE(180000))
 			{
-				MethodProvider.log("Went to GE!");
-				if(Walking.shouldWalk(6) && Walking.walk(Paths.lane1Tiles[0])) Sleep.sleep(420, 696);
+				Logger.log("Went to GE!");
+				if(Walking.shouldWalk(6) && Walking.walk(Paths.lane1Tiles[0])) Sleepz.sleep(420, 696);
 				return false;
 			}
 		}

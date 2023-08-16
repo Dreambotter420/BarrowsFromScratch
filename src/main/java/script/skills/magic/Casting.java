@@ -11,8 +11,10 @@ import org.dreambot.api.methods.skills.Skills;
 import org.dreambot.api.methods.tabs.Tab;
 import org.dreambot.api.methods.tabs.Tabs;
 import org.dreambot.api.methods.widget.Widgets;
+import org.dreambot.api.utilities.Logger;
+import org.dreambot.api.utilities.Sleep;
 
-import script.utilities.Sleep;
+import script.utilities.Sleepz;
 import script.utilities.Tabz;
 import script.utilities.id;
 
@@ -47,28 +49,28 @@ public class Casting {
 		{
 			if(Tabz.open(Tab.COMBAT))
 			{
-				MethodProvider.sleepUntil(() -> Tabs.isOpen(Tab.COMBAT), Sleep.calculate(2222, 2222));
+				Sleep.sleepUntil(() -> Tabs.isOpen(Tab.COMBAT), Sleepz.calculate(2222, 2222));
 			}
 		}
 		if(Tabs.isOpen(Tab.COMBAT))
 		{
-			if(Widgets.getWidgetChild(201,1,1) == null || 
-					!Widgets.getWidgetChild(201,1,1).isVisible())
+			if(Widgets.get(201,1,1) == null || 
+					!Widgets.get(201,1,1).isVisible())
 			{
-				if(Widgets.getWidgetChild(593, 26).interact("Choose spell"))
+				if(Widgets.get(593, 26).interact("Choose spell"))
 				{
-					MethodProvider.sleepUntil(() -> Widgets.getWidgetChild(201,1,1) != null && 
-							Widgets.getWidgetChild(201,1,1).isVisible(),Sleep.calculate(2222, 2222));
+					Sleep.sleepUntil(() -> Widgets.get(201,1,1) != null && 
+							Widgets.get(201,1,1).isVisible(),Sleepz.calculate(2222, 2222));
 				}
 			}
-			if(Widgets.getWidgetChild(201,1,1) != null && 
-					Widgets.getWidgetChild(201,1,1).isVisible())
+			if(Widgets.get(201,1,1) != null && 
+					Widgets.get(201,1,1).isVisible())
 			{
 				String action = getSpellName(spellConfigID);
 				if(spellConfigID == 0) action = "Cancel";
-				if(Widgets.getWidgetChild(201,1,spellConfigID).interact(getSpellName(spellConfigID)))
+				if(Widgets.get(201,1,spellConfigID).interact(getSpellName(spellConfigID)))
 				{
-					MethodProvider.sleepUntil(() -> getAutocastConfig() == spellConfigID,Sleep.calculate(3333, 3333));
+					Sleep.sleepUntil(() -> getAutocastConfig() == spellConfigID,Sleepz.calculate(3333, 3333));
 				}
 				if(getAutocastConfig() == spellConfigID) return true;
 			}
@@ -148,7 +150,7 @@ public class Casting {
 			if(Inventory.count(rune.getName()) >= rune.getAmount()) continue;
 			else 
 			{
-				MethodProvider.log("Missing runes: " + rune.getName() + " for spell: " + spell.toString());
+				Logger.log("Missing runes: " + rune.getName() + " for spell: " + spell.toString());
 				return false;
 			}
 		}

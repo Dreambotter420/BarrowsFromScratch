@@ -5,18 +5,16 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import org.dreambot.api.methods.MethodProvider;
 import org.dreambot.api.methods.container.impl.Inventory;
 import org.dreambot.api.methods.filter.Filter;
 import org.dreambot.api.methods.interactive.Players;
 import org.dreambot.api.methods.item.GroundItems;
 import org.dreambot.api.methods.map.Area;
 import org.dreambot.api.methods.walking.impl.Walking;
+import org.dreambot.api.utilities.Logger;
+import org.dreambot.api.utilities.Sleep;
 import org.dreambot.api.wrappers.items.GroundItem;
 import org.dreambot.api.wrappers.items.Item;
-
-import script.quest.varrockmuseum.Timing;
-import script.skills.ranged.TrainRanged;
 
 public class ItemsOnGround {
 	public static List<Integer> herbTable = new ArrayList<Integer>();
@@ -35,6 +33,7 @@ public class ItemsOnGround {
 	public static List<Integer> lanzigLoot = new ArrayList<Integer>();
 	public static List<Integer> minotaurLoot = new ArrayList<Integer>();
 	public static List<Integer> sandcrabsLoot = new ArrayList<Integer>();
+	public static List<Integer> oborLoot = new ArrayList<Integer>();
 	
 	public static List<Integer> allSlayerLoot = new ArrayList<Integer>();
 	
@@ -89,6 +88,26 @@ public class ItemsOnGround {
 		
 		caveBugsLoot.add(id.natureRune);
 		caveBugsLoot.add(id.waterBattlestaff);
+
+		oborLoot.add(id.giantKey);
+		oborLoot.add(id.noted(id.limpwurtRoot));
+		oborLoot.add(id.noted(id.bigBones));
+		oborLoot.add(id.noted(id.uncutDiamond));
+		oborLoot.add(id.noted(id.uncutRuby));
+		oborLoot.add(id.natureRune);
+		oborLoot.add(id.cosmicRune);
+		oborLoot.add(id.chaosRune);
+		oborLoot.add(id.deathRune);
+		oborLoot.add(id.natureRune);
+		oborLoot.add(id.runeBattleaxe);
+		oborLoot.add(id.rune2h);
+		oborLoot.add(id.runeMedHelm);
+		oborLoot.add(id.runeLongsword);
+		oborLoot.add(id.runeKiteshield);
+		oborLoot.add(id.runeChainbody);
+		oborLoot.add(id.runePlateskirt);
+		oborLoot.add(id.runePlatelegs);
+		oborLoot.add(id.hillGiantClub);
 		
 		hillGiantsLoot.add(id.giantKey);
 		hillGiantsLoot.add(id.natureRune);
@@ -104,6 +123,7 @@ public class ItemsOnGround {
 		allSlayerLoot.addAll(herbTable);
 		allSlayerLoot.addAll(seedTable);
 		allSlayerLoot.addAll(rareDropTable);
+		allSlayerLoot.addAll(oborLoot);
 		allSlayerLoot.add(id.casket);
 		allSlayerLoot.add(id.fireTalisman);
 		allSlayerLoot.add(id.bigBones);
@@ -147,12 +167,12 @@ public class ItemsOnGround {
 	{
 		if(listToCheck == null)
 		{
-			MethodProvider.log("Attempted to check ground items list which is null");
+			Logger.log("Attempted to check ground items list which is null");
 			return null;
 		}
 		if(listToCheck.isEmpty())
 		{
-			MethodProvider.log("Attempted to check ground items list which is empty");
+			Logger.log("Attempted to check ground items list which is empty");
 			return null;
 		}
 		Filter<GroundItem> nearbyGroundItemFilter = g -> 
@@ -165,11 +185,34 @@ public class ItemsOnGround {
 		GroundItem g = GroundItems.closest(nearbyGroundItemFilter);
 		return g;
 	}
-	public static GroundItem getNearbyGroundItem(int itemID, Area area)
+	/**
+	 * Gets a nearby ground item according to most valuable above a given threshold. 
+	 * Set boolean shouldBeReachable to false if you intend to telegrab items, true if walking to loot
+	 * 
+	 */
+	public static GroundItem getNearbyGroundItem(List<Integer> itemsToCheck, boolean shouldBeReachable)
 	{
-		if(itemID <= 0)
-		{
-			MethodProvider.log("Attempted to check ground itemID list which is less than or equal to 0!");
+		if(itemsToCheck == null) {
+			Logger.log("Attempted to check ground items list which is null");
+			return null;
+		}
+		if(itemsToCheck.isEmpty()) {
+			Logger.log("Attempted to check ground items list which is empty");
+			return null;
+		}
+		
+		Filter<GroundItem> nearbyGroundItemFilter = g -> 
+			g != null && 
+			g.exists() &&
+			g.distance() <= 15 &&
+			((shouldBeReachable && g.canReach()) || !shouldBeReachable) &&
+			itemsToCheck.contains(g.getID());
+		GroundItem g = GroundItems.closest(nearbyGroundItemFilter);
+		return g;
+	}
+	public static GroundItem getNearbyGroundItem(int itemID, Area area) {
+		if(itemID <= 0) {
+			Logger.log("Attempted to check ground itemID list which is less than or equal to 0!");
 			return null;
 		}
 		
@@ -188,11 +231,9 @@ public class ItemsOnGround {
 	 * Set boolean shouldBeReachable to false if you intend to telegrab items, true if walking to loot
 	 * 
 	 */
-	public static GroundItem getValuableNearbyItem(int valueThreshold, Area killingArea, boolean shouldBeReachable)
-	{
-		if(valueThreshold <= 0)
-		{
-			MethodProvider.log("Attempted to check ground items value which is 0 or less...");
+	public static GroundItem getValuableNearbyItem(int valueThreshold, Area killingArea, boolean shouldBeReachable) {
+		if(valueThreshold <= 0) {
+			Logger.log("Attempted to check ground items value which is 0 or less...");
 			return null;
 		}
 		
@@ -222,42 +263,43 @@ public class ItemsOnGround {
 	 * @param g
 	 * @return
 	 */
-	public static boolean grabNearbyGroundItem(GroundItem g)
-	{
+	public static boolean grabNearbyGroundItem(GroundItem g) {
 		if(g == null) return true;
-		if(Inventory.isFull())
-		{
-			if(Inventory.count(id.jug) > 0)
-			{
-				if(Inventory.dropAll(id.jug))
-				{
-					MethodProvider.log("Dropped a jug");
+		if(Inventory.isFull()) {
+			if(Inventory.count(id.jug) > 0) {
+				if(Inventory.dropAll(id.jug)) {
+					Logger.log("Dropped a jug");
 				}
 			}
-			for(int food : Combatz.foods)
-			{
-				if(Inventory.count(food) > 0)
-				{
-					if(Inventory.drop(food))
-					{
-						MethodProvider.log("Dropped a food: " + new Item(food, 1).getName());
+			for(int food : Combatz.foods) {
+				if(Inventory.count(food) > 0) {
+					if(Inventory.drop(food)) {
+						Logger.log("Dropped a food: " + new Item(food, 1).getName());
 					}
 				}
 			}
 		}
-		if(Inventory.isFull())
-		{
-			MethodProvider.log("Inventory full but found nearby ground item, confused wat do?? : "+g.getName());
+		if(Inventory.isFull()) {
+			Logger.log("Inventory full but found nearby ground item, confused wat do?? : "+g.getName());
 			return false;
 		}
 		
-		MethodProvider.log("Attempting to grab ground item: "+g.getName() +" in amount: " + g.getAmount());
-		if(!Walking.isRunEnabled() && Walking.getRunEnergy() > 3) Walking.toggleRun(); 
-		final int count = Inventory.count(g.getID());
-		if(g.interact("Take")) 
-		{
-			MethodProvider.sleepUntil(() -> Inventory.count(g.getID()) > count, Sleep.calculate(2222, 2222));
+		Logger.log("Attempting to grab ground item: "+g.getName() +" in amount: " + g.getAmount());
+		if(!Walking.isRunEnabled() && Walking.getRunEnergy() >= 2) {
+			Sleepz.sleep();
+			Walking.toggleRun();
+			Sleepz.sleepInteraction();
 		}
-		return true;
+		final int count = Inventory.count(g.getID());
+		return g.interact("Take") &&
+				Sleep.sleepUntil(() -> Inventory.count(g.getID()) > count || g == null || !g.exists(),
+						() -> Players.getLocal().isMoving(),
+						Sleepz.calculate(2222, 2222), 100) &&
+				Sleepz.sleep(true);
+	}
+
+	public static void grabNearbyItem (String groundItem) {
+		GroundItem g = GroundItems.closest(groundItem);
+		if (g != null) { grabNearbyGroundItem(g); }
 	}
 }

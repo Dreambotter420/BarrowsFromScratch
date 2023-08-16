@@ -1,24 +1,17 @@
 package script.utilities;
 
-import java.util.Arrays;
-import java.util.List;
-
-import org.dreambot.api.methods.MethodProvider;
 import org.dreambot.api.methods.container.impl.Inventory;
 import org.dreambot.api.methods.dialogues.Dialogues;
 import org.dreambot.api.methods.input.Keyboard;
 import org.dreambot.api.methods.interactive.Players;
+import org.dreambot.api.methods.map.Tile;
 import org.dreambot.api.methods.walking.impl.Walking;
 import org.dreambot.api.methods.widget.Widgets;
+import org.dreambot.api.utilities.Logger;
+import org.dreambot.api.utilities.Sleep;
 import org.dreambot.api.utilities.impl.Condition;
-import org.dreambot.api.wrappers.widgets.WidgetChild;
 
-import script.Main;
 import script.Test;
-import script.p;
-import script.actionz.UniqueActions;
-import script.actionz.UniqueActions.Actionz;
-import script.quest.alfredgrimhand.AlfredGrimhandsBarcrawl;
 import script.quest.animalmagnetism.AnimalMagnetism;
 import script.quest.animalmagnetism.AnimalMagnetism.Lover;
 import script.quest.ernestthechicken.ErnestTheChicken;
@@ -28,16 +21,17 @@ import script.quest.naturespirit.NatureSpirit;
 import script.utilities.API.modes;
 
 public class Dialoguez {
-	public static String dialog = "";
+
 	public static boolean foundDialogue = false;
 	public static boolean foundWait = false;
 	public static boolean foundLongWait = false;
+	public static String dialog = "";
 	public static void updateLastNPCDialog()
 	{
-		if(Widgets.getWidgetChild(193, 2) != null && 
-				Widgets.getWidgetChild(193,2).isVisible())
+		if(Widgets.get(193, 2) != null && 
+				Widgets.get(193,2).isVisible())
 		{
-			String txt = Widgets.getWidgetChild(193, 2).getText();
+			String txt = Widgets.get(193, 2).getText();
 			if(txt != null && !txt.isEmpty() && !txt.equalsIgnoreCase("null")) 
 			{
 				dialog = txt;
@@ -47,7 +41,7 @@ public class Dialoguez {
 		String dialoge = Dialogues.getNPCDialogue();
 		if(dialoge != null && !dialoge.isEmpty() && !dialoge.equalsIgnoreCase("null") && !dialoge.equals(dialog))
 		{
-			MethodProvider.log("NPC Dialogue: " + dialoge);
+			Logger.log("NPC Dialogue: " + dialoge);
 			dialog = dialoge;
 		}
 	}
@@ -60,39 +54,27 @@ public class Dialoguez {
 		 	if(Dialogues.canContinue())
 			{
 		 		if(doStepsWhileDialogOpen()) return true;
-				
-				if(UniqueActions.isActionEnabled(Actionz.HOLD_SPACE_WHEN_QUESTING))
-				{
-					final int timeout = Sleep.calculate(2222,2222);
-					final Condition condition = () -> {
-					 	updateLastNPCDialog();
-					 	return observeQuestDialogue(Dialogues.getNPCDialogue()) || 
-					 			Dialogues.areOptionsAvailable() || 
-								!Dialogues.inDialogue();
-					};
-					Keyboard.holdSpace(condition,timeout);
-					MethodProvider.sleepUntil(condition, timeout);
-					if(foundWait) Sleep.sleep(5555, 4444);
-					if(foundLongWait) Sleep.sleep(8888, 6666);
-					return true;
-				}
-				if(continueDialogue()) 
-				{
-					Sleep.sleep(420,696);
-					if(foundWait) Sleep.sleep(5555, 4444);
-					if(foundLongWait) Sleep.sleep(8888, 6666);
-				}
+				final int timeout = Sleepz.calculate(2222,2222);
+				final Condition condition = () -> {
+					updateLastNPCDialog();
+					return observeQuestDialogue(Dialogues.getNPCDialogue()) ||
+							Dialogues.areOptionsAvailable() ||
+							!Dialogues.inDialogue();
+				};
+				Keyboard.holdSpace(condition,timeout);
+				Sleep.sleepUntil(condition, timeout);
+				if(foundWait) Sleepz.sleep(7777, 4444);
+				if(foundLongWait) Sleepz.sleep(12222, 7777);
 				return true;
 			}
-			if(Dialogues.isProcessing())
-			{
-				Sleep.sleep(420,696);
+			if(Dialogues.isProcessing()) {
+				Sleepz.sleepTiming();
 				return true;
 			}
-			 
+
 			if(Dialogues.areOptionsAvailable()) return chooseQuestOptions();
 			
-			if(Dialogues.inDialogue()) Sleep.sleep(2222, 2222);
+			if(Dialogues.inDialogue()) Sleepz.sleep(2222, 2222);
 			return false;
 		}
 	 /**
@@ -105,7 +87,6 @@ public class Dialoguez {
 		{
 		case NATURE_SPIRIT:
 		{
-			
 			if(dialog.contains("You use the mirror on the spirit of the dead") || 
 					dialog.contains("Here take a look at this, perhaps you can see that") ||
 					dialog.contains("The spirit of Filliman reaches forward and takes") ||
@@ -126,12 +107,12 @@ public class Dialoguez {
 					(NatureSpirit.placedFungus || !Inventory.contains(id.mortFungus)) && 
 					(NatureSpirit.placedScroll || !Inventory.contains(id.natureSpirit_usedSpell)))
 			{
-				if(Locations.natureSpirit_finalPuzzleTile.contains(p.l)) return false;
-				if(Walking.walk(Locations.natureSpirit_finalPuzzleTile.getCenter())) Sleep.sleep(696,666);
+				if(Locations.natureSpirit_finalPuzzleTile.contains(Players.getLocal())) return false;
+				if(Walking.walk(Locations.natureSpirit_finalPuzzleTile.getCenter())) Sleepz.sleep(696,666);
 				return true;
 			}
 			if(NatureSpirit.getProgressValue() == 25 && 
-					Locations.natureSpiritGrotto.contains(p.l) && 
+					Locations.natureSpiritGrotto.contains(Players.getLocal()) && 
 					Inventory.contains(id.natureSpirit_fillimansDiary))
 			{
 				NatureSpirit.fillimansDiary();
@@ -163,109 +144,52 @@ public class Dialoguez {
 	
 	public static boolean continueDialogue()
 	{
-		if(UniqueActions.isActionEnabled(Actionz.SPACE_TO_CONTINUE))
-		{
-			if(Dialogues.spaceToContinue()) 
-			{
-				Sleep.sleep(111, 1111);
-				return true;
-			}
-			return false;
-		}
-		if(Dialogues.clickContinue()) 
-		{
-			Sleep.sleep(111, 1111);
+		if(Dialogues.spaceToContinue()) {
+			Sleep.sleepTick();
+			Sleepz.sleep(111, 1111);
 			return true;
 		}
 		return false;
 	}
-	public static boolean chooseOption(String option)
-	{
-		if(UniqueActions.isActionEnabled(Actionz.TYPE_OPTION_DIALOGUE)) 
-		{
-			if(Dialogues.typeOption(option))
-			{
-				MethodProvider.log("Typed option: "+option);
-				return true;
-			}
-			return false;
-		}
-		if(Dialogues.clickOption(option))
-		{
-			MethodProvider.log("Clicked option: "+option);
+	public static boolean chooseOption(String option) {
+		if(Dialogues.typeOption(option)) {
+			Logger.log("Typed option: "+option);
 			return true;
 		}
-		
 		return false;
 	}
-	public static boolean chooseOption(String... options)
-	{
-		if(UniqueActions.isActionEnabled(Actionz.TYPE_OPTION_DIALOGUE)) 
-		{
-			for(String option : options)
-			{
-				if(Dialogues.typeOption(option))
-				{
-					MethodProvider.log("Typed option: "+option);
-					return true;
-				}
-			}
-			return false;
-		}
-		for(String option : options)
-		{
-			if(Dialogues.clickOption(option))
-			{
-				MethodProvider.log("Clicked option: "+option);
+	public static boolean chooseOption(String... options) {
+		for(String option : options) {
+			if(Dialogues.typeOption(option)) {
+				Logger.log("Typed option: "+option);
 				return true;
 			}
 		}
 		return false;
 	}
-	public static boolean chooseFirstOptionContaining(String partialOption)
-	{
+	public static boolean chooseFirstOptionContaining(String partialOption) {
 		String[] options = Dialogues.getOptions();
-		for(int i = 1; i <= options.length; i++)
-		{
+		for(int i = 1; i <= options.length; i++) {
 			if(options[i] == null || options[i].isEmpty()) continue;
-			
-			if(options[i].contains(partialOption))
-			{
-				if(UniqueActions.isActionEnabled(Actionz.TYPE_OPTION_DIALOGUE))
-				{
-					if(Dialogues.typeOption(i))
-					{
-						MethodProvider.log("Typed option index "+i+" containing: "+partialOption);
-						return true;
-					}
-				} else if(Dialogues.clickOption(i)) 
-				{
-					MethodProvider.log("Clicked option index "+i+" containing: "+partialOption);
+			if(options[i].contains(partialOption)) {
+				if(Dialogues.typeOption(i)) {
+					Logger.log("Typed option index "+i+" containing: "+partialOption);
 					return true;
 				}
 			}
 		}
 		return false;
 	}
-	public static boolean chooseOptionIndex(int index)
-	{
-		if(UniqueActions.isActionEnabled(Actionz.TYPE_OPTION_DIALOGUE))
-		{
-			if(Dialogues.typeOption(index))
-			{
-				MethodProvider.log("Typed option index "+index);
-				return true;
-			}
-		} else if(Dialogues.clickOption(index)) 
-		{
-			MethodProvider.log("Clicked option index "+index);
+	public static boolean chooseOptionIndex(int index) {
+		if(Dialogues.typeOption(index)) {
+			Logger.log("Typed option index "+index);
 			return true;
 		}
 		return false;
 	}
 	public static boolean chooseQuestOptions()
 	{
-		if(Locations.strongholdLvl1.contains(p.l))
+		if(Locations.strongholdLvl1.contains(Players.getLocal()))
 		{
 			return chooseOption("Politely tell them no and then use the \'Report Abuse\' button.") || 
 					chooseOption("No way! You\'ll just take my gold for your own! Reported!") || 
@@ -304,6 +228,27 @@ public class Dialoguez {
 		}
 		switch(API.mode)
 		{
+		case TRAIN_PRAYER:
+		{
+			if(hasOption("Can you move my house please?"))
+			{
+				Locations.unlockedHouse = true;
+				return chooseOption("Tell me about houses!");
+			}
+			return chooseOption("How can I get a house?") || 
+					chooseOption("Yes please!");
+		}
+		case OBOR:
+		{
+			if(chooseOption("Yes.") || 
+					chooseOption("Exit the lair."))
+			{
+				Tile current = Players.getLocal().getTile();
+				Sleep.sleepUntil(() -> !current.equals(Players.getLocal().getTile()), Sleepz.calculate(4444,3333));
+				return true;
+			}
+			return false;
+		}
 		case TRAIN_SLAYER:
 			return chooseOption("What\'s a slayer?") || 
 					chooseOption("Wow, can you teach me?");
@@ -352,9 +297,9 @@ public class Dialoguez {
 				{
 					if(chooseOption("Okay")) 
 					{
-						MethodProvider.sleepUntil(() -> Locations.portPhasmatysCharterShip.contains(p.l), Sleep.calculate(5555,5555));
+						Sleep.sleepUntil(() -> Locations.portPhasmatysCharterShip.contains(Players.getLocal()), Sleepz.calculate(5555,5555));
 					}
-					Sleep.sleep(420,2222);
+					Sleepz.sleep(420,2222);
 					return true;
 				}
 			}
@@ -451,10 +396,10 @@ public class Dialoguez {
 	 */
 	public static boolean observeQuestDialogue(String npcDialogue)
 	{
-		if(API.mode == modes.HORROR_FROM_THE_DEEP && Widgets.getWidgetChild(229,1) != null && 
-				Widgets.getWidgetChild(229,1).isVisible())
+		if(API.mode == modes.HORROR_FROM_THE_DEEP && Widgets.get(229,1) != null && 
+				Widgets.get(229,1).isVisible())
 		{
-			String txt = Widgets.getWidgetChild(229,1).getText();
+			String txt = Widgets.get(229,1).getText();
 			if(txt.contains("The first page"))
 			{
 				if(!txt.contains("The first page has been placed."))
@@ -475,10 +420,10 @@ public class Dialoguez {
 				}
 			}
 		}
-		if(API.mode == modes.FREMENNIK_TRIALS && Widgets.getWidgetChild(229, 1) != null && 
-	 			Widgets.getWidgetChild(229,1).isVisible())
+		if(API.mode == modes.FREMENNIK_TRIALS && Widgets.get(229, 1) != null && 
+	 			Widgets.get(229,1).isVisible())
 	 	{
-	 		String dialogue = Widgets.getWidgetChild(229,1).getText();
+	 		String dialogue = Widgets.get(229,1).getText();
 	 		if(dialogue.contains("My first is in mage, but not in wizard"))
 	 		{
 	 			FremennikTrials.riddleAnswer = "mind";
@@ -520,6 +465,16 @@ public class Dialoguez {
 			if(npcDialogue.contains("Welcome to the Grand Exchange."))
 			{
 				Test.test = true;
+			}
+			break;
+		}
+		case TRAIN_PRAYER:
+		{
+			if(npcDialogue.contains("Yes please!") || 
+					npcDialogue.contains("and you will find your house ready for you to start") || 
+					npcDialogue.contains("This book will help you to start building your house."))
+			{
+				Locations.unlockedHouse = true;
 			}
 			break;
 		}
@@ -702,7 +657,7 @@ public class Dialoguez {
 			if(npcDialogue.contains("... and a lot of piranhas!"))
 	 		{ 
 				ErnestTheChicken.poisonedFountain = false;
-				MethodProvider.log("Saw not poisoned fountain, switching to un-poisoned fountain mode");
+				Logger.log("Saw not poisoned fountain, switching to un-poisoned fountain mode");
 	 		} 
 			if(npcDialogue.contains("Give \'em here then."))
 	 		{ 

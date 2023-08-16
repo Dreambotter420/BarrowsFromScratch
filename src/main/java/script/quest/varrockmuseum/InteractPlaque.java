@@ -1,12 +1,13 @@
 package script.quest.varrockmuseum;
 
-import org.dreambot.api.methods.MethodProvider;
 import org.dreambot.api.methods.dialogues.Dialogues;
 import org.dreambot.api.methods.interactive.GameObjects;
 import org.dreambot.api.script.Unobfuscated;
+import org.dreambot.api.utilities.Sleep;
 import org.dreambot.api.wrappers.interactive.GameObject;
 
 import script.framework.Leaf;
+import script.utilities.Sleepz;
 
 @Unobfuscated
 public class InteractPlaque extends Leaf {
@@ -18,7 +19,7 @@ public class InteractPlaque extends Leaf {
     @Override
     public int onLoop() {
         if (Dialogues.inDialogue() && Dialogues.continueDialogue()) {
-            return Timing.sleepLogNormalInteraction();
+            return Sleepz.interactionTiming();
         }
 
         Location location = getLocation();
@@ -28,18 +29,18 @@ public class InteractPlaque extends Leaf {
                 GameObject plaque = GameObjects.getTopObjectOnTile(display.getTile());
                 if (plaque != null && plaque.distance() < 6) {
                     if (plaque.interact("Study")) {
-                        MethodProvider.sleepUntil(() -> Museum.getQuizParent() != null && Museum.getQuizParent().isVisible(), 2500 + Timing.sleepLogNormalInteraction());
+                        Sleep.sleepUntil(() -> Museum.getQuizParent() != null && Museum.getQuizParent().isVisible(), 2500 + Sleepz.interactionTiming());
                     }
-                    return Timing.sleepLogNormalSleep();
+                    return Sleepz.sleepTiming();
                 }
 
                 WalkHandler.walkTo(6, display.getTile());
-                return Timing.sleepLogNormalSleep();
+                return Sleepz.sleepTiming();
             }
 
             WalkHandler.walkTo(6, location.area.getCenter());
         }
-        return Timing.sleepLogNormalSleep();
+        return Sleepz.sleepTiming();
     }
 
     public static Location getLocation() {

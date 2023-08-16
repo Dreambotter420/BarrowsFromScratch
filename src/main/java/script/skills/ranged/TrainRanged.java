@@ -1,11 +1,6 @@
 package script.skills.ranged;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import org.dreambot.api.methods.Calculations;
-import org.dreambot.api.methods.MethodProvider;
 import org.dreambot.api.methods.combat.Combat;
 import org.dreambot.api.methods.combat.CombatStyle;
 import org.dreambot.api.methods.container.impl.Inventory;
@@ -14,31 +9,26 @@ import org.dreambot.api.methods.container.impl.equipment.Equipment;
 import org.dreambot.api.methods.container.impl.equipment.EquipmentSlot;
 import org.dreambot.api.methods.grandexchange.GrandExchange;
 import org.dreambot.api.methods.interactive.Players;
-import org.dreambot.api.methods.magic.Magic;
-import org.dreambot.api.methods.magic.Normal;
 import org.dreambot.api.methods.skills.Skill;
 import org.dreambot.api.methods.skills.Skills;
 import org.dreambot.api.methods.widget.Widgets;
 import org.dreambot.api.script.ScriptManager;
+import org.dreambot.api.utilities.Logger;
 import org.dreambot.api.utilities.Timer;
 import org.dreambot.api.wrappers.widgets.WidgetChild;
 
 import script.Main;
-import script.p;
-import script.actionz.UniqueActions;
-import script.actionz.UniqueActions.Actionz;
 import script.behaviour.DecisionLeaf;
 import script.framework.Leaf;
 import script.quest.animalmagnetism.AnimalMagnetism;
 import script.quest.horrorfromthedeep.HorrorFromTheDeep;
-import script.quest.varrockmuseum.Timing;
 import script.utilities.API;
 import script.utilities.Bankz;
 import script.utilities.Combatz;
 import script.utilities.GrandExchangg;
 import script.utilities.InvEquip;
 import script.utilities.Locations;
-import script.utilities.Sleep;
+import script.utilities.Sleepz;
 import script.utilities.Walkz;
 import script.utilities.id;
 /**
@@ -54,7 +44,7 @@ public class TrainRanged extends Leaf {
 	}
 	public static boolean started = false;
     public void onStart() {
-        Main.customPaintText1 = "~~~ Training Ranged ~~~";
+        Main.paint_task = "~~~ Training Ranged ~~~";
         started = true;
     }
    
@@ -66,7 +56,7 @@ public class TrainRanged extends Leaf {
 			Walkz.exitIsleOfSouls(240000);
 			return false;
 		}
-        if(Locations.kourendGiantsCaveArea.contains(p.l))
+        if(Locations.kourendGiantsCaveArea.contains(Players.getLocal()))
 		{
 			Walkz.exitGiantsCave();
 			return false;
@@ -79,36 +69,36 @@ public class TrainRanged extends Leaf {
     public int onLoop() {
         if(DecisionLeaf.taskTimer.finished())
     	{
-    		MethodProvider.log("[TIMEOUT] -> Ranged!");
+    		Logger.log("[TIMEOUT] -> Ranged!");
     		if(onExit())
     		{
     			API.mode = null;
     		}
-    		return Timing.sleepLogNormalSleep();
+    		return Sleepz.sleepTiming();
     	}
-    	if(Skills.getRealLevel(Skill.RANGED) >= 75) {
-            MethodProvider.log("[COMPLETE] -> lvl 75 ranged!");
+    	/*if(Skills.getRealLevel(Skill.RANGED) >= 75) {
+            Logger.log("[COMPLETE] -> lvl 75 ranged!");
             if(onExit())
     		{
                 API.mode = null;
     		}
             return Timing.sleepLogNormalSleep();
-        }
+        }*/
     	if(!started) 
     	{
     		onStart();
-    		return Timing.sleepLogNormalSleep();
+    		return Sleepz.sleepTiming();
     	}
-    	if(!InvEquip.checkedBank()) return Sleep.calculate(420, 696);
+    	if(!InvEquip.checkedBank()) return Sleepz.calculate(420, 696);
     	if(outOfAvas())
     	{
     		buyMoreAvas();
-    		return Sleep.calculate(420, 696);
+    		return Sleepz.calculate(420, 696);
     	}
         if(Equipment.contains(getBestDart()) && !updateAttStyle()) 
 		{
-			MethodProvider.log("Failed to update attack style with best melee weapon equipped!");
-			return Timing.sleepLogNormalSleep();
+			Logger.log("Failed to update attack style with best melee weapon equipped!");
+			return Sleepz.sleepTiming();
 		}
     	if(Mobs.mob == null) Mobs.chooseMob(false);
         return Mobs.trainMob(false);
@@ -118,13 +108,13 @@ public class TrainRanged extends Leaf {
     	final int qty = (int) Calculations.nextGaussianRandom(7, 3);
     	final int steelArrowQty = qty * 75;
     	final int coinsQty = qty * 1000;
-    	MethodProvider.log("Entering function to buy avas accumulators in qty: "+ qty);
+    	Logger.log("Entering function to buy avas accumulators in qty: "+ qty);
     	Timer timeout = new Timer(300000);
     	boolean haveSteelArrowsAndMoney = false;
     	while(!timeout.finished() && ScriptManager.getScriptManager().isRunning() && 
     			!ScriptManager.getScriptManager().isPaused())
     	{
-    		Sleep.sleep(420, 1111);
+    		Sleepz.sleep(420, 1111);
     		if(haveSteelArrowsAndMoney)
     		{
     			if(Inventory.count(InvEquip.coins) < 999 || 
@@ -132,19 +122,19 @@ public class TrainRanged extends Leaf {
     			{
     				if(Inventory.contains(id.avasAccumulator))
     				{
-    					if(Locations.dontTeleToGEAreaJustWalk.contains(p.l))
+    					if(Locations.dontTeleToGEAreaJustWalk.contains(Players.getLocal()))
     					{
-    						MethodProvider.log("Sucessfully bought more avas!");
+    						Logger.log("Sucessfully bought more avas!");
     						return;
     					}
     					Walkz.useJewelry(InvEquip.wealth, "Grand Exchange");
     				}
 					continue;
     			}
-    			WidgetChild accumulatorButton = Widgets.getWidgetChild(67, 7);
+    			WidgetChild accumulatorButton = Widgets.get(67, 7);
     			if(accumulatorButton != null && accumulatorButton.isVisible())
     			{
-    				if(accumulatorButton.interact()) Sleep.sleep(696, 420);
+    				if(accumulatorButton.interact()) Sleepz.sleep(696, 420);
     				continue;
     			}
     			walkDevicesAva();
@@ -167,7 +157,7 @@ public class TrainRanged extends Leaf {
     }
     public static void walkDevicesAva()
     {
-    	if(Locations.ernest_westWing.contains(p.l))
+    	if(Locations.ernest_westWing.contains(Players.getLocal()))
     	{
     		API.talkToNPC("Ava","Devices");
     		return;
@@ -177,7 +167,7 @@ public class TrainRanged extends Leaf {
     		Walkz.teleport(id.draynorTab, Locations.draynorMaynorTeleSpot, 180000);
     		return;
     	}
-		API.walkInteractWithGameObject("Bookcase", "Search", Locations.ernest_westWingAnd, () -> Locations.ernest_westWing.contains(p.l));
+		API.walkInteractWithGameObject("Bookcase", "Search", Locations.ernest_westWingAnd, () -> Locations.ernest_westWing.contains(Players.getLocal()));
     	
     }
     public static boolean outOfAvas()
@@ -232,11 +222,11 @@ public class TrainRanged extends Leaf {
     	InvEquip.addInvyItem(InvEquip.coins, 0, 0, false, 0);
 		if(InvEquip.fulfillSetup(true, 180000))
 		{
-			MethodProvider.log("[TRAIN RANGED] -> Fulfilled equipment correctly!");
+			Logger.log("[TRAIN RANGED] -> Fulfilled equipment correctly!");
 			return true;
 		} else 
 		{
-			MethodProvider.log("[TRAIN RANGED] -> NOT fulfilled equipment correctly!");
+			Logger.log("[TRAIN RANGED] -> NOT fulfilled equipment correctly!");
 			return false;
 		}
     	
@@ -301,11 +291,11 @@ public class TrainRanged extends Leaf {
     	InvEquip.addInvyItem(InvEquip.coins, 0, 0, false, 0);
 		if(InvEquip.fulfillSetup(true, 180000))
 		{
-			MethodProvider.log("[INVEQUIP] -> Fulfilled equipment correctly! (stamina + games strict)");
+			Logger.log("[INVEQUIP] -> Fulfilled equipment correctly! (stamina + games strict)");
 			return true;
 		} else 
 		{
-			MethodProvider.log("[INVEQUIP] -> NOT Fulfilled equipment correctly! (stamina + games strict)");
+			Logger.log("[INVEQUIP] -> NOT Fulfilled equipment correctly! (stamina + games strict)");
 			return false;
 		}
     	
@@ -329,17 +319,18 @@ public class TrainRanged extends Leaf {
     	{
     		InvEquip.addOptionalItem(r);
     	}
+    	
     	InvEquip.addOptionalItem(InvEquip.jewelry);
     	InvEquip.shuffleFulfillOrder();
     	InvEquip.addInvyItem(Combatz.lowFood, 15, 27, false, (int) Calculations.nextGaussianRandom(500, 100));
     	InvEquip.addInvyItem(InvEquip.coins, 0, 0, false, 0);
 		if(InvEquip.fulfillSetup(true, 180000))
 		{
-			MethodProvider.log("[INVEQUIP] -> Fulfilled equipment correctly! (stamina strict)");
+			Logger.log("[INVEQUIP] -> Fulfilled equipment correctly! (stamina strict)");
 			return true;
 		} else 
 		{
-			MethodProvider.log("[INVEQUIP] -> NOT Fulfilled equipment correctly! (stamina strict)");
+			Logger.log("[INVEQUIP] -> NOT Fulfilled equipment correctly! (stamina strict)");
 			return false;
 		}
     	
@@ -371,11 +362,11 @@ public class TrainRanged extends Leaf {
     	InvEquip.addInvyItem(InvEquip.coins, 0, 0, false, 0);
 		if(InvEquip.fulfillSetup(true, 180000))
 		{
-			MethodProvider.log("[INVEQUIP] -> Fulfilled equipment correctly! (antidote + stamina strict)");
+			Logger.log("[INVEQUIP] -> Fulfilled equipment correctly! (antidote + stamina strict)");
 			return true;
 		} else 
 		{
-			MethodProvider.log("[INVEQUIP] -> NOT Fulfilled equipment correctly! (antidote + stamina strict)");
+			Logger.log("[INVEQUIP] -> NOT Fulfilled equipment correctly! (antidote + stamina strict)");
 			return false;
 		}
     }
@@ -472,11 +463,6 @@ public class TrainRanged extends Leaf {
     public static int getBestDart()
     {
 		final int ranged = Skills.getRealLevel(Skill.RANGED);
-    	if(ranged >= 30) 
-    	{
-    		if(UniqueActions.isActionEnabled(Actionz.MITH_DARTS_INSTEAD_OF_ADDY)) return id.mithDart;
-    		return id.addyDart;
-    	}
     	if(ranged >= 20) return id.mithDart;
     	if(ranged >= 5) return id.steelDart;
     	return id.ironDart;
@@ -484,21 +470,15 @@ public class TrainRanged extends Leaf {
     public static int getNextBestDart()
     {
 		final int ranged = Skills.getRealLevel(Skill.RANGED);
-    	if(ranged >= 20)
-    	{
-    		if(UniqueActions.isActionEnabled(Actionz.MITH_DARTS_INSTEAD_OF_ADDY)) return id.mithDart;
-    		return id.addyDart;
-    	}
-    	if(ranged >= 5) return id.mithDart;
+    	if(ranged >= 20) return id.mithDart;
+		if(ranged >= 5) return id.mithDart;
     	return id.steelDart;
     }
     public static int getNextNextBestDart()
     {
 		final int ranged = Skills.getRealLevel(Skill.RANGED);
-    	if(ranged >= 5)
-    	{
-    		if(UniqueActions.isActionEnabled(Actionz.MITH_DARTS_INSTEAD_OF_ADDY)) return id.mithDart;
-    		return id.addyDart;
+    	if(ranged >= 5) {
+    		return id.mithDart;
     	}
     	return id.mithDart;
     }

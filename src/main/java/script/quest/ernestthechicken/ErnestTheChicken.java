@@ -1,7 +1,6 @@
 package script.quest.ernestthechicken;
 
 import org.dreambot.api.methods.Calculations;
-import org.dreambot.api.methods.MethodProvider;
 import org.dreambot.api.methods.container.impl.Inventory;
 import org.dreambot.api.methods.container.impl.bank.BankLocation;
 import org.dreambot.api.methods.container.impl.equipment.EquipmentSlot;
@@ -10,22 +9,18 @@ import org.dreambot.api.methods.interactive.GameObjects;
 import org.dreambot.api.methods.interactive.Players;
 import org.dreambot.api.methods.settings.PlayerSettings;
 import org.dreambot.api.methods.walking.impl.Walking;
-import org.dreambot.api.methods.widget.Widgets;
+import org.dreambot.api.utilities.Logger;
+
 import script.Main;
-import script.p;
-import script.actionz.UniqueActions;
-import script.actionz.UniqueActions.Actionz;
 import script.behaviour.DecisionLeaf;
 import script.framework.Leaf;
-import script.quest.varrockmuseum.Timing;
-import script.skills.ranged.TrainRanged;
 import script.utilities.API;
 import script.utilities.Combatz;
 import script.utilities.Dialoguez;
 import script.utilities.InvEquip;
 import script.utilities.Locations;
 import script.utilities.Questz;
-import script.utilities.Sleep;
+import script.utilities.Sleepz;
 import script.utilities.Walkz;
 import script.utilities.id;
 /**
@@ -50,17 +45,10 @@ public class ErnestTheChicken extends Leaf {
 	}
 	public static boolean onExit()
 	{
-		if(Questz.closeQuestCompletion()) return false;
-    	if(Locations.ernest_3rdfloorMaynor.contains(p.l) || 
-    			Locations.ernest_2ndfloorMaynor.contains(p.l) ||
-    			Locations.ernest_SkellyTube.contains(p.l) ||
-    			Locations.ernest_westWing.contains(p.l) ||
-    			Locations.ernest_basementMaynor.contains(p.l))
-    	{
-    		if(!Walkz.useJewelry(InvEquip.wealth, "Grand Exchange") && 
-    				!Walkz.useJewelry(InvEquip.glory,"Edgeville"))
-    		{
-    			MethodProvider.log("Stuck in here in Ernest The Chikken :-( Attempting walking to GE...");
+		if(Questz.checkCloseQuestCompletion()) return false;
+    	if (Locations.GE.distance() > 20){
+    		if(!Walkz.useJewelry(InvEquip.wealth, "Grand Exchange")) {
+    			Logger.log("Not able to teleport to GE after Ernest The Chikken :-( Attempting walking to GE...");
     			Walking.walk(BankLocation.GRAND_EXCHANGE);
     		}
     		return false;
@@ -74,68 +62,53 @@ public class ErnestTheChicken extends Leaf {
     @Override
     public int onLoop() {
         if (DecisionLeaf.taskTimer.finished()) {
-            MethodProvider.log("[TIMEOUT] -> Ernest the Chikken");
+            Logger.log("[TIMEOUT] -> Ernest the Chikken");
             if(onExit())
             {
                 API.mode = null;
             }
-            return Timing.sleepLogNormalSleep();
+            return Sleepz.sleepTiming();
         }
         if (completed()) {
             if(onExit())
             {
-            	MethodProvider.log("[COMPLETED] -> Ernest the Chikken!");
-                Main.customPaintText1 = "~~~~~~~~~~~~~~~";
-        		Main.customPaintText2 = "~Quest Complete~";
-        		Main.customPaintText3 = "~Ernest The Chikken~";
-        		Main.customPaintText4 = "~~~~~~~~~~~~~~~";
+            	Logger.log("[COMPLETED] -> Ernest the Chikken!");
+                Main.paint_task = "~~~~~~~~~~~~~~~";
+        		Main.paint_itemsCount = "~Quest Complete~";
+        		Main.paint_subTask = "~Ernest The Chikken~";
+        		Main.paint_levels = "~~~~~~~~~~~~~~~";
                	API.mode = null;
             }
         	
-            return Timing.sleepLogNormalSleep();
+            return Sleepz.sleepTiming();
         }
         if(Questz.shouldCheckQuestStep()) Questz.checkQuestStep("Ernest the Chicken");
         
         
         if(Dialogues.getNPCDialogue() != null && !Dialogues.getNPCDialogue().isEmpty())
         {
-        	MethodProvider.log("NPC Dialogue: " + Dialogues.getNPCDialogue());
+        	Logger.log("NPC Dialogue: " + Dialogues.getNPCDialogue());
 		}
-        if(Dialoguez.handleDialogues()) return Timing.sleepLogNormalSleep();
+        if(Dialoguez.handleDialogues()) return Sleepz.sleepTiming();
         switch(getProgressValue())
         {
-        case(2):
-        {
+        case(2): case(1): {
         	if(!InvEquip.equipmentContains(InvEquip.wearableGlory) || 
          			!InvEquip.equipmentContains(InvEquip.wearableWealth))
          	{
          		fulfillStart();
-         		return Timing.sleepLogNormalSleep();
+         		return Sleepz.sleepTiming();
          	}
         	gatherSuppliesThenTalkToOddenstein();
         	break;
         }
-        case(1):
-        {
+		case(0): {
         	if(!InvEquip.equipmentContains(InvEquip.wearableGlory) || 
-         			!InvEquip.equipmentContains(InvEquip.wearableWealth))
-         	{
+         			!InvEquip.equipmentContains(InvEquip.wearableWealth)) {
          		fulfillStart();
-         		return Timing.sleepLogNormalSleep();
+         		return Sleepz.sleepTiming();
          	}
-        	gatherSuppliesThenTalkToOddenstein();
-        	break;
-        }
-        case(0):
-        {
-        	if(!InvEquip.equipmentContains(InvEquip.wearableGlory) || 
-         			!InvEquip.equipmentContains(InvEquip.wearableWealth))
-         	{
-         		fulfillStart();
-         		return Timing.sleepLogNormalSleep();
-         	}
-        	if(Locations.ernest_veronica.getCenter().distance() > 100)
-            {
+        	if(Locations.ernest_veronica.getCenter().distance() > 100) {
             	Walkz.useJewelry(InvEquip.glory, "Draynor Village");
             	break;
             }
@@ -144,7 +117,7 @@ public class ErnestTheChicken extends Leaf {
         default:break;
         }
         
-        return Timing.sleepLogNormalSleep();
+        return Sleepz.sleepTiming();
     }
     public static void fulfillStart()
     {
@@ -158,11 +131,11 @@ public class ErnestTheChicken extends Leaf {
     	InvEquip.addInvyItem(Combatz.lowFood, 1, 5, false, (int) Calculations.nextGaussianRandom(500, 209));
     	if(InvEquip.fulfillSetup(true, 180000))
 		{
-			MethodProvider.log("[INVEQUIP] -> Fulfilled equipment correctly! (ErnestTheChikken)");
+			Logger.log("[INVEQUIP] -> Fulfilled equipment correctly! (ErnestTheChikken)");
 			return;
 		} else 
 		{
-			MethodProvider.log("[INVEQUIP] -> NOT Fulfilled equipment correctly! (ErnestTheChikken)");
+			Logger.log("[INVEQUIP] -> NOT Fulfilled equipment correctly! (ErnestTheChikken)");
 			return;
 		}
     }
@@ -192,9 +165,9 @@ public class ErnestTheChicken extends Leaf {
     }
     public static void gatherSuppliesThenTalkToOddenstein()
     {
-    	if(!Locations.ernest_2ndfloorMaynor.contains(p.l) && 
-    			!Locations.ernest_3rdfloorMaynor.contains(p.l) && 
-    			!Locations.ernest_basementMaynor.contains(p.l) &&
+    	if(!Locations.ernest_2ndfloorMaynor.contains(Players.getLocal()) && 
+    			!Locations.ernest_3rdfloorMaynor.contains(Players.getLocal()) && 
+    			!Locations.ernest_basementMaynor.contains(Players.getLocal()) &&
     			Locations.ernest_veronica.getCenter().distance() > 100)
         {
         	Walkz.useJewelry(InvEquip.glory, "Draynor Village");
@@ -202,7 +175,6 @@ public class ErnestTheChicken extends Leaf {
         }
     	if(!Inventory.contains(gauge))
     	{
-    		API.randomAFK(5);
     		if(!poisonedFountain)
     		{
     			if(!Inventory.contains(poisonedFood))
@@ -210,7 +182,7 @@ public class ErnestTheChicken extends Leaf {
             		if(!Inventory.contains(poison))
                 	{
             			if(!InvEquip.free1InvySpace()) return;
-                		API.walkPickupGroundItem("Poison", "Take", Locations.ernest_poison);
+                		API.walkPickupGroundItem("Poison", "Take", true, Locations.ernest_poison);
                     	return;
                 	}
                 	if(!Inventory.contains(fishfood))
@@ -219,12 +191,12 @@ public class ErnestTheChicken extends Leaf {
                 		API.walkPickupGroundItem("Fish food", "Take", Locations.ernest_fishfood);
                     	return;
                 	}
-                	if(Inventory.get(fishfood).useOn(poison))Sleep.sleep(696, 1111);
+                	if(Inventory.get(fishfood).useOn(poison))Sleepz.sleep(696, 1111);
                 	return;
             	}
     			if(!Inventory.contains(rubberTube) && !Inventory.contains(key))
             	{
-    				if(Locations.ernest_2ndfloorMaynor.contains(p.l))
+    				if(Locations.ernest_2ndfloorMaynor.contains(Players.getLocal()))
     				{
     					API.interactWithGameObject("Staircase","Climb-down",Locations.ernest_2ndStairs);
     					return;
@@ -240,7 +212,7 @@ public class ErnestTheChicken extends Leaf {
                 	return;
             	}
     		}
-    		if(Locations.ernest_2ndfloorMaynor.contains(p.l))
+    		if(Locations.ernest_2ndfloorMaynor.contains(Players.getLocal()))
 			{
 				API.interactWithGameObject("Staircase","Climb-down",Locations.ernest_2ndStairs);
 				return;
@@ -249,20 +221,19 @@ public class ErnestTheChicken extends Leaf {
         	{
         		if(!InvEquip.free1InvySpace()) return;
         		if(poisonedFountain) API.walkInteractWithGameObject("Fountain", "Search",Locations.ernest_fountain, () -> Dialogues.inDialogue() || Inventory.contains(gauge));
-        		else if(Inventory.get(poisonedFood).useOn(GameObjects.closest("Fountain"))) Sleep.sleep(696, 666);
+        		else if(Inventory.get(poisonedFood).useOn(GameObjects.closest("Fountain"))) Sleepz.sleep(696, 666);
         	}
         	return;
     	}
     	if(!Inventory.contains(rubberTube))
     	{
-    		if(Locations.ernest_SkellyTube.contains(p.l))
+    		if(Locations.ernest_SkellyTube.contains(Players.getLocal()))
     		{
     			if(Combatz.shouldEatFood(6)) Combatz.eatFood();
     			if(!InvEquip.free1InvySpace()) return;
     			API.walkPickupGroundItem("Rubber tube","Take",Locations.ernest_SkellyTube);
     			return;
     		}
-    		API.randomAFK(5);
 			if(!Inventory.contains(key))
 			{
 				if(!Inventory.contains(id.spade))
@@ -275,58 +246,46 @@ public class ErnestTheChicken extends Leaf {
     			API.walkInteractWithGameObject("Compost heap", "Search", Locations.ernest_compost, () -> Inventory.contains(key));
             	return;
 			}
-			API.walkInteractWithGameObject("Door", "Open", Locations.ernest_SkellyDoorArea, () -> Locations.ernest_SkellyTube.contains(p.l));
+			API.walkInteractWithGameObject("Door", "Open", Locations.ernest_SkellyDoorArea, () -> Locations.ernest_SkellyTube.contains(Players.getLocal()));
 			return;
     	}
-
-		API.randomAFK(5);
-    	if(Locations.ernest_SkellyTube.contains(p.l))
+    	if(Locations.ernest_SkellyTube.contains(Players.getLocal()))
     	{
-			API.walkInteractWithGameObject("Door", "Open", Locations.ernest_SkellyDoorArea, () -> !Locations.ernest_SkellyTube.contains(p.l));
+			API.walkInteractWithGameObject("Door", "Open", Locations.ernest_SkellyDoorArea, () -> !Locations.ernest_SkellyTube.contains(Players.getLocal()));
 			return;
     	}
-    	if(!Inventory.contains(oilCan))
-    	{
-    		if(Locations.ernest_basementMaynor.contains(p.l))
-    		{
-    			if(isAUp() && isBUp() && !isCUp() && !isDUp() && isEUp() && !isFUp())
-    			{
+    	if(!Inventory.contains(oilCan)) {
+    		if(Locations.ernest_basementMaynor.contains(Players.getLocal())) {
+    			if(isAUp() && isBUp() && !isCUp() && !isDUp() && isEUp() && !isFUp()) {
     				if(!InvEquip.free1InvySpace()) return;
     				API.walkPickupGroundItem("Oil can", "Take", Locations.ernest_puzzleLast);
     				return;
     			}
-    			if(isAUp() && isBUp() && !isCUp() && !isDUp() && !isFUp())
-    			{
-    				if(!isEUp())
-    				{
-    					API.walkInteractWithGameObject("Lever E","Pull",Locations.ernest_puzzle5);
-						Sleep.sleep(666, 1111);
+    			if(isAUp() && isBUp() && !isCUp() && !isDUp() && !isFUp()) {
+    				if(!isEUp()) {
+    					API.walkInteractWithGameObject("Lever E","Pull",Locations.ernest_puzzle5, () -> isEUp());
+						Sleepz.sleep(666, 1111);
 						return;
     				} 
     				return;
     			}
-    			if(isAUp() && isBUp() && !isDUp() && !isEUp() && !isFUp())
-    			{
-    				if(isCUp())
-    				{
-    					API.walkInteractWithGameObject("Lever C","Pull",Locations.ernest_puzzle2);
-						Sleep.sleep(666, 1111);
+    			if(isAUp() && isBUp() && !isDUp() && !isEUp() && !isFUp()) {
+    				if(isCUp()) {
+    					API.walkInteractWithGameObject("Lever C","Pull",Locations.ernest_puzzle2, () -> !isCUp());
+						Sleepz.sleep(666, 1111);
 						return;
     				} 
     				return;
     			}
-    			if(isAUp() && isBUp() && isCUp() && !isDUp())
-    			{
-    				if(isFUp())
-    				{
-    					API.walkInteractWithGameObject("Lever F","Pull",Locations.ernest_puzzle5);
-						Sleep.sleep(666, 1111);
+    			if(isAUp() && isBUp() && isCUp() && !isDUp()) {
+    				if(isFUp()) {
+    					API.walkInteractWithGameObject("Lever F","Pull",Locations.ernest_puzzle5, () -> !isFUp());
+						Sleepz.sleep(666, 1111);
 						return;
     				} 
-    				if(isEUp())
-    				{
-    					API.walkInteractWithGameObject("Lever E","Pull",Locations.ernest_puzzle5);
- 						Sleep.sleep(666, 1111);
+    				if(isEUp()) {
+    					API.walkInteractWithGameObject("Lever E","Pull",Locations.ernest_puzzle5, () -> !isEUp());
+ 						Sleepz.sleep(666, 1111);
  						return;
     				}
     				return;
@@ -336,66 +295,65 @@ public class ErnestTheChicken extends Leaf {
     				//flip up A + B
     				if(!isBUp())
 					{
-						API.walkInteractWithGameObject("Lever B","Pull",Locations.ernest_puzzle1);
-						Sleep.sleep(666, 1111);
+						API.walkInteractWithGameObject("Lever B","Pull",Locations.ernest_puzzle1, () -> !isBUp());
+						Sleepz.sleep(666, 1111);
 						return;
 					}
 					if(!isAUp())
 					{
-						API.walkInteractWithGameObject("Lever A","Pull",Locations.ernest_puzzle1);
-						Sleep.sleep(666, 1111);
+						API.walkInteractWithGameObject("Lever A","Pull",Locations.ernest_puzzle1, () -> !isAUp());
+						Sleepz.sleep(666, 1111);
 						return;
 					}
     				return;
     			}
     			if(isCUp() && isDUp() && isEUp() && isFUp())
     			{
-    				if(!isAUp() && !isBUp())
-    				{
+    				if(!isAUp() && !isBUp()) {
     					//go flip D down
-    					API.walkInteractWithGameObject("Lever D", "Pull", Locations.ernest_puzzle2);
-    					Sleep.sleep(666, 1111);
+    					API.walkInteractWithGameObject("Lever D", "Pull", Locations.ernest_puzzle2, () -> !isDUp());
+    					Sleepz.sleep(666, 1111);
     					return;
     				}
     				//flip down A + B
     				if(isBUp())
 					{
-						API.walkInteractWithGameObject("Lever B","Pull",Locations.ernest_puzzle1);
-						Sleep.sleep(666, 1111);
+						API.walkInteractWithGameObject("Lever B","Pull",Locations.ernest_puzzle1, () -> !isBUp());
+						Sleepz.sleep(666, 1111);
 						return;
 					}
 					if(isAUp())
 					{
-						API.walkInteractWithGameObject("Lever A","Pull",Locations.ernest_puzzle1);
-						Sleep.sleep(666, 1111);
+						API.walkInteractWithGameObject("Lever A","Pull",Locations.ernest_puzzle1, () -> !isAUp());
+						Sleepz.sleep(666, 1111);
 						return;
 					}
     				Walking.walk(Locations.ernest_puzzle1.getCenter());
     				return;
     			}
     		}
-    		if(Locations.ernest_westWing.contains(p.l))
+    		if(Locations.ernest_westWing.contains(Players.getLocal()))
         	{
-    			API.walkInteractWithGameObject("Ladder", "Climb-down", Locations.ernest_westWing, () -> Locations.ernest_basementMaynor.contains(p.l));
+    			API.walkInteractWithGameObject("Ladder", "Climb-down", Locations.ernest_westWing, () -> Locations.ernest_basementMaynor.contains(Players.getLocal()));
             	return;
         	}
-    		API.walkInteractWithGameObject("Bookcase", "Search", Locations.ernest_westWingAnd, () -> Locations.ernest_westWing.contains(p.l));
+    		API.walkInteractWithGameObject("Bookcase", "Search", Locations.ernest_westWingAnd, () -> Locations.ernest_westWing.contains(Players.getLocal()));
         	return;
     	}
     	if(Inventory.contains(oilCan))
     	{
-    		if(Locations.ernest_basementMaynor.contains(p.l))
+    		if(Locations.ernest_basementMaynor.contains(Players.getLocal()))
     		{
-    			API.walkInteractWithGameObject("Ladder", "Climb-up", Locations.ernest_puzzle1, () -> Locations.ernest_westWing.contains(p.l));
+    			API.walkInteractWithGameObject("Ladder", "Climb-up", Locations.ernest_puzzle1, () -> Locations.ernest_westWing.contains(Players.getLocal()));
     			return;
     		}
-    		if(Locations.ernest_westWing.contains(p.l))
+    		if(Locations.ernest_westWing.contains(Players.getLocal()))
     		{
-    			API.walkInteractWithGameObject("Lever","Pull",Locations.ernest_westWing,() -> !Locations.ernest_westWing.contains(p.l));
+    			API.walkInteractWithGameObject("Lever","Pull",Locations.ernest_westWing,() -> !Locations.ernest_westWing.contains(Players.getLocal()));
     			return;
     		}
     		API.walkTalkToNPC("Professor Oddenstein","Talk-to",true, Locations.ernest_3rdfloorMaynor);
-    		Sleep.sleep(696, 666);
+    		Sleepz.sleep(696, 666);
     	}
     }
     public static int getProgressValue()

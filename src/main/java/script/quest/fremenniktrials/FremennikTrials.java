@@ -1,7 +1,6 @@
 package script.quest.fremenniktrials;
 
 import org.dreambot.api.methods.Calculations;
-import org.dreambot.api.methods.MethodProvider;
 import org.dreambot.api.methods.container.impl.Inventory;
 import org.dreambot.api.methods.container.impl.Shop;
 import org.dreambot.api.methods.container.impl.bank.Bank;
@@ -23,17 +22,16 @@ import org.dreambot.api.methods.tabs.Tab;
 import org.dreambot.api.methods.tabs.Tabs;
 import org.dreambot.api.methods.walking.impl.Walking;
 import org.dreambot.api.methods.widget.Widgets;
+import org.dreambot.api.utilities.Logger;
+import org.dreambot.api.utilities.Sleep;
 import org.dreambot.api.wrappers.interactive.GameObject;
 import org.dreambot.api.wrappers.interactive.NPC;
 import org.dreambot.api.wrappers.items.GroundItem;
 import org.dreambot.api.wrappers.widgets.WidgetChild;
 
 import script.Main;
-import script.p;
 import script.behaviour.DecisionLeaf;
 import script.framework.Leaf;
-import script.framework.Tree;
-import script.quest.varrockmuseum.Timing;
 import script.skills.melee.TrainMelee;
 import script.utilities.API;
 import script.utilities.Combatz;
@@ -43,13 +41,12 @@ import script.utilities.Locations;
 import script.utilities.MissingAPI;
 import script.utilities.Questz;
 import script.utilities.Shopz;
-import script.utilities.Sleep;
+import script.utilities.Sleepz;
 import script.utilities.Tabz;
 import script.utilities.Walkz;
 import script.utilities.id;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 /**
  * Completes Fremennik Trials
@@ -68,17 +65,17 @@ public class FremennikTrials extends Leaf {
     }
     public static boolean completed()
     {
-    	if(getProgressValue() == 10)
-    	{
-    		if(Widgets.getWidgetChild(153,16) != null && 
-    				Widgets.getWidgetChild(153,16).isVisible())
+    	if(getProgressValue() == 10) {
+    		if(Widgets.get(153,16) != null && 
+    				Widgets.get(153,16).isVisible())
     		{
-    			if(Widgets.getWidgetChild(153,16).interact())
+    			if(Widgets.get(153,16).interact())
     			{
-    				Sleep.sleep(666, 669);
+    				Sleepz.sleep(666, 669);
     			}
     			return false;
     		}
+
     		return true;
     	}
 		return false;
@@ -95,93 +92,86 @@ public class FremennikTrials extends Leaf {
     @Override
     public int onLoop() {
     	if (completed()) {
-            MethodProvider.log("[COMPLETED] -> Fremennik Trials!");
+            Logger.log("[COMPLETED] -> Fremennik Trials!");
             if(onExit())
             {
             	API.mode = null;
-            	Main.customPaintText1 = "~~~~~~~~~~~";
-        		Main.customPaintText2 = "~Quest Complete~";
-        		Main.customPaintText3 = "~Fremennik Trials~";
-        		Main.customPaintText4 = "~~~~~~~~~~~";
+            	Main.paint_task = "~~~~~~~~~~~";
+        		Main.paint_itemsCount = "~Quest Complete~";
+        		Main.paint_subTask = "~Fremennik Trials~";
+        		Main.paint_levels = "~~~~~~~~~~~";
             }
-            return Timing.sleepLogNormalSleep();
+            return Sleepz.sleepTiming();
         }
     	if (DecisionLeaf.taskTimer.finished()) {
-            MethodProvider.log("[TIMEOUT] -> Fremennik Trials");
+            Logger.log("[TIMEOUT] -> Fremennik Trials");
             if(onExit())
             {
             	API.mode = null;
             }
-            return Timing.sleepLogNormalSleep();
+            return Sleepz.sleepTiming();
         }
-    	if(!InvEquip.checkedBank()) return Sleep.calculate(111, 1111);
-    	if(handleDialogues()) return Timing.sleepLogNormalSleep();
+    	if(!InvEquip.checkedBank()) return Sleepz.calculate(111, 1111);
+    	if(handleDialogues()) return Sleepz.sleepTiming();
     	switch(getProgressValue())
     	{
-    	
-    	case(8):
-    	{
+    	case(8): {
     		if(Questz.shouldCheckQuestStep()) Questz.checkQuestStep("The Fremennik Trials");
-    		API.randomAFK(2);
     		API.walkTalkToNPC("Brundt", "Talk-to", Locations.fremmy_longHall);
     		break;
     	}
-    	case(7):
-    	{
+    	case(7): {
     		if(Questz.shouldCheckQuestStep()) Questz.checkQuestStep("The Fremennik Trials");
-    		API.randomAFK(2);
-    		if(Locations.fremmy_upstairsHelmetShop.contains(p.l))
-    		{
-    			if(p.l.isAnimating())
-    			{
-    				Sleep.sleep(69, 696);
+    		if(Locations.fremmy_upstairsHelmetShop.contains(Players.getLocal())) {
+    			if(Players.getLocal().isAnimating()) {
+    				Sleepz.sleep(69, 696);
     				break;
     			}
-    			API.walkInteractWithGameObject("Ladder", "Climb-down",Locations.fremmy_upstairsHelmetShop,() -> !Locations.fremmy_upstairsHelmetShop.contains(p.l));
+    			API.walkInteractWithGameObject("Ladder", "Climb-down",Locations.fremmy_upstairsHelmetShop,() -> !Locations.fremmy_upstairsHelmetShop.contains(Players.getLocal()));
     			break;
     		}
-    		if(Locations.fremmy_peerRightHouse.contains(p.l))
+    		if(Locations.fremmy_peerRightHouse.contains(Players.getLocal()))
     		{
     			if(Inventory.contains(id.fremmy_unfrozenKey))
     			{
-    				API.walkInteractWithGameObject("Door", "Open", Locations.fremmy_peerRightDoor,() -> !Locations.fremmy_peerRightHouse.contains(p.l));
+    				API.walkInteractWithGameObject("Door", "Open", Locations.fremmy_peerRightDoor,() -> !Locations.fremmy_peerRightHouse.contains(Players.getLocal()));
     				break;
     			}
     			if(Inventory.contains(id.fremmy_vaseLid))
     			{
-    				API.walkInteractWithGameObject("Ladder", "Climb-up",Locations.fremmy_peerRightHouse,() -> !Locations.fremmy_peerRightHouse.contains(p.l));
+    				API.walkInteractWithGameObject("Ladder", "Climb-up",Locations.fremmy_peerRightHouse,() -> !Locations.fremmy_peerRightHouse.contains(Players.getLocal()));
         			break;
     			}
     			if(Inventory.contains(id.fremmy_oldRedDisk))
     			{
     				if(Inventory.get(id.fremmy_oldRedDisk).useOn(GameObjects.closest("Abstract mural")))
     				{
-    					MethodProvider.sleepUntil(() -> !Inventory.contains(id.fremmy_oldRedDisk), Sleep.calculate(2222,2222));
+    					Sleep.sleepUntil(() -> !Inventory.contains(id.fremmy_oldRedDisk), Sleepz.calculate(2222,2222));
     				}
     			}
     			if(Inventory.contains(id.fremmy_redDisk))
     			{
     				if(Inventory.get(id.fremmy_redDisk).useOn(GameObjects.closest("Abstract mural")))
     				{
-    					MethodProvider.sleepUntil(() -> !Inventory.contains(id.fremmy_redDisk), Sleep.calculate(2222,2222));
+    					Sleep.sleepUntil(() -> !Inventory.contains(id.fremmy_redDisk), Sleepz.calculate(2222,2222));
     				}
     			}
     			break;
     		}
-    		if(Locations.fremmy_peerUpstairs.contains(p.l))
+    		if(Locations.fremmy_peerUpstairs.contains(Players.getLocal()))
     		{
     			if(Inventory.contains(id.fremmy_unfrozenKey))
     			{
     				API.interactWithGameObject("Trapdoor", "Open",trapdoorRight);
-    				Sleep.sleep(1111, 1111);
-    				API.interactWithGameObject("Trapdoor", "Climb-down",trapdoorRight,() -> !Locations.fremmy_peerUpstairs.contains(p.l));
+    				Sleepz.sleep(1111, 1111);
+    				API.interactWithGameObject("Trapdoor", "Climb-down",trapdoorRight,() -> !Locations.fremmy_peerUpstairs.contains(Players.getLocal()));
     				break;
     			}
     			if(Inventory.contains(id.fremmy_frozenKey))
     			{
     				if(Inventory.get(id.fremmy_frozenKey).useOn(GameObjects.closest("Cooking range")))
     				{
-    					MethodProvider.sleepUntil(() -> !Inventory.contains(id.fremmy_frozenKey), Sleep.calculate(2222,2222));
+    					Sleep.sleepUntil(() -> !Inventory.contains(id.fremmy_frozenKey), Sleepz.calculate(2222,2222));
     				}
     				break;
     			}
@@ -189,7 +179,7 @@ public class FremennikTrials extends Leaf {
     			{
     				if(Inventory.get(id.fremmy_wholeVase).useOn(GameObjects.closest("Frozen table")))
     				{
-    					MethodProvider.sleepUntil(() -> !Inventory.contains(id.fremmy_wholeVase), Sleep.calculate(2222,2222));
+    					Sleep.sleepUntil(() -> !Inventory.contains(id.fremmy_wholeVase), Sleepz.calculate(2222,2222));
     				}
     				break;
     			}
@@ -199,7 +189,7 @@ public class FremennikTrials extends Leaf {
         			{
     					if(Inventory.get(id.fremmy_fullVase).useOn(id.fremmy_vaseLid))
         				{
-        					MethodProvider.sleepUntil(() -> !Inventory.contains(id.fremmy_fullVase), Sleep.calculate(2222,2222));
+        					Sleep.sleepUntil(() -> !Inventory.contains(id.fremmy_fullVase), Sleepz.calculate(2222,2222));
         				}
     					break;
         			}
@@ -207,7 +197,7 @@ public class FremennikTrials extends Leaf {
     				{
     					if(Inventory.get(id.fremmy_vase).useOn(GameObjects.closest("Tap")))
         				{
-        					MethodProvider.sleepUntil(() -> !Inventory.contains(id.fremmy_vase), Sleep.calculate(2222,2222));
+        					Sleep.sleepUntil(() -> !Inventory.contains(id.fremmy_vase), Sleepz.calculate(2222,2222));
         				}
     					break;
     				}
@@ -215,7 +205,7 @@ public class FremennikTrials extends Leaf {
     				{
     					if(Inventory.get(id.fremmy_4_5Bucket).useOn(GameObjects.closest(g -> g!=null && g.getName().contains("Chest") && g.getTile().equals(chestWater))))
         				{
-        					MethodProvider.sleepUntil(() -> !Inventory.contains(id.fremmy_4_5Bucket), Sleep.calculate(2222,2222));
+        					Sleep.sleepUntil(() -> !Inventory.contains(id.fremmy_4_5Bucket), Sleepz.calculate(2222,2222));
         				}
     					break;
     				}
@@ -225,7 +215,7 @@ public class FremennikTrials extends Leaf {
         				{
         					if(Inventory.get(id.fremmy_fullBucket).useOn(id.fremmy_2_3Jug))
             				{
-            					MethodProvider.sleepUntil(() -> !Inventory.contains(id.fremmy_fullBucket), Sleep.calculate(2222,2222));
+            					Sleep.sleepUntil(() -> !Inventory.contains(id.fremmy_fullBucket), Sleepz.calculate(2222,2222));
             				}
         					break;
         				}
@@ -233,7 +223,7 @@ public class FremennikTrials extends Leaf {
         				{
         					if(Inventory.get(id.fremmy_emptyBucket).useOn(GameObjects.closest("Tap")))
             				{
-            					MethodProvider.sleepUntil(() -> !Inventory.contains(id.fremmy_emptyBucket), Sleep.calculate(2222,2222));
+            					Sleep.sleepUntil(() -> !Inventory.contains(id.fremmy_emptyBucket), Sleepz.calculate(2222,2222));
             				}
         					break;
         				}
@@ -245,7 +235,7 @@ public class FremennikTrials extends Leaf {
     					{
     						if(Inventory.get(id.fremmy_2_5Bucket).useOn(id.fremmy_emptyJug))
             				{
-            					MethodProvider.sleepUntil(() -> !Inventory.contains(id.fremmy_emptyJug),Sleep.calculate(4444, 3333));
+            					Sleep.sleepUntil(() -> !Inventory.contains(id.fremmy_emptyJug),Sleepz.calculate(4444, 3333));
             				}
             				break;
     					}
@@ -253,7 +243,7 @@ public class FremennikTrials extends Leaf {
     					{
     						if(Inventory.get(id.fremmy_fullJug).useOn(GameObjects.closest("Drain")))
             				{
-            					MethodProvider.sleepUntil(() -> !Inventory.contains(id.fremmy_fullJug),Sleep.calculate(4444, 3333));
+            					Sleep.sleepUntil(() -> !Inventory.contains(id.fremmy_fullJug),Sleepz.calculate(4444, 3333));
             				}
             				break;
     					}
@@ -263,7 +253,7 @@ public class FremennikTrials extends Leaf {
         			{
         				if(Inventory.get(id.fremmy_fullBucket).useOn(id.fremmy_emptyJug))
         				{
-        					MethodProvider.sleepUntil(() -> !Inventory.contains(id.fremmy_fullBucket),Sleep.calculate(4444, 3333));
+        					Sleep.sleepUntil(() -> !Inventory.contains(id.fremmy_fullBucket),Sleepz.calculate(4444, 3333));
         				}
         				break;
         			}
@@ -271,7 +261,7 @@ public class FremennikTrials extends Leaf {
     				{
     					if(Inventory.get(id.fremmy_emptyBucket).useOn(GameObjects.closest("Tap")))
         				{
-        					MethodProvider.sleepUntil(() -> !Inventory.contains(id.fremmy_emptyBucket), Sleep.calculate(2222,2222));
+        					Sleep.sleepUntil(() -> !Inventory.contains(id.fremmy_emptyBucket), Sleepz.calculate(2222,2222));
         				}
     					break;
     				}
@@ -280,15 +270,15 @@ public class FremennikTrials extends Leaf {
     			if(Inventory.contains(id.fremmy_redDisk))
     			{
     				API.interactWithGameObject("Trapdoor", "Open",trapdoorRight);
-    				Sleep.sleep(1111, 1111);
-    				API.interactWithGameObject("Trapdoor", "Climb-down",trapdoorRight,() -> !Locations.fremmy_peerUpstairs.contains(p.l));
+    				Sleepz.sleep(1111, 1111);
+    				API.interactWithGameObject("Trapdoor", "Climb-down",trapdoorRight,() -> !Locations.fremmy_peerUpstairs.contains(Players.getLocal()));
     				break;
     			}
     			if(Inventory.contains(id.fremmy_redGoop))
     			{
     				if(Inventory.get(id.fremmy_redGoop).useOn(id.fremmy_woodenDisk))
     				{
-    					MethodProvider.sleepUntil(() -> Inventory.contains(id.fremmy_redDisk),Sleep.calculate(4444, 3333));
+    					Sleep.sleepUntil(() -> Inventory.contains(id.fremmy_redDisk),Sleepz.calculate(4444, 3333));
     				}
     				break;
     			}
@@ -296,14 +286,14 @@ public class FremennikTrials extends Leaf {
     			{
     				if(Inventory.get(id.fremmy_redHerring).useOn(GameObjects.closest("Cooking range")))
     				{
-    					MethodProvider.sleepUntil(() -> Inventory.contains(id.fremmy_redGoop),Sleep.calculate(4444, 3333));
+    					Sleep.sleepUntil(() -> Inventory.contains(id.fremmy_redGoop),Sleepz.calculate(4444, 3333));
     				}
     				break;
     			}
     			if(Inventory.contains(id.fremmy_oldRedDisk))
     			{
     				API.interactWithGameObject("Cupboard", "Open");
-    				Sleep.sleep(1111, 1111);
+    				Sleepz.sleep(1111, 1111);
     				API.walkInteractWithGameObject("Cupboard", "Search",Locations.fremmy_peerUpstairs,() -> Inventory.contains(id.fremmy_emptyBucket));
     				break;
     			}
@@ -320,20 +310,20 @@ public class FremennikTrials extends Leaf {
     			if(Inventory.contains(id.fremmy_redHerring))
     			{
     				API.interactWithGameObject("Chest", "Open",chestRegular); 
-    				Sleep.sleep(1111, 1111);
+    				Sleepz.sleep(1111, 1111);
     				API.interactWithGameObject("Chest", "Search",chestRegular,() -> Inventory.contains(id.fremmy_emptyJug));
     				break;
     			}
     			API.interactWithGameObject("Bookcase", "Search", bookcaseLeft,() -> Inventory.contains(id.fremmy_redHerring));
     			break;
     		}
-    		if(Locations.fremmy_peerLeftHouse.contains(p.l))
+    		if(Locations.fremmy_peerLeftHouse.contains(Players.getLocal()))
     		{
-    			API.walkInteractWithGameObject("Ladder", "Climb-up", Locations.fremmy_peerLeftHouse, () -> !Locations.fremmy_peerLeftHouse.contains(p.l));
+    			API.walkInteractWithGameObject("Ladder", "Climb-up", Locations.fremmy_peerLeftHouse, () -> !Locations.fremmy_peerLeftHouse.contains(Players.getLocal()));
     			break;
     		}
     		
-    		if(Locations.allFremennikProvinceSeersLighthouse.contains(p.l))
+    		if(Locations.allFremennikProvinceSeersLighthouse.contains(Players.getLocal()))
     		{
     			if(!Inventory.isEmpty())
     			{
@@ -356,14 +346,14 @@ public class FremennikTrials extends Leaf {
     	case(6):
     	{
     		if(!getEventRPG()) break;
-    		if(Locations.fremmy_koscheiArena.contains(p.l))
+    		if(Locations.fremmy_koscheiArena.contains(Players.getLocal()))
     		{
     			if(koschei4thForm)
     			{
-    				if(!p.l.isInCombat())
+    				if(!Players.getLocal().isInCombat())
     				{
-    					API.interactNPC("Koschei the deathless", "Attack", Locations.fremmy_koscheiArena, false,() -> p.l.isInCombat());
-    					Sleep.sleep(2222, 2222);
+    					API.interactNPC("Koschei the deathless", "Attack", Locations.fremmy_koscheiArena, false,() -> Players.getLocal().isInCombat());
+    					Sleepz.sleep(2222, 2222);
     					break;
     				}
     				break;
@@ -372,11 +362,11 @@ public class FremennikTrials extends Leaf {
     			{
     				if(!Prayers.isActive(Prayer.PROTECT_FROM_MELEE))
     				{
-    					if(Skills.getBoostedLevels(Skill.PRAYER) > 0)
+    					if(Skills.getBoostedLevel(Skill.PRAYER) > 0)
     					{
     						Tabz.open(Tab.PRAYER);
     						Prayers.toggle(true, Prayer.PROTECT_FROM_MELEE);
-    						Sleep.sleep(666, 696);
+    						Sleepz.sleep(666, 696);
     						break;
     					}
     					if(!InvEquip.invyContains(id.prayPots))
@@ -384,7 +374,7 @@ public class FremennikTrials extends Leaf {
         					if(!Walkz.useJewelry(InvEquip.glory, "Edgeville") && 
         							!Walkz.useJewelry(InvEquip.wealth, "Grand Exchange"))
         					{
-        						MethodProvider.log("Well we gonna die maybe! No food or pray pots and no tele out");
+        						Logger.log("Well we gonna die maybe! No food or pray pots and no tele out");
         					}
         					break;
         				}
@@ -394,16 +384,15 @@ public class FremennikTrials extends Leaf {
     			if(Combatz.shouldEatFood(15)) Combatz.eatFood();
     			if(Combatz.shouldDrinkMeleeBoost()) Combatz.drinkMeleeBoost();
     			
-    			if(!p.l.isInCombat())
+    			if(!Players.getLocal().isInCombat())
 				{
-					API.interactNPC("Koschei the deathless", "Attack", Locations.fremmy_koscheiArena, false,() -> p.l.isInCombat());
-					Sleep.sleep(2222, 2222);
+					API.interactNPC("Koschei the deathless", "Attack", Locations.fremmy_koscheiArena, false,() -> Players.getLocal().isInCombat());
+					Sleepz.sleep(2222, 2222);
 					break;
 				}
     			break;
     		}
     		if(Questz.shouldCheckQuestStep()) Questz.checkQuestStep("The Fremennik Trials");
-    		API.randomAFK(2);
     		if(!InvEquip.invyContains(Combatz.foods) || 
     				Inventory.contains(id.tinderbox) || 
     				Inventory.contains(id.fremmy_lyre) || 
@@ -414,11 +403,11 @@ public class FremennikTrials extends Leaf {
     			fulfillKoscheiFight();
     			break;
     		}
-    		if(Locations.allFremennikProvinceSeersLighthouse.contains(p.l))
+    		if(Locations.allFremennikProvinceSeersLighthouse.contains(Players.getLocal()))
     		{
     			if(talkedToThorvaldForKoschei)
     			{
-    				API.walkInteractWithGameObject("Ladder", "Climb-down", Locations.fremmy_helmetShop, () -> !Locations.fremmy_helmetShop.contains(p.l));
+    				API.walkInteractWithGameObject("Ladder", "Climb-down", Locations.fremmy_helmetShop, () -> !Locations.fremmy_helmetShop.contains(Players.getLocal()));
     				break;
     			}
     			API.walkTalkToNPC("Thorvald", "Talk-to", Locations.fremmy_helmetShop);
@@ -431,8 +420,7 @@ public class FremennikTrials extends Leaf {
     	case(5):
     	{
     		if(Questz.shouldCheckQuestStep()) Questz.checkQuestStep("The Fremennik Trials");
-    		API.randomAFK(2);
-    		if(!Locations.allFremennikProvinceSeersLighthouse.contains(p.l))
+    		if(!Locations.allFremennikProvinceSeersLighthouse.contains(Players.getLocal()))
     		{
     			Walkz.teleportCamelot(180000);
     			break;
@@ -574,23 +562,22 @@ public class FremennikTrials extends Leaf {
     	case(4):
     	{
     		if(Questz.shouldCheckQuestStep()) Questz.checkQuestStep("The Fremennik Trials");
-    		API.randomAFK(2);
-    		if(swensenPuzzle.contains(p.l))
+    		if(swensenPuzzle.contains(Players.getLocal()))
 			{
 				solveSwensenPuzzle();
     			break;
 			}
     		if(canEnterSwensenMaze)
     		{
-    			if(swensenPuzzle.contains(p.l))
+    			if(swensenPuzzle.contains(Players.getLocal()))
     			{
     				solveSwensenPuzzle();
         			break;
     			}
-    			API.walkInteractWithGameObject("Ladder", "Climb-down", Locations.fremmy_swensen, () -> swensenPuzzle.contains(p.l));
+    			API.walkInteractWithGameObject("Ladder", "Climb-down", Locations.fremmy_swensen, () -> swensenPuzzle.contains(Players.getLocal()));
     			break;
     		}
-    		if(!Locations.allFremennikProvinceSeersLighthouse.contains(p.l))
+    		if(!Locations.allFremennikProvinceSeersLighthouse.contains(Players.getLocal()))
     		{
     			Walkz.teleportCamelot(180000);
     			break;
@@ -602,29 +589,26 @@ public class FremennikTrials extends Leaf {
     	{
     		if(Questz.shouldCheckQuestStep()) Questz.checkQuestStep("The Fremennik Trials");
     		if(shouldFulfillStart()) break;
-    		API.randomAFK(2);
-    		if(Inventory.contains(id.fremmy_strangeObject1))
-    		{
-    			if(Inventory.get(id.tinderbox).useOn(id.fremmy_strangeObject1))
-    			{
-    				MethodProvider.sleepUntil(() -> !Inventory.contains(id.fremmy_strangeObject1), Sleep.calculate(2222,2222));
+    		if(Inventory.contains(id.fremmy_strangeObject1)) {
+    			if(Inventory.get(id.tinderbox).useOn(id.fremmy_strangeObject1)) {
+    				Sleep.sleepUntil(() -> !Inventory.contains(id.fremmy_strangeObject1), Sleepz.calculate(2222,2222));
     			}
     			break;
     		}
     		if(Inventory.contains(id.fremmy_strangeObject2))
     		{
-    			if(Locations.fremmy_pipeBomb.contains(p.l))
+    			if(Locations.fremmy_pipeBomb.contains(Players.getLocal()))
         		{
         			if(Inventory.get(id.fremmy_strangeObject2).useOn(GameObjects.closest(g -> g!=null && g.getName().equals("Pipe") && g.hasAction("Put-inside"))))
         			{
-        				MethodProvider.sleepUntil(() -> !Inventory.contains(id.fremmy_strangeObject2),
-        						() -> p.l.isMoving(),Sleep.calculate(3333, 2222),69);
+        				Sleep.sleepUntil(() -> !Inventory.contains(id.fremmy_strangeObject2),
+        						() -> Players.getLocal().isMoving(),Sleepz.calculate(3333, 2222),69);
         			}
         			break;
         		}
-    			if(Locations.fremmy_wholeConcert.contains(p.l))
+    			if(Locations.fremmy_wholeConcert.contains(Players.getLocal()))
     			{
-    				API.walkInteractWithGameObject("Door", "Open", Locations.fremmy_concertDoor, () -> !Locations.fremmy_wholeConcert.contains(p.l));
+    				API.walkInteractWithGameObject("Door", "Open", Locations.fremmy_concertDoor, () -> !Locations.fremmy_wholeConcert.contains(Players.getLocal()));
     				break;
     			}
     			if(Locations.fremmy_longHall.getCenter().distance() < 250)
@@ -635,7 +619,7 @@ public class FremennikTrials extends Leaf {
     			Walkz.teleportCamelot(180000);
         		break;
     		}
-    		if(Locations.fremmy_longHall.contains(p.l))
+    		if(Locations.fremmy_longHall.contains(Players.getLocal()))
 			{
     			if(filledLowAlcoholKeg)
     			{
@@ -651,7 +635,7 @@ public class FremennikTrials extends Leaf {
 				{
 					if(Inventory.get(id.fremmy_kegOfBeer).useOn(id.fremmy_lowAlcoholKeg))
 					{
-						MethodProvider.sleepUntil(() -> filledLowAlcoholKeg, Sleep.calculate(3333, 2222));
+						Sleep.sleepUntil(() -> filledLowAlcoholKeg, Sleepz.calculate(3333, 2222));
 					}
 					break;
 				}
@@ -670,20 +654,19 @@ public class FremennikTrials extends Leaf {
     		if(Questz.shouldCheckQuestStep()) Questz.checkQuestStep("The Fremennik Trials");
     		if(shouldFulfillStart()) break;
 
-    		API.randomAFK(2);
     		if(Inventory.contains(id.fremmy_enchantedLyre))
     		{
-    			if(Locations.fremmy_concertPlatform.contains(p.l))
+    			if(Locations.fremmy_concertPlatform.contains(Players.getLocal()))
     			{
     				if(Inventory.interact(id.fremmy_enchantedLyre, "Play"))
     				{
-    					MethodProvider.sleepUntil(Dialogues::inDialogue, Sleep.calculate(15000, 5555));
+    					Sleep.sleepUntil(Dialogues::inDialogue, Sleepz.calculate(15000, 5555));
     				}
     				break;
     			}
-    			if(Locations.fremmy_wholeConcert.contains(p.l))
+    			if(Locations.fremmy_wholeConcert.contains(Players.getLocal()))
     			{
-    				if(Walking.shouldWalk(6) && Walking.walk(Locations.fremmy_concertPlatform.getCenter())) Sleep.sleep(696, 666);
+    				if(Walking.shouldWalk(6) && Walking.walk(Locations.fremmy_concertPlatform.getCenter())) Sleepz.sleep(696, 666);
     				break;
     			}
     			if(Locations.fremmy_concertDoor.getCenter().distance() < 250)
@@ -692,7 +675,7 @@ public class FremennikTrials extends Leaf {
     				break;
     			}
     		} 
-    		MethodProvider.log("need enchanted lyre!");
+    		Logger.log("need enchanted lyre!");
     		break;
     	}
     	case(1):
@@ -732,36 +715,31 @@ public class FremennikTrials extends Leaf {
     		{
     			if(!Inventory.contains(id.fremmy_lyre))
     			{
-    				if(Locations.fremmy_lanzigHut.contains(p.l))
+    				if(Locations.fremmy_lanzigHut.contains(Players.getLocal()))
     				{
     					GroundItem lyreNStuff = ItemsOnGround.getNearbyGroundItem(ItemsOnGround.lanzigLoot,Locations.fremmy_lanzigHut);
-            			if(lyreNStuff != null)
-            			{
+            			if(lyreNStuff != null) {
             				ItemsOnGround.grabNearbyGroundItem(lyreNStuff);
             				break;
             			}
             			if(Combatz.shouldDrinkMeleeBoost()) Combatz.drinkMeleeBoost();
             			if(Combatz.shouldEatFood(12))Combatz.eatFood();
-            			if(!p.l.isInCombat())
-            			{
-            	    		API.randomAFK(2);
-            				API.walkInteractNPC("Lanzig","Attack",Locations.fremmy_lanzigHut,() -> p.l.isInCombat());
+            			if(!Players.getLocal().isInCombat()) {
+            				API.walkInteractNPC("Lanzig","Attack",Locations.fremmy_lanzigHut,() -> Players.getLocal().isInCombat());
             			}
-            			Sleep.sleep(69, 2222);
+            			Sleepz.sleep(69, 2222);
             			break;
     				}
     				if(Questz.shouldCheckQuestStep()) Questz.checkQuestStep("The Fremennik Trials");
-    	    		API.randomAFK(2);
-    				if(Locations.allFremennikProvinceSeersLighthouse.contains(p.l))
+    				if(Locations.allFremennikProvinceSeersLighthouse.contains(Players.getLocal()))
     				{
-    					API.walkInteractNPC("Lanzig","Attack",Locations.fremmy_lanzigHut,() -> p.l.isInCombat());
+    					API.walkInteractNPC("Lanzig","Attack",Locations.fremmy_lanzigHut,() -> Players.getLocal().isInCombat());
             			break;
     				}
     				Walkz.teleportCamelot(180000);
     				break;
     			}
     			if(Questz.shouldCheckQuestStep()) Questz.checkQuestStep("The Fremennik Trials");
-        		API.randomAFK(2);
     			//have lyre
     			if(Locations.seersPub.getCenter().distance() <= 75)
     			{
@@ -772,7 +750,6 @@ public class FremennikTrials extends Leaf {
     			break;
     		}
     		if(Questz.shouldCheckQuestStep()) Questz.checkQuestStep("The Fremennik Trials");
-    		API.randomAFK(2);
     		
     		
     		if(talkedToOlafTwice)
@@ -785,9 +762,9 @@ public class FremennikTrials extends Leaf {
     			API.walkTalkToNPC("Olaf the Bard","Talk-to", Locations.fremmy_olafDaBeard);
     			break;
     		}
-    		if(p.l.isAnimating()) 
+    		if(Players.getLocal().isAnimating()) 
     		{
-    			Sleep.sleep(2222, 2222);
+    			Sleepz.sleep(2222, 2222);
     			break;
     		}
     		if(!Inventory.contains(id.fremmy_beerTankard))
@@ -806,19 +783,18 @@ public class FremennikTrials extends Leaf {
     	case(0):
     	{
     		if(Questz.shouldCheckQuestStep()) Questz.checkQuestStep("The Fremennik Trials");
-    		API.randomAFK(2);
     		if(shouldFulfillStart()) break;
-        	if(Locations.allFremennikProvinceSeersLighthouse.contains(p.l))
+        	if(Locations.allFremennikProvinceSeersLighthouse.contains(Players.getLocal()))
         	{
         		API.walkTalkToNPC("Brundt the Chieftain", "Talk-to", Locations.fremmy_longHall);
-        		return Timing.sleepLogNormalSleep();
+        		return Sleepz.sleepTiming();
         	}
         	Walkz.teleportCamelot(180000);
         	break;
     	}
     	default:break;
     	}
-        return Sleep.calculate(69, 696) + Timing.sleepLogNormalSleep();
+        return Sleepz.calculate(69, 696);
     }
     public static boolean shouldFulfillStart()
     {
@@ -876,7 +852,7 @@ public class FremennikTrials extends Leaf {
     	if(Inventory.contains(id.fremmy_kegOfBeer)) return true;
     	if(!Inventory.contains(id.fremmy_kegOfBeer))
     	{
-    		if(!Locations.allFremennikProvinceSeersLighthouse.contains(p.l))
+    		if(!Locations.allFremennikProvinceSeersLighthouse.contains(Players.getLocal()))
     		{
     			Walkz.teleportCamelot(180000);
     			return false;
@@ -891,7 +867,7 @@ public class FremennikTrials extends Leaf {
     	if(Inventory.contains(id.fremmy_beerTankard)) return true;
     	if(!Inventory.contains(id.fremmy_beerTankard))
     	{
-    		if(!Locations.allFremennikProvinceSeersLighthouse.contains(p.l))
+    		if(!Locations.allFremennikProvinceSeersLighthouse.contains(Players.getLocal()))
     		{
     			Walkz.teleportCamelot(180000);
     			return false;
@@ -905,18 +881,18 @@ public class FremennikTrials extends Leaf {
     {
     	if(Inventory.contains(id.fremmy_strangeObject1)) return true;
     	if(!getBeerTankard()) return false;
-    	if(Locations.fremmy_councilWorkman.contains(p.l))
+    	if(Locations.fremmy_councilWorkman.contains(Players.getLocal()))
     	{
     		if(Inventory.get(id.fremmy_beerTankard).useOn(NPCs.closest("Council workman")))
 			{
-				MethodProvider.log("Successfully used beer on workman :-)");
-				MethodProvider.sleepUntil(() -> Inventory.contains(id.fremmy_strangeObject1),
-						() -> p.l.isMoving(),
-						Sleep.calculate(2222, 2222),69);
+				Logger.log("Successfully used beer on workman :-)");
+				Sleep.sleepUntil(() -> Inventory.contains(id.fremmy_strangeObject1),
+						() -> Players.getLocal().isMoving(),
+						Sleepz.calculate(2222, 2222),69);
 			}
     		return false;
     	}
-    	if(Locations.allFremennikProvinceSeersLighthouse.contains(p.l))
+    	if(Locations.allFremennikProvinceSeersLighthouse.contains(Players.getLocal()))
     	{
     		Walkz.walkToArea(Locations.fremmy_councilWorkman);
     		return false;
@@ -940,18 +916,18 @@ public class FremennikTrials extends Leaf {
 			if(Shop.isOpen())
 			{
 				Shopz.close();
-				Sleep.sleep(699,1111);
+				Sleepz.sleep(699,1111);
 				return false;
 			}
 			InvEquip.equipItem(id.eventRPG);
 			return false;
 		}
 		
-		if(Inventory.count(InvEquip.coins) < 500)
-		{
+		if(Inventory.count(InvEquip.coins) < 500) {
 			InvEquip.clearAll();
 			InvEquip.addInvyItem(InvEquip.coins, 500, 500, false, 0);
 			InvEquip.setEquipItem(EquipmentSlot.AMULET, InvEquip.glory);
+			InvEquip.setEquipItem(EquipmentSlot.RING, InvEquip.wealth);
 			InvEquip.fulfillSetup(true, 180000);
 			return false;
 		}
@@ -959,9 +935,9 @@ public class FremennikTrials extends Leaf {
 		{
 			if(Shop.purchaseOne(id.eventRPG))
 			{
-				MethodProvider.sleepUntil(() -> Inventory.contains(id.eventRPG), Sleep.calculate(2222,2222));
+				Sleep.sleepUntil(() -> Inventory.contains(id.eventRPG), Sleepz.calculate(2222,2222));
 			}
-			Sleep.sleep(111, 1111);
+			Sleepz.sleep(111, 1111);
 			return false;
 		}
 		if(Locations.diango.getCenter().distance() < 75)
@@ -1015,9 +991,9 @@ public class FremennikTrials extends Leaf {
 	 private static final List<Tile> portalTilesList = new ArrayList<Tile>();
 	 public static void solveSwensenPuzzle()
 	 {
-		 if(!swensenPuzzle.contains(p.l))
+		 if(!swensenPuzzle.contains(Players.getLocal()))
 		 {
-			 MethodProvider.log("Outside of puzzle!");
+			 Logger.log("Outside of puzzle!");
 			 return;
 		 }
 		 GameObject ladder = GameObjects.closest(g -> g!=null && !g.getTile().equals(new Tile(2631,10005)) && g.hasAction("Climb-up") && g.getName().contains("Ladder") && g.canReach());
@@ -1025,13 +1001,13 @@ public class FremennikTrials extends Leaf {
 		 {
 			 if(ladder.interact("Climb-up"))
 			 {
-				 MethodProvider.sleepUntil(() -> Locations.fremmy_swensen.contains(p.l), Sleep.calculate(5555, 3333));
+				 Sleep.sleepUntil(() -> Locations.fremmy_swensen.contains(Players.getLocal()), Sleepz.calculate(5555, 3333));
 			 }
 			 return;
 		 }
-		 if(p.l.isMoving() || p.l.isAnimating()) 
+		 if(Players.getLocal().isMoving() || Players.getLocal().isAnimating()) 
 		{
-			 Sleep.sleep(2222, 2222);
+			 Sleepz.sleep(2222, 2222);
 			 return;
 		}
 		 GameObject portal = GameObjects.closest(g -> g!=null && 
@@ -1043,7 +1019,7 @@ public class FremennikTrials extends Leaf {
 		 {
 			 if(portal.interact("Use"))
 			 {
-				 Sleep.sleep(2222, 2222);
+				 Sleepz.sleep(2222, 2222);
 			 }
 		 }
 	 }
@@ -1057,26 +1033,25 @@ public class FremennikTrials extends Leaf {
 		 {
 			 if(Combatz.shouldDrinkMeleeBoost()) Combatz.drinkMeleeBoost();
 			 if(Combatz.shouldEatFood(20)) Combatz.eatFood();
-			 if(!p.l.isInCombat())
+			 if(!Players.getLocal().isInCombat())
 			 {
-				 Sleep.sleep(2222, 2222);
-				 if(!p.l.isInCombat())
+				 Sleepz.sleep(2222, 2222);
+				 if(!Players.getLocal().isInCombat())
 				 {
 					if(draugen.interact("Action"))
 					{
-						MethodProvider.sleepUntil(() -> p.l.isInCombat(),
-								() -> p.l.isMoving(),
-								Sleep.calculate(2222, 2222),69);
+						Sleep.sleepUntil(() -> Players.getLocal().isInCombat(),
+								() -> Players.getLocal().isMoving(),
+								Sleepz.calculate(2222, 2222),69);
 					}
 				 }
 				 return;
 			 }
 			 return;
 		 }
-		 API.randomAFK(2);
 		 if(!hoppedToRightDraugenWorld)
 		 {
-			 if(!Locations.fremmy_councilWorkman.contains(p.l))
+			 if(!Locations.fremmy_councilWorkman.contains(Players.getLocal()))
 			 {
 				 if(Locations.fremmy_councilWorkman.getCenter().distance() > 250)
 				 {
@@ -1098,7 +1073,7 @@ public class FremennikTrials extends Leaf {
 				 }
 				 if(Inventory.interact(id.fremmy_huntersTalisman, "Locate"))
 				 {
-					 MethodProvider.sleepUntil(() -> currentDirection != null, Sleep.calculate(2222, 2222));
+					 Sleep.sleepUntil(() -> currentDirection != null, Sleepz.calculate(2222, 2222));
 				 }
 				 return;
 			 }
@@ -1115,7 +1090,7 @@ public class FremennikTrials extends Leaf {
 		 }
 		 if(currentDirection == null)
 		 {
-			 if(p.l.isMoving()) return;
+			 if(Players.getLocal().isMoving()) return;
 			 if(!Tabs.isOpen(Tab.INVENTORY))
 			 {
 				 Tabz.open(Tab.INVENTORY);
@@ -1123,7 +1098,7 @@ public class FremennikTrials extends Leaf {
 			 }
 			 if(Inventory.interact(id.fremmy_huntersTalisman, "Locate"))
 			 {
-				 MethodProvider.sleepUntil(() -> currentDirection != null, Sleep.calculate(2222, 2222));
+				 Sleep.sleepUntil(() -> currentDirection != null, Sleepz.calculate(2222, 2222));
 			 }
 			 return;
 		 }
@@ -1154,12 +1129,12 @@ public class FremennikTrials extends Leaf {
 				 yAdd = 0 + (int) Calculations.nextGaussianRandom(5, 2);
 				 xAdd = 0 - ((int) Calculations.nextGaussianRandom(5, 2));
 			}
-		 walkDirectionTile = new Tile((p.l.getX() + xAdd),(p.l.getY() + yAdd),0);
+		 walkDirectionTile = new Tile((Players.getLocal().getX() + xAdd),(Players.getLocal().getY() + yAdd),0);
 		 walkDirectionTile = Map.getWalkable(walkDirectionTile);
 		 if(Walking.shouldWalk(6) && Walking.walk(walkDirectionTile)) 
 		{
 			 currentDirection = null;
-			 Sleep.sleep(696, 666);
+			 Sleepz.sleep(696, 666);
 		 }
 	 }
 	public static boolean canPickupBeer = false;
@@ -1195,25 +1170,25 @@ public class FremennikTrials extends Leaf {
 	public static void solvePeerPuzzle()
 	{
 		if(solvedRiddle) return;
-		if(Widgets.getWidgetChild(298,43) != null && 
-			Widgets.getWidgetChild(298,43).isVisible())
+		if(Widgets.get(298,43) != null && 
+			Widgets.get(298,43).isVisible())
 		{
-			WidgetChild w1 = Widgets.getWidgetChild(298,43);
-			WidgetChild w2 = Widgets.getWidgetChild(298,44);
-			WidgetChild w3 = Widgets.getWidgetChild(298,45);
-			WidgetChild w4 = Widgets.getWidgetChild(298,46);
+			WidgetChild w1 = Widgets.get(298,43);
+			WidgetChild w2 = Widgets.get(298,44);
+			WidgetChild w3 = Widgets.get(298,45);
+			WidgetChild w4 = Widgets.get(298,46);
 			WidgetChild w1Button;
 			WidgetChild w2Button;
 			WidgetChild w3Button;
 			WidgetChild w4Button;
-			if(peerPuzzle1Left) w1Button = Widgets.getWidgetChild(298,47);
-			else w1Button = Widgets.getWidgetChild(298,48);
-			if(peerPuzzle2Left) w2Button = Widgets.getWidgetChild(298,49);
-			else w2Button = Widgets.getWidgetChild(298,50);
-			if(peerPuzzle3Left) w3Button = Widgets.getWidgetChild(298,51);
-			else w3Button = Widgets.getWidgetChild(298,52);
-			if(peerPuzzle4Left) w4Button = Widgets.getWidgetChild(298,53);
-			else w4Button = Widgets.getWidgetChild(298,54);
+			if(peerPuzzle1Left) w1Button = Widgets.get(298,47);
+			else w1Button = Widgets.get(298,48);
+			if(peerPuzzle2Left) w2Button = Widgets.get(298,49);
+			else w2Button = Widgets.get(298,50);
+			if(peerPuzzle3Left) w3Button = Widgets.get(298,51);
+			else w3Button = Widgets.get(298,52);
+			if(peerPuzzle4Left) w4Button = Widgets.get(298,53);
+			else w4Button = Widgets.get(298,54);
 			String s1 = w1.getText().toLowerCase();
 			String s2 = w2.getText().toLowerCase();
 			String s3 = w3.getText().toLowerCase();
@@ -1222,7 +1197,7 @@ public class FremennikTrials extends Leaf {
 			{
 				if(w1Button.interact())
 				{
-					Sleep.sleep(666, 696);
+					Sleepz.sleep(666, 696);
 				}
 				return;
 			}
@@ -1230,7 +1205,7 @@ public class FremennikTrials extends Leaf {
 			{
 				if(w2Button.interact())
 				{
-					Sleep.sleep(666, 696);
+					Sleepz.sleep(666, 696);
 				}
 				return;
 			}
@@ -1238,7 +1213,7 @@ public class FremennikTrials extends Leaf {
 			{
 				if(w3Button.interact())
 				{
-					Sleep.sleep(666, 696);
+					Sleepz.sleep(666, 696);
 				}
 				return;
 			}
@@ -1246,14 +1221,14 @@ public class FremennikTrials extends Leaf {
 			{
 				if(w4Button.interact())
 				{
-					Sleep.sleep(666, 696);
+					Sleepz.sleep(666, 696);
 				}
 				return;
 			}
-			if(Widgets.getWidgetChild(298,56).interact())
+			if(Widgets.get(298,56).interact())
 			{
-				MethodProvider.log("Solved riddle: "+s1+s2+s3+s4);
-				MethodProvider.sleepUntil(() -> solvedRiddle, Sleep.calculate(2222, 2222));
+				Logger.log("Solved riddle: "+s1+s2+s3+s4);
+				Sleep.sleepUntil(() -> solvedRiddle, Sleepz.calculate(2222, 2222));
 			}
 			return;
 		}
@@ -1263,10 +1238,10 @@ public class FremennikTrials extends Leaf {
 	 public static boolean handleDialogues()
 		{
 		 	boolean continueWait = false;
-		 	if(Widgets.getWidgetChild(229, 1) != null && 
-		 			Widgets.getWidgetChild(229,1).isVisible())
+		 	if(Widgets.get(229, 1) != null && 
+		 			Widgets.get(229,1).isVisible())
 		 	{
-		 		String dialogue = Widgets.getWidgetChild(229,1).getText();
+		 		String dialogue = Widgets.get(229,1).getText();
 		 		if(dialogue.contains("My first is in mage, but not in wizard"))
 		 		{
 		 			riddleAnswer = "mind";
@@ -1295,7 +1270,7 @@ public class FremennikTrials extends Leaf {
 		 	if(Dialogues.getNPCDialogue() != null && !Dialogues.getNPCDialogue().isEmpty())
 		 	{
 		 		String dialogue = Dialogues.getNPCDialogue();
-		 		MethodProvider.log("NPC Dialogue: " + dialogue);
+		 		Logger.log("NPC Dialogue: " + dialogue);
 		 		if(dialogue.contains("As you wish outerlander; I will drink first, then you will"))
 		 		{
 		 			continueWait = true;
@@ -1407,14 +1382,14 @@ public class FremennikTrials extends Leaf {
 			{
 				if(Dialogues.continueDialogue()) 
 				{
-					Sleep.sleep(420,696);
-					if(continueWait) Sleep.sleep(5555, 4444);
+					Sleepz.sleep(420,696);
+					if(continueWait) Sleepz.sleep(5555, 4444);
 				}
 				return true;
 			}
 			if(Dialogues.isProcessing())
 			{
-				Sleep.sleep(420,696);
+				Sleepz.sleep(420,696);
 				return true;
 			}
 			 
@@ -1445,7 +1420,7 @@ public class FremennikTrials extends Leaf {
 						Dialogues.chooseOption("Yes");
 			}
 			
-			if(Dialogues.inDialogue()) Sleep.sleep(2222, 2222);
+			if(Dialogues.inDialogue()) Sleepz.sleep(2222, 2222);
 			return false;
 		}
 }

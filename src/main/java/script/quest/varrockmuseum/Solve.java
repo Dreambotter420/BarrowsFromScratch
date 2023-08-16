@@ -1,11 +1,13 @@
 package script.quest.varrockmuseum;
 
-import org.dreambot.api.methods.MethodProvider;
 import org.dreambot.api.methods.dialogues.Dialogues;
 import org.dreambot.api.script.Unobfuscated;
+import org.dreambot.api.utilities.Logger;
+import org.dreambot.api.utilities.Sleep;
 import org.dreambot.api.wrappers.widgets.WidgetChild;
 
 import script.framework.Leaf;
+import script.utilities.Sleepz;
 
 import java.util.Arrays;
 import java.util.List;
@@ -22,23 +24,23 @@ public class Solve extends Leaf {
     public int onLoop() {
 
         String question = getQuestionText();
-        MethodProvider.log("[SOLVING] -> " + question);
+        Logger.log("[SOLVING] -> " + question);
 
         WidgetChild widgetChild = getSolutionWidget();
         if (widgetChild != null) {
-            MethodProvider.log("[ANSWER] -> " + (widgetChild.getText() != null ? widgetChild.getText() : ""));
+            Logger.log("[ANSWER] -> " + (widgetChild.getText() != null ? widgetChild.getText() : ""));
             if (widgetChild.interact("Ok")) {
-                MethodProvider.sleepUntil(Dialogues::inDialogue, 2500 + Timing.sleepLogNormalInteraction());
+                Sleep.sleepUntil(Dialogues::inDialogue, 2500 + Sleepz.interactionTiming());
             }
-            return Timing.sleepLogNormalSleep();
+            return Sleepz.sleepTiming();
         }
 
         WidgetChild close = Museum.getQuizParent().getChild(32);
         if (close != null && close.interact("Close")) {
-            MethodProvider.sleepUntil(() -> Museum.getQuizParent() == null, 1000 + Timing.sleepLogNormalInteraction());
+            Sleep.sleepUntil(() -> Museum.getQuizParent() == null, 1000 + Sleepz.interactionTiming());
         }
 
-        return Timing.sleepLogNormalSleep();
+        return Sleepz.sleepTiming();
     }
 
 

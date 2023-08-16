@@ -2,13 +2,11 @@ package script.behaviour;
 
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.util.Arrays;
 
 import org.dreambot.api.ClientSettings;
 import org.dreambot.api.data.ActionMode;
 import org.dreambot.api.input.Mouse;
 import org.dreambot.api.methods.Calculations;
-import org.dreambot.api.methods.MethodProvider;
 import org.dreambot.api.methods.dialogues.Dialogues;
 import org.dreambot.api.methods.filter.Filter;
 import org.dreambot.api.methods.interactive.Players;
@@ -17,14 +15,12 @@ import org.dreambot.api.methods.tabs.Tab;
 import org.dreambot.api.methods.tabs.Tabs;
 import org.dreambot.api.methods.walking.impl.Walking;
 import org.dreambot.api.methods.widget.Widgets;
+import org.dreambot.api.utilities.Logger;
+import org.dreambot.api.utilities.Sleep;
 import org.dreambot.api.wrappers.widgets.WidgetChild;
 
-import script.p;
-import script.actionz.UniqueActions;
-import script.actionz.UniqueActions.Actionz;
 import script.framework.Leaf;
-import script.utilities.Sleep;
-import script.utilities.Tabz;
+import script.utilities.*;
 
 
 public class CustomizeSettings extends Leaf {
@@ -34,17 +30,16 @@ public class CustomizeSettings extends Leaf {
 	 {
 	    return ClientSettings.isAcceptAidEnabled() ||
 				shouldToggleProfanity() ||
-    			ClientSettings.roofsEnabled() || 
+    			!ClientSettings.areRoofsHidden() ||
     			shouldToggleWarningsOff() ||
-    			(UniqueActions.isActionEnabled(Actionz.LEFTMOUSECLICK_ATTACK_NPC) && ClientSettings.getNPCAttackOptionsMode() != ActionMode.LEFT_CLICK_WHERE_AVAILABLE) ||
-    			(!UniqueActions.isActionEnabled(Actionz.LEFTMOUSECLICK_ATTACK_NPC) && ClientSettings.getNPCAttackOptionsMode() != ActionMode.ALWAYS_RIGHT_CLICK) ||
-    			(UniqueActions.isActionEnabled(Actionz.HIDE_PLAYER_ATTACK) && ClientSettings.getPlayerAttackOptionsMode() != ActionMode.HIDDEN) ||
-    			(!UniqueActions.isActionEnabled(Actionz.HIDE_PLAYER_ATTACK) && ClientSettings.getPlayerAttackOptionsMode() != ActionMode.ALWAYS_RIGHT_CLICK) ||
-    			(UniqueActions.isActionEnabled(Actionz.ESC_TO_CLOSE) && !ClientSettings.isEscInterfaceClosingEnabled()) || 
+				ClientSettings.isResizableActive() ||
+    			ClientSettings.getNPCAttackOptionsMode() != ActionMode.LEFT_CLICK_WHERE_AVAILABLE ||
+    			ClientSettings.getPlayerAttackOptionsMode() != ActionMode.HIDDEN ||
+    			!ClientSettings.isEscInterfaceClosingEnabled() ||
     			!ClientSettings.isShiftClickDroppingEnabled() || 
     			ClientSettings.isGameAudioOn() || 
     			ClientSettings.isResizableActive() || 
-    			(UniqueActions.isActionEnabled(Actionz.TRADE_ACCEPT_DELAY_OFF) && ClientSettings.isTradeDelayEnabled());
+    			ClientSettings.isTradeDelayEnabled();
 		
 	 }
     @Override
@@ -54,42 +49,78 @@ public class CustomizeSettings extends Leaf {
     
 	public static int customizeSettings()
 	{
-		if(Dialogues.canContinue())
-		{
+		Sleepz.sleepTiming();
+		if(Dialogues.canContinue()) {
 			Dialogues.continueDialogue();
-			return Sleep.calculate(420, 696);
+			Sleep.sleepTick();
+			return Sleepz.sleepTiming();
 		}
-		if(Dialogues.areOptionsAvailable())
-		{
-			Walking.clickTileOnMinimap(p.l.getTile());
-			return Sleep.calculate(420, 696);
+		if(Dialogues.areOptionsAvailable()) {
+			Walking.clickTileOnMinimap(Players.getLocal().getTile());
+			Sleep.sleepTick();
+			return Sleepz.sleepTiming();
 		}
-		if(ClientSettings.isAcceptAidEnabled()) ClientSettings.toggleAcceptAid(false);
-		else if(shouldToggleProfanity()) toggleProfanity();
-		else if(ClientSettings.roofsEnabled()) ClientSettings.toggleRoofs(false);
-		else if(shouldToggleWarningsOff()) toggleWarnings();
-		else if(UniqueActions.isActionEnabled(Actionz.LEFTMOUSECLICK_ATTACK_NPC) && ClientSettings.getNPCAttackOptionsMode() != ActionMode.LEFT_CLICK_WHERE_AVAILABLE)
+		if (!GrandExchangg.close() || !Bankz.close() || !Shopz.close()) {
+			Logger.log("Closing GE / Bank / Shop");
+			Widgets.closeAll();
+			Sleep.sleepTick();
+			return Sleepz.sleepTiming();
+		}
+		if(ClientSettings.isAcceptAidEnabled()) {
+			Logger.log("Toggling accept aid");
+			ClientSettings.toggleAcceptAid(false);
+		}
+		else if(shouldToggleProfanity()) {
+			Logger.log("Toggling profanity");
+			toggleProfanity();
+		}
+		else if(!ClientSettings.areRoofsHidden()) {
+			Logger.log("Toggling roofs");
+			ClientSettings.toggleRoofs(false);
+		}
+		else if(shouldToggleWarningsOff()) {
+			Logger.log("Toggling warnings");
+			toggleWarnings();
+		}
+		else if(ClientSettings.isResizableActive()) {
+			Logger.log("Toggling resizable");
+			ClientSettings.toggleResizable(false);
+		}
+		else if(ClientSettings.getNPCAttackOptionsMode() != ActionMode.LEFT_CLICK_WHERE_AVAILABLE) {
+			Logger.log("Setting NPC attack options mode to LEFT_CLICK_WHERE_AVAILABLE");
 			setNPCAttackOptionsMode(ActionMode.LEFT_CLICK_WHERE_AVAILABLE);
-		else if(!UniqueActions.isActionEnabled(Actionz.LEFTMOUSECLICK_ATTACK_NPC) && ClientSettings.getNPCAttackOptionsMode() != ActionMode.ALWAYS_RIGHT_CLICK)
-			setNPCAttackOptionsMode(ActionMode.ALWAYS_RIGHT_CLICK);
-		else if(UniqueActions.isActionEnabled(Actionz.HIDE_PLAYER_ATTACK) && ClientSettings.getPlayerAttackOptionsMode() != ActionMode.HIDDEN)
+		}
+		else if(ClientSettings.getPlayerAttackOptionsMode() != ActionMode.HIDDEN) {
+			Logger.log("Setting player attack options mode to HIDDEN");
 			setPlayerAttackOptionsMode(ActionMode.HIDDEN);
-		else if(!UniqueActions.isActionEnabled(Actionz.HIDE_PLAYER_ATTACK) && ClientSettings.getPlayerAttackOptionsMode() != ActionMode.ALWAYS_RIGHT_CLICK)
-			setPlayerAttackOptionsMode(ActionMode.ALWAYS_RIGHT_CLICK);
-		else if((UniqueActions.isActionEnabled(Actionz.ESC_TO_CLOSE) && !ClientSettings.isEscInterfaceClosingEnabled()))
+		}
+		else if(!ClientSettings.isEscInterfaceClosingEnabled()) {
+			Logger.log("Toggling ESC interface closing");
 			toggleEscInterfaceClosing(true);
-		else if(!ClientSettings.isShiftClickDroppingEnabled()) ClientSettings.toggleShiftClickDropping(true);
-		else if(ClientSettings.isGameAudioOn()) ClientSettings.toggleGameAudio(false);
-		else if(ClientSettings.isResizableActive()) ClientSettings.toggleResizable(false);
-		else if(UniqueActions.isActionEnabled(Actionz.TRADE_ACCEPT_DELAY_OFF) && ClientSettings.isTradeDelayEnabled())
+		}
+		else if(!ClientSettings.isShiftClickDroppingEnabled()) {
+			Logger.log("Toggling shift click dropping");
+			ClientSettings.toggleShiftClickDropping(true);
+		}
+		else if(ClientSettings.isGameAudioOn()) {
+			Logger.log("Toggling game audio");
+			ClientSettings.toggleGameAudio(false);
+		}
+		else if(ClientSettings.isResizableActive()) {
+			Logger.log("Toggling resizable");
+			ClientSettings.toggleResizable(false);
+		}
+		else if(ClientSettings.isTradeDelayEnabled()) {
+			Logger.log("Toggling trade delay");
 			ClientSettings.toggleTradeDelay(false);
+		}
 		else 
 		{
-			MethodProvider.log("Testttt@22");
-			return Sleep.calculate(111, 111);
+			Logger.log("Testttt@22");
+			return Sleepz.interactionTiming();
 		}
-			
-		return Sleep.calculate(420, 696);
+		Sleep.sleepTick();
+		return Sleepz.sleepTiming();
 	}
 	public static boolean toggleEscInterfaceClosing(boolean trueFalse)
 	{
@@ -129,21 +160,25 @@ public class CustomizeSettings extends Leaf {
 				PlayerSettings.getBitValue(tabWarningVarbit6) == 0 || 
 				PlayerSettings.getBitValue(tabWarningVarbit7) == 0;
 	}
+	public static boolean shouldToggleCharterShipsOff() { return PlayerSettings.getBitValue(charterShipsConfirmationVarbit) == 1;}
 	public static boolean shouldToggleFeroxOff() 
 	{
 		return PlayerSettings.getBitValue(feroxWarningVarbit) == 0;
 	}
-	public static boolean shouldToggleWildyCanoeOff()
+	public static boolean shouldToggleGEBuyOff()
 	{
-		return PlayerSettings.getBitValue(wildyCanoeWarningVarbit) == 0;
+		return PlayerSettings.getBitValue(GEBuyWarningVarbit) == 0;
 	}
-	public static boolean shouldToggleWarningsOff()
+	public static boolean shouldToggleGESellOff()
 	{
-		return UniqueActions.isActionEnabled(Actionz.DISABLE_ALL_WARNINGS) && 
-				(shouldToggleWildyCanoeOff() || 
-						shouldToggleFeroxOff() || 
-						shouldToggleTabWarningsOff() ||
-						shouldToggleTeleWarningsOff());
+		return PlayerSettings.getBitValue(GESellWarningVarbit) == 0;
+	}
+	public static boolean shouldToggleWarningsOff() {
+		return shouldToggleFeroxOff() ||
+				shouldToggleTabWarningsOff() ||
+				shouldToggleGESellOff() ||
+				shouldToggleGEBuyOff() ||
+				shouldToggleTeleWarningsOff();
 	}
 	//1 -> off, 0 -> on
     public static final int teleWarningVarbit1 = 13986;
@@ -163,30 +198,36 @@ public class CustomizeSettings extends Leaf {
     public static final int tabWarningVarbit5 = 2324;
     public static final int tabWarningVarbit6 = 2323;
     public static final int tabWarningVarbit7 = 2322;
+    
+    //0 -> off, 1 -> on
+    public static final int charterShipsConfirmationVarbit = 75;
+    
     //1 -> off, 0 -> on
     public static final int feroxWarningVarbit = 10532;
-    public static final int wildyCanoeWarningVarbit = 13988;
-    public static void scrollWarningsButton(WidgetChild button)
-	{
-		if(button == null || !button.isVisible())
-		{
-			Sleep.sleep(111, 1111);
+	public static final int GEBuyWarningVarbit = 14700;
+	public static final int GESellWarningVarbit = 14701;
+    public static void scrollWarningsButton(WidgetChild button) {
+
+		Logger.log("Scroll Warnings Button");
+		if(button == null || !button.isVisible()) {
+			Logger.log("Called scrollWarningsButton but button passed not visible");
+			Sleepz.sleep(111, 1111);
 			return;
 		}
 		Rectangle worldRectangle = button.getRectangle();
-		WidgetChild worldListContainer = Widgets.getWidgetChild(134, 18);
-		Rectangle worldListRectangle = Widgets.getWidgetChild(134, 14).getRectangle();
-		if(worldListContainer == null)
-		{
-			Sleep.sleep(111, 1111);
+		WidgetChild worldListContainer = Widgets.get(134, 18);
+		Rectangle worldListRectangle = Widgets.get(134, 14).getRectangle();
+		if(worldListContainer == null) {
+			Logger.log("scrollWarningsButton - error1");
+			Sleepz.sleep(111, 1111);
 			return;
 		}
-		if(worldRectangle.intersects(worldListRectangle))
-		{
+		if(worldRectangle.intersects(worldListRectangle)) {
 			//World widget is visible - clicking it
 			Rectangle visibleWorldRectangle = worldRectangle.intersection(worldListRectangle);
 			Mouse.click(visibleWorldRectangle);
-			Sleep.sleep(111, 1111);
+			Sleep.sleepTick();
+			Sleepz.sleep(111, 1111);
 			return;
 		}
 		//World list needs scrolling
@@ -194,10 +235,10 @@ public class CustomizeSettings extends Leaf {
 		double yMin = worldListContainer.getRectangle().getMinY();
 		double yMax = worldListContainer.getRectangle().getMaxY();
 		double offsetRatio = ((yPos - yMin) / (yMax - yMin));
-		WidgetChild scrollContainer = Widgets.getWidgetChild(134, 20 , 0);
-		if(scrollContainer == null)
-		{
-			Sleep.sleep(100, 111);
+		WidgetChild scrollContainer = Widgets.get(134, 20 , 0);
+		if(scrollContainer == null) {
+			Logger.log("scrollWarningsButton - error21");
+			Sleepz.sleepInteraction();
 			return;
 		}
 		double scrollMinY = scrollContainer.getRectangle().getMinY();
@@ -214,49 +255,50 @@ public class CustomizeSettings extends Leaf {
 			if(yClickPos < scrollContainer.getRectangle().getMinY()) yClickPos = (int) scrollContainer.getRectangle().getMinY() + 1;
 		}
 		Mouse.click(new Point(xRand,yClickPos));
-		Sleep.sleep(111, 1111);
-		return;
+		Sleepz.sleepInteraction();
 	}
     public static WidgetChild teleWarningsButton()
     {
-    	return Widgets.getWidgetChild(134, 18, 34);
+    	return Widgets.get(134, 18, 34);
     }
     public static WidgetChild tabWarningsButton()
     {
-    	return Widgets.getWidgetChild(134, 18 , 79);
+    	return Widgets.get(134, 18 , 79);
     }
-    public static WidgetChild feroxWarningsButton()
-    {
-    	return Widgets.getWidgetChild(134, 18 , 117);
+    public static WidgetChild charterConfirmationButton() {
+    	return getUpOneWidget(Widgets.get(w -> w.getParentID() == 134 && w.getText().equals("Charter Ships confirmation")));
     }
-    public static WidgetChild wildyCanoeWarningsButton()
-    {
-    	return Widgets.getWidgetChild(134, 18 , 120);
+    public static WidgetChild feroxWarningsButton() {
+		return getUpOneWidget(Widgets.get(w -> w.getParentID() == 134 && w.getText().equals("Show warning on exiting Ferox Enclave")));
     }
+	public static WidgetChild GEBuyWarningButton() {
+		return getUpOneWidget(Widgets.get(w -> w.getParentID() == 134 && w.getText().equals("Show warning when a buy offer price is too high in the Grand Exchange")));
+	}
+	public static WidgetChild GESellWarningButton() {
+		return getUpOneWidget(Widgets.get(w -> w.getParentID() == 134 && w.getText().equals("Show warning when a sell offer price is too low in the Grand Exchange")));
+	}
+	private static WidgetChild getUpOneWidget(WidgetChild c) {
+		return Widgets.get(c.getParentID(), c.getID(), c.getIndex() - 1);
+	}
     public static void toggleWarnings()
 	{
 		//exit button for main Settings menu visible
-    	if(openSettingsMenu())
-    	{
-    		if(openSettingsSubTab("Warnings"))
-    		{
+    	if(openSettingsMenu()) {
+    		if(openSettingsSubTab("Warnings")) {
     			if(shouldToggleTeleWarningsOff()) scrollWarningsButton(teleWarningsButton());
     			else if(shouldToggleTabWarningsOff()) scrollWarningsButton(tabWarningsButton());
+				else if(shouldToggleCharterShipsOff()) scrollWarningsButton(charterConfirmationButton());
+				else if(shouldToggleGEBuyOff()) scrollWarningsButton(GEBuyWarningButton());
+				else if(shouldToggleGESellOff()) scrollWarningsButton(GESellWarningButton());
     			else if(shouldToggleFeroxOff()) scrollWarningsButton(feroxWarningsButton());
-    			else if(shouldToggleWildyCanoeOff()) scrollWarningsButton(wildyCanoeWarningsButton());
     		}
     	}
-    	Sleep.sleep(410, 696);
+    	Sleep.sleepTick();
 	}
 	// 0 -> on, 1 -> off
     public static final int profanityConfig = 1074;
-    public static boolean shouldToggleProfanity()
-    {
-    	if(UniqueActions.isActionEnabled(Actionz.PROFANITY_FILTER_OFF))
-    	{
-    		if(isProfanityEnabled()) return true;
-    	}
-    	return false;
+    public static boolean shouldToggleProfanity() {
+    	return isProfanityEnabled();
     }
     public static boolean isProfanityEnabled()
     {
@@ -265,38 +307,32 @@ public class CustomizeSettings extends Leaf {
 	public static void toggleProfanity()
 	{
 		//exit button for main Settings menu visible
-    	if(openSettingsMenu())
-    	{
+    	if(openSettingsMenu()) {
     		//chat tab of settings window is NOT selected ("select chat" action exists)
-    		if(Widgets.getWidgetChild(134, 23, 2) != null &&
-    				Widgets.getWidgetChild(134, 23, 2).isVisible())
-    		{
-    			if(Widgets.getWidgetChild(134, 23, 2).interact("Select Chat"))
-    			{
-    				MethodProvider.sleepUntil(() -> Widgets.getWidgetChild(134, 23, 2) == null || 
-        					!Widgets.getWidgetChild(134, 23, 2).isVisible(), Sleep.calculate(2222, 2222));
+    		if(Widgets.get(134, 23, 2) != null &&
+    				Widgets.get(134, 23, 2).isVisible()) {
+    			if(Widgets.get(134, 23, 2).interact("Select Chat")) {
+    				Sleep.sleepUntil(() -> Widgets.get(134, 23, 2) == null || 
+        					!Widgets.get(134, 23, 2).isVisible(), Sleepz.calculate(2222, 2222));
+					Sleepz.sleepInteraction();
     			}
-        		Sleep.sleep(333,444);
     		}
     		//Enable profanity button toggle is visible
-    		if(Widgets.getWidgetChild(134, 19, 1) != null && Widgets.getWidgetChild(134, 19, 1).isVisible())
-        	{
-    			if(Widgets.getWidgetChild(134, 19, 1).interact("Toggle"))
-    			{
-    				MethodProvider.sleepUntil(() -> PlayerSettings.getConfig(1074) == 1, Sleep.calculate(2222, 2222));
+    		if(Widgets.get(134, 19, 1) != null && Widgets.get(134, 19, 1).isVisible()) {
+    			if(Widgets.get(134, 19, 1).interact("Toggle")) {
+    				Sleep.sleepUntil(() -> PlayerSettings.getConfig(1074) == 1, Sleepz.calculate(2222, 2222));
     			}
-    			Sleep.sleep(420,420);
             }
     	}
 	}
 	
-	public static boolean openSettingsSubTab(String subtabName)
-	{
+	public static boolean openSettingsSubTab(String subtabName) {
+		Logger.log("Open Settings SubTab name: " + subtabName);
 		Filter<WidgetChild> tabFilter = w -> w!=null && w.isVisible() && w.getID() == 23 && 
 				w.getParentID() == 134 && (w.getIndex() <= 7 && w.getIndex() >= 0);
 		boolean foundTab = false;
 		int tabGC = 0;
-		for(WidgetChild tab : Widgets.getWidgets(tabFilter))
+		for(WidgetChild tab : Widgets.getAll(tabFilter))
 		{
 			if(tab == null || !tab.isVisible()) continue;
 			String[] actions = tab.getActions();
@@ -313,66 +349,62 @@ public class CustomizeSettings extends Leaf {
 		}
 		final int tabGCFinal = tabGC;
 		if(!foundTab) return true;
-		if(Widgets.getWidgetChild(134,4) == null || !Widgets.getWidgetChild(134,4).isVisible()) return false;
+		if(Widgets.get(134,4) == null || !Widgets.get(134,4).isVisible()) return false;
 		Filter<WidgetChild> chosenTabFilter = w -> 
 				w!=null && 
 				w.isVisible() && 
 				w.getID() == 23 && 
 				w.getParentID() == 134 && 
 				w.getIndex() == tabGCFinal;
-		WidgetChild chosenTab = Widgets.getMatchingWidget(chosenTabFilter);
-		if(chosenTab != null && chosenTab.isVisible())
-		{
-			if(chosenTab.interact())
-			{
-				MethodProvider.sleepUntil(() -> chosenTab == null || !chosenTab.isVisible(),Sleep.calculate(2222, 2222)); 
+		WidgetChild chosenTab = Widgets.get(chosenTabFilter);
+		if(chosenTab != null && chosenTab.isVisible()) {
+			if(chosenTab.interact()) {
+				Sleep.sleepUntil(() -> chosenTab == null || !chosenTab.isVisible(),Sleepz.calculate(2222, 2222)); 
 			}
 		}
 		return false;
 	}
-	public static boolean openSettingsMenu()
-	{
+	public static boolean isSettingsMainMenuOpen() {
+		WidgetChild mainSettingsExitButton = Widgets.get(134,4);
+		return mainSettingsExitButton != null && mainSettingsExitButton.isVisible();
+	}
+	public static boolean openSettingsMenu() {
+		Logger.log("Open Settings Menu");
 		//exit button for main Settings menu visible
-    	if(Widgets.getWidgetChild(134,4) != null && Widgets.getWidgetChild(134,4).isVisible()) return true;
+		if (isSettingsMainMenuOpen()) {
+
+		}
     	//"All settings" button visible in Settings tab
-		if(Widgets.getWidgetChild(116,75) != null && Widgets.getWidgetChild(116,75).isVisible())
-    	{
-			if(Widgets.getWidgetChild(116,75).interact("All Settings"))
-			{
-				MethodProvider.sleepUntil(() -> Widgets.getWidgetChild(134,4) != null && Widgets.getWidgetChild(134,4).isVisible(), Sleep.calculate(2222, 2222));
-			}
-    		Sleep.sleep(333,444);
-        } 
-		else if(!Tabs.isOpen(Tab.OPTIONS) && Tabz.open(Tab.OPTIONS))
-		{
-			MethodProvider.sleepUntil(() -> Tabs.isOpen(Tab.OPTIONS), Sleep.calculate(2222, 2222));
+		WidgetChild allSettingsButton = Widgets.get(w -> w.getParentID() == 116 &&
+				w.isVisible() &&
+				(w.hasAction("All Settings") || w.getText().equals("All Settings")));
+		if(allSettingsButton != null && allSettingsButton.interact()) {
+			Sleep.sleepUntil(() -> {
+				WidgetChild mainSettingsExitButton2 = Widgets.get(134,4);
+				return mainSettingsExitButton2 != null && mainSettingsExitButton2.isVisible();
+			}, Sleepz.calculate(2222, 2222));
+        } else if (!Tabs.isOpen(Tab.OPTIONS) && Tabz.open(Tab.OPTIONS)) {
+			Sleep.sleepUntil(() -> Tabs.isOpen(Tab.OPTIONS), Sleepz.calculate(2222, 2222));
 		}
 		return false;
 	}
-	public static void disableWarnings()
-	{
-    	if(openSettingsMenu())
-    	{
+	public static void disableWarnings() {
+    	if(openSettingsMenu()) {
     		//chat tab of settings window is NOT selected ("select chat" action exists)
-    		if(Widgets.getWidgetChild(134, 23 , 7) != null &&
-    				Widgets.getWidgetChild(134, 23 , 7).isVisible())
-    		{
-    			if(Widgets.getWidgetChild(134, 23 , 7).interact("Select Warnings"))
-    			{
-    				MethodProvider.sleepUntil(() -> Widgets.getWidgetChild(134, 23, 7) == null || 
-        					!Widgets.getWidgetChild(134, 23, 7).isVisible(), Sleep.calculate(2222, 2222));
+    		if(Widgets.get(134, 23 , 7) != null &&
+    				Widgets.get(134, 23 , 7).isVisible()) {
+    			if(Widgets.get(134, 23 , 7).interact("Select Warnings")) {
+    				Sleep.sleepUntil(() -> Widgets.get(134, 23, 7) == null || 
+        					!Widgets.get(134, 23, 7).isVisible(), Sleepz.calculate(2222, 2222));
     			}
-        		Sleep.sleep(333,444);
     		}
     		// button toggle is visible
-    		if(Widgets.getWidgetChild(134, 19, 1) != null && Widgets.getWidgetChild(134, 19, 1).isVisible())
+    		if(Widgets.get(134, 19, 1) != null && Widgets.get(134, 19, 1).isVisible())
         	{
     			final int configValPrevious = PlayerSettings.getConfig(1074);
-    			if(Widgets.getWidgetChild(134, 19, 1).interact("Toggle"))
-    			{
-    				MethodProvider.sleepUntil(() -> PlayerSettings.getConfig(1074) != configValPrevious, Sleep.calculate(2222, 2222));
+    			if(Widgets.get(134, 19, 1).interact("Toggle")) {
+    				Sleep.sleepUntil(() -> PlayerSettings.getConfig(1074) != configValPrevious, Sleepz.calculate(2222, 2222));
     			}
-    			Sleep.sleep(420,420);
             }
     	} 
 	}
@@ -392,7 +424,6 @@ public class CustomizeSettings extends Leaf {
 				PlayerSettings.getBitValue(tabWarningVarbit5) == 0 || 
 				PlayerSettings.getBitValue(tabWarningVarbit6) == 0 || 
 				PlayerSettings.getBitValue(tabWarningVarbit7) == 0 || 
-				PlayerSettings.getBitValue(feroxWarningVarbit) == 0 || 
-				PlayerSettings.getBitValue(wildyCanoeWarningVarbit) == 0;
+				PlayerSettings.getBitValue(feroxWarningVarbit) == 0;
 	}
 }

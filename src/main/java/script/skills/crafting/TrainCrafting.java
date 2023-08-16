@@ -1,26 +1,23 @@
 package script.skills.crafting;
 
 import org.dreambot.api.methods.Calculations;
-import org.dreambot.api.methods.MethodProvider;
 import org.dreambot.api.methods.container.impl.Inventory;
 import org.dreambot.api.methods.container.impl.bank.Bank;
-import org.dreambot.api.methods.container.impl.equipment.EquipmentSlot;
 import org.dreambot.api.methods.dialogues.Dialogues;
 import org.dreambot.api.methods.interactive.Players;
 import org.dreambot.api.methods.skills.Skill;
 import org.dreambot.api.methods.skills.Skills;
 import org.dreambot.api.methods.widget.helpers.ItemProcessing;
+import org.dreambot.api.utilities.Logger;
+import org.dreambot.api.utilities.Sleep;
 import org.dreambot.api.wrappers.items.Item;
 
-import script.p;
 import script.behaviour.DecisionLeaf;
 import script.framework.Leaf;
-import script.quest.varrockmuseum.Timing;
 import script.utilities.API;
 import script.utilities.Bankz;
 import script.utilities.InvEquip;
-import script.utilities.Skillz;
-import script.utilities.Sleep;
+import script.utilities.Sleepz;
 /**
  * Trains crafting 35-40
  * 
@@ -39,25 +36,23 @@ public class TrainCrafting extends Leaf {
     public int onLoop() {
     	if(DecisionLeaf.taskTimer.finished())
     	{
-    		MethodProvider.log("[TIMEOUT] -> Crafting!");
+    		Logger.log("[TIMEOUT] -> Crafting!");
             API.mode = null;
-            return Timing.sleepLogNormalSleep();
+            return Sleepz.sleepTiming();
     	}
     	final int crafting = Skills.getRealLevel(Skill.CRAFTING);
     	if (crafting >= DecisionLeaf.craftingSetpoint) {
-            MethodProvider.log("[COMPLETE] -> lvl "+DecisionLeaf.craftingSetpoint+" crafting!");
+            Logger.log("[COMPLETE] -> lvl "+DecisionLeaf.craftingSetpoint+" crafting!");
            	API.mode = null;
-            return Timing.sleepLogNormalSleep();
+            return Sleepz.sleepTiming();
         }
-        
+
     	doCrafting();
         
-        return Sleep.calculate(69,420);
+        return Sleepz.calculate(69,420);
     }
     public static void doCrafting()
     {
-
-    	if(Skillz.shouldCheckSkillInterface()) Skillz.checkSkillProgress(Skill.CRAFTING);
     	if(!craftLeatherThing(Skills.getRealLevel(Skill.CRAFTING)))
         {
         	InvEquip.clearAll();
@@ -67,7 +62,7 @@ public class TrainCrafting extends Leaf {
             InvEquip.addInvyItem(InvEquip.coins, 0,0, false,0);
         	if(InvEquip.fulfillSetup(true,60000))
             {
-            	MethodProvider.log("Should be equipped now for crafting!");
+            	Logger.log("Should be equipped now for crafting!");
             }
         }
     }
@@ -91,16 +86,16 @@ public class TrainCrafting extends Leaf {
         	{
         		if(ItemProcessing.makeAll(name))
         		{
-        			MethodProvider.log("Starting to make all: " + name);
-        			MethodProvider.sleepUntil(() -> Inventory.count(leather) <= 0 || Dialogues.canContinue(),() -> p.l.isAnimating(), Sleep.calculate(2222, 2222),50);   
+        			Logger.log("Starting to make all: " + name);
+        			Sleep.sleepUntil(() -> Inventory.count(leather) <= 0 || Dialogues.canContinue(),() -> Players.getLocal().isAnimating(), Sleepz.calculate(2222, 2222),50);   
         		}
         		return true;
         	}
         	else
         	{
-        		if(p.l.isAnimating())
+        		if(Players.getLocal().isAnimating())
         		{
-        			MethodProvider.sleepUntil(() -> Inventory.count(leather) <= 0 || Dialogues.canContinue(), () -> p.l.isAnimating(), Sleep.calculate(2222, 2222),50);    		
+        			Sleep.sleepUntil(() -> Inventory.count(leather) <= 0 || Dialogues.canContinue(), () -> Players.getLocal().isAnimating(), Sleepz.calculate(2222, 2222),50);    		
         			return true;
         		}
         		Item leatherItem = Inventory.get(leather);
@@ -111,14 +106,14 @@ public class TrainCrafting extends Leaf {
         		{
         			if(leatherItem.useOn(needleItem))
             		{
-            			MethodProvider.sleepUntil(() -> ItemProcessing.isOpen(), Sleep.calculate(2222, 2222));
+            			Sleep.sleepUntil(() -> ItemProcessing.isOpen(), Sleepz.calculate(2222, 2222));
             		}
         		}
         		else
         		{
         			if(needleItem.useOn(leatherItem))
             		{
-            			MethodProvider.sleepUntil(() -> ItemProcessing.isOpen(), Sleep.calculate(2222, 2222));
+            			Sleep.sleepUntil(() -> ItemProcessing.isOpen(), Sleepz.calculate(2222, 2222));
             		}
         		}
         	}

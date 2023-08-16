@@ -1,7 +1,6 @@
 package script.quest.fightarena;
 
 import org.dreambot.api.methods.Calculations;
-import org.dreambot.api.methods.MethodProvider;
 import org.dreambot.api.methods.container.impl.Inventory;
 import org.dreambot.api.methods.container.impl.bank.Bank;
 import org.dreambot.api.methods.container.impl.equipment.Equipment;
@@ -12,20 +11,17 @@ import org.dreambot.api.methods.interactive.Players;
 import org.dreambot.api.methods.map.Tile;
 import org.dreambot.api.methods.prayer.Prayers;
 import org.dreambot.api.methods.settings.PlayerSettings;
-import org.dreambot.api.methods.skills.Skill;
-import org.dreambot.api.methods.skills.Skills;
 import org.dreambot.api.methods.tabs.Tab;
 import org.dreambot.api.methods.tabs.Tabs;
 import org.dreambot.api.methods.walking.impl.Walking;
-import org.dreambot.api.methods.widget.Widgets;
+import org.dreambot.api.utilities.Logger;
+import org.dreambot.api.utilities.Sleep;
 import org.dreambot.api.wrappers.interactive.GameObject;
 import org.dreambot.api.wrappers.interactive.NPC;
 
 import script.Main;
-import script.p;
 import script.behaviour.DecisionLeaf;
 import script.framework.Leaf;
-import script.quest.varrockmuseum.Timing;
 import script.skills.ranged.TrainRanged;
 import script.utilities.API;
 import script.utilities.Combatz;
@@ -34,7 +30,7 @@ import script.utilities.InvEquip;
 import script.utilities.Locations;
 import script.utilities.Questz;
 import script.utilities.Tabz;
-import script.utilities.Sleep;
+import script.utilities.Sleepz;
 import script.utilities.Walkz;
 import script.utilities.id;
 /**
@@ -55,14 +51,18 @@ public class FightArena extends Leaf {
 	}
 	public static boolean completed()
 	{
-		if(Questz.closeQuestCompletion()) return false;
+		if(Questz.checkCloseQuestCompletion()) return false;
     	if(!Inventory.contains(khazardCellKeys) && 
     			!Inventory.contains(khazardHelm) &&
     			!Inventory.contains(khazardPlatebody) &&
     			!Equipment.contains(khazardHelm) &&
-    			!Equipment.contains(khazardPlatebody))
-    	{
-    		return true;
+    			!Equipment.contains(khazardPlatebody) &&
+				Locations.GE.distance(Players.getLocal()) > 20) {
+			if(!Walkz.useJewelry(InvEquip.wealth, "Grand Exchange")) {
+				Logger.log("Finished Fight Arena with no teleport to GE :-( Ending quest branch early...");
+				return true;
+			}
+    		return false;
     	}
     	if(Inventory.contains(khazardCellKeys) || Inventory.contains(khazardHelm) || 
     			Inventory.contains(khazardPlatebody))
@@ -70,7 +70,7 @@ public class FightArena extends Leaf {
     		if(Inventory.drop(i -> i != null && 
     				(i.getID() == khazardCellKeys ||
     				i.getID() == khazardHelm || 
-    				i.getID() == khazardPlatebody))) Sleep.sleep(666, 696);
+    				i.getID() == khazardPlatebody))) Sleepz.sleep(666, 696);
     		return false;
     	}
     	if(Equipment.contains(khazardHelm) || 
@@ -80,14 +80,14 @@ public class FightArena extends Leaf {
         	{
         		if(!Tabs.isOpen(Tab.EQUIPMENT))
         		{
-        			if(Tabz.open(Tab.EQUIPMENT)) Sleep.sleep(69, 696);
+        			if(Tabz.open(Tab.EQUIPMENT)) Sleepz.sleep(69, 696);
         			return false;
         		}
         		if(Equipment.unequip(i -> i!=null && 
         				(i.getID() == khazardHelm || 
         				i.getID() == khazardPlatebody)))
         		{
-        			Sleep.sleep(666, 696);
+        			Sleepz.sleep(666, 696);
         		}
         	}
     	}
@@ -96,25 +96,25 @@ public class FightArena extends Leaf {
     @Override
     public int onLoop() {
         if (DecisionLeaf.taskTimer.finished()) {
-            MethodProvider.log("[TIMEOUT] -> Fight Arena");
+            Logger.log("[TIMEOUT] -> Fight Arena");
            	API.mode = null;
-            return Timing.sleepLogNormalSleep();
+            return Sleepz.sleepTiming();
         }
         if (completed()) {
-            MethodProvider.log("[FINISHED] -> Fight Arena!!");
+            Logger.log("[FINISHED] -> Fight Arena!!");
            	API.mode = null;
-           	Main.customPaintText1 = "~~~~~~~~~~";
-    		Main.customPaintText2 = "~Quest Complete~";
-    		Main.customPaintText3 = "~Fight Arena~";
-    		Main.customPaintText4 = "~~~~~~~~~~";
-            return Timing.sleepLogNormalSleep();
+           	Main.paint_task = "~~~~~~~~~~";
+    		Main.paint_itemsCount = "~Quest Complete~";
+    		Main.paint_subTask = "~Fight Arena~";
+    		Main.paint_levels = "~~~~~~~~~~";
+            return Sleepz.sleepTiming();
         }
         if(Questz.shouldCheckQuestStep()) Questz.checkQuestStep("Fight Arena");
         
         if(Inventory.contains(TrainRanged.getBestDart()))
     	{
     		InvEquip.equipItem(TrainRanged.getBestDart());
-    		return Timing.sleepLogNormalSleep();
+    		return Sleepz.sleepTiming();
     	}
         
         if((!InvEquip.equipmentContains(InvEquip.wearableWealth) && !InvEquip.invyContains(InvEquip.wearableWealth)) ||
@@ -123,10 +123,10 @@ public class FightArena extends Leaf {
         		(Combatz.shouldDrinkPrayPot() && !InvEquip.invyContains(id.prayPots))) 
 		{
         	fulfillFightArenaGear();
-        	return Timing.sleepLogNormalSleep();
+        	return Sleepz.sleepTiming();
 		}
         
-        if(Dialoguez.handleDialogues()) return Timing.sleepLogNormalSleep();
+        if(Dialoguez.handleDialogues()) return Sleepz.sleepTiming();
         
         switch(getProgressValue())
         {
@@ -134,14 +134,14 @@ public class FightArena extends Leaf {
         {
         	if(Prayers.isQuickPrayerActive() && Prayers.toggleQuickPrayer(false))
         	{
-        		Sleep.sleep(1111,420);
+        		Sleepz.sleep(1111,420);
         	}
         	talkToLadyServil();
-        	return Timing.sleepLogNormalSleep();
+        	return Sleepz.sleepTiming();
         }
         case(11):
         {
-        	if(Locations.fightArenaFightArena.contains(p.l))
+        	if(Locations.fightArenaFightArena.contains(Players.getLocal()))
         	{
         		GameObject door = GameObjects.closest(g ->  
         				g != null && 
@@ -149,28 +149,28 @@ public class FightArena extends Leaf {
         				g.getTile().equals(new Tile(2606,3152,0)));
         		if(door == null)
         		{
-        			MethodProvider.log("Door to escape khazard general is null in fight arena fight arena!");
+        			Logger.log("Door to escape khazard general is null in fight arena fight arena!");
         			Walking.walk(new Tile(2606,3152,0));
-        			return Timing.sleepLogNormalSleep();
+        			return Sleepz.sleepTiming();
         		}
         		if(door.interact("Open"))
         		{
-        			MethodProvider.sleepUntil(() -> !Locations.fightArenaFightArena.contains(p.l), 
-        					() -> p.l.isMoving(),
-        					Sleep.calculate(2222, 2222),50);
+        			Sleep.sleepUntil(() -> !Locations.fightArenaFightArena.contains(Players.getLocal()), 
+        					() -> Players.getLocal().isMoving(),
+        					Sleepz.calculate(2222, 2222),50);
         		}
         	}
-        	return Timing.sleepLogNormalSleep();
+        	return Sleepz.sleepTiming();
         }
         case(10):
         {
-        	if(Locations.fightArenaFightArena.contains(p.l))
+        	if(Locations.fightArenaFightArena.contains(Players.getLocal()))
         	{
         		NPC bouncer = NPCs.closest("Bouncer");
             	if(bouncer == null)
             	{
-            		MethodProvider.log("Bouncer is null in fight arena part to kill it!");
-            		return Timing.sleepLogNormalSleep();
+            		Logger.log("Bouncer is null in fight arena part to kill it!");
+            		return Sleepz.sleepTiming();
             	}
             	if(!Locations.fightArenaBouncerCage.contains(bouncer))
             	{
@@ -186,7 +186,7 @@ public class FightArena extends Leaf {
             		{
             			Combatz.drinkPrayPot();
 
-            			return Timing.sleepLogNormalSleep();
+            			return Sleepz.sleepTiming();
             		}
             		if(Combatz.setQuickPrayEagleEyeProtectMelee())
             		{
@@ -194,33 +194,33 @@ public class FightArena extends Leaf {
             			{
             				if(Prayers.toggleQuickPrayer(true))
             				{
-            					Sleep.sleep(666, 697);
+            					Sleepz.sleep(666, 697);
             				}
-            				return Timing.sleepLogNormalInteraction();
+            				return Sleepz.interactionTiming();
             			}
             		}
-            		if(p.l.isInteracting(bouncer)) return Timing.sleepLogNormalSleep();
+            		if(Players.getLocal().isInteracting(bouncer)) return Sleepz.sleepTiming();
             		if(bouncer.interact("Attack"))
             		{
-            			MethodProvider.sleepUntil(() -> bouncer.isInteracting(p.l), 
-            					() -> p.l.isMoving(),
-            					Sleep.calculate(2222, 2222),69);
-            			Sleep.sleep(696, 666);
+            			Sleep.sleepUntil(() -> bouncer.isInteracting(Players.getLocal()), 
+            					() -> Players.getLocal().isMoving(),
+            					Sleepz.calculate(2222, 2222),69);
+            			Sleepz.sleep(696, 666);
             		}
             	}
-            	return Timing.sleepLogNormalSleep();
+            	return Sleepz.sleepTiming();
         	}
-        	return Timing.sleepLogNormalSleep();
+        	return Sleepz.sleepTiming();
         }
         case(9):
         {
-        	if(Locations.fightArenaFightArena.contains(p.l))
+        	if(Locations.fightArenaFightArena.contains(Players.getLocal()))
         	{
         		NPC scorpion = NPCs.closest("Khazard Scorpion");
             	if(scorpion == null)
             	{
-            		MethodProvider.log("Khazard scorpion is null in fight arena part to kill it!");
-            		return Timing.sleepLogNormalSleep();
+            		Logger.log("Khazard scorpion is null in fight arena part to kill it!");
+            		return Sleepz.sleepTiming();
             	}
             	if(!Locations.fightArenaScorpionCage.contains(scorpion))
             	{
@@ -235,7 +235,7 @@ public class FightArena extends Leaf {
             		if(Combatz.shouldDrinkPrayPot())
             		{
             			Combatz.drinkPrayPot();
-            			return Timing.sleepLogNormalSleep();
+            			return Sleepz.sleepTiming();
             		}
             		if(Combatz.setQuickPrayEagleEyeProtectMelee())
             		{
@@ -243,20 +243,20 @@ public class FightArena extends Leaf {
             			{
             				if(Prayers.toggleQuickPrayer(true))
             				{
-            					Sleep.sleep(666, 697);
+            					Sleepz.sleep(666, 697);
             				}
-            				return Timing.sleepLogNormalInteraction();
+            				return Sleepz.interactionTiming();
             			}
             		}
-            		if(p.l.isInteracting(scorpion)) return Timing.sleepLogNormalSleep();
+            		if(Players.getLocal().isInteracting(scorpion)) return Sleepz.sleepTiming();
             		if(scorpion.interact("Attack"))
             		{
-            			MethodProvider.sleepUntil(() -> scorpion.isInteracting(p.l), 
-            					() -> p.l.isMoving(),
-            					Sleep.calculate(2222, 2222),69);
-            			Sleep.sleep(696, 666);
+            			Sleep.sleepUntil(() -> scorpion.isInteracting(Players.getLocal()), 
+            					() -> Players.getLocal().isMoving(),
+            					Sleepz.calculate(2222, 2222),69);
+            			Sleepz.sleep(696, 666);
             		}
-            		return Timing.sleepLogNormalInteraction();
+            		return Sleepz.interactionTiming();
             	}
             	NPC closestMotherfucker = NPCs.closest(n -> 
             		n != null && 
@@ -266,50 +266,50 @@ public class FightArena extends Leaf {
 					n.getName().contains("Sammy Servil")));
 				if(closestMotherfucker == null)
 				{
-					MethodProvider.log("Closest motherfucker to talk to inside fight arena after ogre kill is null!");
-					return Timing.sleepLogNormalInteraction();
+					Logger.log("Closest motherfucker to talk to inside fight arena after ogre kill is null!");
+					return Sleepz.interactionTiming();
 				}
 				if(closestMotherfucker.interact("Talk-to"))
 				{
-					MethodProvider.sleepUntil(Dialogues::inDialogue,
-							() -> p.l.isMoving(),Sleep.calculate(2222, 2222),66);
+					Sleep.sleepUntil(Dialogues::inDialogue,
+							() -> Players.getLocal().isMoving(),Sleepz.calculate(2222, 2222),66);
 				}
-				return Timing.sleepLogNormalSleep();
+				return Sleepz.sleepTiming();
         	}
-        	if(Locations.fightArenaHengradWaitingCell.contains(p.l))
+        	if(Locations.fightArenaHengradWaitingCell.contains(Players.getLocal()))
         	{
         		if(Prayers.isQuickPrayerActive() && Prayers.toggleQuickPrayer(false))
             	{
-            		Sleep.sleep(1111,420);
+            		Sleepz.sleep(1111,420);
             	}
-        		Sleep.sleep(6666, 3333);
-        		if(!p.l.isMoving())
+        		Sleepz.sleep(6666, 3333);
+        		if(!Players.getLocal().isMoving())
         		{
-        			if(Dialogues.isProcessing()) return Timing.sleepLogNormalInteraction();
+        			if(Dialogues.isProcessing()) return Sleepz.interactionTiming();
         			if(Dialogues.canContinue())
         			{
         				Dialogues.continueDialogue();
-        				return Timing.sleepLogNormalInteraction();
+        				return Sleepz.interactionTiming();
         			}
         			NPC hengrad = NPCs.closest("Hengrad");
             		if(hengrad == null)
             		{
-            			MethodProvider.log("Hengrad is null in fight arena waiting cell after ogre kill!");
-            			return Timing.sleepLogNormalInteraction();
+            			Logger.log("Hengrad is null in fight arena waiting cell after ogre kill!");
+            			return Sleepz.interactionTiming();
             		}
             		if(hengrad.interact("Talk-to"))
             		{
-            			MethodProvider.sleepUntil(Dialogues::inDialogue,
-        						() -> p.l.isMoving(),Sleep.calculate(2222, 2222),66);
+            			Sleep.sleepUntil(Dialogues::inDialogue,
+        						() -> Players.getLocal().isMoving(),Sleepz.calculate(2222, 2222),66);
         			}
         		}
-        		return Timing.sleepLogNormalSleep();
+        		return Sleepz.sleepTiming();
         	}
-        	return Timing.sleepLogNormalSleep();
+        	return Sleepz.sleepTiming();
         }
         case(8):
         {
-        	if(Locations.fightArenaFightArena.contains(p.l))
+        	if(Locations.fightArenaFightArena.contains(Players.getLocal()))
         	{
         		NPC closestMotherfucker = NPCs.closest(n -> 
         				n != null && 
@@ -319,15 +319,15 @@ public class FightArena extends Leaf {
         				n.getName().contains("Sammy Servil")));
         		if(closestMotherfucker == null)
         		{
-        			MethodProvider.log("Closest motherfucker to talk to inside fight arena after ogre kill is null!");
-        			return Timing.sleepLogNormalInteraction();
+        			Logger.log("Closest motherfucker to talk to inside fight arena after ogre kill is null!");
+        			return Sleepz.interactionTiming();
         		}
         		if(closestMotherfucker.interact("Talk-to"))
         		{
-        			MethodProvider.sleepUntil(Dialogues::inDialogue,
-    						() -> p.l.isMoving(),Sleep.calculate(2222, 2222),66);
+        			Sleep.sleepUntil(Dialogues::inDialogue,
+    						() -> Players.getLocal().isMoving(),Sleepz.calculate(2222, 2222),66);
     			}
-        		return Timing.sleepLogNormalSleep();
+        		return Sleepz.sleepTiming();
         	}
         }
         case(6):
@@ -335,28 +335,28 @@ public class FightArena extends Leaf {
         	NPC ogre = NPCs.closest("Khazard Ogre");
         	if(ogre == null)
         	{
-        		MethodProvider.log("Khazard ogre is null in fight arena part to kill it!");
-        		return Timing.sleepLogNormalSleep();
+        		Logger.log("Khazard ogre is null in fight arena part to kill it!");
+        		return Sleepz.sleepTiming();
         	}
         	if(Locations.fightArenaOgreCage.contains(ogre) && !ogre.isMoving() && 
-        			!p.l.isMoving())
+        			!Players.getLocal().isMoving())
         	{
-        		Sleep.sleep(2222, 2222);
+        		Sleepz.sleep(2222, 2222);
         		if(Locations.fightArenaOgreCage.contains(ogre) && !ogre.isMoving() && 
-            			!p.l.isMoving())
+            			!Players.getLocal().isMoving())
             	{
             		NPC justin = NPCs.closest("Justin Servil");
             		if(justin == null)
             		{
-            			MethodProvider.log("Justin servil is null to try to talk to to start Ogre fight in Fight arena!");
-            			return Timing.sleepLogNormalSleep();
+            			Logger.log("Justin servil is null to try to talk to to start Ogre fight in Fight arena!");
+            			return Sleepz.sleepTiming();
             		}
             		if(justin.interact("Talk-to"))
             		{
-            			MethodProvider.sleepUntil(Dialogues::inDialogue,
-        						() -> p.l.isMoving(),Sleep.calculate(2222, 2222),66);
+            			Sleep.sleepUntil(Dialogues::inDialogue,
+        						() -> Players.getLocal().isMoving(),Sleepz.calculate(2222, 2222),66);
         			}
-            		return Timing.sleepLogNormalSleep();
+            		return Sleepz.sleepTiming();
             	}
         	}
         	if(!Locations.fightArenaOgreCage.contains(ogre))
@@ -372,7 +372,7 @@ public class FightArena extends Leaf {
         		if(Combatz.shouldDrinkPrayPot())
         		{
         			Combatz.drinkPrayPot();
-        			return Timing.sleepLogNormalSleep();
+        			return Sleepz.sleepTiming();
         		}
         		if(Combatz.setQuickPrayEagleEyeProtectMelee())
         		{
@@ -380,21 +380,21 @@ public class FightArena extends Leaf {
         			{
         				if(Prayers.toggleQuickPrayer(true))
         				{
-        					Sleep.sleep(666, 697);
+        					Sleepz.sleep(666, 697);
         				}
-        				return Timing.sleepLogNormalInteraction();
+        				return Sleepz.interactionTiming();
         			}
         		}
-        		if(p.l.isInteracting(ogre)) return Timing.sleepLogNormalSleep();
+        		if(Players.getLocal().isInteracting(ogre)) return Sleepz.sleepTiming();
         		if(ogre.interact("Attack"))
         		{
-        			MethodProvider.sleepUntil(() -> ogre.isInteracting(p.l), 
-        					() -> p.l.isMoving(),
-        					Sleep.calculate(2222, 2222),69);
-        			Sleep.sleep(696, 666);
+        			Sleep.sleepUntil(() -> ogre.isInteracting(Players.getLocal()), 
+        					() -> Players.getLocal().isMoving(),
+        					Sleepz.calculate(2222, 2222),69);
+        			Sleepz.sleep(696, 666);
         		}
         	}
-        	return Timing.sleepLogNormalSleep();
+        	return Sleepz.sleepTiming();
         }
         case(5):
         {
@@ -404,20 +404,20 @@ public class FightArena extends Leaf {
             	{
                 	talkToSammy();
                 }
-        		return Timing.sleepLogNormalSleep();
+        		return Sleepz.sleepTiming();
         	}
         	if(Bank.contains(khazardCellKeys))
         	{
         		InvEquip.withdrawOne(khazardCellKeys, 180000);
-        		return Timing.sleepLogNormalSleep();
+        		return Sleepz.sleepTiming();
         	}
         	if(Inventory.count(khaliBrew) > 0)
     		{
     			talkToPrisonGuard();
-    			return Timing.sleepLogNormalSleep();
+    			return Sleepz.sleepTiming();
     		}
     		talkToBarman();
-    		return Timing.sleepLogNormalSleep();
+    		return Sleepz.sleepTiming();
         }
         case(3):
         {
@@ -426,10 +426,10 @@ public class FightArena extends Leaf {
         		if(Inventory.count(khaliBrew) > 0)
         		{
         			talkToPrisonGuard();
-        			return Timing.sleepLogNormalSleep();
+        			return Sleepz.sleepTiming();
         		}
         		talkToBarman();
-        		return Timing.sleepLogNormalSleep();
+        		return Sleepz.sleepTiming();
         	}
         }
         case(2):
@@ -437,30 +437,30 @@ public class FightArena extends Leaf {
         	if(getWearKhazardArmour())
         	{
         		talkToPrisonGuard();
-        		return Timing.sleepLogNormalSleep();
+        		return Sleepz.sleepTiming();
         	}
-        	return Timing.sleepLogNormalSleep();
+        	return Sleepz.sleepTiming();
         }
         case(1):
         {
         	getWearKhazardArmour();
-        	return Timing.sleepLogNormalSleep();
+        	return Sleepz.sleepTiming();
         }
         case(0):
         {
         	//have not started quest yet
         	talkToLadyServil();
-        	return Timing.sleepLogNormalSleep();
+        	return Sleepz.sleepTiming();
         }
         default: break;
         }
-        return Timing.sleepLogNormalSleep();
+        return Sleepz.sleepTiming();
     }
     public static final int khazardHelm = 74;
     public static final int khazardPlatebody = 75;
     public static void talkToLadyServil()
     {
-    	if(Locations.fightArenaStartArea.contains(p.l))
+    	if(Locations.fightArenaStartArea.contains(Players.getLocal()))
         {
     		NPC ladyServil = NPCs.closest("Lady servil");
          	if(ladyServil == null || !ladyServil.exists())
@@ -470,7 +470,7 @@ public class FightArena extends Leaf {
          	}
          	if(ladyServil.interact("Talk-to"))
          	{
-         		MethodProvider.sleepUntil(() -> Dialogues.inDialogue(), () -> p.l.isMoving(), Sleep.calculate(2222, 2222),50);
+         		Sleep.sleepUntil(() -> Dialogues.inDialogue(), () -> Players.getLocal().isMoving(), Sleepz.calculate(2222, 2222),50);
          	}
          	return;
         }
@@ -484,7 +484,7 @@ public class FightArena extends Leaf {
  			return;
  		}
         if(!Walkz.isStaminated()) Walkz.drinkStamina();
-        if(Walking.shouldWalk(6) && Walking.walk(Locations.fightArenaStartArea.getCenter())) Sleep.sleep(420, 696);
+        if(Walking.shouldWalk(6) && Walking.walk(Locations.fightArenaStartArea.getCenter())) Sleepz.sleep(420, 696);
     }
     public static boolean getWearKhazardArmour()
     {
@@ -496,7 +496,7 @@ public class FightArena extends Leaf {
     		return false;
     	}
     	
-    	if(Locations.fightArenaChestHouse.contains(p.l))
+    	if(Locations.fightArenaChestHouse.contains(Players.getLocal()))
     	{
     		if(InvEquip.freeInvySpaces(2))
     		{
@@ -506,16 +506,16 @@ public class FightArena extends Leaf {
     				g.getTile().equals(new Tile(2613,3189,0)));
 	    		if(chest == null)
 	    		{
-	    			MethodProvider.log("Something wrong, chest in chest/armoury house null in Fight Arena!");
+	    			Logger.log("Something wrong, chest in chest/armoury house null in Fight Arena!");
 	    			return false;
 	    		}
 	    		if(chest.hasAction("Open"))
 	    		{
 	    			if(chest.interact("Open"))
 	    			{
-	    				MethodProvider.sleepUntil(() -> chest.distance() <= 1, 
-	    					() -> p.l.isMoving(),
-	    					Sleep.calculate(2222, 2222),50);
+	    				Sleep.sleepUntil(() -> chest.distance() <= 1, 
+	    					() -> Players.getLocal().isMoving(),
+	    					Sleepz.calculate(2222, 2222),50);
 	    			}
 	    			return false;
 	    		}
@@ -523,21 +523,21 @@ public class FightArena extends Leaf {
 	    		{
 	    			if(chest.interact("Search"))
 	    			{
-	    				MethodProvider.sleepUntil(() -> chest.distance() <= 1, 
-	    					() -> p.l.isMoving(),
-	    					Sleep.calculate(2222, 2222),50);
-	    				Sleep.sleep(696, 666);
+	    				Sleep.sleepUntil(() -> chest.distance() <= 1, 
+	    					() -> Players.getLocal().isMoving(),
+	    					Sleepz.calculate(2222, 2222),50);
+	    				Sleepz.sleep(696, 666);
 	    			}
 	    			return false;
 	    		}
     		}
     	}
-    	if(Walking.shouldWalk(6) && Walking.walk(Locations.fightArenaChestHouse.getCenter())) Sleep.sleep(696, 666);
+    	if(Walking.shouldWalk(6) && Walking.walk(Locations.fightArenaChestHouse.getCenter())) Sleepz.sleep(696, 666);
     	return false;
     }
     public static void talkToSammy()
     {
-    	if(Locations.fightArenaSammySpace.contains(p.l))
+    	if(Locations.fightArenaSammySpace.contains(Players.getLocal()))
     	{
     		GameObject jailDoor = GameObjects.closest(g -> 
     			g != null && 
@@ -545,23 +545,23 @@ public class FightArena extends Leaf {
     			g.getTile().equals(new Tile(2617,3167,0)));
     		if(jailDoor == null)
     		{
-    			MethodProvider.log("Jail door in Fight arena for sammys cell null!");
+    			Logger.log("Jail door in Fight arena for sammys cell null!");
     			return;
     		}
     		if(Inventory.get(khazardCellKeys).useOn(jailDoor))
     		{
-    			MethodProvider.sleepUntil(Dialogues::inDialogue,
-						() -> p.l.isMoving(),Sleep.calculate(2222, 2222),66);
+    			Sleep.sleepUntil(Dialogues::inDialogue,
+						() -> Players.getLocal().isMoving(),Sleepz.calculate(2222, 2222),66);
 			}
     	}
 		if(enterPrison())
 		{
-			if(Walking.shouldWalk(6) && Walking.walk(Locations.fightArenaSammySpace.getCenter())) Sleep.sleep(666, 696);
+			if(Walking.shouldWalk(6) && Walking.walk(Locations.fightArenaSammySpace.getCenter())) Sleepz.sleep(666, 696);
 		}
     }
     public static void talkToPrisonGuard()
     {
-    	if(Locations.fightArenaDrunkGuardArea.contains(p.l))
+    	if(Locations.fightArenaDrunkGuardArea.contains(Players.getLocal()))
 		{
 			NPC drunkGuard = NPCs.closest(n -> 
 				n != null && 
@@ -569,19 +569,19 @@ public class FightArena extends Leaf {
 				Locations.fightArenaDrunkGuardArea.contains(n));
 			if(drunkGuard == null || !drunkGuard.exists())
 			{
-				MethodProvider.log("Guard to get drunk is null in Fight arena prison!");
+				Logger.log("Guard to get drunk is null in Fight arena prison!");
 				return;
 			}
 			if(drunkGuard.interact("Talk-to"))
 			{
-				MethodProvider.sleepUntil(Dialogues::inDialogue,
-						() -> p.l.isMoving(),Sleep.calculate(2222, 2222),66);
+				Sleep.sleepUntil(Dialogues::inDialogue,
+						() -> Players.getLocal().isMoving(),Sleepz.calculate(2222, 2222),66);
 			}
 			return;
 		}
 		if(enterPrison())
 		{
-			if(Walking.shouldWalk(6) && Walking.walk(Locations.fightArenaDrunkGuardArea.getCenter())) Sleep.sleep(666, 696);
+			if(Walking.shouldWalk(6) && Walking.walk(Locations.fightArenaDrunkGuardArea.getCenter())) Sleepz.sleep(666, 696);
 		}
     }
     public static final Tile northPrisonDoorTile = new Tile(2617,3171,0);
@@ -589,8 +589,8 @@ public class FightArena extends Leaf {
     public static boolean enterPrison()
     {
     	if(inPrisonWalkable()) return true;
-    	if(Locations.fightArenaOutsideLeftJailDoor.contains(p.l) || 
-    			Locations.fightArenaOutsideNorthJailDoor.contains(p.l))
+    	if(Locations.fightArenaOutsideLeftJailDoor.contains(Players.getLocal()) || 
+    			Locations.fightArenaOutsideNorthJailDoor.contains(Players.getLocal()))
     	{
     		GameObject door = GameObjects.closest(g -> 
     				g!= null && 
@@ -599,13 +599,13 @@ public class FightArena extends Leaf {
     						g.getTile().equals(westPrisonDoorTile)));
     		if(door == null)
     		{
-    			MethodProvider.log("Outside fight arena prison doors and door is null!");
+    			Logger.log("Outside fight arena prison doors and door is null!");
     			return false;
     		}
     		if(door.interact("Open"))
     		{
-    			MethodProvider.sleepUntil(Dialogues::inDialogue,
-						() -> p.l.isMoving(),Sleep.calculate(3333, 2222),66);
+    			Sleep.sleepUntil(Dialogues::inDialogue,
+						() -> Players.getLocal().isMoving(),Sleepz.calculate(3333, 2222),66);
     		}
     	}
     	if(Locations.fightArenaStartArea.getCenter().distance() > 250)
@@ -618,20 +618,20 @@ public class FightArena extends Leaf {
  			return false;
  		}
     	if(!Walkz.isStaminated()) Walkz.drinkStamina();
-    	if(Walking.shouldWalk(6) && Walking.walk(Locations.fightArenaDrunkGuardArea.getCenter())) Sleep.sleep(696, 669);
+    	if(Walking.shouldWalk(6) && Walking.walk(Locations.fightArenaDrunkGuardArea.getCenter())) Sleepz.sleep(696, 669);
     	return false;
     }
     public static boolean inPrisonWalkable()
     {
-    	return Locations.fightArenaLeftWing1.contains(p.l) || 
-    			Locations.fightArenaLeftWing2.contains(p.l) || 
-    			Locations.fightArenaUpperWing1.contains(p.l) || 
-    			Locations.fightArenaUpperWing2.contains(p.l) || 
-    			Locations.fightArenaDrunkGuardArea.contains(p.l);
+    	return Locations.fightArenaLeftWing1.contains(Players.getLocal()) || 
+    			Locations.fightArenaLeftWing2.contains(Players.getLocal()) || 
+    			Locations.fightArenaUpperWing1.contains(Players.getLocal()) || 
+    			Locations.fightArenaUpperWing2.contains(Players.getLocal()) || 
+    			Locations.fightArenaDrunkGuardArea.contains(Players.getLocal());
     }
     public static void talkToBarman()
     {
-    	if(Locations.fightArenaAlcoholicsArea.contains(p.l))
+    	if(Locations.fightArenaAlcoholicsArea.contains(Players.getLocal()))
 		{
     		if(!InvEquip.free1InvySpace()) return;
 			NPC barman = NPCs.closest("Khazard barman");
@@ -642,8 +642,8 @@ public class FightArena extends Leaf {
 			}
 			if(barman.interact("Talk-to"))
 			{
-				MethodProvider.sleepUntil(Dialogues::inDialogue,
-						() -> p.l.isMoving(),Sleep.calculate(2222, 2222),66);
+				Sleep.sleepUntil(Dialogues::inDialogue,
+						() -> Players.getLocal().isMoving(),Sleepz.calculate(2222, 2222),66);
 			}
 			return;
 		}
@@ -658,7 +658,7 @@ public class FightArena extends Leaf {
  		}
 		if(Walking.shouldWalk(6) && Walking.walk(Locations.fightArenaAlcoholicsArea.getCenter()))
 		{
-			Sleep.sleep(696, 420);
+			Sleepz.sleep(696, 420);
 		}
     }
     public static boolean fulfillFightArenaGear()
@@ -686,11 +686,11 @@ public class FightArena extends Leaf {
     	InvEquip.addInvyItem(InvEquip.coins, 5, API.roundToMultiple((int) Calculations.nextGaussianRandom(5000,3000), 100), false, 0);
     	if(InvEquip.fulfillSetup(true, 180000))
 		{
-			MethodProvider.log("[INVEQUIP] -> Fulfilled equipment correctly! (Fight Arena setup)");
+			Logger.log("[INVEQUIP] -> Fulfilled equipment correctly! (Fight Arena setup)");
 			return true;
 		} else 
 		{
-			MethodProvider.log("[INVEQUIP] -> NOT Fulfilled equipment correctly! (Fight Arena setup)");
+			Logger.log("[INVEQUIP] -> NOT Fulfilled equipment correctly! (Fight Arena setup)");
 			return false;
 		}
     	

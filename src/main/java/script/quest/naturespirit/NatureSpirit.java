@@ -1,7 +1,6 @@
 package script.quest.naturespirit;
 
 import org.dreambot.api.methods.Calculations;
-import org.dreambot.api.methods.MethodProvider;
 import org.dreambot.api.methods.container.impl.Inventory;
 import org.dreambot.api.methods.container.impl.equipment.Equipment;
 import org.dreambot.api.methods.container.impl.equipment.EquipmentSlot;
@@ -14,18 +13,16 @@ import org.dreambot.api.methods.settings.PlayerSettings;
 import org.dreambot.api.methods.tabs.Tab;
 import org.dreambot.api.methods.walking.impl.Walking;
 import org.dreambot.api.methods.widget.Widgets;
+import org.dreambot.api.utilities.Logger;
+import org.dreambot.api.utilities.Sleep;
 import org.dreambot.api.wrappers.interactive.GameObject;
 import org.dreambot.api.wrappers.interactive.NPC;
-import org.dreambot.api.wrappers.interactive.Player;
 import org.dreambot.api.wrappers.items.Item;
 import org.dreambot.api.wrappers.widgets.WidgetChild;
 
-import script.p;
 import script.behaviour.DecisionLeaf;
 import script.framework.Leaf;
-import script.framework.Tree;
 import script.quest.restlessghost.RestlessGhost;
-import script.quest.varrockmuseum.Timing;
 import script.skills.ranged.TrainRanged;
 import script.utilities.API;
 import script.utilities.Combatz;
@@ -34,13 +31,10 @@ import script.utilities.InvEquip;
 import script.utilities.Locations;
 import script.utilities.Paths;
 import script.utilities.Questz;
-import script.utilities.Sleep;
+import script.utilities.Sleepz;
 import script.utilities.Tabz;
 import script.utilities.Walkz;
 import script.utilities.id;
-
-import java.util.LinkedHashMap;
-import java.util.List;
 /**
  * Completes Nature Spirit
  * @author Dreambotter420
@@ -59,8 +53,8 @@ public class NatureSpirit extends Leaf {
 	{
 		if(getProgressValue() == 110)
 		{
-			Questz.closeQuestCompletion();
-			if(Locations.natureSpirit_insideGrottoFinished.contains(p.l))
+			Questz.checkCloseQuestCompletion();
+			if(Locations.natureSpirit_insideGrottoFinished.contains(Players.getLocal()))
 			{
 				if(!Walkz.useJewelry(InvEquip.wealth, "Grand Exchange"))
 				{
@@ -85,18 +79,17 @@ public class NatureSpirit extends Leaf {
 	}
     @Override
     public int onLoop() {
-    	Player loc = p.l;
         if (DecisionLeaf.taskTimer.finished()) {
-            MethodProvider.log("[TIMEOUT] -> Nature Spirit");
+            Logger.log("[TIMEOUT] -> Nature Spirit");
             API.mode = null;
-            return Timing.sleepLogNormalSleep();
+            return Sleepz.sleepTiming();
         }
         final int bestDart = TrainRanged.getBestDart();
         if(completed())
         {
-        	MethodProvider.log("[COMPLETED] -> Nature Spirit!");
+        	Logger.log("[COMPLETED] -> Nature Spirit!");
             API.mode = null;
-            return Timing.sleepLogNormalSleep();
+            return Sleepz.sleepTiming();
         }
         if(Inventory.isFull())
         {
@@ -111,10 +104,10 @@ public class NatureSpirit extends Leaf {
                 		i.getID() == id.applePie1_2 || 
         				i.getID() == id.pieDish);
         		Inventory.dropAll(filter);
-        		Sleep.sleep(420, 696);
+        		Sleepz.sleep(420, 696);
         	}
         }
-        if(Dialoguez.handleDialogues()) return Sleep.calculate(420, 696);
+        if(Dialoguez.handleDialogues()) return Sleepz.calculate(420, 696);
         switch(getProgressValue())
         {
         case(105):
@@ -184,7 +177,7 @@ public class NatureSpirit extends Leaf {
         }
         case(0):
         {
-            if(!InvEquip.checkedBank()) return Sleep.calculate(420, 696);
+            if(!InvEquip.checkedBank()) return Sleepz.calculate(420, 696);
         	if(!RestlessGhost.getGhostspeakAmulet()) break;
         	if(Inventory.contains(bestDart))
         	{
@@ -208,12 +201,11 @@ public class NatureSpirit extends Leaf {
         }
         default:break;
         }
-        return Sleep.calculate(420,696);
+        return Sleepz.calculate(420,696);
     }
     public static void walkTalkGrotto()
     {
-    	Player loc = p.l;
-    	if(Locations.natureSpirit_insideGrotto.contains(loc))
+    	if(Locations.natureSpirit_insideGrotto.contains(Players.getLocal()))
     	{
     		API.interactWithGameObject("Grotto", "Search");
     		return;
@@ -222,8 +214,7 @@ public class NatureSpirit extends Leaf {
     }
     public static void walkTalkNatureSpirit()
     {
-    	Player loc = p.l;
-    	if(Locations.natureSpirit_insideGrotto.contains(loc))
+    	if(Locations.natureSpirit_insideGrotto.contains(Players.getLocal()))
     	{
     		NPC spirit = NPCs.closest("Nature Spirit");
     		if(spirit != null)	API.talkToNPC("Nature Spirit");
@@ -243,10 +234,9 @@ public class NatureSpirit extends Leaf {
     }
     public static void walkToNatureSpirit()
     {
-    	Player loc = p.l;
-		if(Locations.natureSpiritGrotto.contains(loc))
+		if(Locations.natureSpiritGrotto.contains(Players.getLocal()))
 		{
-			API.interactWithGameObject("Grotto", "Enter", () -> Locations.natureSpirit_insideGrotto.contains(loc));
+			API.interactWithGameObject("Grotto", "Enter", () -> Locations.natureSpirit_insideGrotto.contains(Players.getLocal()));
 			return;
 		}
 		walkToGrotto();
@@ -254,41 +244,40 @@ public class NatureSpirit extends Leaf {
     }
     public static boolean leaveUndergroundPass()
     {
-    	if(Locations.PiP_undergroundPass.contains(p.l))
+    	if(Locations.PiP_undergroundPass.contains(Players.getLocal()))
     	{
     		if(Inventory.contains(id.salveGraveyardTab))
     		{
     			Walkz.teleport(id.salveGraveyardTab, Locations.salveGraveyard, 30000);
     		}
-    		else API.interactWithGameObject("Holy barrier", "Pass-through", () -> !Locations.PiP_undergroundPass.contains(p.l));
+    		else API.interactWithGameObject("Holy barrier", "Pass-through", () -> !Locations.PiP_undergroundPass.contains(Players.getLocal()));
     	}
-    	return !Locations.PiP_undergroundPass.contains(p.l);
+    	return !Locations.PiP_undergroundPass.contains(Players.getLocal());
     }
     public static void walkToGrotto()
     {
-    	Player loc = p.l;
     	if(!leaveUndergroundPass()) return;
-    	if(Locations.entireMorytania.contains(loc))
+    	if(Locations.entireMorytania.contains(Players.getLocal()))
     	{
-    		if(Locations.natureSpiritGrottoBridgeSouth.contains(loc))
+    		if(Locations.natureSpiritGrottoBridgeSouth.contains(Players.getLocal()))
     		{
-    			API.interactWithGameObject("Bridge", "Jump", () -> Locations.natureSpiritGrotto.contains(loc));
+    			API.interactWithGameObject("Bridge", "Jump", () -> Locations.natureSpiritGrotto.contains(Players.getLocal()));
     			return;
     		}
-        	WidgetChild enterSwampButton = Widgets.getWidgetChild(580, 17);
+        	WidgetChild enterSwampButton = Widgets.get(580, 17);
     		if(enterSwampButton != null && enterSwampButton.isVisible())
     		{
     			if(enterSwampButton.interact("Yes"))
     			{
-    				MethodProvider.sleepUntil(() -> Locations.morytaniaSwampGateSouth.contains(loc), Sleep.calculate(4444, 4444));
+    				Sleep.sleepUntil(() -> Locations.morytaniaSwampGateSouth.contains(Players.getLocal()), Sleepz.calculate(4444, 4444));
     			}
     			return;
     		}
-    		if(Locations.morytaniaSwampGateNorth.contains(loc) || 
-    				Locations.salveGraveyard.contains(loc))
+    		if(Locations.morytaniaSwampGateNorth.contains(Players.getLocal()) || 
+    				Locations.salveGraveyard.contains(Players.getLocal()))
     		{
-    			MethodProvider.log("Clicking gate");
-    			API.interactWithGameObject("Gate", "Open",() -> Widgets.getWidgetChild(580, 17) != null && Widgets.getWidgetChild(580, 17).isVisible());
+    			Logger.log("Clicking gate");
+    			API.interactWithGameObject("Gate", "Open",() -> Widgets.get(580, 17) != null && Widgets.get(580, 17).isVisible());
     			return;
     		}
     		Walkz.walkPath(Paths.drezelToNatureGrotto);
@@ -298,44 +287,42 @@ public class NatureSpirit extends Leaf {
     	{
     		if(Walkz.teleport(id.salveGraveyardTab, Locations.salveGraveyard, 30000))
     		{
-    			MethodProvider.log("Teleported to salve graveyard to get into morytania!");
+    			Logger.log("Teleported to salve graveyard to get into morytania!");
     		}
     	}
     }
     public static void walkTalkToDrezel()
     {
-    	Player loc = p.l;
-    	if(Locations.PiP_undergroundPass.contains(loc)) //whole underground area
+    	if(Locations.PiP_undergroundPass.contains(Players.getLocal())) //whole underground area
     	{
-    		if(Locations.PiP_undergroundPassDrezel.contains(loc))
+    		if(Locations.PiP_undergroundPassDrezel.contains(Players.getLocal()))
     		{
     			API.talkToNPC("Drezel");
     			return;
     		}
-    		if(Walking.shouldWalk(6) && Walking.walk(Locations.PiP_undergroundPassDrezel.getCenter())) Sleep.sleep(696, 666);
+    		if(Walking.shouldWalk(6) && Walking.walk(Locations.PiP_undergroundPassDrezel.getCenter())) Sleepz.sleep(696, 666);
     		return;
     	}
-    	if(Locations.natureSpirit_trapdoor.contains(loc))
+    	if(Locations.natureSpirit_trapdoor.contains(Players.getLocal()))
     	{
     		Filter<GameObject> filter = g -> g!=null && g.getName().contains("Trapdoor") && g.hasAction("Climb-down");
     		API.walkInteractWithGameObject("Trapdoor", "Open", Locations.natureSpirit_trapdoor, () -> GameObjects.closest(filter) != null);
-        	Sleep.sleep(696, 666);
-        	API.walkInteractWithGameObject("Trapdoor", "Climb-down", Locations.natureSpirit_trapdoor, () -> Locations.PiP_undergroundPass.contains(loc));
-        	Sleep.sleep(696, 666);
+        	Sleepz.sleep(696, 666);
+        	API.walkInteractWithGameObject("Trapdoor", "Climb-down", Locations.natureSpirit_trapdoor, () -> Locations.PiP_undergroundPass.contains(Players.getLocal()));
+        	Sleepz.sleep(696, 666);
         	return;
     	}
     	if(Locations.natureSpirit_trapdoor.getCenter().distance() < 50)
     	{
-    		if(Walking.shouldWalk(6) && Walking.walk(Locations.natureSpirit_trapdoor.getCenter())) Sleep.sleep(696, 666);
+    		if(Walking.shouldWalk(6) && Walking.walk(Locations.natureSpirit_trapdoor.getCenter())) Sleepz.sleep(696, 666);
     		return;
     	}
-    	if(Walkz.teleport(id.salveGraveyardTab, Locations.salveGraveyard, 180000)) Sleep.sleep(696, 666);
+    	if(Walkz.teleport(id.salveGraveyardTab, Locations.salveGraveyard, 180000)) Sleepz.sleep(696, 666);
     	
     }
     public static void fillimansDiary()
     {
-    	Player loc = p.l;
-    	if(!Locations.natureSpiritGrotto.contains(loc)) 
+    	if(!Locations.natureSpiritGrotto.contains(Players.getLocal())) 
     	{
     		goTalkToFilliman();
     		return;
@@ -349,9 +336,9 @@ public class NatureSpirit extends Leaf {
 			{
 				if(Inventory.get(id.natureSpirit_fillimansDiary).useOn(filliman))
 				{
-					MethodProvider.sleepUntil(() -> Dialogues.inDialogue(),
-							() -> p.l.isMoving(),
-							Sleep.calculate(3333,3333),69);
+					Sleep.sleepUntil(() -> Dialogues.inDialogue(),
+							() -> Players.getLocal().isMoving(),
+							Sleepz.calculate(3333,3333),69);
 				}
 				return;
 			}
@@ -362,8 +349,7 @@ public class NatureSpirit extends Leaf {
     }
     public static void solvePuzzle()
     {
-    	Player loc = p.l;
-    	if(Locations.natureSpiritGrotto.contains(loc))
+    	if(Locations.natureSpiritGrotto.contains(Players.getLocal()))
 		{
 			//solve puzzle part
 			if(placedFungus || !Inventory.contains(id.mortFungus))
@@ -383,15 +369,15 @@ public class NatureSpirit extends Leaf {
 	    					n.hasAction("Talk-to"));
 	    			if(filliman != null)
 	    			{
-	    				if(Locations.natureSpirit_finalPuzzleTile.contains(loc))
+	    				if(Locations.natureSpirit_finalPuzzleTile.contains(Players.getLocal()))
 	    				{
 	    					if(filliman.interact("Talk-to")) 
 		    				{
-		    					MethodProvider.sleepUntil(() -> Dialogues.inDialogue(), Sleep.calculate(4444, 4444));
+		    					Sleep.sleepUntil(() -> Dialogues.inDialogue(), Sleepz.calculate(4444, 4444));
 		    				}
 	    					return;
 	    				}
-	    				if(Walking.shouldWalk(6) && Walking.walk(Locations.natureSpirit_finalPuzzleTile.getCenter())) Sleep.sleep(696, 666);
+	    				if(Walking.shouldWalk(6) && Walking.walk(Locations.natureSpirit_finalPuzzleTile.getCenter())) Sleepz.sleep(696, 666);
 	    				return;
 	    			}
 	    			API.interactWithGameObject("Grotto", "Enter");
@@ -399,12 +385,12 @@ public class NatureSpirit extends Leaf {
 				}
 				if(Inventory.get(id.natureSpirit_usedSpell).useOn(GameObjects.closest(g->g!=null && 
 						g.getName().equals("Stone") && 
-						g.getID() == eastStone))) MethodProvider.sleepUntil(() -> placedScroll,Sleep.calculate(4444,4444));
+						g.getID() == eastStone))) Sleep.sleepUntil(() -> placedScroll,Sleepz.calculate(4444,4444));
 				return;
 			}
 			if(Inventory.get(id.mortFungus).useOn(GameObjects.closest(g->g!=null && 
 					g.getName().equals("Stone") && 
-					g.getID() == westStone))) MethodProvider.sleepUntil(() -> placedFungus,Sleep.calculate(4444,4444));
+					g.getID() == westStone))) Sleep.sleepUntil(() -> placedFungus,Sleepz.calculate(4444,4444));
 			return;
 		}
     	walkToGrotto();
@@ -412,8 +398,8 @@ public class NatureSpirit extends Leaf {
     
     public static void takeBowlMirror()
     {
-    	Player loc = p.l;
-    	if(!Locations.natureSpiritGrotto.contains(loc)) 
+    	
+    	if(!Locations.natureSpiritGrotto.contains(Players.getLocal())) 
     	{
     		goTalkToFilliman();
     		return;
@@ -428,9 +414,9 @@ public class NatureSpirit extends Leaf {
 			{
 				if(Inventory.get(id.natureSpirit_mirror).useOn(filliman))
 				{
-					MethodProvider.sleepUntil(() -> Dialogues.inDialogue(),
-							() -> p.l.isMoving(),
-							Sleep.calculate(3333,3333),69);
+					Sleep.sleepUntil(() -> Dialogues.inDialogue(),
+							() -> Players.getLocal().isMoving(),
+							Sleepz.calculate(3333,3333),69);
 				}
 				return;
 			}
@@ -458,16 +444,16 @@ public class NatureSpirit extends Leaf {
     }
     public static void killGhasts()
     {
-    	Player loc = p.l;
     	
-    	if(Locations.entireMorytania.contains(loc))
+    	
+    	if(Locations.entireMorytania.contains(Players.getLocal()))
     	{
     		//1. check combat
-    		if(loc.isInCombat())
+    		if(Players.getLocal().isInCombat())
     		{
     			if(Combatz.shouldEatFood(10)) Combatz.eatFood();
     			if(Combatz.shouldDrinkRangedBoost()) Combatz.drinkRangeBoost();
-    			Sleep.sleep(2222, 2222);
+    			Sleepz.sleep(2222, 2222);
     			return;
     		}
     		//2. check for ghasts
@@ -477,7 +463,7 @@ public class NatureSpirit extends Leaf {
     		if(visibleGhast != null)
     		{
     			if(visibleGhast.interact("Attack")) {
-        			MethodProvider.sleepUntil(() -> loc.isInCombat(), Sleep.calculate(3333, 3333));
+        			Sleep.sleepUntil(() -> Players.getLocal().isInCombat(), Sleepz.calculate(3333, 3333));
         		}
     			return;
     		}
@@ -491,11 +477,11 @@ public class NatureSpirit extends Leaf {
     			{
     				if(Inventory.get(id.druidPouchFilled).useOn(ghast))
     				{
-    					MethodProvider.sleepUntil(() -> loc.isInCombat(), Sleep.calculate(4444, 3434));
+    					Sleep.sleepUntil(() -> Players.getLocal().isInCombat(), Sleepz.calculate(4444, 3434));
     				}
     				return;
     			}
-    			MethodProvider.log("Invisible ghast null to put pouch on!");
+    			Logger.log("Invisible ghast null to put pouch on!");
     			return;
     		}
     		//4. check for at least 3 fungi to fill pouch
@@ -505,7 +491,7 @@ public class NatureSpirit extends Leaf {
     			{
     				if(Inventory.interact(id.druidPouch, "Fill"))
     				{
-    					MethodProvider.sleepUntil(() -> Inventory.contains(id.druidPouchFilled),Sleep.calculate(3333, 3333));
+    					Sleep.sleepUntil(() -> Inventory.contains(id.druidPouchFilled),Sleepz.calculate(3333, 3333));
     				}
     			}
     			return;
@@ -519,24 +505,24 @@ public class NatureSpirit extends Leaf {
 			{
 				if(fungiLog.interact("Pick"))
 				{
-					MethodProvider.log("Picking fungus!");
-					MethodProvider.sleepUntil(() -> Inventory.contains(id.mortFungus), Sleep.calculate(3333,3333));
+					Logger.log("Picking fungus!");
+					Sleep.sleepUntil(() -> Inventory.contains(id.mortFungus), Sleepz.calculate(3333,3333));
 				}
 				return;
 			}
 			
     		//6. check for location of log casting and prayer, if so, cast spell
-			if(Locations.natureSpirit_logSpellTile.contains(p.l))
+			if(Locations.natureSpirit_logSpellTile.contains(Players.getLocal()))
     		{
     			if(Tabz.open(Tab.INVENTORY))
     			{
     				if(Combatz.shouldDrinkPrayPot()) Combatz.drinkPrayPot();
     				if(Inventory.interact(id.blessedSickle, "Cast bloom"))
     				{
-    					MethodProvider.sleepUntil(() -> p.l.isAnimating(), Sleep.calculate(3333,3333));
-    					MethodProvider.sleepUntil(() -> !p.l.isAnimating(),
-    							() -> p.l.isAnimating(),
-    							Sleep.calculate(3333,3333),69);
+    					Sleep.sleepUntil(() -> Players.getLocal().isAnimating(), Sleepz.calculate(3333,3333));
+    					Sleep.sleepUntil(() -> !Players.getLocal().isAnimating(),
+    							() -> Players.getLocal().isAnimating(),
+    							Sleepz.calculate(3333,3333),69);
     					return;
     				}
     			}
@@ -548,10 +534,10 @@ public class NatureSpirit extends Leaf {
     }
     public static void walkToFungusSpot()
     {
-    	Player loc = p.l;
-    	if(Locations.natureSpiritGrotto.contains(loc))
+    	
+    	if(Locations.natureSpiritGrotto.contains(Players.getLocal()))
 		{
-			API.interactWithGameObject("Bridge", "Jump", () -> Locations.natureSpiritGrottoBridgeSouth.contains(loc));
+			API.interactWithGameObject("Bridge", "Jump", () -> Locations.natureSpiritGrottoBridgeSouth.contains(Players.getLocal()));
 			return;
 		}
     	
@@ -559,42 +545,42 @@ public class NatureSpirit extends Leaf {
 		{
 			if(Locations.natureSpirit_logSpellTile.getCenter().distance() < 6)
 			{
-				if(Walking.shouldWalk(6) && Walking.walkExact(Locations.natureSpirit_logSpellTile.getCenter())) Sleep.sleep(696, 420);
+				if(Walking.shouldWalk(6) && Walking.walkExact(Locations.natureSpirit_logSpellTile.getCenter())) Sleepz.sleep(696, 420);
 				return;
 			}
-			if(Walking.shouldWalk(6) && Walking.walk(Locations.natureSpirit_logSpellTile.getCenter())) Sleep.sleep(696, 420);
+			if(Walking.shouldWalk(6) && Walking.walk(Locations.natureSpirit_logSpellTile.getCenter())) Sleepz.sleep(696, 420);
 			return;
 		}
-    	if(Locations.natureSpirit_insideGrotto.contains(loc))
+    	if(Locations.natureSpirit_insideGrotto.contains(Players.getLocal()))
     	{
-    		API.interactWithGameObject("Grotto", "Exit", () -> Locations.natureSpiritGrotto.contains(loc));
+    		API.interactWithGameObject("Grotto", "Exit", () -> Locations.natureSpiritGrotto.contains(Players.getLocal()));
     		return;
     	}
-    	if(Locations.PiP_undergroundPass.contains(loc))
+    	if(Locations.PiP_undergroundPass.contains(Players.getLocal()))
     	{
     		if(Inventory.contains(id.salveGraveyardTab))
     		{
     			Walkz.teleport(id.salveGraveyardTab, Locations.salveGraveyard, 30000);
     			return;
     		}
-    		API.interactWithGameObject("Holy barrier", "Pass-through", () -> !Locations.PiP_undergroundPass.contains(loc));
+    		API.interactWithGameObject("Holy barrier", "Pass-through", () -> !Locations.PiP_undergroundPass.contains(Players.getLocal()));
     		return;
     	}
-    	WidgetChild enterSwampButton = Widgets.getWidgetChild(580, 17);
+    	WidgetChild enterSwampButton = Widgets.get(580, 17);
 		if(enterSwampButton != null && enterSwampButton.isVisible())
 		{
 			if(enterSwampButton.interact("Yes"))
 			{
-				MethodProvider.sleepUntil(() -> Locations.morytaniaSwampGateSouth.contains(loc), Sleep.calculate(4444, 4444));
+				Sleep.sleepUntil(() -> Locations.morytaniaSwampGateSouth.contains(Players.getLocal()), Sleepz.calculate(4444, 4444));
 			}
 			return;
 		}
     	
-    	if(Locations.morytaniaSwampGateNorth.contains(loc) || 
-				Locations.salveGraveyard.contains(loc))
+    	if(Locations.morytaniaSwampGateNorth.contains(Players.getLocal()) || 
+				Locations.salveGraveyard.contains(Players.getLocal()))
 		{
-			MethodProvider.log("Clicking gate");
-			API.interactWithGameObject("Gate", "Open",() -> Widgets.getWidgetChild(580, 17) != null && Widgets.getWidgetChild(580, 17).isVisible());
+			Logger.log("Clicking gate");
+			API.interactWithGameObject("Gate", "Open",() -> Widgets.get(580, 17) != null && Widgets.get(580, 17).isVisible());
 			return;
 		}
     	
@@ -603,8 +589,7 @@ public class NatureSpirit extends Leaf {
     }
     public static void harvestFirstFungus()
     {
-    	Player loc = p.l;
-    	if(Locations.natureSpirit_logSpellTile.contains(p.l))
+    	if(Locations.natureSpirit_logSpellTile.contains(Players.getLocal()))
 		{
 			GameObject fungiLog = GameObjects.closest(g -> g!=null && 
 					g.getName().equals("Fungi on log") && 
@@ -613,8 +598,8 @@ public class NatureSpirit extends Leaf {
 			{
 				if(fungiLog.interact("Pick"))
 				{
-					MethodProvider.log("Picking fungus!");
-					MethodProvider.sleepUntil(() -> Inventory.contains(id.mortFungus), Sleep.calculate(3333,3333));
+					Logger.log("Picking fungus!");
+					Sleep.sleepUntil(() -> Inventory.contains(id.mortFungus), Sleepz.calculate(3333,3333));
 				}
 				return;
 			}
@@ -622,10 +607,10 @@ public class NatureSpirit extends Leaf {
 			{
 				if(Inventory.interact(id.natureSpirit_spell, "Cast"))
 				{
-					MethodProvider.sleepUntil(() -> p.l.isAnimating(), Sleep.calculate(3333,3333));
-					MethodProvider.sleepUntil(() -> !p.l.isAnimating(),
-							() -> p.l.isAnimating(),
-							Sleep.calculate(3333,3333),69);
+					Sleep.sleepUntil(() -> Players.getLocal().isAnimating(), Sleepz.calculate(3333,3333));
+					Sleep.sleepUntil(() -> !Players.getLocal().isAnimating(),
+							() -> Players.getLocal().isAnimating(),
+							Sleepz.calculate(3333,3333),69);
 					return;
 				}
 			}
@@ -636,8 +621,7 @@ public class NatureSpirit extends Leaf {
     
     public static void goTalkToFilliman()
     {
-    	Player loc = p.l;
-    	if(Locations.natureSpiritGrotto.contains(loc))
+    	if(Locations.natureSpiritGrotto.contains(Players.getLocal()))
 		{
 			if(!Equipment.contains(RestlessGhost.ghostspeakAmulet))
 			{
@@ -654,9 +638,9 @@ public class NatureSpirit extends Leaf {
 			{
 				if(filliman.interact("Talk-to"))
 				{
-					MethodProvider.sleepUntil(() -> Dialogues.inDialogue(),
-							() -> p.l.isMoving(),
-							Sleep.calculate(3333,3333),69);
+					Sleep.sleepUntil(() -> Dialogues.inDialogue(),
+							() -> Players.getLocal().isMoving(),
+							Sleepz.calculate(3333,3333),69);
 				}
 				return;
 			}
@@ -684,8 +668,8 @@ public class NatureSpirit extends Leaf {
 		InvEquip.shuffleFulfillOrder();
 		if(InvEquip.fulfillSetup(true, 240000))
 		{
-			MethodProvider.log("[NATURE SPIRIT] -> Fulfilled step 0 correctly!");
-		} else MethodProvider.log("[NATURE SPIRIT] -> NOT Fulfilled step 0 correctly! :-(");
+			Logger.log("[NATURE SPIRIT] -> Fulfilled step 0 correctly!");
+		} else Logger.log("[NATURE SPIRIT] -> NOT Fulfilled step 0 correctly! :-(");
 	}
 	public static int getProgressValue()
     {
